@@ -1,0 +1,55 @@
+Agent_Task_Reassignment_On_Success as "Notify Agent Task Reassignment"
+{
+    type = form
+    form = Agent_Tasks[Task_Status != "Completed"]
+    record event = on edit
+    description = "Notifies a newly selected agent and records a controlled pre-completion reassignment."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                assignmentHistory = Audit_Log[Entity_Type == "Agent_Tasks" && Entity_Record_ID == input.ID.toString() && (Action == "Agent Task Assigned" || Action == "Agent Task Reassigned")] sort by Event_Time desc range from 0 to 0;
+                if(assignmentHistory.count() > 0 && assignmentHistory.After_Value != input.Assigned_Agent.toString())
+                {
+                    priorAgent = Employees[ID == assignmentHistory.After_Value.toLong()];
+                    newAgent = Employees[ID == input.Assigned_Agent];
+                    if(newAgent.count() > 0)
+                    {
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : newAgent.Work_Email
+                            subject : input.Task_Type + " task reassigned to you"
+                            message : "Task " + input.Task_Number.toString() + " for shipment " + input.Shipment.toString() + " has been reassigned to you. Scheduled time: " + input.Scheduled_At.toString() + "."
+                        )
+                        newAgent.Availability_Status = "Assigned";
+                    }
+                    if(priorAgent.count() > 0)
+                    {
+                        priorOpenTasks = Agent_Tasks[Assigned_Agent == priorAgent.ID && ID != input.ID && Task_Status != "Completed" && Task_Status != "Failed"];
+                        if(priorOpenTasks.count() == 0)
+                        {
+                            priorAgent.Availability_Status = "Available";
+                        }
+                    }
+                    auditID = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        User_Email = zoho.loginuserid
+                        User_Profile = "Agent Task Reassignment"
+                        Entity_Type = "Agent_Tasks"
+                        Entity_Record_ID = input.ID.toString()
+                        Action = "Agent Task Reassigned"
+                        Before_Value = assignmentHistory.After_Value
+                        After_Value = input.Assigned_Agent.toString()
+                        Details = "Task reassigned before completion at hub " + input.Hub.toString() + "."
+                        Severity = "Info"
+                    ];
+                }
+            )
+        }
+    }
+}

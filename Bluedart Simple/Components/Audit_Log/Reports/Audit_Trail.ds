@@ -1,0 +1,40 @@
+default list Audit_Trail
+{
+    displayName = "Audit Trail"
+    show all rows from Audit_Log
+    (
+        Log_ID
+        Event_Time
+        User_Email
+        User_Profile
+        Entity_Type
+        Entity_Record_ID
+        Action
+        Before_Value
+        After_Value
+        Details
+        Severity
+    )
+    filters
+    (
+        Entity_Type
+        Action
+        User_Email
+        Severity
+        Event_Time
+        "Critical Events" : (Severity == "Critical")
+        "Warnings and Critical" : (Severity == "Warning" || Severity == "Critical")
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Entity_Type ascending
+    )
+    sort by
+    (
+        Event_Time descending
+    )
+}

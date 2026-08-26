@@ -1,0 +1,181 @@
+"Logistics_Admin"
+{
+    name = "Logistics_Admin"
+    type = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+    description = "Full logistics, KYC, pricing, loyalty, audit, and dashboard administration"
+    ModulePermissions
+    {
+        Hubs
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Hubs={"View","Edit","Delete"}
+                Hub_Map={"View","Edit","Delete"}
+            }
+        }
+        Employees
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Employees={"View","Edit","Delete"}
+                Active_Agents={"View","Edit","Delete"}
+            }
+        }
+        KYC_Document_Rules
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                KYC_Document_Rule_List={"View","Edit","Delete"}
+            }
+        }
+        Customers
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Customers={"View","Edit","Delete"}
+                Customer_Onboarding_Board={"View","Edit","Delete"}
+                Customer_Map={"View","Edit","Delete"}
+            }
+        }
+        KYC_Document_Requests
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                KYC_Review_Queue={"View","Edit","Delete"}
+                KYC_Verification_Board={"View","Edit","Delete"}
+                My_KYC_Documents={"View","Edit","Delete"}
+            }
+        }
+        Transport_Rates
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Active_Transport_Rates={"View","Edit","Delete"}
+                Rate_Matrix={"View","Edit","Delete"}
+            }
+        }
+        Loyalty_Programs
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Loyalty_Program_Matrix={"View","Edit","Delete"}
+            }
+        }
+        Shipment_Requests
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Shipments={"View","Edit","Delete"}
+                Shipment_Status_Board={"View","Edit","Delete"}
+                My_Shipments={"View","Edit","Delete"}
+                Shipment_Timeline={"View","Edit","Delete"}
+            }
+        }
+        Manifests
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Manifests={"View","Edit","Delete"}
+                Manifest_Board={"View","Edit","Delete"}
+                My_Assigned_Manifests={"View","Edit","Delete"}
+            }
+        }
+        Manifest_Items
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Manifest_Shipments={"View","Edit","Delete"}
+                Shipment_Journey_Legs={"View","Edit","Delete"}
+            }
+        }
+        Agent_Tasks
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Agent_Task_Board={"View","Edit","Delete"}
+                My_Agent_Tasks={"View","Edit","Delete"}
+                Agent_Task_Calendar={"View","Edit","Delete"}
+            }
+        }
+        Shipment_Tracking_Events
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Shipment_Tracking_History={"View","Edit","Delete"}
+                Tracking_Timeline={"View","Edit","Delete"}
+                My_Tracking_Events={"View","Edit","Delete"}
+            }
+        }
+        Loyalty_Transactions
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Loyalty_Ledger={"View","Edit"}
+                My_Loyalty_Transactions={"View","Edit"}
+            }
+        }
+        Loyalty_Redemptions
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Redemption_Queue={"View","Edit"}
+                Redemption_Board={"View","Edit"}
+                My_Redemptions={"View","Edit"}
+            }
+        }
+        Audit_Log
+        {
+            enabled = Viewall,Export,Tab,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Audit_Trail={"View"}
+            }
+        }
+        Customer_Dashboard
+        {
+            enabled = tab
+        }
+        Hub_Dashboard
+        {
+            enabled = tab
+        }
+        Agent_Dashboard
+        {
+            enabled = tab
+        }
+        Admin_Dashboard
+        {
+            enabled = tab
+        }
+    }
+}

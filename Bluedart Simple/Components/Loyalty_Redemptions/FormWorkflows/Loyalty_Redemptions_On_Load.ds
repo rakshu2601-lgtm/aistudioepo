@@ -1,0 +1,62 @@
+Loyalty_Redemptions_On_Load as "Prepare Loyalty Redemption Form"
+{
+    type = form
+    form = Loyalty_Redemptions
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                isAdministrator = thisapp.permissions.isUserInProfile("Logistics_Admin");
+                isPortalCustomer = thisapp.portal.isUserInProfile("Customer_Portal");
+                disable Customer_Portal_User;
+                disable Program;
+                disable Amount_Value;
+                disable Redemption_Status;
+                disable Requested_On;
+                disable Reviewed_By;
+                disable Reviewed_On;
+                disable Generated_Transaction;
+                hide Payment_Reference;
+                if(input.Redemption_Type == "Shipment Discount")
+                {
+                    show Shipment;
+                }
+                else
+                {
+                    hide Shipment;
+                }
+                if(isAdministrator == true && input.Redemption_Type == "Cash Value" && input.Redemption_Status == "Approved")
+                {
+                    show Payment_Reference;
+                    enable Payment_Reference;
+                }
+                if(isAdministrator == false)
+                {
+                    disable Review_Notes;
+                }
+                if(isPortalCustomer == true)
+                {
+                    portalCustomer = Customers[Customer_Email == zoho.loginuserid && Active == true];
+                    if(portalCustomer.count() > 0 && input.ID == null)
+                    {
+                        input.Customer = portalCustomer.ID;
+                        input.Customer_Portal_User = portalCustomer.Portal_User;
+                        input.Program = portalCustomer.Current_Loyalty_Program;
+                    }
+                    disable Customer;
+                }
+                if(input.ID != null)
+                {
+                    disable Customer;
+                    disable Redemption_Type;
+                    disable Shipment;
+                    disable Points_Requested;
+                }
+            )
+        }
+    }
+}

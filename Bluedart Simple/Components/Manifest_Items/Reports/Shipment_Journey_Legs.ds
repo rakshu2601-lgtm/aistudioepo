@@ -1,0 +1,39 @@
+list Shipment_Journey_Legs
+{
+    displayName = "Shipment Journey Legs"
+    show all rows from Manifest_Items
+    (
+        Manifest_Item_ID
+        Shipment
+        Leg_Sequence
+        Manifest
+        Assigned_Agent_User
+        Item_Status
+        Loaded_On
+        Unloaded_On
+        Exception_Notes
+    )
+    filters
+    (
+        Shipment
+        Manifest
+        Assigned_Agent_User
+        Item_Status
+        Loaded_On
+        Unloaded_On
+        "Journey Exceptions" : (Item_Status == "Exception")
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Shipment ascending
+    )
+    sort by
+    (
+        Leg_Sequence ascending
+        Manifest_Item_ID ascending
+    )
+}

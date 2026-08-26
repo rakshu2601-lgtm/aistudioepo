@@ -1,0 +1,29 @@
+KYC_Document_Requests_On_Validate as "Validate KYC Document Upload"
+{
+    type = form
+    form = KYC_Document_Requests
+    record event = on add or edit
+    description = "Enforces portal ownership for each KYC request."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                customerRecord = Customers[ID == input.Customer];
+                if(customerRecord.count() > 0 && input.Customer_Portal_User != customerRecord.Portal_User)
+                {
+                    alert "The KYC request owner must match the customer's portal user.";
+                    cancel submit;
+                }
+                isPortalCustomer = thisapp.portal.isUserInProfile("Customer_Portal");
+                if(isPortalCustomer == true && input.Customer_Portal_User != zoho.loginuserid)
+                {
+                    alert "You can update only your own KYC document requests.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

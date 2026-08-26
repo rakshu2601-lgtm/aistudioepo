@@ -1,0 +1,36 @@
+default list All_Hubs
+{
+    displayName = "All Hubs"
+    show all rows from Hubs
+    (
+        Hub_Code
+        Hub_Name
+        Hub_Address
+        Manager_User
+        Contact_Phone
+        (
+            displayformat = formattednumber
+            linktodial = enable
+        )
+        Contact_Email
+        Operating_Hours
+        Status
+    )
+    filters
+    (
+        Status
+        "Active Hubs" : (Status == "Active")
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Status ascending
+    )
+    sort by
+    (
+        Hub_Name ascending
+    )
+}

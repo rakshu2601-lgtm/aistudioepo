@@ -1,0 +1,189 @@
+"Hub_Agent"
+{
+    name = "Hub_Agent"
+    type = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false }
+    description = "Assigned pickup, delivery, and manifest execution"
+    ModulePermissions
+    {
+        Hubs
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Hub_ID{visibility:true,readonly:true}
+                Hub_Code{visibility:true,readonly:true}
+                Hub_Name{visibility:true,readonly:true}
+                Status{visibility:true,readonly:true}
+                Hub_Address{visibility:true,readonly:true}
+                Manager_User{visibility:false}
+                Contact_Phone{visibility:true,readonly:true}
+                Contact_Email{visibility:true,readonly:true}
+                Operating_Hours{visibility:true,readonly:true}
+                Service_Area_Notes{visibility:true,readonly:true}
+            }
+        }
+        Employees
+        {
+            enabled = View,Edit,Search
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Employee_ID{visibility:true,readonly:true}
+                Employee_Name{visibility:true,readonly:true}
+                Work_Email{visibility:true,readonly:true}
+                Phone{visibility:true,readonly:true}
+                Internal_User{visibility:false}
+                Employee_Type{visibility:true,readonly:true}
+                Hub{visibility:true,readonly:true}
+                Availability_Status{visibility:true,readonly:true}
+                Active{visibility:true,readonly:true}
+            }
+        }
+        Shipment_Requests
+        {
+            enabled = View,Search
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Shipment_Number{visibility:true,readonly:true}
+                Customer{visibility:true,readonly:true}
+                Customer_Portal_User{visibility:false}
+                Requested_By_Type{visibility:true,readonly:true}
+                Requested_By_Employee{visibility:false}
+                Requested_On{visibility:true,readonly:true}
+                Pickup_Contact_Name{visibility:true,readonly:true}
+                Pickup_Phone{visibility:true,readonly:true}
+                Pickup_Address{visibility:true,readonly:true}
+                Delivery_Contact_Name{visibility:true,readonly:true}
+                Delivery_Phone{visibility:true,readonly:true}
+                Delivery_Address{visibility:true,readonly:true}
+                Package_Description{visibility:true,readonly:true}
+                Weight_Kg{visibility:true,readonly:true}
+                Dimensions_Cm{visibility:true,readonly:true}
+                Transport_Mode{visibility:true,readonly:true}
+                Manual_Distance_Km{visibility:false}
+                Origin_Hub{visibility:true,readonly:true}
+                Destination_Hub{visibility:true,readonly:true}
+                Current_Hub{visibility:true,readonly:true}
+                Pickup_Agent{visibility:true,readonly:true}
+                Applied_Rate{visibility:false}
+                Base_Transport_Amount{visibility:false}
+                Fuel_Surcharge{visibility:false}
+                Gross_Amount{visibility:false}
+                Payment_Status{visibility:false}
+                Use_Loyalty{visibility:false}
+                Available_Points{visibility:false}
+                Loyalty_Points_To_Use{visibility:false}
+                Loyalty_Discount{visibility:false}
+                Net_Amount{visibility:false}
+                Shipment_Status{visibility:true,readonly:true}
+                Quoted_On{visibility:true,readonly:true}
+                Confirmed_On{visibility:true,readonly:true}
+                Expected_Delivery{visibility:true,readonly:true}
+                Picked_Up_On{visibility:true,readonly:true}
+                Delivered_On{visibility:true,readonly:true}
+                Latest_Tracking_Text{visibility:true,readonly:true}
+            }
+        }
+        Manifests
+        {
+            enabled = View,Edit,Search
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Manifest_Number{visibility:true,readonly:true}
+                Manifest_Type{visibility:true,readonly:true}
+                Origin_Hub{visibility:true,readonly:true}
+                Destination_Hub{visibility:true,readonly:true}
+                Transport_Mode{visibility:true,readonly:true}
+                Assigned_Agent{visibility:true,readonly:true}
+                Assigned_Agent_User{visibility:false}
+                Vehicle_or_Carrier_Details{visibility:true,readonly:true}
+                Notes{visibility:true,readonly:true}
+                Planned_Departure{visibility:true,readonly:true}
+                Planned_Arrival{visibility:true,readonly:true}
+                Actual_Departure{visibility:true,readonly:true}
+                Actual_Arrival{visibility:true,readonly:true}
+                Manifest_Status{visibility:true,readonly:true}
+            }
+            ReportPermissions
+            {
+                My_Assigned_Manifests={"View","Edit"}
+            }
+        }
+        Manifest_Items
+        {
+            enabled = View,Search
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Manifest_Item_ID{visibility:true,readonly:true}
+                Manifest{visibility:true,readonly:true}
+                Shipment{visibility:true,readonly:true}
+                Leg_Sequence{visibility:true,readonly:true}
+                Assigned_Agent_User{visibility:false}
+                Item_Status{visibility:true,readonly:true}
+                Loaded_On{visibility:true,readonly:true}
+                Unloaded_On{visibility:true,readonly:true}
+                Exception_Notes{visibility:true,readonly:true}
+            }
+        }
+        Agent_Tasks
+        {
+            enabled = View,Edit,Search,Tab
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Task_Number{visibility:true,readonly:true}
+                Task_Type{visibility:true,readonly:true}
+                Shipment{visibility:true,readonly:true}
+                Hub{visibility:true,readonly:true}
+                Assigned_Agent{visibility:true,readonly:true}
+                Agent_User{visibility:false}
+                Scheduled_At{visibility:true,readonly:true}
+                Contact_Name{visibility:true,readonly:true}
+                Contact_Phone{visibility:true,readonly:true}
+                Task_Address{visibility:true,readonly:true}
+                Task_Status{visibility:true,readonly:true}
+                Accepted_On{visibility:true,readonly:true}
+                Started_On{visibility:true,readonly:true}
+                Completed_On{visibility:true,readonly:true}
+                Recipient_Name{visibility:true,readonly:false}
+                Proof_File{visibility:true,readonly:false}
+                Recipient_Signature{visibility:true,readonly:false}
+                Failure_Reason{visibility:true,readonly:false}
+                Agent_Notes{visibility:true,readonly:false}
+            }
+            ReportPermissions
+            {
+                My_Agent_Tasks={"View","Edit"}
+            }
+        }
+        Shipment_Tracking_Events
+        {
+            enabled = View,Search
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Event_ID{visibility:true,readonly:true}
+                Shipment{visibility:true,readonly:true}
+                Customer_Portal_User{visibility:false}
+                Manifest{visibility:true,readonly:true}
+                Agent_Task{visibility:true,readonly:true}
+                Event_Type{visibility:true,readonly:true}
+                Event_Time{visibility:true,readonly:true}
+                Hub{visibility:true,readonly:true}
+                Location_Text{visibility:true,readonly:true}
+                Details{visibility:true,readonly:true}
+                Recorded_By{visibility:false}
+                Customer_Visible{visibility:false}
+            }
+        }
+        Agent_Dashboard
+        {
+            enabled = tab
+        }
+    }
+}

@@ -1,0 +1,62 @@
+Shipment_Tracking_Events_On_Validate as "Validate Append-Only Tracking Event"
+{
+    type = form
+    form = Shipment_Tracking_Events
+    record event = on add or edit
+    description = "Copies shipment ownership and rejects non-admin edits to the append-only operational history."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                shipmentRecord = Shipment_Requests[ID == input.Shipment];
+                if(shipmentRecord.count() == 0)
+                {
+                    alert "Select a valid shipment.";
+                    cancel submit;
+                }
+                input.Customer_Portal_User = shipmentRecord.Customer_Portal_User;
+                if(input.Event_Time == null)
+                {
+                    input.Event_Time = zoho.currenttime;
+                }
+                currentEmployee = Employees[Work_Email == zoho.loginuserid && Active == true];
+                if(input.ID == null && input.Recorded_By == null && currentEmployee.count() > 0)
+                {
+                    input.Recorded_By = currentEmployee.ID;
+                }
+                if(input.Manifest != null)
+                {
+                    manifestRecord = Manifests[ID == input.Manifest];
+                    manifestItem = Manifest_Items[Manifest == input.Manifest && Shipment == input.Shipment];
+                    if(manifestRecord.count() == 0 || manifestItem.count() == 0)
+                    {
+                        alert "The selected manifest leg must contain this shipment.";
+                        cancel submit;
+                    }
+                }
+                if(input.Agent_Task != null)
+                {
+                    taskRecord = Agent_Tasks[ID == input.Agent_Task];
+                    if(taskRecord.count() == 0 || taskRecord.Shipment != input.Shipment)
+                    {
+                        alert "The selected agent task must belong to this shipment.";
+                        cancel submit;
+                    }
+                }
+                isAdministrator = thisapp.permissions.isUserInProfile("Logistics_Admin");
+                persistedEvent = Shipment_Tracking_Events[ID == input.ID];
+                if(input.ID != null && isAdministrator == false)
+                {
+                    if(persistedEvent.Shipment != input.Shipment || persistedEvent.Customer_Portal_User != input.Customer_Portal_User || persistedEvent.Manifest != input.Manifest || persistedEvent.Agent_Task != input.Agent_Task || persistedEvent.Event_Type != input.Event_Type || persistedEvent.Event_Time != input.Event_Time || persistedEvent.Hub != input.Hub || persistedEvent.Location_Text != input.Location_Text || persistedEvent.Details != input.Details || persistedEvent.Recorded_By != input.Recorded_By || persistedEvent.Customer_Visible != input.Customer_Visible)
+                    {
+                        alert "Shipment tracking history is append-only and cannot be edited.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,32 @@
+Redemption_Type_On_User_Input as "Change Redemption Type Fields"
+{
+    type = form
+    form = Loyalty_Redemptions
+    record event = on add or edit
+
+    on user input of Redemption_Type
+    {
+        actions
+        {
+            custom deluge script
+            (
+                isAdministrator = thisapp.permissions.isUserInProfile("Logistics_Admin");
+                if(input.Redemption_Type == "Shipment Discount")
+                {
+                    show Shipment;
+                    hide Payment_Reference;
+                    input.Payment_Reference = "";
+                }
+                else
+                {
+                    hide Shipment;
+                    input.Shipment = null;
+                    if(isAdministrator == true && input.Redemption_Status == "Approved")
+                    {
+                        show Payment_Reference;
+                    }
+                }
+            )
+        }
+    }
+}

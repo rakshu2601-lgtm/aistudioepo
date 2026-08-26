@@ -1,0 +1,34 @@
+Manifest_On_User_Input as "Filter Shipments for Manifest"
+{
+    type = form
+    form = Manifest_Items
+    record event = on add or edit
+    description = "Refreshes eligible shipments and assigned ownership when the selected manifest changes."
+
+    on user input of Manifest
+    {
+        actions
+        {
+            custom deluge script
+            (
+                clear Shipment;
+                input.Shipment = null;
+                input.Leg_Sequence = null;
+                input.Assigned_Agent_User = null;
+                if(input.Manifest != null)
+                {
+                    manifestRecord = Manifests[ID == input.Manifest];
+                    if(manifestRecord.count() > 0)
+                    {
+                        input.Assigned_Agent_User = manifestRecord.Assigned_Agent_User;
+                        eligibleShipments = Shipment_Requests[(Shipment_Status == "Confirmed" && Origin_Hub == manifestRecord.Origin_Hub) || ((Shipment_Status == "Picked Up" || Shipment_Status == "At Hub") && Current_Hub == manifestRecord.Origin_Hub)] sort by Shipment_Number;
+                        if(eligibleShipments.count() > 0)
+                        {
+                            Shipment:ui.add(eligibleShipments.ID.getall());
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

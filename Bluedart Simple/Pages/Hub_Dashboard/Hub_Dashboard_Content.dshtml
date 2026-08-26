@@ -1,0 +1,335 @@
+<%
+loginEmail = zoho.loginuserid;
+isAdmin = thisapp.permissions.isUserInProfile("Logistics_Admin");
+isHubManager = thisapp.permissions.isUserInProfile("Hub_Manager");
+currentEmployee = Employees[(Work_Email == loginEmail || Internal_User == loginEmail) && Active == true];
+hubID = 0;
+hubContextType = "Assigned hub";
+directHubRows = Hubs[Manager_User == loginEmail && Status == "Active"];
+for each directHub in directHubRows
+{
+    if(hubID == 0)
+    {
+        hubID = directHub.ID;
+    }
+}
+if(hubID == 0 && currentEmployee.count() > 0 && currentEmployee.Hub != null)
+{
+    hubID = currentEmployee.Hub.ID;
+}
+if(isAdmin && hubID == 0)
+{
+    defaultHubRows = Hubs[Status == "Active"] sort by Hub_Name asc;
+    for each defaultHub in defaultHubRows
+    {
+        if(hubID == 0)
+        {
+            hubID = defaultHub.ID;
+            hubContextType = "Administrator default hub";
+        }
+    }
+}
+hubRows = Hubs[ID == hubID && Status == "Active"];
+%>
+<style>
+/* zcs-global utility sheet: included once for this page, limited to utilities used below. */
+:root{--zcs-theme-brand-color:var(--zcs_brand_color);--zcs-light-bg-color:var(--zcs_brand_light_color);--zcs-page-bg-color:#f3f3f4;--zcs-primary-text-color:var(--zcs_primary_text_color);--zcs-secondary-text-color:var(--zcs_secondary_text_color);--zcs-teritiary-text-color:var(--zcs_tertiary_text_color);--zcs-white-color:#fff;--zcs-border-color:var(--zcs_tertiary_border_color);font-size:16px;line-height:1.5}
+.zcs-row,.zcs-flex{display:flex}.zcs-row{flex-wrap:wrap}.zcs-inline-flex{display:inline-flex}.zcs-direction-column{flex-direction:column}.zcs-align-items-center{align-items:center}.zcs-align-items-start{align-items:flex-start}.zcs-justify-center{justify-content:center}.zcs-justify-space-between{justify-content:space-between}.zcs-row-wrap{flex-wrap:wrap}.zcs-no-shrink{flex-shrink:0}.zcs-relative{position:relative}.zcs-absolute{position:absolute}.zcs-sticky{position:sticky}.zcs-w-full{width:100%}.zcs-wh-full{width:100%;height:100%}.zcs-box-border{box-sizing:border-box}.zcs-overflow-auto{overflow:auto}.zcs-ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.zcs-text-left{text-align:left}.zcs-text-right{text-align:right}.zcs-text-center{text-align:center}.zcs-no-underline{text-decoration:none}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-secondary{color:var(--zcs-secondary-text-color)}.zcs-color-tertiary{color:var(--zcs-teritiary-text-color)}.zcs-color-theme{color:var(--zcs-theme-brand-color)}.zcs-font-normal{font-weight:400}.zcs-font-medium{font-weight:500}.zcs-font-semibold{font-weight:600}.zcs-font-bold{font-weight:700}.zcs-font-12{font-size:.75rem}.zcs-font-13{font-size:.8125rem}.zcs-font-14{font-size:.875rem}.zcs-font-15{font-size:.9375rem}.zcs-font-16{font-size:1rem}.zcs-font-18{font-size:1.125rem}.zcs-font-20{font-size:1.25rem}.zcs-font-24{font-size:1.5rem}.zcs-font-30{font-size:1.875rem}.zcs-lh-body{line-height:1.5}.zcs-lh-heading{line-height:1.25}.zcs-m-0{margin:0}.zcs-mx-0{margin-left:0;margin-right:0}.zcs-mt-5{margin-top:.3125rem}.zcs-mt-8{margin-top:.5rem}.zcs-mt-10{margin-top:.625rem}.zcs-mb-0{margin-bottom:0}.zcs-mb-8{margin-bottom:.5rem}.zcs-mb-12{margin-bottom:.75rem}.zcs-p-0{padding:0}.zcs-p-2{padding:.125rem}.zcs-p-12{padding:.75rem}.zcs-p-16{padding:1rem}.zcs-p-20{padding:1.25rem}.zcs-p-24{padding:1.5rem}.zcs-px-10{padding-left:.625rem;padding-right:.625rem}.zcs-px-12{padding-left:.75rem;padding-right:.75rem}.zcs-px-16{padding-left:1rem;padding-right:1rem}.zcs-px-60{padding-left:3.75rem;padding-right:3.75rem}.zcs-py-2{padding-top:.125rem;padding-bottom:.125rem}.zcs-py-8{padding-top:.5rem;padding-bottom:.5rem}.zcs-py-10{padding-top:.625rem;padding-bottom:.625rem}.zcs-py-12{padding-top:.75rem;padding-bottom:.75rem}.zcs-gap-6{gap:.375rem}.zcs-gap-8{gap:.5rem}.zcs-gap-10{gap:.625rem}.zcs-gap-12{gap:.75rem}.zcs-gap-16{gap:1rem}.zcs-gap-20{gap:1.25rem}.zcs-gap-24{gap:1.5rem}.zcs-gap-32{gap:2rem}.zcs-rounded-sm{border-radius:.25rem}.zcs-rounded-md{border-radius:.375rem}.zcs-rounded-lg{border-radius:.5rem}.zcs-rounded-xl{border-radius:.75rem}.zcs-rounded-half{border-radius:50%}.zcs-card{background:var(--zcs-white-color);border:1px solid #e1e4ea;border-radius:12px}.zcs-list-none{list-style:none}
+.zcs-col-2{flex:0 0 16.6667%;max-width:16.6667%}.zcs-col-4{flex:0 0 33.3333%;max-width:33.3333%}.zcs-col-5{flex:0 0 41.6667%;max-width:41.6667%}.zcs-col-6{flex:0 0 50%;max-width:50%}.zcs-col-7{flex:0 0 58.3333%;max-width:58.3333%}.zcs-col-10{flex:0 0 83.3333%;max-width:83.3333%}.zcs-col-12{flex:0 0 100%;max-width:100%}
+/* ZCS: layout-dashboard KPI panels */
+.zcs-panel{border:1px solid var(--zcs_tertiary_border_color);box-shadow:0 2px 8px #f2f2f6;background:#fff}.zcs-panel-icon-wrapper{width:40px;height:40px}.zcs-panel-icon{font-size:22px}.zcs-panel-green .zcs-panel-icon-wrapper{background:#e4fcf3;color:#147a56}.zcs-panel-yellow .zcs-panel-icon-wrapper{background:#fcf4e6;color:#8a5a06}.zcs-panel-red .zcs-panel-icon-wrapper{background:#fde3e6;color:#a42135}.zcs-panel-d_blue .zcs-panel-icon-wrapper{background:#eaf2ff;color:#1652bb}.zcs-panel-l_blue .zcs-panel-icon-wrapper{background:#e8efff;color:#2a6ffc}.zcs-panel-orange .zcs-panel-icon-wrapper{background:#fdf5f3;color:#c9580a}
+/* ZCS: filled badges */
+.zcs-badge{width:auto}.zcs-badge-filled-outline{border:1px solid}.zcs-badge-green{background:#e4fcf3;border-color:#147a56;color:#116b4c}.zcs-badge-red{background:#fde3e6;border-color:#b42335;color:#9d1d2d}.zcs-badge-yellow{background:#fcf4e6;border-color:#9a6508;color:#744b04}.zcs-badge-blue{background:#e8efff;border-color:#245fca;color:#174caa}.zcs-badge-grey{background:#eceef1;border-color:#5f6670;color:#3f454d}.zcs-badge-orange{background:#fff0e8;border-color:#b94d0b;color:#8e3906}
+/* ZCS: primary button */
+.zcs-button{width:auto;min-width:5rem;min-height:36px}.zcs-primary-button{background:var(--zcs_brand_color);color:var(--zcs_brand_foreground_color)}.zcs-primary-button:hover{background:var(--zcs_brand_dark_color)}
+/* ZCS: quick actions */
+.zcs-quick-action-item{list-style:none}.zcs-quick-action-item.zcs-card:hover{border-color:var(--zcs_brand_color)}.zcs-quick-action-item:hover .zcs-quick-action-link{color:var(--zcs_brand_color)}
+/* ZCS: simple table */
+.zcs-table-wrapper{border:1px solid var(--zcs_tertiary_border_color);background:#fff;overflow:auto}.zcs-table-wrapper table{line-height:normal;border-collapse:collapse;min-width:680px}.zcs-table-wrapper thead{top:0}.zcs-table-wrapper th{background:#f7f8fb;box-shadow:0 -1px 0 var(--zcs_tertiary_border_color) inset;white-space:nowrap}.zcs-table-wrapper td{border-top:1px solid var(--zcs_tertiary_border_color)}.zcs-table-wrapper tbody tr:first-child td{border-top-color:transparent}.zcs-table-wrapper tbody tr:hover td{background:#f7f8fb}
+/* ZCS: donut chart with text */
+.zcs-legend-wrapper li{list-style:none}.zcs-legend-wrapper li label:before{content:'';display:inline-block;width:12px;height:12px;margin:4px 10px 4px 0;border-radius:50%}.zcs-legend-wrapper li:nth-child(1) label:before{background:#fece56}.zcs-legend-wrapper li:nth-child(2) label:before{background:#36a2eb}.zcs-legend-wrapper li:nth-child(3) label:before{background:#ff6283}.zcs-legend-wrapper li:nth-child(4) label:before{background:#28cc97}.zcs-simple-donut-chart{--donut-cx:80px;--donut-cy:80px;--donut-r:62;--donut-pi:3.14;--donut-stroke:18px}.zcs-simple-donut-chart svg{width:160px;height:160px;overflow:hidden}.zcs-simple-donut-chart circle{cx:var(--donut-cx);cy:var(--donut-cy);r:var(--donut-r);stroke-width:var(--donut-stroke);fill:transparent}.zcs-simple-donut-chart circle:nth-child(1){stroke:#fece56;stroke-dasharray:calc(2 * var(--donut-pi) * var(--donut-r) * var(--donut-a1) / 100) 500;stroke-dashoffset:calc((2 * var(--donut-pi) * var(--donut-r)) / 4)}.zcs-simple-donut-chart circle:nth-child(2){stroke:#36a2eb;stroke-dasharray:calc(2 * var(--donut-pi) * var(--donut-r) * var(--donut-a2) / 100) 500;stroke-dashoffset:calc((2 * var(--donut-pi) * var(--donut-r)) / 4 - 2 * var(--donut-pi) * var(--donut-r) * var(--donut-a1) / 100)}.zcs-simple-donut-chart circle:nth-child(3){stroke:#ff6283;stroke-dasharray:calc(2 * var(--donut-pi) * var(--donut-r) * var(--donut-a3) / 100) 500;stroke-dashoffset:calc((2 * var(--donut-pi) * var(--donut-r)) / 4 - 2 * var(--donut-pi) * var(--donut-r) * (var(--donut-a1) + var(--donut-a2)) / 100)}.zcs-simple-donut-chart circle:nth-child(4){stroke:#28cc97;stroke-dasharray:calc(2 * var(--donut-pi) * var(--donut-r) * var(--donut-a4) / 100) 500;stroke-dashoffset:calc((2 * var(--donut-pi) * var(--donut-r)) / 4 - 2 * var(--donut-pi) * var(--donut-r) * (var(--donut-a1) + var(--donut-a2) + var(--donut-a3)) / 100)}
+/* ZCS: simple timeline */
+.zcs-tl-indicator{width:44px;left:16.6667%}.zcs-tl-dot{width:12px;height:12px;background:var(--zcs_brand_color);border:1px solid #fff;box-shadow:0 2px 6px #c4dee4}.zcs-tl-li:not(:last-child) .zcs-tl-indicator:before{content:'';position:absolute;width:1px;height:calc(100% + 32px);background:#d8dde3;top:5px}
+/* ZCS: outline banner */
+.zcs-outline-toast{border:1px solid}.zcs-info-toast{background:#e4f6fd;border-color:#0875a5;color:#024361}.zcs-warning-toast{background:#fef4e5;border-color:#9a6508;color:#663c01}.zcs-error-toast{background:#feedec;border-color:#b42335;color:#5f2120}
+/* Hub dashboard composition */
+*{box-sizing:border-box}.hd-shell{background:var(--zcs-page-bg-color);min-height:100%;padding:20px;color:var(--zcs-primary-text-color)}.hd-container{max-width:1520px;margin:0 auto}.hd-grid{display:grid;gap:16px}.hd-header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}.hd-title{min-width:0}.hd-address{margin-top:7px;word-break:break-word}.hd-header-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}.hd-kpis{grid-template-columns:repeat(6,minmax(0,1fr));margin-top:16px}.hd-kpi{height:100%;min-height:118px}.hd-two{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:16px}.hd-main{grid-template-columns:minmax(0,2fr) minmax(300px,1fr);margin-top:16px}.hd-section{margin-top:16px}.hd-card-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.hd-card-header a,.hd-link{color:var(--zcs_brand_color);text-decoration:none}.hd-card-header a:hover,.hd-link:hover{text-decoration:underline}.hd-chart-wrap{min-height:255px}.hd-chart-inner{display:flex;align-items:center;justify-content:center;gap:28px;flex-wrap:wrap}.hd-donut-name{inset:0;display:flex;align-items:center;justify-content:center}.hd-agents{grid-template-columns:repeat(3,minmax(0,1fr))}.hd-agent-avatar{width:38px;height:38px;border-radius:50%;background:var(--zcs_brand_color);color:var(--zcs_brand_foreground_color);display:flex;align-items:center;justify-content:center;font-weight:700}.hd-agent-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}.hd-agent-metric{background:#f7f8fb;border:1px solid var(--zcs_tertiary_border_color);border-radius:8px;padding:9px}.hd-agent-metric strong{display:block;font-size:18px}.hd-empty{min-height:130px}.hd-empty i{font-size:28px;color:var(--zcs-teritiary-text-color)}.hd-quick ul{display:grid;gap:10px}.hd-exception{padding:12px 0;border-top:1px solid var(--zcs_tertiary_border_color)}.hd-exception:first-of-type{border-top:0}.hd-exception-title{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.hd-table-status{white-space:nowrap}.hd-nowrap{white-space:nowrap}.hd-muted{color:var(--zcs-teritiary-text-color)}.hd-notfound{max-width:760px;margin:56px auto;text-align:center}.hd-timeline .zcs-tl-content{padding-left:44px}.hd-timeline .zcs-tl-time{font-size:12px}
+@media(max-width:1280px){.hd-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.hd-agents{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:960px){.hd-main,.hd-two{grid-template-columns:1fr}.hd-header{flex-direction:column}.hd-header-actions{justify-content:flex-start}.hd-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.hd-shell{padding:12px}.hd-kpis,.hd-agents{grid-template-columns:1fr}.hd-chart-inner{align-items:flex-start;justify-content:flex-start}.zcs-tl-li{flex-direction:column}.hd-timeline .zcs-tl-indicator{left:0}.hd-timeline .zcs-tl-time{text-align:left;padding-left:44px;margin-bottom:8px}.hd-timeline .zcs-tl-content{padding-left:44px}.hd-header-actions .zcs-button{width:100%}}
+</style>
+<div class='hd-shell'><div class='hd-container'>
+<%
+if(isAdmin == false && isHubManager == false)
+{
+%>
+<div class='zcs-toast zcs-outline-toast zcs-error-toast zcs-w-full zcs-flex zcs-gap-8 zcs-px-16 zcs-py-12 zcs-rounded-sm zcs-box-border' role='alert'>
+    <i class='zc-li-outline ui-1-lock'></i><div><strong>Access unavailable.</strong> This operational dashboard is intended for Hub Manager and Logistics Admin profiles.</div>
+</div>
+<%
+}
+else if(hubRows.count() == 0)
+{
+%>
+<div class='zcs-card zcs-p-24 hd-notfound'>
+    <i class='zc-li-outline location-pin-copy' style='font-size:32px;color:var(--zcs-teritiary-text-color)'></i>
+    <h1 class='zcs-font-24 zcs-font-semibold zcs-color-primary'>No active hub is mapped</h1>
+    <p class='zcs-font-14 zcs-color-secondary'>No active hub could be resolved from Hubs.Manager_User or Employees.Internal_User and Work_Email for <%=loginEmail%>.<%if(isAdmin){%> Add or activate a hub, or map your employee record; administrators use the first active hub as their default context.<%}else{%> Contact a Logistics Admin to map your user to one hub before using operational data.<%}%></p>
+    <%if(isAdmin){%><a class='zcs-button zcs-primary-button zcs-inline-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md zcs-no-underline' href='#Form:Hubs?zc_LoadIn=dialog'><i class='zc-li-outline ui-1-simple-add'></i><span>Create hub</span></a><%}%>
+</div>
+<%
+}
+else
+{
+    hub = hubRows;
+    hubName = hub.Hub_Name;
+    hubCode = hub.Hub_Code;
+    hubAddress = ifnull(hub.Hub_Address.address_line_1,"");
+    if(ifnull(hub.Hub_Address.address_line_2,"") != "")
+    {
+        hubAddress = hubAddress + ", " + hub.Hub_Address.address_line_2;
+    }
+    hubAddress = hubAddress + ", " + ifnull(hub.Hub_Address.district_city,"") + ", " + ifnull(hub.Hub_Address.state_province,"") + " - " + ifnull(hub.Hub_Address.postal_Code,"") + ", " + ifnull(hub.Hub_Address.country,"India");
+    shipmentsAtHub = Shipment_Requests[Current_Hub == hubID && Shipment_Status != "Delivered" && Shipment_Status != "Cancelled"];
+    pickupRows = Agent_Tasks[Hub == hubID && Task_Type == "Pickup" && Task_Status != "Completed" && Task_Status != "Failed"] sort by Scheduled_At asc;
+    deliveryRows = Agent_Tasks[Hub == hubID && Task_Type == "Delivery" && Task_Status != "Completed" && Task_Status != "Failed"] sort by Scheduled_At asc;
+    pickupsDue = Agent_Tasks[Hub == hubID && Task_Type == "Pickup" && Task_Status != "Completed" && Task_Status != "Failed" && Scheduled_At <= zoho.currenttime.addDay(1)];
+    deliveriesDue = Agent_Tasks[Hub == hubID && Task_Type == "Delivery" && Task_Status != "Completed" && Task_Status != "Failed" && Scheduled_At <= zoho.currenttime.addDay(1)];
+    outboundRows = Manifests[Origin_Hub == hubID && Manifest_Status != "Closed" && Manifest_Status != "Cancelled"] sort by Planned_Departure asc;
+    inboundRows = Manifests[Destination_Hub == hubID && Manifest_Status != "Closed" && Manifest_Status != "Cancelled"] sort by Planned_Arrival asc;
+    exceptionRows = Shipment_Tracking_Events[Hub == hubID && Event_Type == "Exception"] sort by Event_Time desc;
+    recentExceptionCount = Shipment_Tracking_Events[Hub == hubID && Event_Type == "Exception" && Event_Time >= zoho.currenttime.subDay(7)].count();
+    agentRows = Employees[Hub == hubID && Employee_Type == "Agent" && Active == true];
+    atHubStatusCount = Shipment_Requests[Current_Hub == hubID && Shipment_Status == "At Hub"].count();
+    inTransitStatusCount = Shipment_Requests[Current_Hub == hubID && Shipment_Status == "In Transit"].count();
+    pickupFlowCount = Shipment_Requests[Current_Hub == hubID && (Shipment_Status == "Confirmed" || Shipment_Status == "Pickup Assigned" || Shipment_Status == "Picked Up")].count();
+    distributionTotal = shipmentsAtHub.count();
+    atHubPct = 0;
+    inTransitPct = 0;
+    pickupPct = 0;
+    remainingPct = 0;
+    if(distributionTotal > 0)
+    {
+        atHubPct = ((atHubStatusCount * 100.0) / distributionTotal).round(1);
+        inTransitPct = ((inTransitStatusCount * 100.0) / distributionTotal).round(1);
+        pickupPct = ((pickupFlowCount * 100.0) / distributionTotal).round(1);
+        remainingPct = 100 - atHubPct - inTransitPct - pickupPct;
+        if(remainingPct < 0)
+        {
+            remainingPct = 0;
+        }
+    }
+    timelineRows = Manifests[(Origin_Hub == hubID || Destination_Hub == hubID) && Manifest_Status != "Closed" && Manifest_Status != "Cancelled"] sort by Planned_Departure asc;
+%>
+<header class='zcs-card zcs-p-24 hd-header'>
+    <div class='hd-title'>
+        <div class='zcs-flex zcs-align-items-center zcs-gap-10 zcs-row-wrap'><h1 class='zcs-font-24 zcs-font-semibold zcs-m-0'><%=hubName%></h1><span class='zcs-badge zcs-badge-filled-outline zcs-badge-blue zcs-inline-flex zcs-rounded-sm zcs-px-10 zcs-py-2 zcs-font-12'><%=hubCode%></span></div>
+        <p class='zcs-font-13 zcs-color-secondary zcs-mt-5 zcs-mb-0'><%=hubContextType%> · Updated <%=zoho.currenttime.toString("dd-MMM-yyyy, hh:mm a")%> IST</p>
+        <p class='hd-address zcs-font-14 zcs-color-secondary zcs-mb-0'><i class='zc-li-outline location-pin-copy'></i> <%=hubAddress%></p>
+    </div>
+    <nav class='hd-header-actions' aria-label='Hub quick actions'>
+        <a class='zcs-button zcs-primary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md zcs-no-underline' href='#Form:Manifests?Origin_Hub=<%=hubID%>&amp;zc_LoadIn=dialog'><i class='zc-li-outline ui-1-simple-add'></i><span>Create manifest</span></a>
+        <a class='zcs-button zcs-primary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md zcs-no-underline' href='#Form:Agent_Tasks?Hub=<%=hubID%>&amp;zc_LoadIn=dialog'><i class='zc-li-outline users-1-add-29'></i><span>Assign agent task</span></a>
+    </nav>
+</header>
+
+<section class='hd-grid hd-kpis' aria-label='Hub operational metrics'>
+<%
+kpiValues = {shipmentsAtHub.count(),pickupsDue.count(),deliveriesDue.count(),outboundRows.count(),inboundRows.count(),recentExceptionCount};
+kpiLabels = {"Shipments at hub","Pickups due in 24 hours","Deliveries due in 24 hours","Outbound manifests","Inbound manifests","Exceptions in 7 days"};
+kpiIcons = {"transport-delivery-fast","ui-2-time","location-pin-copy","arrows-1-tail-right","arrows-1-tail-left","ui-3-alert"};
+kpiClasses = {"zcs-panel-d_blue","zcs-panel-yellow","zcs-panel-green","zcs-panel-l_blue","zcs-panel-orange","zcs-panel-red"};
+for each index kpiIndex in kpiValues
+{
+%>
+    <div class='zcs-panel <%=kpiClasses.get(kpiIndex)%> zcs-flex zcs-direction-column zcs-gap-8 zcs-rounded-lg zcs-p-16 zcs-box-border hd-kpi'>
+        <div class='zcs-flex zcs-align-items-center zcs-gap-10'><span class='zcs-panel-icon-wrapper zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-lg'><i class='zcs-panel-icon zc-li-outline <%=kpiIcons.get(kpiIndex)%>'></i></span><strong class='zcs-font-24'><%=kpiValues.get(kpiIndex).toString("##,##,##0")%></strong></div>
+        <span class='zcs-font-13 zcs-color-tertiary'><%=kpiLabels.get(kpiIndex)%></span>
+    </div>
+<%
+}
+%>
+</section>
+
+<div class='hd-grid hd-two'>
+<section class='zcs-card zcs-p-24 hd-chart-wrap' aria-labelledby='distribution-heading'>
+    <div class='hd-card-header'><h2 id='distribution-heading' class='zcs-font-18 zcs-font-semibold zcs-m-0'>Shipment status distribution</h2><a href='#Report:Shipment_Status_Board'>Open status board</a></div>
+    <%if(distributionTotal > 0){%>
+    <div class='zcs-donut-chart-wrapper hd-chart-inner' style='--donut-a1:<%=atHubPct%>;--donut-a2:<%=inTransitPct%>;--donut-a3:<%=pickupPct%>;--donut-a4:<%=remainingPct%>'>
+        <div class='zcs-donut-chart zcs-simple-donut-chart zcs-flex zcs-align-items-center zcs-justify-center zcs-relative'><svg class='zcs-rounded-half'><circle></circle><circle></circle><circle></circle><circle></circle></svg><div class='hd-donut-name zcs-absolute zcs-text-center'><div><strong class='zcs-font-24'><%=distributionTotal.toString("##,##,##0")%></strong><div class='zcs-font-12 zcs-color-secondary'>open shipments</div></div></div></div>
+        <div class='zcs-legend-wrapper'><ul class='zcs-flex zcs-direction-column zcs-gap-12 zcs-p-0 zcs-m-0'>
+            <li><label class='zcs-font-14'>At Hub: <strong><%=atHubStatusCount%></strong></label></li>
+            <li><label class='zcs-font-14'>In Transit: <strong><%=inTransitStatusCount%></strong></label></li>
+            <li><label class='zcs-font-14'>Pickup flow: <strong><%=pickupFlowCount%></strong></label></li>
+            <li><label class='zcs-font-14'>Delivery and other: <strong><%=distributionTotal - atHubStatusCount - inTransitStatusCount - pickupFlowCount%></strong></label></li>
+        </ul></div>
+    </div>
+    <%}else{%><div class='hd-empty zcs-flex zcs-align-items-center zcs-justify-center zcs-text-center'><div><i class='zc-li-outline transport-delivery-fast'></i><h3 class='zcs-font-16 zcs-font-medium zcs-mt-8 zcs-mb-0'>No open shipments at this hub</h3></div></div><%}%>
+</section>
+<section class='zcs-card zcs-p-24' aria-labelledby='timeline-heading'>
+    <div class='hd-card-header'><h2 id='timeline-heading' class='zcs-font-18 zcs-font-semibold zcs-m-0'>Manifest departures and arrivals</h2><a href='#Report:All_Manifests'>Open manifests</a></div>
+    <%
+    timelineCounter = 0;
+    if(timelineRows.count() > 0)
+    {
+    %><div class='zcs-timeline-wrapper hd-timeline'><ul class='zcs-flex zcs-direction-column zcs-gap-32 zcs-p-0 zcs-m-0'><%
+        for each manifestRow in timelineRows
+        {
+            if(timelineCounter < 6)
+            {
+                movementLabel = "Departure";
+                movementTimeText = "Not scheduled";
+                if(manifestRow.Origin_Hub == hubID)
+                {
+                    if(manifestRow.Actual_Departure != null)
+                    {
+                        movementTimeText = manifestRow.Actual_Departure.toString("dd-MMM-yyyy, hh:mm a") + " IST";
+                    }
+                    else if(manifestRow.Planned_Departure != null)
+                    {
+                        movementTimeText = manifestRow.Planned_Departure.toString("dd-MMM-yyyy, hh:mm a") + " IST";
+                    }
+                }
+                else
+                {
+                    movementLabel = "Arrival";
+                    if(manifestRow.Actual_Arrival != null)
+                    {
+                        movementTimeText = manifestRow.Actual_Arrival.toString("dd-MMM-yyyy, hh:mm a") + " IST";
+                    }
+                    else if(manifestRow.Planned_Arrival != null)
+                    {
+                        movementTimeText = manifestRow.Planned_Arrival.toString("dd-MMM-yyyy, hh:mm a") + " IST";
+                    }
+                }
+    %><li class='zcs-tl-li zcs-row zcs-gap-0 zcs-relative zcs-list-none'><div class='zcs-tl-indicator zcs-flex zcs-justify-center zcs-absolute'><span class='zcs-tl-dot zcs-rounded-half zcs-mt-5 zcs-relative'></span></div><span class='zcs-col-2 zcs-tl-time zcs-color-tertiary zcs-text-right'><%=movementTimeText%></span><div class='zcs-flex zcs-direction-column zcs-col-10 zcs-box-border zcs-tl-content'><div class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-row-wrap'><a class='hd-link zcs-font-14 zcs-font-semibold' href='#Report:All_Manifests?ID=<%=manifestRow.ID%>&amp;zc_LoadIn=dialog'><%=movementLabel%> <%=manifestRow.Manifest_Number%></a><span class='zcs-badge zcs-badge-filled-outline zcs-badge-blue zcs-inline-flex zcs-rounded-sm zcs-px-10 zcs-py-2 zcs-font-12'><%=manifestRow.Manifest_Status%></span></div><span class='zcs-font-12 zcs-color-secondary'><%=manifestRow.Origin_Hub.Hub_Name%> to <%=manifestRow.Destination_Hub.Hub_Name%> · <%=manifestRow.Transport_Mode%></span></div></li><%
+                timelineCounter = timelineCounter + 1;
+            }
+        }
+    %></ul></div><%
+    }
+    else
+    {
+    %><div class='hd-empty zcs-flex zcs-align-items-center zcs-justify-center zcs-text-center'><div><i class='zc-li-outline ui-2-time'></i><h3 class='zcs-font-16 zcs-font-medium zcs-mt-8 zcs-mb-0'>No upcoming manifest movement</h3></div></div><%
+    }
+    %>
+</section>
+</div>
+
+<section class='zcs-card zcs-p-24 hd-section' aria-labelledby='agents-heading'>
+    <div class='hd-card-header'><h2 id='agents-heading' class='zcs-font-18 zcs-font-semibold zcs-m-0'>Agent availability and workload</h2><a href='#Report:Active_Agents'>Open active agents</a></div>
+    <%if(agentRows.count() > 0){%><div class='hd-grid hd-agents'><%
+    agentCounter = 0;
+    for each agent in agentRows
+    {
+        if(agentCounter < 6)
+        {
+            agentName = (ifnull(agent.Employee_Name.first_name,"") + " " + ifnull(agent.Employee_Name.last_name,"")).trim();
+            agentInitial = ifnull(agent.Employee_Name.first_name,"").left(1) + ifnull(agent.Employee_Name.last_name,"").left(1);
+            agentOpenTasks = Agent_Tasks[Assigned_Agent == agent.ID && Task_Status != "Completed" && Task_Status != "Failed"];
+            agentInProgress = Agent_Tasks[Assigned_Agent == agent.ID && Task_Status == "In Progress"].count();
+            availabilityClass = "zcs-badge-green";
+            if(agent.Availability_Status == "Assigned")
+            {
+                availabilityClass = "zcs-badge-blue";
+            }
+            else if(agent.Availability_Status == "Off Duty" || agent.Availability_Status == "Inactive")
+            {
+                availabilityClass = "zcs-badge-grey";
+            }
+    %><article class='zcs-card zcs-flex zcs-direction-column zcs-gap-12 zcs-p-16'><div class='zcs-flex zcs-align-items-center zcs-gap-10'><div class='hd-agent-avatar'><%=agentInitial.toUpperCase()%></div><div style='min-width:0;flex:1'><strong class='zcs-font-14 zcs-ellipsis'><%=agentName%></strong><div class='zcs-font-12 zcs-color-secondary zcs-ellipsis'><%=agent.Work_Email%></div></div><span class='zcs-badge zcs-badge-filled-outline <%=availabilityClass%> zcs-inline-flex zcs-rounded-sm zcs-px-10 zcs-py-2 zcs-font-12'><%=agent.Availability_Status%></span></div><div class='hd-agent-metrics'><div class='hd-agent-metric'><span class='zcs-font-12 zcs-color-secondary'>Open tasks</span><strong><%=agentOpenTasks.count()%></strong></div><div class='hd-agent-metric'><span class='zcs-font-12 zcs-color-secondary'>In progress</span><strong><%=agentInProgress%></strong></div></div></article><%
+            agentCounter = agentCounter + 1;
+        }
+    }
+    %></div><%}else{%><div class='hd-empty zcs-flex zcs-align-items-center zcs-justify-center zcs-text-center'><div><i class='zc-li-outline users-1-single-02'></i><h3 class='zcs-font-16 zcs-font-medium zcs-mt-8 zcs-mb-0'>No active agents are assigned to this hub</h3></div></div><%}%>
+</section>
+
+<div class='hd-grid hd-main'>
+<div>
+<%
+queueTypes = {"Pickup","Delivery"};
+for each queueType in queueTypes
+{
+    queueRows = pickupRows;
+    queueHeading = "Pickup queue";
+    queueIcon = "arrows-1-tail-right";
+    if(queueType == "Delivery")
+    {
+        queueRows = deliveryRows;
+        queueHeading = "Delivery queue";
+        queueIcon = "transport-delivery-fast";
+    }
+%>
+<section class='zcs-card zcs-p-24 <%if(queueType == "Delivery"){%>hd-section<%}%>' aria-label='<%=queueHeading%>'>
+    <div class='hd-card-header'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'><%=queueHeading%></h2><a href='#Report:Agent_Task_Board'>Open task board</a></div>
+    <%if(queueRows.count() > 0){%><div class='zcs-table-wrapper zcs-rounded-sm zcs-relative'><table class='zcs-w-full'><thead class='zcs-sticky'><tr><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Task</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Shipment</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Scheduled</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Contact and address</th><th class='zcs-px-16 zcs-py-8 zcs-text-right zcs-font-13'>Shipment value</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Status</th></tr></thead><tbody><%
+    queueCounter = 0;
+    for each taskRow in queueRows
+    {
+        if(queueCounter < 6)
+        {
+            scheduleText = "Not scheduled";
+            if(taskRow.Scheduled_At != null)
+            {
+                scheduleText = taskRow.Scheduled_At.toString("dd-MMM-yyyy, hh:mm a") + " IST";
+            }
+            taskAddress = ifnull(taskRow.Task_Address.address_line_1,"");
+            if(ifnull(taskRow.Task_Address.address_line_2,"") != "")
+            {
+                taskAddress = taskAddress + ", " + taskRow.Task_Address.address_line_2;
+            }
+            taskAddress = taskAddress + ", " + ifnull(taskRow.Task_Address.district_city,"") + ", " + ifnull(taskRow.Task_Address.state_province,"") + " - " + ifnull(taskRow.Task_Address.postal_Code,"");
+            taskStatusClass = "zcs-badge-yellow";
+            if(taskRow.Task_Status == "In Progress")
+            {
+                taskStatusClass = "zcs-badge-blue";
+            }
+            else if(taskRow.Task_Status == "Accepted")
+            {
+                taskStatusClass = "zcs-badge-orange";
+            }
+    %><tr><td class='zcs-px-16 zcs-py-10 zcs-font-13'><a class='hd-link zcs-font-semibold' href='#Report:Agent_Task_Board?ID=<%=taskRow.ID%>&amp;zc_LoadIn=dialog'><%=taskRow.Task_Number%></a></td><td class='zcs-px-16 zcs-py-10 zcs-font-13'><%=taskRow.Shipment.Shipment_Number%></td><td class='zcs-px-16 zcs-py-10 zcs-font-13 hd-nowrap'><%=scheduleText%></td><td class='zcs-px-16 zcs-py-10 zcs-font-13'><strong><%=taskRow.Contact_Name%></strong><div class='zcs-font-12 zcs-color-secondary'><%=taskAddress%></div></td><td class='zcs-px-16 zcs-py-10 zcs-font-13 zcs-text-right hd-nowrap'>₹<%=ifnull(taskRow.Shipment.Net_Amount,0).toString("##,##,##0.00")%></td><td class='zcs-px-16 zcs-py-10 zcs-font-13 hd-table-status'><span class='zcs-badge zcs-badge-filled-outline <%=taskStatusClass%> zcs-inline-flex zcs-rounded-sm zcs-px-10 zcs-py-2 zcs-font-12'><%=taskRow.Task_Status%></span></td></tr><%
+            queueCounter = queueCounter + 1;
+        }
+    }
+    %></tbody></table></div><%}else{%><div class='hd-empty zcs-flex zcs-align-items-center zcs-justify-center zcs-text-center'><div><i class='zc-li-outline <%=queueIcon%>'></i><h3 class='zcs-font-16 zcs-font-medium zcs-mt-8 zcs-mb-0'>No open <%=queueType.toLowerCase()%> tasks</h3></div></div><%}%>
+</section>
+<%
+}
+%>
+</div>
+<aside>
+<section class='zcs-quick-actions-wrapper zcs-card zcs-flex zcs-direction-column zcs-gap-16 zcs-p-16 hd-quick' aria-labelledby='quick-heading'>
+    <h2 id='quick-heading' class='zcs-font-18 zcs-font-semibold zcs-m-0'>Quick actions and reports</h2>
+    <ul class='zcs-p-0 zcs-m-0'>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-10'><a class='zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-14 zcs-color-primary zcs-no-underline' href='#Form:Manifests?Origin_Hub=<%=hubID%>&amp;zc_LoadIn=dialog'><i class='zc-li-outline ui-1-simple-add'></i><span>Create manifest</span></a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-10'><a class='zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-14 zcs-color-primary zcs-no-underline' href='#Form:Agent_Tasks?Hub=<%=hubID%>&amp;zc_LoadIn=dialog'><i class='zc-li-outline users-1-add-29'></i><span>Assign agent task</span></a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-10'><a class='zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-14 zcs-color-primary zcs-no-underline' href='#Report:All_Shipments?Current_Hub=<%=hubID%>'><i class='zc-li-outline transport-delivery-fast'></i><span>Hub shipments report</span></a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-10'><a class='zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-14 zcs-color-primary zcs-no-underline' href='#Report:All_Manifests'><i class='zc-li-outline files-2-doc'></i><span>Manifest reports</span></a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-10'><a class='zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-14 zcs-color-primary zcs-no-underline' href='#Report:Shipment_Tracking_History?Hub=<%=hubID%>'><i class='zc-li-outline location-pin-copy'></i><span>Tracking history</span></a></li>
+    </ul>
+</section>
+<section class='zcs-card zcs-p-24 hd-section' aria-labelledby='exceptions-heading'>
+    <div class='hd-card-header'><h2 id='exceptions-heading' class='zcs-font-18 zcs-font-semibold zcs-m-0'>Recent tracking exceptions</h2><a href='#Report:Shipment_Tracking_History?Hub=<%=hubID%>'>View all</a></div>
+    <%
+    exceptionCounter = 0;
+    for each exceptionRow in exceptionRows
+    {
+        if(exceptionCounter < 6)
+        {
+    %><article class='hd-exception'><div class='hd-exception-title'><div><a class='hd-link zcs-font-14 zcs-font-semibold' href='#Report:Shipment_Tracking_History?ID=<%=exceptionRow.ID%>&amp;zc_LoadIn=dialog'>Shipment <%=exceptionRow.Shipment.Shipment_Number%></a><div class='zcs-font-12 zcs-color-secondary'><%=exceptionRow.Event_Time.toString("dd-MMM-yyyy, hh:mm a")%> IST</div></div><span class='zcs-badge zcs-badge-filled-outline zcs-badge-red zcs-inline-flex zcs-rounded-sm zcs-px-10 zcs-py-2 zcs-font-12'>Exception</span></div><p class='zcs-font-13 zcs-color-secondary zcs-mt-8 zcs-mb-0'><%=ifnull(exceptionRow.Details,ifnull(exceptionRow.Location_Text,"Operational exception recorded"))%></p></article><%
+            exceptionCounter = exceptionCounter + 1;
+        }
+    }
+    if(exceptionCounter == 0)
+    {
+    %><div class='hd-empty zcs-flex zcs-align-items-center zcs-justify-center zcs-text-center'><div><i class='zc-li-outline ui-1-check-circle-08'></i><h3 class='zcs-font-16 zcs-font-medium zcs-mt-8 zcs-mb-0'>No tracking exceptions recorded</h3></div></div><%
+    }
+    %>
+</section>
+</aside>
+</div>
+<%
+}
+%>
+</div></div>

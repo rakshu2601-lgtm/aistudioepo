@@ -1,0 +1,51 @@
+KYC_Document_Requests_On_Load as "Configure KYC Request Form"
+{
+    type = form
+    form = KYC_Document_Requests
+    record event = on add or edit
+    description = "Shows upload fields to the owning customer and review fields to authorized staff."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                isPortalCustomer = thisapp.portal.isUserInProfile("Customer_Portal");
+                isAdministrator = thisapp.permissions.isUserInProfile("Logistics_Admin");
+                isOperations = thisapp.permissions.isUserInProfile("Operations_Employee");
+                if(isPortalCustomer == true && (input.Verification_Status == "Requested" || input.Verification_Status == "Rejected"))
+                {
+                    show Uploaded_Document;
+                    show Uploaded_On;
+                    enable Uploaded_Document;
+                    disable Uploaded_On;
+                }
+                else
+                {
+                    hide Uploaded_Document;
+                    hide Uploaded_On;
+                }
+                if(isAdministrator == true || isOperations == true)
+                {
+                    show Reviewed_By;
+                    show Reviewed_On;
+                    show Review_Notes;
+                    show Rejection_Reason;
+                }
+                else
+                {
+                    hide Reviewed_By;
+                    hide Reviewed_On;
+                    hide Review_Notes;
+                    hide Rejection_Reason;
+                }
+                disable Customer_Portal_User;
+                disable Requested_On;
+                disable Verification_Status;
+                disable Uploaded_On;
+                disable Reviewed_On;
+            )
+        }
+    }
+}

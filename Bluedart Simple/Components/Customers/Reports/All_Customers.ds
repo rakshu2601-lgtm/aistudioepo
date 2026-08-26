@@ -1,0 +1,53 @@
+default list All_Customers
+{
+    displayName = "All Customers"
+    show all rows from Customers
+    (
+        Customer_ID
+        Customer_Name
+        Customer_Email
+        Customer_Phone
+        (
+            displayformat = formattednumber
+            linktodial = enable
+        )
+        Customer_Type
+        Company_Name
+        Primary_Address
+        Onboarding_Status
+        KYC_Status
+        Current_Loyalty_Program
+        Overall_Points_Earned
+        Current_Points_Balance
+        Onboarded_On
+        (
+            displayformat = dateonly
+        )
+        Active
+        (
+            displaytrue = "Active"
+            displayfalse = "Inactive"
+        )
+    )
+    filters
+    (
+        Customer_Type
+        Onboarding_Status
+        KYC_Status
+        Current_Loyalty_Program
+        Active
+        "Active Customers" : (Onboarding_Status == "Active" && Active == true)
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Customer_Type ascending
+    )
+    sort by
+    (
+        Customer_Email ascending
+    )
+}

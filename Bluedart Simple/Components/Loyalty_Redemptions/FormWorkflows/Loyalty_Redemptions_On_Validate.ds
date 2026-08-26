@@ -1,0 +1,96 @@
+Loyalty_Redemptions_On_Validate as "Validate Loyalty Redemption"
+{
+    type = form
+    form = Loyalty_Redemptions
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                customerRecord = Customers[ID == input.Customer];
+                if(customerRecord.count() == 0 || customerRecord.Active == false || customerRecord.Onboarding_Status != "Active")
+                {
+                    alert "Select an active, fully onboarded customer.";
+                    cancel submit;
+                }
+                isPortalCustomer = thisapp.portal.isUserInProfile("Customer_Portal");
+                if(isPortalCustomer == true && customerRecord.Customer_Email != zoho.loginuserid)
+                {
+                    alert "You can request redemptions only for your own loyalty account.";
+                    cancel submit;
+                }
+                input.Customer_Portal_User = customerRecord.Portal_User;
+                input.Program = customerRecord.Current_Loyalty_Program;
+                if(input.Program == null)
+                {
+                    alert "No active loyalty programme is assigned to this customer.";
+                    cancel submit;
+                }
+                programRecord = Loyalty_Programs[ID == input.Program];
+                if(programRecord.count() == 0 || programRecord.Active == false || programRecord.Effective_From > zoho.currentdate || (programRecord.Effective_To != null && programRecord.Effective_To < zoho.currentdate))
+                {
+                    alert "The customer's loyalty programme is not currently active.";
+                    cancel submit;
+                }
+                if(ifnull(input.Points_Requested,0) <= 0)
+                {
+                    alert "Points requested must be greater than zero.";
+                    cancel submit;
+                }
+                if(input.Points_Requested < programRecord.Minimum_Redemption_Points)
+                {
+                    alert "The request is below the minimum redemption points for this programme.";
+                    cancel submit;
+                }
+                currentBalance = ifnull(Loyalty_Transactions[Customer == input.Customer].sum(Points),0);
+                if(input.ID == null && input.Points_Requested > currentBalance)
+                {
+                    alert "The requested points exceed the available loyalty balance.";
+                    cancel submit;
+                }
+                input.Amount_Value = (input.Points_Requested * programRecord.Redemption_Value_Per_Point).round(2);
+                if(input.Redemption_Type == "Shipment Discount")
+                {
+                    if(input.Shipment == null)
+                    {
+                        alert "Select the shipment that will receive the loyalty discount.";
+                        cancel submit;
+                    }
+                    shipmentRecord = Shipment_Requests[ID == input.Shipment];
+                    if(shipmentRecord.count() == 0 || shipmentRecord.Customer != input.Customer || shipmentRecord.Shipment_Status not in {"Quoted","Confirmed"})
+                    {
+                        alert "The shipment must belong to this customer and be Quoted or Confirmed.";
+                        cancel submit;
+                    }
+                    maximumDiscount = shipmentRecord.Gross_Amount * programRecord.Max_Shipment_Discount_Percent / 100;
+                    if(input.Amount_Value > maximumDiscount)
+                    {
+                        alert "The redemption exceeds the programme's maximum shipment discount.";
+                        cancel submit;
+                    }
+                }
+                else
+                {
+                    input.Shipment = null;
+                }
+                if(input.ID == null)
+                {
+                    input.Redemption_Status = "Requested";
+                    input.Requested_On = zoho.currenttime;
+                }
+                else
+                {
+                    persistedRecord = Loyalty_Redemptions[ID == input.ID];
+                    if(persistedRecord.count() > 0 && (persistedRecord.Customer != input.Customer || persistedRecord.Customer_Portal_User != input.Customer_Portal_User || persistedRecord.Redemption_Type != input.Redemption_Type || persistedRecord.Shipment != input.Shipment || persistedRecord.Program != input.Program || persistedRecord.Points_Requested != input.Points_Requested || persistedRecord.Amount_Value != input.Amount_Value || persistedRecord.Requested_On != input.Requested_On || persistedRecord.Generated_Transaction != input.Generated_Transaction))
+                    {
+                        alert "Core redemption details cannot be changed after submission. Cancel and create a new request instead.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

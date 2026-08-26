@@ -1,0 +1,90 @@
+Manifests_On_Validate as "Validate Manifest Leg"
+{
+    type = form
+    form = Manifests
+    record event = on add or edit
+    description = "Enforces active hubs, agent ownership, hub access, journey timing, and lifecycle field protection."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                originRecord = Hubs[ID == input.Origin_Hub];
+                destinationRecord = Hubs[ID == input.Destination_Hub];
+                if(originRecord.count() == 0 || destinationRecord.count() == 0 || originRecord.Status != "Active" || destinationRecord.Status != "Active")
+                {
+                    alert "Select active origin and destination hubs.";
+                    cancel submit;
+                }
+                if(input.Origin_Hub == input.Destination_Hub)
+                {
+                    alert "A manifest leg must connect two different hubs.";
+                    cancel submit;
+                }
+                if(input.Planned_Departure != null && input.Planned_Arrival != null && input.Planned_Arrival <= input.Planned_Departure)
+                {
+                    alert "Planned arrival must be after planned departure.";
+                    cancel submit;
+                }
+                if(input.Actual_Departure != null && input.Actual_Arrival != null && input.Actual_Arrival < input.Actual_Departure)
+                {
+                    alert "Actual arrival cannot be before actual departure.";
+                    cancel submit;
+                }
+                if(input.Manifest_Status != "Draft" && input.Assigned_Agent == null)
+                {
+                    alert "Assign an agent before the manifest leaves Draft.";
+                    cancel submit;
+                }
+                if(input.Assigned_Agent != null)
+                {
+                    agentRecord = Employees[ID == input.Assigned_Agent];
+                    if(agentRecord.count() == 0 || agentRecord.Active == false || agentRecord.Employee_Type != "Agent" || agentRecord.Internal_User == null)
+                    {
+                        alert "Select an active agent with an internal user account.";
+                        cancel submit;
+                    }
+                    if(agentRecord.Hub != input.Origin_Hub)
+                    {
+                        alert "The assigned agent must belong to the manifest origin hub.";
+                        cancel submit;
+                    }
+                    if(input.Assigned_Agent_User != agentRecord.Internal_User)
+                    {
+                        input.Assigned_Agent_User = agentRecord.Internal_User;
+                    }
+                }
+                else
+                {
+                    input.Assigned_Agent_User = null;
+                }
+                currentEmployee = Employees[Work_Email == zoho.loginuserid && Active == true];
+                isAdmin = thisapp.permissions.isUserInProfile("Logistics_Admin");
+                if(isAdmin == false && currentEmployee.count() > 0)
+                {
+                    if(currentEmployee.Employee_Type == "Hub Manager" && currentEmployee.Hub != input.Origin_Hub && currentEmployee.Hub != input.Destination_Hub)
+                    {
+                        alert "Hub managers can manage only manifests touching their own hub.";
+                        cancel submit;
+                    }
+                    if(currentEmployee.Employee_Type == "Agent" && input.Assigned_Agent_User != currentEmployee.Internal_User)
+                    {
+                        alert "Agents can access only manifests assigned to them.";
+                        cancel submit;
+                    }
+                }
+                if(input.Manifest_Status != "Draft")
+                {
+                    manifestItems = Manifest_Items[Manifest == input.ID];
+                    if(manifestItems.count() == 0)
+                    {
+                        alert "Add at least one shipment before the manifest leaves Draft.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,47 @@
+list My_KYC_Documents
+{
+    displayName = "My KYC Documents"
+    show all rows from KYC_Document_Requests [Customer_Portal_User == zoho.loginuserid]
+    (
+        Request_ID
+        Customer
+        Requested_Document_Name
+        Instructions
+        (
+            foldcontent = enable
+        )
+        Required_Document
+        (
+            displaytrue = "Required"
+            displayfalse = "Optional"
+        )
+        Verification_Status
+        Uploaded_Document
+        Uploaded_On
+        (
+            displayformat = dateonly
+        )
+        Review_Notes
+        (
+            foldcontent = enable
+        )
+        Rejection_Reason
+        (
+            foldcontent = enable
+        )
+        Requested_On
+        (
+            displayformat = dateonly
+        )
+    )
+    filters
+    (
+        Verification_Status
+        Required_Document
+        "Action Required" : (Verification_Status == "Requested" || Verification_Status == "Rejected")
+    )
+    sort by
+    (
+        Requested_On descending
+    )
+}

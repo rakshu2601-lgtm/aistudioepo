@@ -1,0 +1,41 @@
+Loyalty_Points_To_Use_On_User_Input as "Calculate Loyalty Discount"
+{
+    type = form
+    form = Shipment_Requests
+    record event = on add or edit
+    description = "Calculates the rupee discount and enforces the configured maximum shipment discount."
+
+    on user input of Loyalty_Points_To_Use
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Loyalty_Discount = 0;
+                customerRecord = Customers[ID == input.Customer];
+                if(customerRecord.count() > 0)
+                {
+                    input.Available_Points = ifnull(customerRecord.Current_Points_Balance,0);
+                    if(input.Use_Loyalty == true && input.Loyalty_Points_To_Use > 0 && customerRecord.Current_Loyalty_Program != null)
+                    {
+                        programRecord = Loyalty_Programs[ID == customerRecord.Current_Loyalty_Program];
+                        if(programRecord.count() > 0)
+                        {
+                            input.Loyalty_Discount = (input.Loyalty_Points_To_Use * programRecord.Redemption_Value_Per_Point).round(2);
+                            maximumDiscount = input.Gross_Amount * programRecord.Max_Shipment_Discount_Percent / 100;
+                            if(input.Loyalty_Discount > maximumDiscount)
+                            {
+                                input.Loyalty_Discount = maximumDiscount.round(2);
+                            }
+                            if(input.Loyalty_Discount > input.Gross_Amount)
+                            {
+                                input.Loyalty_Discount = input.Gross_Amount;
+                            }
+                        }
+                    }
+                }
+                input.Net_Amount = (input.Gross_Amount - input.Loyalty_Discount).round(2);
+            )
+        }
+    }
+}

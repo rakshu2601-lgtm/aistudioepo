@@ -1,0 +1,5 @@
+report My_Redemptions
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Redemption_Number Redemption_Type Points_Requested Amount_Value Redemption_Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Redemption_Number Redemption_Type Shipment Program Points_Requested Amount_Value Redemption_Status Requested_On Reviewed_On Payment_Reference Review_Notes ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

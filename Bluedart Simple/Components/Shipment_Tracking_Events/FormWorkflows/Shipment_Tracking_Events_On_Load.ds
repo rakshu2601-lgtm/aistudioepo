@@ -1,0 +1,32 @@
+Shipment_Tracking_Events_On_Load as "Protect Tracking History on Load"
+{
+    type = form
+    form = Shipment_Tracking_Events
+    record event = on add or edit
+    description = "Keeps shipment ownership and timestamps system-managed and makes saved history read-only for ordinary users."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Customer_Portal_User;
+                disable Event_Time;
+                disable Recorded_By;
+                isAdministrator = thisapp.permissions.isUserInProfile("Logistics_Admin");
+                if(input.ID != null && isAdministrator == false)
+                {
+                    disable Shipment;
+                    disable Manifest;
+                    disable Agent_Task;
+                    disable Event_Type;
+                    disable Hub;
+                    disable Location_Text;
+                    disable Details;
+                    disable Customer_Visible;
+                }
+            )
+        }
+    }
+}

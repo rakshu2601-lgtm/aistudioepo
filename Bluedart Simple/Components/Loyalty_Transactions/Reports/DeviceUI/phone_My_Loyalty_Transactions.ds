@@ -1,0 +1,5 @@
+report My_Loyalty_Transactions
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Transaction_ID Transaction_Type Points Monetary_Value Transaction_Date ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on tap ( View Record ) on long press ( Edit Delete Duplicate View Record ) on left swipe ( Delete ) on right swipe ( Edit ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Transaction_ID Shipment Program Transaction_Type Points Monetary_Value Transaction_Date Expiry_Date Reference_Text Balance_After ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

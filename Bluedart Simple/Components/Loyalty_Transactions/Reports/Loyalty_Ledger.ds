@@ -1,0 +1,49 @@
+default list Loyalty_Ledger
+{
+    displayName = "Loyalty Ledger"
+    show all rows from Loyalty_Transactions
+    (
+        Transaction_ID
+        Customer
+        Customer_Portal_User
+        Shipment
+        Program
+        Transaction_Type
+        Points
+        Monetary_Value
+        Transaction_Date
+        Expiry_Date
+        Remaining_Points
+        Used_Points
+        Transaction_Status
+        Reference_Text
+        Balance_After
+        Created_By
+    )
+    filters
+    (
+        Customer
+        Shipment
+        Program
+        Transaction_Type
+        Transaction_Date
+        Expiry_Date
+        Transaction_Status
+        Created_By
+        "Open Earn Lots" : (Transaction_Type == "Earn" && Remaining_Points > 0)
+        "Adjustments and Reversals" : (Transaction_Type == "Adjust" || Transaction_Type == "Reverse")
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Customer ascending
+    )
+    sort by
+    (
+        Transaction_Date descending
+        Transaction_ID descending
+    )
+}

@@ -1,0 +1,19 @@
+<page linkname = "Hub_Dashboard" displayname = "Hub Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Hub_Dashboard_Content' elementName='Hub_Dashboard_Content'>
+          <![CDATA[htmlpage Hub_Dashboard_Content()
+            content
+             <%{%>
+                 <file name:Hub_Dashboard_Content.dshtml/>
+             <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

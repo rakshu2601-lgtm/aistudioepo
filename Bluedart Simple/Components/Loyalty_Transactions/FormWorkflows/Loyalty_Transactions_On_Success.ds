@@ -1,0 +1,78 @@
+Loyalty_Transactions_On_Success as "Post Loyalty Ledger Entry"
+{
+    type = form
+    form = Loyalty_Transactions
+    record event = on add
+    description = "Recalculates cached balances, consumes oldest lots, selects the applicable programme tier, and audits exceptional entries."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                customerRecord = Customers[ID == input.Customer];
+                if(customerRecord.count() > 0)
+                {
+                    if(input.Transaction_Type == "Redeem")
+                    {
+                        pointsToAllocate = 0 - input.Points;
+                        positiveLots = Loyalty_Transactions[Customer == input.Customer && Points > 0 && Remaining_Points > 0 && Transaction_Status != "Expired" && ID != input.ID] sort by Transaction_Date;
+                        for each positiveLot in positiveLots
+                        {
+                            if(pointsToAllocate > 0)
+                            {
+                                lotAvailable = ifnull(positiveLot.Remaining_Points,0);
+                                lotUsed = lotAvailable;
+                                if(lotUsed > pointsToAllocate)
+                                {
+                                    lotUsed = pointsToAllocate;
+                                }
+                                positiveLot.Remaining_Points = lotAvailable - lotUsed;
+                                positiveLot.Used_Points = ifnull(positiveLot.Used_Points,0) + lotUsed;
+                                pointsToAllocate = pointsToAllocate - lotUsed;
+                            }
+                        }
+                    }
+                    ledgerBalance = ifnull(Loyalty_Transactions[Customer == input.Customer].sum(Points),0);
+                    lifetimeEarned = ifnull(Loyalty_Transactions[Customer == input.Customer && Transaction_Type == "Earn"].sum(Points),0);
+                    customerRecord.Current_Points_Balance = ledgerBalance;
+                    customerRecord.Overall_Points_Earned = lifetimeEarned;
+                    transactionRecord = Loyalty_Transactions[ID == input.ID];
+                    if(transactionRecord.count() > 0)
+                    {
+                        transactionRecord.Balance_After = ledgerBalance;
+                    }
+                    selectedProgram = null;
+                    eligiblePrograms = Loyalty_Programs[Active == true && Customer_Type == customerRecord.Customer_Type && Min_Lifetime_Points <= lifetimeEarned && (Max_Lifetime_Points is null || Max_Lifetime_Points >= lifetimeEarned) && Effective_From <= zoho.currentdate && (Effective_To is null || Effective_To >= zoho.currentdate)] sort by Priority;
+                    for each eligibleProgram in eligiblePrograms
+                    {
+                        if(selectedProgram == null)
+                        {
+                            selectedProgram = eligibleProgram.ID;
+                        }
+                    }
+                    if(selectedProgram != null)
+                    {
+                        customerRecord.Current_Loyalty_Program = selectedProgram;
+                    }
+                    if(input.Transaction_Type == "Adjust" || input.Transaction_Type == "Reverse" || input.Transaction_Type == "Expire")
+                    {
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Loyalty Ledger"
+                            Entity_Type = "Loyalty_Transactions"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Loyalty " + input.Transaction_Type
+                            After_Value = input.Points.toString()
+                            Details = ifnull(input.Reference_Text,"Signed loyalty ledger entry posted.")
+                            Severity = if(input.Transaction_Type == "Adjust","Warning","Info")
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,41 @@
+default list Redemption_Queue
+{
+    displayName = "Redemption Queue"
+    show all rows from Loyalty_Redemptions
+    (
+        Redemption_Number
+        Customer
+        Redemption_Type
+        Shipment
+        Program
+        Points_Requested
+        Amount_Value
+        Redemption_Status
+        Requested_On
+        Reviewed_By
+        Reviewed_On
+        Payment_Reference
+        Generated_Transaction
+    )
+    filters
+    (
+        Redemption_Type
+        Redemption_Status
+        Customer
+        Requested_On
+        "Pending Review" : (Redemption_Status == "Requested")
+        "Awaiting Fulfilment" : (Redemption_Status == "Approved")
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Redemption_Status ascending
+    )
+    sort by
+    (
+        Requested_On descending
+    )
+}

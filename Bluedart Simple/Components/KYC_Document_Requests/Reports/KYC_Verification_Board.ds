@@ -1,0 +1,33 @@
+kanban KYC_Verification_Board
+{
+    displayName = "KYC Verification Board"
+    show all rows from KYC_Document_Requests
+    (
+        Request_ID
+        Customer
+        Requested_Document_Name
+        Required_Document
+        Requested_On
+        Uploaded_On
+        Verification_Status
+        Reviewed_By
+    )
+    filters
+    (
+        Customer
+        Required_Document
+        Reviewed_By
+    )
+    sort by
+    (
+        Requested_On descending
+    )
+    options
+    (
+        display field = Verification_Status
+        othercolumn = "Other"
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

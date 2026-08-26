@@ -1,0 +1,26 @@
+Audit_Log_On_Load as "Protect Audit Entry Fields"
+{
+    type = form
+    form = Audit_Log
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Event_Time;
+                disable User_Email;
+                disable User_Profile;
+                disable Entity_Type;
+                disable Entity_Record_ID;
+                disable Action;
+                disable Before_Value;
+                disable After_Value;
+                disable Details;
+                disable Severity;
+            )
+        }
+    }
+}

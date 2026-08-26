@@ -1,0 +1,237 @@
+form Transport_Rates
+{
+    title
+    {
+        displayname = "Transport Rates"
+        on add = "Add Transport Rate"
+        on edit = "Edit Transport Rate"
+    }
+    success message = "Transport rate saved successfully."
+
+    Rate_Classification
+    (
+        type = section
+        displayname = "Rate Classification"
+        row = 1
+        column = 0
+    )
+    Rate_ID
+    (
+        type = autonumber
+        displayname = "Rate ID"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Rate_Name
+    (
+        type = text
+        displayname = "Rate Name"
+        maxchar = 150
+        row = 1
+        column = 1
+        width = medium
+    )
+    Customer_Type
+    (
+        type = picklist
+        displayname = "Customer Type"
+        values = {"All","Retail","Corporate","Wholesale"}
+        initial value = "All"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Transport_Mode
+    (
+        type = picklist
+        displayname = "Transport Mode"
+        values = {"Road","Air","Rail","Sea"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    Priority
+    (
+        type = number
+        displayname = "Selection Priority"
+        format = commadotindian
+        initial value = 1
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    Pricing_Bands
+    (
+        type = section
+        displayname = "Pricing Bands"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Min_Weight_Kg
+    (
+        type = decimal
+        displayname = "Minimum Weight (kg)"
+        format = commadotindian
+        decimalplace = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Max_Weight_Kg
+    (
+        type = decimal
+        displayname = "Maximum Weight (kg)"
+        format = commadotindian
+        decimalplace = 2
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Min_Distance_Km
+    (
+        type = decimal
+        displayname = "Minimum Distance (km)"
+        format = commadotindian
+        decimalplace = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Max_Distance_Km
+    (
+        type = decimal
+        displayname = "Maximum Distance (km)"
+        format = commadotindian
+        decimalplace = 2
+        row = 2
+        column = 2
+        width = medium
+    )
+    Base_Charge
+    (
+        type = INR
+        displayname = "Base Charge (INR)"
+        format = commadotindian
+        initial value = 0
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 1
+        width = medium
+    )
+    Charge_Per_Kg
+    (
+        type = INR
+        displayname = "Charge per kg (INR)"
+        format = commadotindian
+        initial value = 0
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 2
+        width = medium
+    )
+    Charge_Per_Km
+    (
+        type = INR
+        displayname = "Charge per km (INR)"
+        format = commadotindian
+        initial value = 0
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 1
+        width = medium
+    )
+    Minimum_Charge
+    (
+        type = INR
+        displayname = "Minimum Charge (INR)"
+        format = commadotindian
+        initial value = 0
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 2
+        width = medium
+    )
+    Fuel_Surcharge_Percent
+    (
+        type = decimal
+        displayname = "Fuel Surcharge (%)"
+        format = commadotindian
+        initial value = 0
+        decimalplace = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+
+    Effective_Period
+    (
+        type = section
+        displayname = "Effective Period"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Effective_From
+    (
+        type = date
+        displayname = "Effective From"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Effective_To
+    (
+        type = date
+        displayname = "Effective To"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 3
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Rate"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Rate"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

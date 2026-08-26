@@ -1,0 +1,199 @@
+"Customer_Portal"
+{
+    name = "Customer_Portal"
+    type = customer_portal
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+    description = "Customer profile, KYC, shipment, tracking, loyalty, and redemption access"
+    ModulePermissions
+    {
+        Customers
+        {
+            enabled = View,Edit,Search,Tab
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Customer_ID{visibility:true,readonly:true}
+                Customer_Name{visibility:true,readonly:false}
+                Customer_Email{visibility:true,readonly:true}
+                Customer_Phone{visibility:true,readonly:false}
+                Customer_Type{visibility:true,readonly:true}
+                Primary_Address{visibility:true,readonly:false}
+                Company_Name{visibility:true,readonly:false}
+                GSTIN{visibility:true,readonly:false}
+                PAN{visibility:true,readonly:false}
+                CIN_or_Udyam_Number{visibility:true,readonly:false}
+                Billing_Contact_Name{visibility:true,readonly:false}
+                Billing_Email{visibility:true,readonly:false}
+                Portal_User{visibility:false}
+                Onboarding_Status{visibility:true,readonly:true}
+                KYC_Status{visibility:true,readonly:true}
+                Onboarded_On{visibility:true,readonly:true}
+                Active{visibility:true,readonly:true}
+                Current_Loyalty_Program{visibility:true,readonly:true}
+                Overall_Points_Earned{visibility:true,readonly:true}
+                Current_Points_Balance{visibility:true,readonly:true}
+            }
+        }
+        KYC_Document_Requests
+        {
+            enabled = View,Edit,Search,Tab
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Request_ID{visibility:true,readonly:true}
+                Customer{visibility:true,readonly:true}
+                Customer_Portal_User{visibility:false}
+                Rule{visibility:false}
+                Requested_Document_Name{visibility:true,readonly:true}
+                Instructions{visibility:true,readonly:true}
+                Required_Document{visibility:true,readonly:true}
+                Requested_By{visibility:false}
+                Requested_On{visibility:true,readonly:true}
+                Verification_Status{visibility:true,readonly:true}
+                Uploaded_Document{visibility:true,readonly:false}
+                Uploaded_On{visibility:true,readonly:true}
+                Reviewed_By{visibility:false}
+                Reviewed_On{visibility:true,readonly:true}
+                Review_Notes{visibility:true,readonly:true}
+                Rejection_Reason{visibility:true,readonly:true}
+            }
+            ReportPermissions
+            {
+                My_KYC_Documents={"View","Edit"}
+            }
+        }
+        Shipment_Requests
+        {
+            enabled = Create,View,Edit,Search,Tab
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Shipment_Number{visibility:true,readonly:true}
+                Customer{visibility:true,readonly:true}
+                Customer_Portal_User{visibility:false}
+                Requested_By_Type{visibility:true,readonly:true}
+                Requested_By_Employee{visibility:false}
+                Requested_On{visibility:true,readonly:true}
+                Pickup_Contact_Name{visibility:true,readonly:false}
+                Pickup_Phone{visibility:true,readonly:false}
+                Pickup_Address{visibility:true,readonly:false}
+                Delivery_Contact_Name{visibility:true,readonly:false}
+                Delivery_Phone{visibility:true,readonly:false}
+                Delivery_Address{visibility:true,readonly:false}
+                Package_Description{visibility:true,readonly:false}
+                Weight_Kg{visibility:true,readonly:false}
+                Dimensions_Cm{visibility:true,readonly:false}
+                Transport_Mode{visibility:true,readonly:false}
+                Manual_Distance_Km{visibility:false}
+                Origin_Hub{visibility:false}
+                Destination_Hub{visibility:false}
+                Current_Hub{visibility:false}
+                Pickup_Agent{visibility:false}
+                Applied_Rate{visibility:false}
+                Base_Transport_Amount{visibility:true,readonly:true}
+                Fuel_Surcharge{visibility:true,readonly:true}
+                Gross_Amount{visibility:true,readonly:true}
+                Payment_Status{visibility:true,readonly:true}
+                Use_Loyalty{visibility:true,readonly:false}
+                Available_Points{visibility:true,readonly:true}
+                Loyalty_Points_To_Use{visibility:true,readonly:false}
+                Loyalty_Discount{visibility:true,readonly:true}
+                Net_Amount{visibility:true,readonly:true}
+                Shipment_Status{visibility:true,readonly:true}
+                Quoted_On{visibility:true,readonly:true}
+                Confirmed_On{visibility:true,readonly:true}
+                Expected_Delivery{visibility:true,readonly:true}
+                Picked_Up_On{visibility:true,readonly:true}
+                Delivered_On{visibility:true,readonly:true}
+                Latest_Tracking_Text{visibility:true,readonly:true}
+            }
+            ReportPermissions
+            {
+                My_Shipments={"View","Edit"}
+            }
+        }
+        Shipment_Tracking_Events
+        {
+            enabled = View,Search,Tab
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Event_ID{visibility:true,readonly:true}
+                Shipment{visibility:true,readonly:true}
+                Customer_Portal_User{visibility:false}
+                Manifest{visibility:true,readonly:true}
+                Agent_Task{visibility:false}
+                Event_Type{visibility:true,readonly:true}
+                Event_Time{visibility:true,readonly:true}
+                Hub{visibility:true,readonly:true}
+                Location_Text{visibility:true,readonly:true}
+                Details{visibility:true,readonly:true}
+                Recorded_By{visibility:false}
+                Customer_Visible{visibility:false}
+            }
+            ReportPermissions
+            {
+                My_Tracking_Events={"View"}
+            }
+        }
+        Loyalty_Transactions
+        {
+            enabled = View,Search,Tab
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Transaction_ID{visibility:true,readonly:true}
+                Customer{visibility:false}
+                Customer_Portal_User{visibility:false}
+                Shipment{visibility:true,readonly:true}
+                Program{visibility:true,readonly:true}
+                Transaction_Type{visibility:true,readonly:true}
+                Points{visibility:true,readonly:true}
+                Monetary_Value{visibility:true,readonly:true}
+                Transaction_Date{visibility:true,readonly:true}
+                Expiry_Date{visibility:true,readonly:true}
+                Remaining_Points{visibility:false}
+                Used_Points{visibility:false}
+                Transaction_Status{visibility:false}
+                Reference_Text{visibility:true,readonly:true}
+                Balance_After{visibility:true,readonly:true}
+                Created_By{visibility:false}
+            }
+            ReportPermissions
+            {
+                My_Loyalty_Transactions={"View"}
+            }
+        }
+        Loyalty_Redemptions
+        {
+            enabled = Create,View,Edit,Search,Tab
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Redemption_Number{visibility:true,readonly:true}
+                Customer{visibility:true,readonly:true}
+                Customer_Portal_User{visibility:false}
+                Redemption_Type{visibility:true,readonly:false}
+                Shipment{visibility:true,readonly:false}
+                Program{visibility:true,readonly:true}
+                Points_Requested{visibility:true,readonly:false}
+                Amount_Value{visibility:true,readonly:true}
+                Redemption_Status{visibility:true,readonly:true}
+                Requested_On{visibility:true,readonly:true}
+                Generated_Transaction{visibility:false}
+                Reviewed_By{visibility:false}
+                Reviewed_On{visibility:true,readonly:true}
+                Payment_Reference{visibility:true,readonly:true}
+                Review_Notes{visibility:true,readonly:true}
+            }
+            ReportPermissions
+            {
+                My_Redemptions={"View","Edit"}
+            }
+        }
+        Customer_Dashboard
+        {
+            enabled = tab
+        }
+    }
+}

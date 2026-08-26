@@ -1,0 +1,5 @@
+report My_Agent_Tasks
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Task_Number Task_Type Shipment Scheduled_At Task_Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Task_Number Task_Type Shipment Hub Assigned_Agent Scheduled_At Contact_Name Contact_Phone Task_Address Task_Status Accepted_On Started_On Completed_On Recipient_Name Proof_File Recipient_Signature Failure_Reason Agent_Notes ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

@@ -1,0 +1,92 @@
+Shipment_Customer_On_User_Input as "Populate Customer and Recalculate Quote"
+{
+    type = form
+    form = Shipment_Requests
+    record event = on add or edit
+    description = "Copies customer ownership and loyalty values, then selects the configured transport rate."
+
+    on user input of Customer
+    {
+        actions
+        {
+            custom deluge script
+            (
+                customerRecord = Customers[ID == input.Customer];
+                if(customerRecord.count() > 0)
+                {
+                    input.Customer_Portal_User = customerRecord.Portal_User;
+                    input.Available_Points = ifnull(customerRecord.Current_Points_Balance,0);
+                    if(input.Pickup_Contact_Name in {""," ","null"})
+                    {
+                        input.Pickup_Contact_Name = customerRecord.Customer_Name.first_name;
+                        input.Pickup_Phone = customerRecord.Customer_Phone;
+                        input.Pickup_Address = customerRecord.Primary_Address;
+                    }
+                    selectedRateID = 0;
+                    if(input.Weight_Kg != null && input.Weight_Kg > 0 && input.Manual_Distance_Km != null && input.Manual_Distance_Km > 0 && input.Transport_Mode != null)
+                    {
+                        rateCandidates = Transport_Rates[Active == true && Transport_Mode == input.Transport_Mode && Effective_From <= zoho.currentdate] sort by Priority, Effective_From desc;
+                        for each rateRecord in rateCandidates
+                        {
+                            if(selectedRateID == 0 && rateRecord.Customer_Type == customerRecord.Customer_Type && (rateRecord.Effective_To == null || rateRecord.Effective_To >= zoho.currentdate) && rateRecord.Min_Weight_Kg <= input.Weight_Kg && (rateRecord.Max_Weight_Kg == null || rateRecord.Max_Weight_Kg >= input.Weight_Kg) && rateRecord.Min_Distance_Km <= input.Manual_Distance_Km && (rateRecord.Max_Distance_Km == null || rateRecord.Max_Distance_Km >= input.Manual_Distance_Km))
+                            {
+                                selectedRateID = rateRecord.ID;
+                            }
+                        }
+                        if(selectedRateID == 0)
+                        {
+                            for each rateRecord in rateCandidates
+                            {
+                                if(selectedRateID == 0 && rateRecord.Customer_Type == "All" && (rateRecord.Effective_To == null || rateRecord.Effective_To >= zoho.currentdate) && rateRecord.Min_Weight_Kg <= input.Weight_Kg && (rateRecord.Max_Weight_Kg == null || rateRecord.Max_Weight_Kg >= input.Weight_Kg) && rateRecord.Min_Distance_Km <= input.Manual_Distance_Km && (rateRecord.Max_Distance_Km == null || rateRecord.Max_Distance_Km >= input.Manual_Distance_Km))
+                                {
+                                    selectedRateID = rateRecord.ID;
+                                }
+                            }
+                        }
+                    }
+                    if(selectedRateID != 0)
+                    {
+                        selectedRate = Transport_Rates[ID == selectedRateID];
+                        input.Applied_Rate = selectedRate.ID;
+                        calculatedBase = ifnull(selectedRate.Base_Charge,0) + (ifnull(selectedRate.Charge_Per_Kg,0) * input.Weight_Kg) + (ifnull(selectedRate.Charge_Per_Km,0) * input.Manual_Distance_Km);
+                        if(calculatedBase < ifnull(selectedRate.Minimum_Charge,0))
+                        {
+                            calculatedBase = selectedRate.Minimum_Charge;
+                        }
+                        input.Base_Transport_Amount = calculatedBase.round(2);
+                        input.Fuel_Surcharge = (calculatedBase * ifnull(selectedRate.Fuel_Surcharge_Percent,0) / 100).round(2);
+                        input.Gross_Amount = (input.Base_Transport_Amount + input.Fuel_Surcharge).round(2);
+                    }
+                    else
+                    {
+                        input.Applied_Rate = null;
+                        input.Base_Transport_Amount = 0;
+                        input.Fuel_Surcharge = 0;
+                        input.Gross_Amount = 0;
+                    }
+                    input.Loyalty_Discount = 0;
+                    if(input.Use_Loyalty == true && input.Loyalty_Points_To_Use > 0 && customerRecord.Current_Loyalty_Program != null)
+                    {
+                        programRecord = Loyalty_Programs[ID == customerRecord.Current_Loyalty_Program];
+                        if(programRecord.count() > 0)
+                        {
+                            pointsValue = input.Loyalty_Points_To_Use * programRecord.Redemption_Value_Per_Point;
+                            maximumDiscount = input.Gross_Amount * programRecord.Max_Shipment_Discount_Percent / 100;
+                            input.Loyalty_Discount = pointsValue;
+                            if(input.Loyalty_Discount > maximumDiscount)
+                            {
+                                input.Loyalty_Discount = maximumDiscount;
+                            }
+                            if(input.Loyalty_Discount > input.Gross_Amount)
+                            {
+                                input.Loyalty_Discount = input.Gross_Amount;
+                            }
+                            input.Loyalty_Discount = input.Loyalty_Discount.round(2);
+                        }
+                    }
+                    input.Net_Amount = (input.Gross_Amount - input.Loyalty_Discount).round(2);
+                }
+            )
+        }
+    }
+}

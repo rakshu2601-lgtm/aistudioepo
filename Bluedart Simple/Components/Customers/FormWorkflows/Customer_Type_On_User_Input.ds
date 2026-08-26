@@ -1,0 +1,41 @@
+Customer_Type_On_User_Input as "Update Business Fields for Customer Type"
+{
+    type = form
+    form = Customers
+    record event = on add or edit
+    description = "Updates business-field visibility when customer type changes."
+
+    on user input of Customer_Type
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Customer_Type == "Corporate" || input.Customer_Type == "Wholesale")
+                {
+                    show Company_Name;
+                    show GSTIN;
+                    show PAN;
+                    show CIN_or_Udyam_Number;
+                    show Billing_Contact_Name;
+                    show Billing_Email;
+                }
+                else
+                {
+                    input.Company_Name = "";
+                    input.GSTIN = "";
+                    input.PAN = "";
+                    input.CIN_or_Udyam_Number = "";
+                    input.Billing_Contact_Name = "";
+                    input.Billing_Email = "";
+                    hide Company_Name;
+                    hide GSTIN;
+                    hide PAN;
+                    hide CIN_or_Udyam_Number;
+                    hide Billing_Contact_Name;
+                    hide Billing_Email;
+                }
+            )
+        }
+    }
+}

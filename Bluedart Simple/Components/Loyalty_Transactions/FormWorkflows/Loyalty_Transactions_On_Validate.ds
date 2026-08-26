@@ -1,0 +1,99 @@
+Loyalty_Transactions_On_Validate as "Validate Loyalty Ledger Entry"
+{
+    type = form
+    form = Loyalty_Transactions
+    record event = on add or edit
+    description = "Validates signed points, ownership, lot values, and the resulting authoritative balance."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                isAdministrator = thisapp.permissions.isUserInProfile("Logistics_Admin");
+                if(input.ID == null && isAdministrator == false)
+                {
+                    alert "Only logistics administrators and trusted application workflows can post loyalty ledger entries.";
+                    cancel submit;
+                }
+                customerRecord = Customers[ID == input.Customer];
+                if(customerRecord.count() == 0)
+                {
+                    alert "Select a valid customer.";
+                    cancel submit;
+                }
+                input.Customer_Portal_User = customerRecord.Portal_User;
+                if(input.Transaction_Date == null)
+                {
+                    input.Transaction_Date = zoho.currenttime;
+                }
+                if(input.Points == 0)
+                {
+                    alert "Points must be a non-zero signed value.";
+                    cancel submit;
+                }
+                if(input.Transaction_Type == "Earn" && input.Points < 0)
+                {
+                    alert "Earn transactions must contain positive points.";
+                    cancel submit;
+                }
+                if((input.Transaction_Type == "Redeem" || input.Transaction_Type == "Expire") && input.Points > 0)
+                {
+                    alert "Redeem and expiry transactions must contain negative points.";
+                    cancel submit;
+                }
+                if(ifnull(input.Monetary_Value,0) < 0 || ifnull(input.Remaining_Points,0) < 0 || ifnull(input.Used_Points,0) < 0)
+                {
+                    alert "Monetary value and lot point values cannot be negative.";
+                    cancel submit;
+                }
+                if(input.Shipment != null)
+                {
+                    shipmentRecord = Shipment_Requests[ID == input.Shipment];
+                    if(shipmentRecord.count() == 0 || shipmentRecord.Customer != input.Customer)
+                    {
+                        alert "The selected shipment must belong to this customer.";
+                        cancel submit;
+                    }
+                }
+                if(input.ID == null)
+                {
+                    currentBalance = ifnull(Loyalty_Transactions[Customer == input.Customer].sum(Points),0);
+                    if(currentBalance + input.Points < 0)
+                    {
+                        alert "This transaction would make the customer's loyalty balance negative.";
+                        cancel submit;
+                    }
+                    if(input.Transaction_Type == "Earn")
+                    {
+                        input.Remaining_Points = input.Points;
+                        input.Used_Points = 0;
+                        if(input.Program != null && input.Expiry_Date == null)
+                        {
+                            programRecord = Loyalty_Programs[ID == input.Program];
+                            if(programRecord.count() > 0 && ifnull(programRecord.Expiry_Months,0) > 0)
+                            {
+                                input.Expiry_Date = zoho.currentdate.addMonth(programRecord.Expiry_Months);
+                            }
+                        }
+                    }
+                    currentEmployee = Employees[Work_Email == zoho.loginuserid && Active == true];
+                    if(input.Created_By == null && currentEmployee.count() > 0)
+                    {
+                        input.Created_By = currentEmployee.ID;
+                    }
+                }
+                else
+                {
+                    persistedTransaction = Loyalty_Transactions[ID == input.ID];
+                    if(persistedTransaction.Customer != input.Customer || persistedTransaction.Customer_Portal_User != input.Customer_Portal_User || persistedTransaction.Shipment != input.Shipment || persistedTransaction.Program != input.Program || persistedTransaction.Transaction_Type != input.Transaction_Type || persistedTransaction.Points != input.Points || persistedTransaction.Monetary_Value != input.Monetary_Value || persistedTransaction.Transaction_Date != input.Transaction_Date || persistedTransaction.Expiry_Date != input.Expiry_Date || persistedTransaction.Remaining_Points != input.Remaining_Points || persistedTransaction.Used_Points != input.Used_Points || persistedTransaction.Transaction_Status != input.Transaction_Status || persistedTransaction.Reference_Text != input.Reference_Text || persistedTransaction.Balance_After != input.Balance_After || persistedTransaction.Created_By != input.Created_By)
+                    {
+                        alert "Posted loyalty ledger entries are immutable. Create an adjustment or reversal instead.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

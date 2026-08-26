@@ -1,0 +1,190 @@
+form Hubs
+{
+    title
+    {
+        displayname = "Hubs"
+        on add = "Add Hub"
+        on edit = "Edit Hub"
+    }
+    success message = "Hub saved successfully."
+
+    Hub_Information
+    (
+        type = section
+        displayname = "Hub Information"
+        row = 1
+        column = 0
+    )
+    Hub_ID
+    (
+        type = autonumber
+        displayname = "Hub ID"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have unique Hub_Code
+    (
+        type = text
+        displayname = "Hub Code"
+        maxchar = 30
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Hub_Name
+    (
+        type = text
+        displayname = "Hub Name"
+        maxchar = 100
+        row = 1
+        column = 2
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"Active","Inactive"}
+        initial value = "Active"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Contact_and_Location
+    (
+        type = section
+        displayname = "Contact and Location"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Hub_Address
+    (
+        type = address
+        displayname = "Hub Address"
+        capture_coordinates = true
+        adjust_using_map = true
+        address_line_1
+        (
+            type = address_line_1
+            displayname = "Address Line 1"
+        )
+        address_line_2
+        (
+            type = address_line_2
+            displayname = "Address Line 2"
+        )
+        district_city
+        (
+            type = district_city
+            displayname = "City"
+        )
+        state_province
+        (
+            type = state_province
+            displayname = "State"
+        )
+        postal_Code
+        (
+            type = postal_Code
+            displayname = "PIN Code"
+        )
+        country
+        (
+            type = country
+            displayname = "Country"
+        )
+        latitude
+        (
+            type = latitude
+            displayname = "Latitude"
+            visibility = false
+        )
+        longitude
+        (
+            type = longitude
+            displayname = "Longitude"
+            visibility = false
+        )
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Manager_User
+    (
+        type = picklist
+        displayname = "Hub Manager"
+        module = users
+        displayformat = [name]
+        row = 2
+        column = 2
+        width = medium
+    )
+    Contact_Phone
+    (
+        type = phonenumber
+        displayname = "Contact Phone"
+        allowedcountries = {in}
+        defaultcountry = "in"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Contact_Email
+    (
+        type = email
+        displayname = "Contact Email"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Operating_Hours
+    (
+        type = text
+        displayname = "Operating Hours"
+        maxchar = 100
+        row = 2
+        column = 1
+        width = medium
+    )
+    Service_Area_Notes
+    (
+        type = textarea
+        displayname = "Service Area Notes"
+        height = 100px
+        row = 2
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Hub"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Hub"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

@@ -1,0 +1,366 @@
+Loyalty_Redemption_Lifecycle as "Loyalty Redemption Lifecycle"
+{
+    type = blueprint
+    form = Loyalty_Redemptions
+
+    start
+    {
+        start stage = "Requested"
+    }
+
+    stages
+    {
+        "Requested" { }
+        "Approved" { }
+        "Applied" { }
+        "Paid" { }
+        "Rejected" { }
+        "Cancelled" { }
+    }
+
+    transitions
+    {
+        Approve_Redemption as "Approve Redemption"
+        {
+            type = normal
+            from stage = "Requested"
+            to stage = "Approved"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin"}
+                )
+                confirmation before execution
+                (
+                    message = "Approve this redemption after confirming the available points and value?"
+                    confirm button text = "Approve"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Reviewed_On = zoho.currenttime;
+                        reviewer = Employees[Work_Email == zoho.loginuserid && Active == true];
+                        if(reviewer.count() > 0)
+                        {
+                            Reviewed_By = reviewer.ID;
+                        }
+                        customerRecord = Customers[ID == input.Customer];
+                        if(input.Redemption_Type == "Cash Value" && input.Generated_Transaction == null && customerRecord.count() > 0)
+                        {
+                            newBalance = customerRecord.Current_Points_Balance - input.Points_Requested;
+                            transactionID = insert into Loyalty_Transactions
+                            [
+                                Customer = input.Customer
+                                Customer_Portal_User = input.Customer_Portal_User
+                                Program = input.Program
+                                Transaction_Type = "Redeem"
+                                Points = 0 - input.Points_Requested
+                                Monetary_Value = input.Amount_Value
+                                Transaction_Date = zoho.currenttime
+                                Remaining_Points = 0
+                                Used_Points = input.Points_Requested
+                                Transaction_Status = "Posted"
+                                Reference_Text = "Cash value redemption " + input.Redemption_Number.toString()
+                                Balance_After = newBalance
+                                Created_By = reviewer.ID
+                            ];
+                            Generated_Transaction = transactionID;
+                            pointsToAllocate = input.Points_Requested;
+                            earnLots = Loyalty_Transactions[Customer == input.Customer && Points > 0 && Remaining_Points > 0 && Transaction_Status != "Expired"] sort by Expiry_Date, Transaction_Date;
+                            for each earnLot in earnLots
+                            {
+                                if(pointsToAllocate > 0)
+                                {
+                                    lotAvailable = ifnull(earnLot.Remaining_Points,0);
+                                    lotUsed = lotAvailable;
+                                    if(lotUsed > pointsToAllocate)
+                                    {
+                                        lotUsed = pointsToAllocate;
+                                    }
+                                    earnLot.Remaining_Points = lotAvailable - lotUsed;
+                                    earnLot.Used_Points = ifnull(earnLot.Used_Points,0) + lotUsed;
+                                    pointsToAllocate = pointsToAllocate - lotUsed;
+                                }
+                            }
+                            customerRecord.Current_Points_Balance = newBalance;
+                        }
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Logistics_Admin"
+                            Entity_Type = "Loyalty_Redemptions"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Redemption Approved"
+                            Before_Value = "Requested"
+                            After_Value = "Approved"
+                            Details = input.Redemption_Type + " redemption approved for INR " + input.Amount_Value.toString() + "."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Reject_Redemption as "Reject Redemption"
+        {
+            type = normal
+            from stage = "Requested"
+            to stage = "Rejected"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin"}
+                )
+                transition criteria = ( Review_Notes is not null )
+                tooltip message = "Enter review notes before rejecting the request."
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Reviewed_On = zoho.currenttime;
+                        reviewer = Employees[Work_Email == zoho.loginuserid && Active == true];
+                        if(reviewer.count() > 0)
+                        {
+                            Reviewed_By = reviewer.ID;
+                        }
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Logistics_Admin"
+                            Entity_Type = "Loyalty_Redemptions"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Redemption Rejected"
+                            Before_Value = "Requested"
+                            After_Value = "Rejected"
+                            Details = input.Review_Notes
+                            Severity = "Warning"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Pay_Cash_Value as "Record Cash Payout"
+        {
+            type = normal
+            from stage = "Approved"
+            to stage = "Paid"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin"}
+                )
+                transition criteria = ( Redemption_Type == "Cash Value" && Payment_Reference is not null && Generated_Transaction is not null )
+                tooltip message = "Enter the UPI or bank payment reference before recording payout."
+                confirmation before execution
+                (
+                    message = "Confirm that the INR payout has been completed?"
+                    confirm button text = "Record Payout"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Reviewed_On = zoho.currenttime;
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Logistics_Admin"
+                            Entity_Type = "Loyalty_Redemptions"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Cash Redemption Paid"
+                            Before_Value = "Approved"
+                            After_Value = "Paid"
+                            Details = "INR payout recorded with reference " + input.Payment_Reference + "."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Apply_Shipment_Discount as "Apply Shipment Discount"
+        {
+            type = normal
+            from stage = "Approved"
+            to stage = "Applied"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin"}
+                )
+                transition criteria = ( Redemption_Type == "Shipment Discount" && Shipment is not null )
+                confirmation before execution
+                (
+                    message = "Apply this loyalty discount to the selected shipment?"
+                    confirm button text = "Apply Discount"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        customerRecord = Customers[ID == input.Customer];
+                        shipmentRecord = Shipment_Requests[ID == input.Shipment];
+                        if(input.Generated_Transaction == null && customerRecord.count() > 0 && shipmentRecord.count() > 0)
+                        {
+                            newBalance = customerRecord.Current_Points_Balance - input.Points_Requested;
+                            transactionID = insert into Loyalty_Transactions
+                            [
+                                Customer = input.Customer
+                                Customer_Portal_User = input.Customer_Portal_User
+                                Shipment = input.Shipment
+                                Program = input.Program
+                                Transaction_Type = "Redeem"
+                                Points = 0 - input.Points_Requested
+                                Monetary_Value = input.Amount_Value
+                                Transaction_Date = zoho.currenttime
+                                Remaining_Points = 0
+                                Used_Points = input.Points_Requested
+                                Transaction_Status = "Posted"
+                                Reference_Text = "Shipment discount redemption " + input.Redemption_Number.toString()
+                                Balance_After = newBalance
+                            ];
+                            Generated_Transaction = transactionID;
+                            pointsToAllocate = input.Points_Requested;
+                            earnLots = Loyalty_Transactions[Customer == input.Customer && Points > 0 && Remaining_Points > 0 && Transaction_Status != "Expired"] sort by Expiry_Date, Transaction_Date;
+                            for each earnLot in earnLots
+                            {
+                                if(pointsToAllocate > 0)
+                                {
+                                    lotAvailable = ifnull(earnLot.Remaining_Points,0);
+                                    lotUsed = lotAvailable;
+                                    if(lotUsed > pointsToAllocate)
+                                    {
+                                        lotUsed = pointsToAllocate;
+                                    }
+                                    earnLot.Remaining_Points = lotAvailable - lotUsed;
+                                    earnLot.Used_Points = ifnull(earnLot.Used_Points,0) + lotUsed;
+                                    pointsToAllocate = pointsToAllocate - lotUsed;
+                                }
+                            }
+                            customerRecord.Current_Points_Balance = newBalance;
+                            shipmentRecord.Use_Loyalty = true;
+                            shipmentRecord.Loyalty_Points_To_Use = input.Points_Requested;
+                            shipmentRecord.Loyalty_Discount = input.Amount_Value;
+                            shipmentRecord.Net_Amount = shipmentRecord.Gross_Amount - input.Amount_Value;
+                            if(shipmentRecord.Net_Amount < 0)
+                            {
+                                shipmentRecord.Net_Amount = 0;
+                            }
+                        }
+                        Reviewed_On = zoho.currenttime;
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Logistics_Admin"
+                            Entity_Type = "Loyalty_Redemptions"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Shipment Discount Applied"
+                            Before_Value = "Approved"
+                            After_Value = "Applied"
+                            Details = "Applied INR " + input.Amount_Value.toString() + " to shipment " + input.Shipment.toString() + "."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Cancel_Redemption as "Cancel Redemption"
+        {
+            type = common
+            from stage = "Requested"
+            to stage = "Cancelled"
+            common stages = {"Approved"}
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Customer_Portal","Logistics_Admin","Operations_Employee"}
+                )
+                confirmation before execution
+                (
+                    message = "Cancel this unfulfilled redemption and reverse any posted points debit?"
+                    confirm button text = "Cancel Redemption"
+                    cancel button text = "Keep Request"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        previousStatus = input.Redemption_Status;
+                        if(input.Generated_Transaction != null)
+                        {
+                            originalTransaction = Loyalty_Transactions[ID == input.Generated_Transaction];
+                            reversalExists = Loyalty_Transactions[Transaction_Type == "Reverse" && Reference_Text == "Redemption cancellation " + input.Redemption_Number.toString()];
+                            customerRecord = Customers[ID == input.Customer];
+                            if(originalTransaction.count() > 0 && reversalExists.count() == 0 && customerRecord.count() > 0)
+                            {
+                                pointsToRestore = 0 - originalTransaction.Points;
+                                newBalance = customerRecord.Current_Points_Balance + pointsToRestore;
+                                reversalID = insert into Loyalty_Transactions
+                                [
+                                    Customer = input.Customer
+                                    Customer_Portal_User = input.Customer_Portal_User
+                                    Shipment = input.Shipment
+                                    Program = input.Program
+                                    Transaction_Type = "Reverse"
+                                    Points = pointsToRestore
+                                    Monetary_Value = input.Amount_Value
+                                    Transaction_Date = zoho.currenttime
+                                    Remaining_Points = pointsToRestore
+                                    Used_Points = 0
+                                    Transaction_Status = "Posted"
+                                    Reference_Text = "Redemption cancellation " + input.Redemption_Number.toString()
+                                    Balance_After = newBalance
+                                ];
+                                originalTransaction.Transaction_Status = "Reversed";
+                                customerRecord.Current_Points_Balance = newBalance;
+                            }
+                        }
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Loyalty Redemption Lifecycle"
+                            Entity_Type = "Loyalty_Redemptions"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Redemption Cancelled"
+                            Before_Value = previousStatus
+                            After_Value = "Cancelled"
+                            Details = "Unfulfilled redemption cancelled; posted points were reversed when applicable."
+                            Severity = "Warning"
+                        ];
+                    )
+                }
+            }
+        }
+    }
+}

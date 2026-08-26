@@ -1,0 +1,5 @@
+report Rate_Matrix
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Rate_ID Rate_Name Customer_Type Transport_Mode Priority ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Rate_ID Rate_Name Customer_Type Transport_Mode Min_Weight_Kg Max_Weight_Kg Min_Distance_Km Max_Distance_Km Base_Charge Charge_Per_Kg Charge_Per_Km Minimum_Charge Fuel_Surcharge_Percent Priority Effective_From Effective_To Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

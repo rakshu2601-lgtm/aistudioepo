@@ -1,0 +1,37 @@
+kanban Customer_Onboarding_Board
+{
+    displayName = "Customer Onboarding Board"
+    show all rows from Customers
+    (
+        Customer_ID
+        Customer_Name
+        Customer_Email
+        Customer_Type
+        Company_Name
+        Onboarding_Status
+        KYC_Status
+        Active
+        (
+            displaytrue = "Active"
+            displayfalse = "Inactive"
+        )
+    )
+    filters
+    (
+        Customer_Type
+        KYC_Status
+        Active
+    )
+    sort by
+    (
+        Customer_Email ascending
+    )
+    options
+    (
+        display field = Onboarding_Status
+        othercolumn = "Other"
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

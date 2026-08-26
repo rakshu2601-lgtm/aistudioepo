@@ -1,0 +1,51 @@
+calendar Agent_Task_Calendar
+{
+    displayName = "Agent Task Calendar"
+    show all rows from Agent_Tasks [Scheduled_At is not null]
+    (
+        Task_Number
+        Task_Type
+        Shipment
+        Hub
+        Assigned_Agent
+        Scheduled_At
+        Contact_Name
+        Contact_Phone
+        (
+            displayformat = formattednumber
+            linktodial = enable
+        )
+        Task_Address
+        Task_Status
+    )
+    filters
+    (
+        Task_Type
+        Hub
+        Assigned_Agent
+        Scheduled_At
+        Task_Status
+        "Open Tasks" : (Task_Status != "Completed" && Task_Status != "Failed")
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Assigned_Agent ascending
+    )
+    options
+    (
+        display type = week
+        week start day = monday
+        display field = Task_Number
+        start date = Scheduled_At
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+}

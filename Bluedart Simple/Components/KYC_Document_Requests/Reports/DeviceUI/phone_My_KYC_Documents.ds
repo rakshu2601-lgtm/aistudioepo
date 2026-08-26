@@ -1,0 +1,5 @@
+report My_KYC_Documents
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Request_ID Requested_Document_Name Verification_Status Uploaded_Document ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on tap ( View Record ) on long press ( Edit Delete Duplicate View Record ) on left swipe ( Delete ) on right swipe ( Edit ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Request_ID Requested_Document_Name Instructions Required_Document Verification_Status Uploaded_Document Uploaded_On Review_Notes Rejection_Reason Requested_On ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

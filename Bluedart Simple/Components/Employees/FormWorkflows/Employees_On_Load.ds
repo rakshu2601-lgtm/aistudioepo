@@ -1,0 +1,27 @@
+Employees_On_Load as "Configure Employee Hub on Load"
+{
+    type = form
+    form = Employees
+    record event = on add or edit
+    description = "Shows hub assignment only for employees whose role is tied to hub operations."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Employee_Type == "Administrator")
+                {
+                    hide Hub;
+                    disable Hub;
+                }
+                else
+                {
+                    show Hub;
+                    enable Hub;
+                }
+            )
+        }
+    }
+}

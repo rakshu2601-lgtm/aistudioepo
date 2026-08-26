@@ -1,0 +1,76 @@
+Agent_Tasks_On_Load as "Configure Agent Task on Load"
+{
+    type = form
+    form = Agent_Tasks
+    record event = on add or edit
+    description = "Protects ownership and lifecycle fields while exposing India-localized proof and exception inputs to the assigned agent."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Agent_User;
+                disable Task_Status;
+                disable Accepted_On;
+                disable Started_On;
+                disable Completed_On;
+                hide Recipient_Name;
+                hide Recipient_Signature;
+                hide Failure_Reason;
+                currentEmployee = Employees[Work_Email == zoho.loginuserid && Active == true];
+                isAgent = thisapp.permissions.isUserInProfile("Hub_Agent");
+                if(isAgent == true)
+                {
+                    disable Task_Type;
+                    disable Shipment;
+                    disable Hub;
+                    disable Assigned_Agent;
+                    disable Scheduled_At;
+                    disable Contact_Name;
+                    disable Contact_Phone;
+                    disable Task_Address;
+                    if(input.Agent_User != zoho.loginuserid)
+                    {
+                        disable Proof_File;
+                        disable Recipient_Name;
+                        disable Recipient_Signature;
+                        disable Failure_Reason;
+                        disable Agent_Notes;
+                    }
+                    else if(input.Task_Status == "In Progress")
+                    {
+                        enable Proof_File;
+                        enable Agent_Notes;
+                        show Failure_Reason;
+                        enable Failure_Reason;
+                        if(input.Task_Type == "Delivery")
+                        {
+                            show Recipient_Name;
+                            show Recipient_Signature;
+                            enable Recipient_Name;
+                            enable Recipient_Signature;
+                        }
+                    }
+                    else
+                    {
+                        disable Proof_File;
+                        disable Recipient_Name;
+                        disable Recipient_Signature;
+                        disable Failure_Reason;
+                    }
+                }
+                else if(input.Task_Type == "Delivery")
+                {
+                    show Recipient_Name;
+                    show Recipient_Signature;
+                }
+                if(input.Task_Status == "Failed")
+                {
+                    show Failure_Reason;
+                }
+            )
+        }
+    }
+}

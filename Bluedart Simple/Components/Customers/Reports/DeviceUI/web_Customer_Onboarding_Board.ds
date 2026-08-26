@@ -1,0 +1,5 @@
+report Customer_Onboarding_Board
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Customer_ID Customer_Name Customer_Type Onboarding_Status KYC_Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Customer_ID Customer_Name Customer_Email Customer_Type Company_Name Onboarding_Status KYC_Status Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

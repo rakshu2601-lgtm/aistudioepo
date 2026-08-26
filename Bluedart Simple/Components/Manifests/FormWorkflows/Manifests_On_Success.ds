@@ -1,0 +1,26 @@
+Manifests_On_Success as "Synchronize Manifest Agent Ownership"
+{
+    type = form
+    form = Manifests
+    record event = on add or edit
+    description = "Keeps the manifest record owner synchronized with the selected active agent."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Assigned_Agent != null)
+                {
+                    agentRecord = Employees[ID == input.Assigned_Agent];
+                    manifestRecord = Manifests[ID == input.ID];
+                    if(agentRecord.count() > 0 && manifestRecord.count() > 0)
+                    {
+                        manifestRecord.Assigned_Agent_User = agentRecord.Internal_User;
+                    }
+                }
+            )
+        }
+    }
+}

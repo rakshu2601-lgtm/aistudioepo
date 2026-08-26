@@ -1,0 +1,31 @@
+Employees_On_Validate as "Validate Employee Assignment"
+{
+    type = form
+    form = Employees
+    record event = on add or edit
+    description = "Requires operational employees to have a hub and prevents one internal user from being assigned twice."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Employee_Type != "Administrator" && input.Hub == null)
+                {
+                    alert "Select a hub for this employee type.";
+                    cancel submit;
+                }
+                duplicateUsers = Employees[Internal_User == input.Internal_User];
+                for each duplicateUser in duplicateUsers
+                {
+                    if(duplicateUser.ID != input.ID)
+                    {
+                        alert "This internal user is already linked to another employee record.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

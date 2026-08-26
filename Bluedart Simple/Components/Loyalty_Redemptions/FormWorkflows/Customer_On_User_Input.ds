@@ -1,0 +1,32 @@
+Redemption_Customer_On_User_Input as "Populate Redemption Customer Details"
+{
+    type = form
+    form = Loyalty_Redemptions
+    record event = on add or edit
+
+    on user input of Customer
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Customer != null)
+                {
+                    customerRecord = Customers[ID == input.Customer];
+                    if(customerRecord.count() > 0)
+                    {
+                        input.Customer_Portal_User = customerRecord.Portal_User;
+                        input.Program = customerRecord.Current_Loyalty_Program;
+                    }
+                }
+                else
+                {
+                    input.Customer_Portal_User = null;
+                    input.Program = null;
+                    input.Shipment = null;
+                    input.Amount_Value = 0;
+                }
+            )
+        }
+    }
+}

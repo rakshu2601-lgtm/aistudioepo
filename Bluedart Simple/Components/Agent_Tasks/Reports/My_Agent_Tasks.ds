@@ -1,0 +1,51 @@
+default list My_Agent_Tasks
+{
+    displayName = "My Agent Tasks"
+    show all rows from Agent_Tasks [Agent_User == zoho.loginuserid]
+    (
+        Task_Number
+        Task_Type
+        Shipment
+        Hub
+        Assigned_Agent
+        Agent_User
+        Scheduled_At
+        Contact_Name
+        Contact_Phone
+        (
+            displayformat = formattednumber
+            linktodial = enable
+        )
+        Task_Address
+        Task_Status
+        Accepted_On
+        Started_On
+        Completed_On
+        Recipient_Name
+        Proof_File
+        Recipient_Signature
+        Failure_Reason
+        Agent_Notes
+    )
+    filters
+    (
+        Task_Type
+        Hub
+        Scheduled_At
+        Task_Status
+        "My Open Tasks" : (Task_Status != "Completed" && Task_Status != "Failed")
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Task_Status ascending
+    )
+    sort by
+    (
+        Scheduled_At ascending
+        Task_Number descending
+    )
+}

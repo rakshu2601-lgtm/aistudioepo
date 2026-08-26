@@ -1,0 +1,34 @@
+Shipment_On_User_Input as "Set Shipment Leg Sequence"
+{
+    type = form
+    form = Manifest_Items
+    record event = on add or edit
+    description = "Suggests the next positive journey-leg sequence for the selected shipment."
+
+    on user input of Shipment
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Shipment == null)
+                {
+                    input.Leg_Sequence = null;
+                }
+                else
+                {
+                    nextSequence = 1;
+                    shipmentLegs = Manifest_Items[Shipment == input.Shipment] sort by Leg_Sequence;
+                    for each shipmentLeg in shipmentLegs
+                    {
+                        if(shipmentLeg.ID != input.ID && shipmentLeg.Leg_Sequence >= nextSequence)
+                        {
+                            nextSequence = shipmentLeg.Leg_Sequence + 1;
+                        }
+                    }
+                    input.Leg_Sequence = nextSequence;
+                }
+            )
+        }
+    }
+}

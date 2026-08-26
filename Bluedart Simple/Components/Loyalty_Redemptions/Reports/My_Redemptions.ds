@@ -1,0 +1,29 @@
+list My_Redemptions
+{
+    displayName = "My Redemptions"
+    show all rows from Loyalty_Redemptions [Customer_Portal_User == zoho.loginuserid]
+    (
+        Redemption_Number
+        Redemption_Type
+        Shipment
+        Program
+        Points_Requested
+        Amount_Value
+        Redemption_Status
+        Requested_On
+        Reviewed_On
+        Payment_Reference
+        Review_Notes
+    )
+    filters
+    (
+        Redemption_Type
+        Redemption_Status
+        Requested_On
+        "Open Requests" : (Redemption_Status == "Requested" || Redemption_Status == "Approved")
+    )
+    sort by
+    (
+        Requested_On descending
+    )
+}

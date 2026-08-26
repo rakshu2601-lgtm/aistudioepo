@@ -1,0 +1,18 @@
+Audit_Log_On_Delete as "Prevent Audit Deletion"
+{
+    type = form
+    form = Audit_Log
+    record event = on delete
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Audit entries are immutable and cannot be deleted.";
+                cancel delete;
+            )
+        }
+    }
+}

@@ -1,0 +1,331 @@
+KYC_Document_Lifecycle as "KYC Document Lifecycle"
+{
+    type = blueprint
+    form = KYC_Document_Requests
+
+    start
+    {
+        start stage = "Draft"
+    }
+
+    stages
+    {
+        "Draft"
+        {
+        }
+        "Requested"
+        {
+        }
+        "Uploaded"
+        {
+        }
+        "Approved"
+        {
+        }
+        "Rejected"
+        {
+        }
+    }
+
+    transitions
+    {
+        Send_Request as "Send Request"
+        {
+            type = normal
+            from stage = "Draft"
+            to stage = "Requested"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin","Operations_Employee"}
+                )
+                confirmation before execution
+                (
+                    message = "Send this KYC document request to the customer?"
+                    confirm button text = "Send Request"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Requested_On = zoho.currenttime;
+                        requester = Employees[Work_Email == zoho.loginuserid];
+                        if(requester.count() > 0)
+                        {
+                            Requested_By = requester.ID;
+                        }
+                        customerRecord = Customers[ID == input.Customer];
+                        if(customerRecord.count() > 0)
+                        {
+                            customerRecord.KYC_Status = "Documents Requested";
+                            sendmail
+                            (
+                                from : zoho.adminuserid
+                                to : customerRecord.Customer_Email
+                                subject : "KYC document requested"
+                                message : "Please upload your " + input.Requested_Document_Name + " in the customer portal."
+                            )
+                        }
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "KYC Request Workflow"
+                            Entity_Type = "KYC_Document_Requests"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Document Requested"
+                            After_Value = input.Requested_Document_Name
+                            Details = "KYC document request sent to customer."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Upload_Document as "Upload Document"
+        {
+            type = normal
+            from stage = "Requested"
+            to stage = "Uploaded"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Customer_Portal"}
+                )
+                transition criteria = ( Uploaded_Document is not null )
+                tooltip message = "Upload and save the requested document before submitting it for review."
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Uploaded_On = zoho.currenttime;
+                        customerRecord = Customers[ID == input.Customer];
+                        if(customerRecord.count() > 0)
+                        {
+                            customerRecord.KYC_Status = "Under Review";
+                        }
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : zoho.adminuserid
+                            subject : "KYC document uploaded for review"
+                            message : "A customer has uploaded " + input.Requested_Document_Name + " for KYC review."
+                        )
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Customer_Portal"
+                            Entity_Type = "KYC_Document_Requests"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Document Uploaded"
+                            After_Value = input.Requested_Document_Name
+                            Details = "Customer uploaded a KYC document for review."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Approve_Document as "Approve Document"
+        {
+            type = normal
+            from stage = "Uploaded"
+            to stage = "Approved"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin"}
+                )
+                confirmation before execution
+                (
+                    message = "Approve this KYC document?"
+                    confirm button text = "Approve"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Reviewed_On = zoho.currenttime;
+                        reviewer = Employees[Work_Email == zoho.loginuserid];
+                        if(reviewer.count() > 0)
+                        {
+                            Reviewed_By = reviewer.ID;
+                        }
+                        requiredRequests = KYC_Document_Requests[Customer == input.Customer && Required_Document == true];
+                        allApproved = true;
+                        for each requiredRequest in requiredRequests
+                        {
+                            if(requiredRequest.ID != input.ID && requiredRequest.Verification_Status != "Approved")
+                            {
+                                allApproved = false;
+                            }
+                        }
+                        customerRecord = Customers[ID == input.Customer];
+                        if(customerRecord.count() > 0)
+                        {
+                            if(allApproved == true)
+                            {
+                                customerRecord.KYC_Status = "Approved";
+                                customerRecord.Onboarding_Status = "Active";
+                                customerRecord.Onboarded_On = zoho.currenttime;
+                            }
+                            else
+                            {
+                                customerRecord.KYC_Status = "Under Review";
+                            }
+                            sendmail
+                            (
+                                from : zoho.adminuserid
+                                to : customerRecord.Customer_Email
+                                subject : "KYC document approved"
+                                message : "Your " + input.Requested_Document_Name + " has been approved."
+                            )
+                        }
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Logistics_Admin"
+                            Entity_Type = "KYC_Document_Requests"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Document Approved"
+                            After_Value = input.Requested_Document_Name
+                            Details = "KYC document approved and customer status recalculated."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Reject_Document as "Reject Document"
+        {
+            type = normal
+            from stage = "Uploaded"
+            to stage = "Rejected"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin"}
+                )
+                transition criteria = ( Rejection_Reason is not null )
+                tooltip message = "Enter and save a rejection reason before rejecting."
+                confirmation before execution
+                (
+                    message = "Reject this KYC document and request resubmission?"
+                    confirm button text = "Reject"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Reviewed_On = zoho.currenttime;
+                        reviewer = Employees[Work_Email == zoho.loginuserid];
+                        if(reviewer.count() > 0)
+                        {
+                            Reviewed_By = reviewer.ID;
+                        }
+                        customerRecord = Customers[ID == input.Customer];
+                        if(customerRecord.count() > 0)
+                        {
+                            customerRecord.KYC_Status = "Rejected";
+                            customerRecord.Onboarding_Status = "Pending KYC";
+                            sendmail
+                            (
+                                from : zoho.adminuserid
+                                to : customerRecord.Customer_Email
+                                subject : "KYC document requires resubmission"
+                                message : "Your " + input.Requested_Document_Name + " was rejected. Reason: " + input.Rejection_Reason + ". Please upload a corrected document."
+                            )
+                        }
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Logistics_Admin"
+                            Entity_Type = "KYC_Document_Requests"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Document Rejected"
+                            After_Value = input.Rejection_Reason
+                            Details = "KYC document rejected; customer may resubmit."
+                            Severity = "Warning"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Resubmit_Document as "Resubmit Document"
+        {
+            type = normal
+            from stage = "Rejected"
+            to stage = "Uploaded"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Customer_Portal"}
+                )
+                transition criteria = ( Uploaded_Document is not null )
+                tooltip message = "Upload and save a corrected document before resubmitting it."
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Uploaded_On = zoho.currenttime;
+                        Rejection_Reason = "";
+                        customerRecord = Customers[ID == input.Customer];
+                        if(customerRecord.count() > 0)
+                        {
+                            customerRecord.KYC_Status = "Under Review";
+                        }
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : zoho.adminuserid
+                            subject : "KYC document resubmitted for review"
+                            message : "A customer has resubmitted " + input.Requested_Document_Name + " for KYC review."
+                        )
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Customer_Portal"
+                            Entity_Type = "KYC_Document_Requests"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Document Resubmitted"
+                            After_Value = input.Requested_Document_Name
+                            Details = "Customer resubmitted a rejected KYC document."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+    }
+}

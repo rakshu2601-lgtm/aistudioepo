@@ -1,0 +1,19 @@
+<page linkname = "Customer_Dashboard" displayname = "Customer Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Customer_Dashboard_Content' elementName='Customer_Dashboard_Content'>
+          <![CDATA[htmlpage Customer_Dashboard_Content()
+            content
+             <%{%>
+                 <file name:Customer_Dashboard_Content.dshtml/>
+             <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

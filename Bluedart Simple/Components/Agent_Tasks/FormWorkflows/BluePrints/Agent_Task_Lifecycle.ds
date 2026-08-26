@@ -1,0 +1,370 @@
+Agent_Task_Lifecycle as "Agent Task Lifecycle"
+{
+    type = blueprint
+    form = Agent_Tasks
+
+    start
+    {
+        start stage = "Assigned"
+    }
+
+    stages
+    {
+        "Assigned" { }
+        "Accepted" { }
+        "In Progress" { }
+        "Completed" { }
+        "Failed" { }
+    }
+
+    transitions
+    {
+        Accept_Task as "Accept Task"
+        {
+            type = normal
+            from stage = "Assigned"
+            to stage = "Accepted"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Hub_Agent"}
+                    userfields = {Agent_User}
+                )
+                confirmation before execution
+                (
+                    message = "Accept this assigned pickup or delivery task?"
+                    confirm button text = "Accept Task"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Accepted_On = zoho.currenttime;
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Agent Task Lifecycle"
+                            Entity_Type = "Agent_Tasks"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Agent Task Accepted"
+                            Before_Value = "Assigned"
+                            After_Value = "Accepted"
+                            Details = "Assigned agent accepted the " + input.Task_Type.toLowerCase() + " task."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Start_Task as "Start Task"
+        {
+            type = normal
+            from stage = "Accepted"
+            to stage = "In Progress"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Hub_Agent"}
+                    userfields = {Agent_User}
+                )
+                confirmation before execution
+                (
+                    message = "Start this task now?"
+                    confirm button text = "Start Task"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Started_On = zoho.currenttime;
+                        shipmentRecord = Shipment_Requests[ID == input.Shipment];
+                        if(shipmentRecord.count() > 0 && input.Task_Type == "Delivery")
+                        {
+                            shipmentRecord.Shipment_Status = "Out for Delivery";
+                            shipmentRecord.Current_Hub = input.Hub;
+                            shipmentRecord.Latest_Tracking_Text = "Shipment is out for delivery.";
+                            trackingID = insert into Shipment_Tracking_Events
+                            [
+                                Shipment = shipmentRecord.ID
+                                Customer_Portal_User = shipmentRecord.Customer_Portal_User
+                                Event_Type = "Out for Delivery"
+                                Event_Time = zoho.currenttime
+                                Hub = input.Hub
+                                Location_Text = "Delivery route"
+                                Details = "Final-delivery agent started the assigned task."
+                                Customer_Visible = true
+                            ];
+                        }
+                    )
+                }
+            }
+        }
+
+        Complete_Task as "Complete Task"
+        {
+            type = normal
+            from stage = "In Progress"
+            to stage = "Completed"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Hub_Agent"}
+                    userfields = {Agent_User}
+                )
+                transition criteria = ( (Task_Type == "Pickup" && Proof_File is not null) || (Task_Type == "Delivery" && Recipient_Name is not null && (Proof_File is not null || Recipient_Signature is not null)) )
+                confirmation before execution
+                (
+                    message = "Complete this task using the captured proof?"
+                    confirm button text = "Complete Task"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Completed_On = zoho.currenttime;
+                        shipmentRecord = Shipment_Requests[ID == input.Shipment];
+                        if(shipmentRecord.count() > 0)
+                        {
+                            if(input.Task_Type == "Pickup")
+                            {
+                                shipmentRecord.Picked_Up_On = zoho.currenttime;
+                                shipmentRecord.Current_Hub = input.Hub;
+                                shipmentRecord.Shipment_Status = "Picked Up";
+                                shipmentRecord.Latest_Tracking_Text = "Shipment picked up and received at the origin hub.";
+                                trackingID = insert into Shipment_Tracking_Events
+                                [
+                                    Shipment = shipmentRecord.ID
+                                    Customer_Portal_User = shipmentRecord.Customer_Portal_User
+                                    Event_Type = "Picked Up"
+                                    Event_Time = zoho.currenttime
+                                    Hub = input.Hub
+                                    Location_Text = "Origin hub"
+                                    Details = "Pickup task completed with proof. Shipment is eligible for a manifest journey leg."
+                                    Customer_Visible = true
+                                ];
+                            }
+                            else
+                            {
+                                shipmentRecord.Delivered_On = zoho.currenttime;
+                                shipmentRecord.Current_Hub = input.Hub;
+                                shipmentRecord.Shipment_Status = "Delivered";
+                                shipmentRecord.Latest_Tracking_Text = "Shipment delivered successfully.";
+                                trackingID = insert into Shipment_Tracking_Events
+                                [
+                                    Shipment = shipmentRecord.ID
+                                    Customer_Portal_User = shipmentRecord.Customer_Portal_User
+                                    Event_Type = "Delivered"
+                                    Event_Time = zoho.currenttime
+                                    Hub = input.Hub
+                                    Location_Text = "Delivery address"
+                                    Details = "Delivery completed for recipient " + input.Recipient_Name + "."
+                                    Customer_Visible = true
+                                ];
+                                customerRecord = Customers[ID == shipmentRecord.Customer];
+                                priorEarn = Loyalty_Transactions[Shipment == shipmentRecord.ID && Transaction_Type == "Earn"];
+                                if(customerRecord.count() > 0 && customerRecord.Current_Loyalty_Program != null && priorEarn.count() == 0)
+                                {
+                                    programRecord = Loyalty_Programs[ID == customerRecord.Current_Loyalty_Program];
+                                    if(programRecord.count() > 0 && programRecord.Active == true)
+                                    {
+                                        earnedPoints = (shipmentRecord.Net_Amount * programRecord.Points_Per_Rupee).round(0).toNumber();
+                                        if(earnedPoints > 0)
+                                        {
+                                            expiryDate = null;
+                                            if(programRecord.Expiry_Months > 0)
+                                            {
+                                                expiryDate = zoho.currentdate.addMonth(programRecord.Expiry_Months);
+                                            }
+                                            newBalance = customerRecord.Current_Points_Balance + earnedPoints;
+                                            transactionID = insert into Loyalty_Transactions
+                                            [
+                                                Customer = shipmentRecord.Customer
+                                                Customer_Portal_User = shipmentRecord.Customer_Portal_User
+                                                Shipment = shipmentRecord.ID
+                                                Program = programRecord.ID
+                                                Transaction_Type = "Earn"
+                                                Points = earnedPoints
+                                                Monetary_Value = 0
+                                                Transaction_Date = zoho.currenttime
+                                                Expiry_Date = expiryDate
+                                                Remaining_Points = earnedPoints
+                                                Used_Points = 0
+                                                Transaction_Status = "Posted"
+                                                Reference_Text = "Points earned on delivered shipment"
+                                                Balance_After = newBalance
+                                            ];
+                                            customerRecord.Current_Points_Balance = newBalance;
+                                            customerRecord.Overall_Points_Earned = customerRecord.Overall_Points_Earned + earnedPoints;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        agentRecord = Employees[ID == input.Assigned_Agent];
+                        openTasks = Agent_Tasks[Assigned_Agent == input.Assigned_Agent && ID != input.ID && Task_Status != "Completed" && Task_Status != "Failed"];
+                        if(agentRecord.count() > 0 && openTasks.count() == 0)
+                        {
+                            agentRecord.Availability_Status = "Available";
+                        }
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Agent Task Lifecycle"
+                            Entity_Type = "Agent_Tasks"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Agent Task Completed"
+                            Before_Value = "In Progress"
+                            After_Value = "Completed"
+                            Details = input.Task_Type + " task completed; shipment and loyalty outcomes were applied idempotently."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Fail_Task as "Fail Task"
+        {
+            type = normal
+            from stage = "In Progress"
+            to stage = "Failed"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Hub_Agent"}
+                    userfields = {Agent_User}
+                )
+                transition criteria = ( Failure_Reason is not null )
+                confirmation before execution
+                (
+                    message = "Record this task as failed and create a shipment exception?"
+                    confirm button text = "Record Failure"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Completed_On = zoho.currenttime;
+                        shipmentRecord = Shipment_Requests[ID == input.Shipment];
+                        if(shipmentRecord.count() > 0)
+                        {
+                            shipmentRecord.Latest_Tracking_Text = "An exception occurred during the " + input.Task_Type.toLowerCase() + " task.";
+                            trackingID = insert into Shipment_Tracking_Events
+                            [
+                                Shipment = shipmentRecord.ID
+                                Customer_Portal_User = shipmentRecord.Customer_Portal_User
+                                Event_Type = "Exception"
+                                Event_Time = zoho.currenttime
+                                Hub = input.Hub
+                                Location_Text = input.Task_Type + " location"
+                                Details = input.Failure_Reason
+                                Customer_Visible = true
+                            ];
+                        }
+                        agentRecord = Employees[ID == input.Assigned_Agent];
+                        openTasks = Agent_Tasks[Assigned_Agent == input.Assigned_Agent && ID != input.ID && Task_Status != "Completed" && Task_Status != "Failed"];
+                        if(agentRecord.count() > 0 && openTasks.count() == 0)
+                        {
+                            agentRecord.Availability_Status = "Available";
+                        }
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Agent Task Lifecycle"
+                            Entity_Type = "Agent_Tasks"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Agent Task Failed"
+                            Before_Value = "In Progress"
+                            After_Value = "Failed"
+                            Details = input.Failure_Reason
+                            Severity = "Warning"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Retry_Task as "Retry Failed Task"
+        {
+            type = normal
+            from stage = "Failed"
+            to stage = "Assigned"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin","Hub_Manager"}
+                )
+                transition criteria = ( Assigned_Agent is not null )
+                confirmation before execution
+                (
+                    message = "Retry this failed task with the selected agent and schedule?"
+                    confirm button text = "Retry Task"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Accepted_On = null;
+                        Started_On = null;
+                        Completed_On = null;
+                        agentRecord = Employees[ID == input.Assigned_Agent];
+                        if(agentRecord.count() > 0)
+                        {
+                            Agent_User = agentRecord.Internal_User;
+                            agentRecord.Availability_Status = "Assigned";
+                            sendmail
+                            (
+                                from : zoho.adminuserid
+                                to : agentRecord.Work_Email
+                                subject : "Retried " + input.Task_Type + " task assigned"
+                                message : "Task " + input.Task_Number.toString() + " has been retried and assigned to you. Review the earlier failure reason before proceeding."
+                            )
+                        }
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Agent Task Retry"
+                            Entity_Type = "Agent_Tasks"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Failed Task Retried"
+                            Before_Value = "Failed"
+                            After_Value = "Assigned"
+                            Details = "Task retried with employee record " + input.Assigned_Agent.toString() + "."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+    }
+}

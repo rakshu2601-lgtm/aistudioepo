@@ -1,0 +1,164 @@
+"Hub_Manager"
+{
+    name = "Hub_Manager"
+    type = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+    description = "Hub operations, manifests, shipment flow, and agent management"
+    ModulePermissions
+    {
+        Hubs
+        {
+            enabled = Viewall,Tab,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Hubs={"View"}
+                Hub_Map={"View"}
+            }
+        }
+        Employees
+        {
+            enabled = Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Employee_ID{visibility:true,readonly:true}
+                Employee_Name{visibility:true,readonly:true}
+                Work_Email{visibility:true,readonly:true}
+                Phone{visibility:true,readonly:true}
+                Internal_User{visibility:false}
+                Employee_Type{visibility:true,readonly:true}
+                Hub{visibility:true,readonly:true}
+                Availability_Status{visibility:true,readonly:false}
+                Active{visibility:true,readonly:true}
+            }
+            ReportPermissions
+            {
+                All_Employees={"View"}
+                Active_Agents={"View","Edit"}
+            }
+        }
+        KYC_Document_Rules
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                KYC_Document_Rule_List={"View"}
+            }
+        }
+        Customers
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Customers={"View"}
+            }
+        }
+        KYC_Document_Requests
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                KYC_Review_Queue={"View"}
+                KYC_Verification_Board={"View"}
+            }
+        }
+        Transport_Rates
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Active_Transport_Rates={"View"}
+                Rate_Matrix={"View"}
+            }
+        }
+        Loyalty_Programs
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Loyalty_Program_Matrix={"View"}
+            }
+        }
+        Shipment_Requests
+        {
+            enabled = Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Shipments={"View","Edit"}
+                Shipment_Status_Board={"View","Edit"}
+                Shipment_Timeline={"View"}
+            }
+        }
+        Manifests
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Manifests={"View","Edit"}
+                Manifest_Board={"View","Edit"}
+            }
+        }
+        Manifest_Items
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Manifest_Shipments={"View","Edit"}
+                Shipment_Journey_Legs={"View","Edit"}
+            }
+        }
+        Agent_Tasks
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Agent_Task_Board={"View","Edit"}
+                My_Agent_Tasks={"View"}
+                Agent_Task_Calendar={"View","Edit"}
+            }
+        }
+        Shipment_Tracking_Events
+        {
+            enabled = Create,Viewall,Tab,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Shipment_Tracking_History={"View"}
+                Tracking_Timeline={"View"}
+            }
+        }
+        Loyalty_Transactions
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Loyalty_Ledger={"View"}
+            }
+        }
+        Loyalty_Redemptions
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Redemption_Queue={"View"}
+                Redemption_Board={"View"}
+            }
+        }
+        Hub_Dashboard
+        {
+            enabled = tab
+        }
+    }
+}

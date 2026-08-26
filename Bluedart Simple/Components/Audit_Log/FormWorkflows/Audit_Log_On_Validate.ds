@@ -1,0 +1,18 @@
+Audit_Log_On_Validate as "Block Direct Audit Changes"
+{
+    type = form
+    form = Audit_Log
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Audit entries are system generated and cannot be created or edited through this form.";
+                cancel submit;
+            )
+        }
+    }
+}

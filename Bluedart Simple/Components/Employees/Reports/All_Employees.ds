@@ -1,0 +1,44 @@
+default list All_Employees
+{
+    displayName = "All Employees"
+    show all rows from Employees
+    (
+        Employee_ID
+        Employee_Name
+        Work_Email
+        Phone
+        (
+            displayformat = formattednumber
+            linktodial = enable
+        )
+        Internal_User
+        Employee_Type
+        Hub
+        Availability_Status
+        Active
+        (
+            displaytrue = "Active"
+            displayfalse = "Inactive"
+        )
+    )
+    filters
+    (
+        Employee_Type
+        Hub
+        Availability_Status
+        Active
+        "Active Employees" : (Active == true)
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Employee_Type ascending
+    )
+    sort by
+    (
+        Work_Email ascending
+    )
+}

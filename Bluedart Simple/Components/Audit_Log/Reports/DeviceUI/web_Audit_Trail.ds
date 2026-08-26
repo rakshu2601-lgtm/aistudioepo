@@ -1,0 +1,5 @@
+report Audit_Trail
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Log_ID Event_Time Entity_Type Action Severity ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Log_ID Event_Time User_Email User_Profile Entity_Type Entity_Record_ID Action Before_Value After_Value Details Severity ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

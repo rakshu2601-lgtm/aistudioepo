@@ -1,0 +1,43 @@
+Manifest_Items_On_Success as "Complete Manifest Shipment Save"
+{
+    type = form
+    form = Manifest_Items
+    record event = on add or edit
+    description = "Synchronizes manifest ownership, records loading time, and audits handling exceptions."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                itemRecord = Manifest_Items[ID == input.ID];
+                manifestRecord = Manifests[ID == input.Manifest];
+                if(itemRecord.count() > 0 && manifestRecord.count() > 0)
+                {
+                    itemRecord.Assigned_Agent_User = manifestRecord.Assigned_Agent_User;
+                    if(itemRecord.Loaded_On == null)
+                    {
+                        itemRecord.Loaded_On = zoho.currenttime;
+                    }
+                }
+                if(input.Item_Status == "Exception")
+                {
+                    auditID = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        User_Email = zoho.loginuserid
+                        User_Profile = "Manifest Item Exception"
+                        Entity_Type = "Manifest_Items"
+                        Entity_Record_ID = input.ID.toString()
+                        Action = "Journey Leg Exception Recorded"
+                        Before_Value = "In Handling"
+                        After_Value = "Exception"
+                        Details = input.Exception_Notes
+                        Severity = "Warning"
+                    ];
+                }
+            )
+        }
+    }
+}

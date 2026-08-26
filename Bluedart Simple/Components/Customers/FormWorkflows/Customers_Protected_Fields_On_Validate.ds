@@ -1,0 +1,26 @@
+Customers_Protected_Fields_On_Validate as "Protect Customer System Fields"
+{
+    type = form
+    form = Customers
+    record event = on edit
+    description = "Prevents non-administrators from changing workflow-controlled onboarding and loyalty values."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                isAdministrator = thisapp.permissions.isUserInProfile("Logistics_Admin");
+                if(isAdministrator == false)
+                {
+                    if(old.Portal_User != input.Portal_User || old.Onboarding_Status != input.Onboarding_Status || old.KYC_Status != input.KYC_Status || old.Current_Loyalty_Program != input.Current_Loyalty_Program || old.Overall_Points_Earned != input.Overall_Points_Earned || old.Current_Points_Balance != input.Current_Points_Balance || old.Onboarded_On != input.Onboarded_On || old.Active != input.Active)
+                    {
+                        alert "Onboarding, portal ownership, and loyalty summary fields are managed by authorized workflows.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

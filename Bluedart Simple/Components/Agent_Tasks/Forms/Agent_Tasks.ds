@@ -1,0 +1,306 @@
+form Agent_Tasks
+{
+    title
+    {
+        displayname = "Agent Tasks"
+        on add = "Assign Agent Task"
+        on edit = "Edit Agent Task"
+    }
+    success message = "Agent task saved successfully."
+    record owner = Agent_User
+
+    Task_Assignment
+    (
+        type = section
+        displayname = "Task Assignment"
+        row = 1
+        column = 0
+    )
+    Task_Number
+    (
+        type = autonumber
+        displayname = "Task Number"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Task_Type
+    (
+        type = picklist
+        displayname = "Task Type"
+        values = {"Pickup","Delivery"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Shipment
+    (
+        type = picklist
+        displayname = "Shipment"
+        values = Shipment_Requests.ID
+        displayformat = [Shipment_Number]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Hub
+    (
+        type = picklist
+        displayname = "Hub"
+        values = Hubs[Status == "Active"].ID
+        displayformat = [Hub_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Assigned_Agent
+    (
+        type = picklist
+        displayname = "Assigned Agent"
+        values = Employees[Employee_Type == "Agent" && Active == true].ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Agent_User
+    (
+        type = picklist
+        displayname = "Agent User"
+        module = users
+        displayformat = [name]
+        row = 1
+        column = 1
+        width = medium
+    )
+    Scheduled_At
+    (
+        type = datetime
+        displayname = "Scheduled At"
+        mins_displayinterval = 5
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    Contact_and_Location
+    (
+        type = section
+        displayname = "Contact and Location"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Contact_Name
+    (
+        type = text
+        displayname = "Contact Name"
+        maxchar = 120
+        personal data = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Contact_Phone
+    (
+        type = phonenumber
+        displayname = "Contact Phone"
+        allowedcountries = {in}
+        defaultcountry = "in"
+        personal data = true
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Task_Address
+    (
+        type = address
+        displayname = "Task Address"
+        capture_coordinates = true
+        adjust_using_map = true
+        address_line_1
+        (
+            type = address_line_1
+            displayname = "Address Line 1"
+        )
+        address_line_2
+        (
+            type = address_line_2
+            displayname = "Address Line 2"
+        )
+        district_city
+        (
+            type = district_city
+            displayname = "City"
+        )
+        state_province
+        (
+            type = state_province
+            displayname = "State"
+        )
+        postal_Code
+        (
+            type = postal_Code
+            displayname = "PIN Code"
+        )
+        country
+        (
+            type = country
+            displayname = "Country"
+        )
+        latitude
+        (
+            type = latitude
+            displayname = "Latitude"
+            visibility = false
+        )
+        longitude
+        (
+            type = longitude
+            displayname = "Longitude"
+            visibility = false
+        )
+        row = 2
+        column = 1
+        width = medium
+    )
+
+    Task_Progress
+    (
+        type = section
+        displayname = "Task Progress"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Task_Status
+    (
+        type = picklist
+        displayname = "Task Status"
+        values = {"Assigned","Accepted","In Progress","Completed","Failed"}
+        initial value = "Assigned"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Accepted_On
+    (
+        type = datetime
+        displayname = "Accepted On"
+        mins_displayinterval = 5
+        row = 3
+        column = 2
+        width = medium
+    )
+    Started_On
+    (
+        type = datetime
+        displayname = "Started On"
+        mins_displayinterval = 5
+        row = 3
+        column = 1
+        width = medium
+    )
+    Completed_On
+    (
+        type = datetime
+        displayname = "Completed On"
+        mins_displayinterval = 5
+        row = 3
+        column = 2
+        width = medium
+    )
+
+    Completion_and_Exceptions
+    (
+        type = section
+        displayname = "Completion and Exceptions"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    Recipient_Name
+    (
+        type = text
+        displayname = "Recipient Name"
+        maxchar = 120
+        personal data = true
+        row = 4
+        column = 1
+        width = medium
+    )
+    Proof_File
+    (
+        type = upload file
+        displayname = "Proof File"
+        browse = local_drive, google_docs, zoho_docs
+        row = 4
+        column = 2
+        width = medium
+    )
+    Recipient_Signature
+    (
+        type = signature
+        displayname = "Recipient Signature"
+        row = 4
+        column = 1
+        width = medium
+    )
+    Failure_Reason
+    (
+        type = textarea
+        displayname = "Failure Reason"
+        height = 90px
+        row = 4
+        column = 2
+        width = medium
+    )
+    Agent_Notes
+    (
+        type = textarea
+        displayname = "Agent Notes"
+        height = 90px
+        row = 4
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Assign Task"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Task"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Close"
+            )
+        }
+    }
+
+    blueprint components
+    {
+        stages = {"Assigned","Accepted","In Progress","Completed","Failed"}
+    }
+}

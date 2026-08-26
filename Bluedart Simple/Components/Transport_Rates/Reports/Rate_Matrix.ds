@@ -1,0 +1,53 @@
+list Rate_Matrix
+{
+    displayName = "Rate Matrix"
+    show all rows from Transport_Rates
+    (
+        Rate_ID
+        Rate_Name
+        Customer_Type
+        Transport_Mode
+        Min_Weight_Kg
+        Max_Weight_Kg
+        Min_Distance_Km
+        Max_Distance_Km
+        Base_Charge
+        Charge_Per_Kg
+        Charge_Per_Km
+        Minimum_Charge
+        Fuel_Surcharge_Percent
+        Priority
+        Effective_From
+        Effective_To
+        Active
+        (
+            displaytrue = "Active"
+            displayfalse = "Inactive"
+        )
+    )
+    filters
+    (
+        Customer_Type
+        Transport_Mode
+        Effective_From
+        Effective_To
+        Active
+        "Currently Enabled" : (Active == true)
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Transport_Mode ascending
+        Customer_Type ascending
+    )
+    sort by
+    (
+        Priority ascending
+        Effective_From descending
+        Min_Weight_Kg ascending
+        Min_Distance_Km ascending
+    )
+}

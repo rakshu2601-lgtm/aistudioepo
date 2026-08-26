@@ -1,0 +1,21 @@
+customize
+{
+    layout
+    {
+        theme = "theme_2"
+        variant = "variant_2"
+    }
+    font = "lato"
+    color options
+    {
+        name = "India Logistics"
+        brand color = "#0B6E4F"
+        type = "custom"
+        dark mode color = "#084C3A"
+    }
+    logo
+    {
+        preference = "app_icon"
+        placement = "left"
+    }
+}

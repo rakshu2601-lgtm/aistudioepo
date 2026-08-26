@@ -1,0 +1,26 @@
+Task_Assigned_Agent_On_User_Input as "Copy Assigned Agent User"
+{
+    type = form
+    form = Agent_Tasks
+    record event = on add or edit
+    description = "Copies the selected active agent's internal user into the task owner field."
+
+    on user input of Assigned_Agent
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Agent_User = null;
+                if(input.Assigned_Agent != null)
+                {
+                    agentRecord = Employees[ID == input.Assigned_Agent && Employee_Type == "Agent" && Active == true];
+                    if(agentRecord.count() > 0)
+                    {
+                        input.Agent_User = agentRecord.Internal_User;
+                    }
+                }
+            )
+        }
+    }
+}

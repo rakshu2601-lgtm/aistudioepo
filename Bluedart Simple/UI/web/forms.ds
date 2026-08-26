@@ -1,0 +1,18 @@
+forms
+{
+    form Hubs { label placement = left }
+    form Employees { label placement = left }
+    form KYC_Document_Rules { label placement = left }
+    form Customers { label placement = left }
+    form KYC_Document_Requests { label placement = left }
+    form Transport_Rates { label placement = left }
+    form Loyalty_Programs { label placement = left }
+    form Shipment_Requests { label placement = left }
+    form Manifests { label placement = left }
+    form Manifest_Items { label placement = left }
+    form Agent_Tasks { label placement = left }
+    form Shipment_Tracking_Events { label placement = left }
+    form Loyalty_Transactions { label placement = left }
+    form Loyalty_Redemptions { label placement = left }
+    form Audit_Log { label placement = left }
+}

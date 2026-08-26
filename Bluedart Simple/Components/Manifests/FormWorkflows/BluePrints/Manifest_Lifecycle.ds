@@ -1,0 +1,330 @@
+Manifest_Lifecycle as "Manifest Lifecycle"
+{
+    type = blueprint
+    form = Manifests
+
+    start
+    {
+        start stage = "Draft"
+    }
+
+    stages
+    {
+        "Draft" { }
+        "Ready" { }
+        "Dispatched" { }
+        "Arrived" { }
+        "Closed" { }
+        "Cancelled" { }
+    }
+
+    transitions
+    {
+        Ready_Manifest as "Ready Manifest"
+        {
+            type = normal
+            from stage = "Draft"
+            to stage = "Ready"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin","Hub_Manager"}
+                )
+                transition criteria = ( Assigned_Agent is not null && Planned_Departure is not null && Planned_Arrival is not null )
+                confirmation before execution
+                (
+                    message = "Confirm that this one-leg manifest is loaded and ready for dispatch?"
+                    confirm button text = "Mark Ready"
+                    cancel button text = "Keep Draft"
+                )
+            }
+            after
+            {
+            }
+        }
+
+        Dispatch_Manifest as "Dispatch Manifest"
+        {
+            type = normal
+            from stage = "Ready"
+            to stage = "Dispatched"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin","Hub_Manager","Hub_Agent"}
+                    userfields = {Assigned_Agent_User}
+                )
+                confirmation before execution
+                (
+                    message = "Dispatch this manifest leg from the origin hub?"
+                    confirm button text = "Dispatch"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Actual_Departure = zoho.currenttime;
+                        manifestItems = Manifest_Items[Manifest == input.ID];
+                        for each manifestItem in manifestItems
+                        {
+                            manifestItem.Item_Status = "Departed";
+                            shipmentRecord = Shipment_Requests[ID == manifestItem.Shipment];
+                            if(shipmentRecord.count() > 0)
+                            {
+                                shipmentRecord.Shipment_Status = "In Transit";
+                                shipmentRecord.Current_Hub = input.Origin_Hub;
+                                shipmentRecord.Latest_Tracking_Text = "Shipment departed the origin hub on manifest leg " + input.Manifest_Number.toString() + ".";
+                                trackingID = insert into Shipment_Tracking_Events
+                                [
+                                    Shipment = shipmentRecord.ID
+                                    Customer_Portal_User = shipmentRecord.Customer_Portal_User
+                                    Manifest = input.ID
+                                    Event_Type = "Departed Hub"
+                                    Event_Time = zoho.currenttime
+                                    Hub = input.Origin_Hub
+                                    Location_Text = "Departed origin hub"
+                                    Details = "Shipment dispatched on manifest leg " + input.Manifest_Number.toString() + "."
+                                    Customer_Visible = true
+                                ];
+                            }
+                        }
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Manifest Dispatch"
+                            Entity_Type = "Manifests"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Manifest Dispatched"
+                            Before_Value = "Ready"
+                            After_Value = "Dispatched"
+                            Details = "One-leg manifest departed origin hub " + input.Origin_Hub.toString() + "."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Arrive_Manifest as "Arrive Manifest"
+        {
+            type = normal
+            from stage = "Dispatched"
+            to stage = "Arrived"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin","Hub_Manager","Hub_Agent"}
+                    userfields = {Assigned_Agent_User}
+                )
+                confirmation before execution
+                (
+                    message = "Confirm arrival of this manifest leg at the destination hub?"
+                    confirm button text = "Record Arrival"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Actual_Arrival = zoho.currenttime;
+                        manifestItems = Manifest_Items[Manifest == input.ID];
+                        for each manifestItem in manifestItems
+                        {
+                            manifestItem.Item_Status = "Arrived";
+                            manifestItem.Unloaded_On = zoho.currenttime;
+                            shipmentRecord = Shipment_Requests[ID == manifestItem.Shipment];
+                            if(shipmentRecord.count() > 0)
+                            {
+                                shipmentRecord.Current_Hub = input.Destination_Hub;
+                                shipmentRecord.Shipment_Status = "At Hub";
+                                shipmentRecord.Latest_Tracking_Text = "Shipment arrived at the destination hub for manifest leg " + input.Manifest_Number.toString() + ".";
+                                trackingID = insert into Shipment_Tracking_Events
+                                [
+                                    Shipment = shipmentRecord.ID
+                                    Customer_Portal_User = shipmentRecord.Customer_Portal_User
+                                    Manifest = input.ID
+                                    Event_Type = "Arrived Hub"
+                                    Event_Time = zoho.currenttime
+                                    Hub = input.Destination_Hub
+                                    Location_Text = "Destination hub"
+                                    Details = "Shipment arrived on manifest leg " + input.Manifest_Number.toString() + "."
+                                    Customer_Visible = true
+                                ];
+                                if(input.Destination_Hub == shipmentRecord.Destination_Hub)
+                                {
+                                    existingDeliveryTask = Agent_Tasks[Shipment == shipmentRecord.ID && Task_Type == "Delivery" && Task_Status != "Completed"];
+                                    if(existingDeliveryTask.count() == 0)
+                                    {
+                                        deliveryAgent = Employees[Hub == input.Destination_Hub && Employee_Type == "Agent" && Active == true && Availability_Status == "Available"] sort by Employee_ID range from 0 to 0;
+                                        if(deliveryAgent.count() > 0)
+                                        {
+                                            taskID = insert into Agent_Tasks
+                                            [
+                                                Task_Type = "Delivery"
+                                                Shipment = shipmentRecord.ID
+                                                Hub = input.Destination_Hub
+                                                Assigned_Agent = deliveryAgent.ID
+                                                Agent_User = deliveryAgent.Internal_User
+                                                Scheduled_At = zoho.currenttime
+                                                Contact_Name = shipmentRecord.Delivery_Contact_Name
+                                                Contact_Phone = shipmentRecord.Delivery_Phone
+                                                Task_Address = shipmentRecord.Delivery_Address
+                                                Task_Status = "Assigned"
+                                                Agent_Notes = "Final delivery generated after manifest arrival."
+                                            ];
+                                            deliveryAgent.Availability_Status = "Assigned";
+                                            shipmentRecord.Shipment_Status = "Delivery Assigned";
+                                            shipmentRecord.Latest_Tracking_Text = "Shipment arrived at the final hub and was assigned for delivery.";
+                                        }
+                                        else
+                                        {
+                                            shipmentRecord.Latest_Tracking_Text = "Shipment arrived at the final hub and is awaiting delivery-agent assignment.";
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Manifest Arrival"
+                            Entity_Type = "Manifests"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Manifest Arrived"
+                            Before_Value = "Dispatched"
+                            After_Value = "Arrived"
+                            Details = "One-leg manifest arrived at destination hub " + input.Destination_Hub.toString() + "; final-hub shipments were assigned for delivery when an agent was available."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Close_Manifest as "Close Manifest"
+        {
+            type = normal
+            from stage = "Arrived"
+            to stage = "Closed"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin","Hub_Manager"}
+                )
+                confirmation before execution
+                (
+                    message = "Close this completed one-leg manifest?"
+                    confirm button text = "Close Manifest"
+                    cancel button text = "Keep Open"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Manifest Closure"
+                            Entity_Type = "Manifests"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Manifest Closed"
+                            Before_Value = "Arrived"
+                            After_Value = "Closed"
+                            Details = "Manifest leg closed after arrival processing."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Cancel_Manifest as "Cancel Manifest"
+        {
+            type = common
+            from stage = "Draft"
+            to stage = "Cancelled"
+            common stages = {"Ready","Dispatched"}
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin","Hub_Manager"}
+                )
+                confirmation before execution
+                (
+                    message = "Cancel this manifest before arrival?"
+                    confirm button text = "Cancel Manifest"
+                    cancel button text = "Keep Manifest"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        previousStatus = input.Manifest_Status;
+                        manifestItems = Manifest_Items[Manifest == input.ID];
+                        for each manifestItem in manifestItems
+                        {
+                            if(previousStatus == "Dispatched")
+                            {
+                                manifestItem.Item_Status = "Exception";
+                                manifestItem.Exception_Notes = "Manifest cancelled after dispatch; shipment returned to origin-hub exception handling.";
+                                shipmentRecord = Shipment_Requests[ID == manifestItem.Shipment];
+                                if(shipmentRecord.count() > 0)
+                                {
+                                    shipmentRecord.Current_Hub = input.Origin_Hub;
+                                    shipmentRecord.Shipment_Status = "At Hub";
+                                    shipmentRecord.Latest_Tracking_Text = "Manifest leg cancelled after dispatch; shipment returned to origin-hub exception handling.";
+                                    trackingID = insert into Shipment_Tracking_Events
+                                    [
+                                        Shipment = shipmentRecord.ID
+                                        Customer_Portal_User = shipmentRecord.Customer_Portal_User
+                                        Manifest = input.ID
+                                        Event_Type = "Exception"
+                                        Event_Time = zoho.currenttime
+                                        Hub = input.Origin_Hub
+                                        Location_Text = "Origin hub exception handling"
+                                        Details = "Manifest leg cancelled after dispatch; shipment requires operational reassignment."
+                                        Customer_Visible = true
+                                    ];
+                                }
+                            }
+                        }
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Manifest Cancellation"
+                            Entity_Type = "Manifests"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Manifest Cancelled"
+                            Before_Value = previousStatus
+                            After_Value = "Cancelled"
+                            Details = "Manifest leg cancelled before arrival; dispatched shipments were returned to origin-hub exception handling for reassignment."
+                            Severity = "Warning"
+                        ];
+                    )
+                }
+            }
+        }
+    }
+}

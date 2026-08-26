@@ -1,0 +1,37 @@
+Customers_On_Validate as "Validate Customer Details"
+{
+    type = form
+    form = Customers
+    record event = on add or edit
+    description = "Requires and validates Indian business identifiers for Corporate and Wholesale customers."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Customer_Type == "Corporate" || input.Customer_Type == "Wholesale")
+                {
+                    if(ifnull(input.Company_Name, "").trim() == "" || ifnull(input.GSTIN, "").trim() == "" || ifnull(input.PAN, "").trim() == "")
+                    {
+                        alert "Company Name, GSTIN, and PAN are required for Corporate and Wholesale customers.";
+                        cancel submit;
+                    }
+                    input.GSTIN = input.GSTIN.trim().toUpperCase();
+                    input.PAN = input.PAN.trim().toUpperCase();
+                    if(input.GSTIN.matches("^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$") == false)
+                    {
+                        alert "Enter a valid 15-character Indian GSTIN.";
+                        cancel submit;
+                    }
+                    if(input.PAN.matches("^[A-Z]{5}[0-9]{4}[A-Z]$") == false)
+                    {
+                        alert "Enter a valid 10-character Indian PAN.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

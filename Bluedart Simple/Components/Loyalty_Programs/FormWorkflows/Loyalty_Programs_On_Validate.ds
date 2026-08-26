@@ -1,0 +1,75 @@
+Loyalty_Programs_On_Validate as "Validate Loyalty Programme"
+{
+    type = form
+    form = Loyalty_Programs
+    record event = on add or edit
+    description = "Validates tier thresholds, earning and redemption values, effective dates, and overlapping active tiers."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(ifnull(input.Min_Lifetime_Points,0) < 0 || ifnull(input.Max_Lifetime_Points,0) < 0 || ifnull(input.Points_Per_Rupee,0) < 0 || ifnull(input.Redemption_Value_Per_Point,0) < 0 || ifnull(input.Minimum_Redemption_Points,0) < 0 || ifnull(input.Expiry_Months,0) < 0)
+                {
+                    alert "Points, redemption values, and expiry months cannot be negative.";
+                    cancel submit;
+                }
+                if(input.Max_Lifetime_Points != null && input.Max_Lifetime_Points < input.Min_Lifetime_Points)
+                {
+                    alert "Maximum lifetime points must be greater than or equal to minimum lifetime points.";
+                    cancel submit;
+                }
+                if(ifnull(input.Max_Shipment_Discount_Percent,0) < 0 || ifnull(input.Max_Shipment_Discount_Percent,0) > 100)
+                {
+                    alert "Maximum shipment discount must be between 0 and 100 percent.";
+                    cancel submit;
+                }
+                if(ifnull(input.Priority,0) < 1)
+                {
+                    alert "Selection priority must be 1 or greater.";
+                    cancel submit;
+                }
+                if(input.Effective_To != null && input.Effective_To < input.Effective_From)
+                {
+                    alert "Effective To must be on or after Effective From.";
+                    cancel submit;
+                }
+                if(input.Active == true)
+                {
+                    candidateProgrammes = Loyalty_Programs[Customer_Type == input.Customer_Type && Active == true];
+                    for each candidateProgramme in candidateProgrammes
+                    {
+                        if(candidateProgramme.ID != input.ID)
+                        {
+                            dateOverlaps = true;
+                            if(candidateProgramme.Effective_To != null && input.Effective_From > candidateProgramme.Effective_To)
+                            {
+                                dateOverlaps = false;
+                            }
+                            if(input.Effective_To != null && candidateProgramme.Effective_From > input.Effective_To)
+                            {
+                                dateOverlaps = false;
+                            }
+                            pointsOverlap = true;
+                            if(candidateProgramme.Max_Lifetime_Points != null && input.Min_Lifetime_Points > candidateProgramme.Max_Lifetime_Points)
+                            {
+                                pointsOverlap = false;
+                            }
+                            if(input.Max_Lifetime_Points != null && candidateProgramme.Min_Lifetime_Points > input.Max_Lifetime_Points)
+                            {
+                                pointsOverlap = false;
+                            }
+                            if(dateOverlaps == true && pointsOverlap == true)
+                            {
+                                alert "An active loyalty tier for this customer type already overlaps the same lifetime-points band and effective period.";
+                                cancel submit;
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

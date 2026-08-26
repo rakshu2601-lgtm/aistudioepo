@@ -1,0 +1,5 @@
+report KYC_Document_Rule_List
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Rule_ID Customer_Type Document_Name Required_Document Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Rule_ID Customer_Type Document_Name Instructions Allowed_File_Type Required_Document Sort_Order Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

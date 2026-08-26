@@ -1,0 +1,149 @@
+Manifest_Items_On_Validate as "Validate Manifest Shipment"
+{
+    type = form
+    form = Manifest_Items
+    record event = on add or edit
+    description = "Enforces eligible origin-hub loading, unique sequential journey legs, ownership, and exception-only agent edits."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                manifestRecord = Manifests[ID == input.Manifest];
+                shipmentRecord = Shipment_Requests[ID == input.Shipment];
+                if(manifestRecord.count() == 0 || shipmentRecord.count() == 0)
+                {
+                    alert "Select a valid manifest and shipment.";
+                    cancel submit;
+                }
+                coreLinkChanged = false;
+                persistedItem = Manifest_Items[ID == input.ID];
+                if(input.ID == null)
+                {
+                    coreLinkChanged = true;
+                }
+                else if(persistedItem.Manifest != input.Manifest || persistedItem.Shipment != input.Shipment || persistedItem.Leg_Sequence != input.Leg_Sequence)
+                {
+                    coreLinkChanged = true;
+                }
+                if(coreLinkChanged == true && manifestRecord.Manifest_Status != "Draft" && manifestRecord.Manifest_Status != "Ready")
+                {
+                    alert "Shipments can be added or resequenced only while the manifest is Draft or Ready.";
+                    cancel submit;
+                }
+                if(input.Leg_Sequence == null || input.Leg_Sequence <= 0)
+                {
+                    alert "Leg sequence must be a positive whole number.";
+                    cancel submit;
+                }
+                duplicateLinks = Manifest_Items[Manifest == input.Manifest && Shipment == input.Shipment];
+                for each duplicateLink in duplicateLinks
+                {
+                    if(duplicateLink.ID != input.ID)
+                    {
+                        alert "This shipment is already linked to the selected manifest leg.";
+                        cancel submit;
+                    }
+                }
+                if(coreLinkChanged == true)
+                {
+                    statusEligible = shipmentRecord.Shipment_Status == "Confirmed" || shipmentRecord.Shipment_Status == "Picked Up" || shipmentRecord.Shipment_Status == "At Hub";
+                    hubEligible = false;
+                    if(shipmentRecord.Shipment_Status == "Confirmed" && shipmentRecord.Origin_Hub == manifestRecord.Origin_Hub)
+                    {
+                        hubEligible = true;
+                    }
+                    if((shipmentRecord.Shipment_Status == "Picked Up" || shipmentRecord.Shipment_Status == "At Hub") && shipmentRecord.Current_Hub == manifestRecord.Origin_Hub)
+                    {
+                        hubEligible = true;
+                    }
+                    if(statusEligible == false || hubEligible == false)
+                    {
+                        alert "The shipment must be Confirmed, Picked Up, or At Hub and associated with the manifest origin hub.";
+                        cancel submit;
+                    }
+                    expectedSequence = 1;
+                    previousDestination = null;
+                    existingLegs = Manifest_Items[Shipment == input.Shipment] sort by Leg_Sequence;
+                    for each existingLeg in existingLegs
+                    {
+                        if(existingLeg.ID != input.ID && existingLeg.Leg_Sequence >= expectedSequence)
+                        {
+                            expectedSequence = existingLeg.Leg_Sequence + 1;
+                            previousManifest = Manifests[ID == existingLeg.Manifest];
+                            if(previousManifest.count() > 0)
+                            {
+                                previousDestination = previousManifest.Destination_Hub;
+                            }
+                        }
+                    }
+                    if(input.Leg_Sequence != expectedSequence)
+                    {
+                        alert "The next journey leg for this shipment must use sequence " + expectedSequence.toString() + ".";
+                        cancel submit;
+                    }
+                    if(expectedSequence > 1 && previousDestination != manifestRecord.Origin_Hub)
+                    {
+                        alert "The manifest origin hub must match the preceding journey leg's destination hub.";
+                        cancel submit;
+                    }
+                }
+                input.Assigned_Agent_User = manifestRecord.Assigned_Agent_User;
+                isAdministrator = thisapp.permissions.isUserInProfile("Logistics_Admin");
+                isAgent = thisapp.permissions.isUserInProfile("Hub_Agent");
+                currentEmployee = Employees[Work_Email == zoho.loginuserid && Active == true];
+                if(isAdministrator == false)
+                {
+                    if(currentEmployee.count() == 0)
+                    {
+                        alert "Only authorized logistics employees can manage manifest shipments.";
+                        cancel submit;
+                    }
+                    if(isAgent == true)
+                    {
+                        if(input.Assigned_Agent_User != zoho.loginuserid)
+                        {
+                            alert "Agents can update only items on their assigned manifests.";
+                            cancel submit;
+                        }
+                        if(input.ID == null || coreLinkChanged == true || persistedItem.Assigned_Agent_User != input.Assigned_Agent_User || persistedItem.Loaded_On != input.Loaded_On || persistedItem.Unloaded_On != input.Unloaded_On)
+                        {
+                            alert "Agents cannot change manifest links, sequence, ownership, or handling timestamps.";
+                            cancel submit;
+                        }
+                        if(persistedItem.Item_Status != input.Item_Status && input.Item_Status != "Exception")
+                        {
+                            alert "Agents may change an item status only to Exception.";
+                            cancel submit;
+                        }
+                    }
+                    else
+                    {
+                        if(currentEmployee.Hub != manifestRecord.Origin_Hub && currentEmployee.Hub != manifestRecord.Destination_Hub)
+                        {
+                            alert "You can manage only manifest items touching your assigned hub.";
+                            cancel submit;
+                        }
+                        if(input.ID != null && (persistedItem.Assigned_Agent_User != input.Assigned_Agent_User || persistedItem.Item_Status != input.Item_Status || persistedItem.Loaded_On != input.Loaded_On || persistedItem.Unloaded_On != input.Unloaded_On))
+                        {
+                            alert "Handling status, ownership, and timestamps are managed by manifest workflows.";
+                            cancel submit;
+                        }
+                    }
+                }
+                if(input.Item_Status == "Exception" && input.Exception_Notes in {""," ","null"})
+                {
+                    alert "Enter exception notes when recording a manifest-item exception.";
+                    cancel submit;
+                }
+                if(input.ID == null && input.Item_Status != "Loaded")
+                {
+                    alert "A new manifest item must begin with Loaded status.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

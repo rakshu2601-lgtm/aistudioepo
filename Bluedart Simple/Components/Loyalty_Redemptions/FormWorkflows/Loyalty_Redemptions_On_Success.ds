@@ -1,0 +1,28 @@
+Loyalty_Redemptions_On_Success as "Audit Loyalty Redemption Request"
+{
+    type = form
+    form = Loyalty_Redemptions
+    record event = on add
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                auditID = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    User_Email = zoho.loginuserid
+                    User_Profile = "Loyalty Redemption Request"
+                    Entity_Type = "Loyalty_Redemptions"
+                    Entity_Record_ID = input.ID.toString()
+                    Action = "Redemption Requested"
+                    After_Value = input.Points_Requested.toString()
+                    Details = input.Redemption_Type + " request for INR " + input.Amount_Value.toString() + "."
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

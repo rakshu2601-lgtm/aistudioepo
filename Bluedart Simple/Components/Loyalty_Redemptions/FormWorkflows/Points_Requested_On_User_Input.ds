@@ -1,0 +1,25 @@
+Points_Requested_On_User_Input as "Calculate Redemption Value"
+{
+    type = form
+    form = Loyalty_Redemptions
+    record event = on add or edit
+
+    on user input of Points_Requested
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Amount_Value = 0;
+                if(input.Program != null && ifnull(input.Points_Requested,0) > 0)
+                {
+                    programRecord = Loyalty_Programs[ID == input.Program];
+                    if(programRecord.count() > 0)
+                    {
+                        input.Amount_Value = (input.Points_Requested * programRecord.Redemption_Value_Per_Point).round(2);
+                    }
+                }
+            )
+        }
+    }
+}

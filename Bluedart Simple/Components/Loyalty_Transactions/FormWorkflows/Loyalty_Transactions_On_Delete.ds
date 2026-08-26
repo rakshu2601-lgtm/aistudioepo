@@ -1,0 +1,19 @@
+Loyalty_Transactions_On_Delete as "Protect Loyalty Ledger Deletion"
+{
+    type = form
+    form = Loyalty_Transactions
+    record event = on delete
+    description = "Prevents deletion of authoritative loyalty ledger history."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Loyalty ledger entries cannot be deleted. Post an adjustment or reversal instead.";
+                cancel delete;
+            )
+        }
+    }
+}

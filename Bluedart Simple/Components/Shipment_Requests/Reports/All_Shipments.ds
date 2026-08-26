@@ -1,0 +1,61 @@
+default list All_Shipments
+{
+    displayName = "All Shipments"
+    show all rows from Shipment_Requests
+    (
+        Shipment_Number
+        Customer
+        Pickup_Contact_Name
+        Pickup_Phone
+        (
+            displayformat = formattednumber
+            linktodial = enable
+        )
+        Delivery_Contact_Name
+        Delivery_Phone
+        (
+            displayformat = formattednumber
+            linktodial = enable
+        )
+        Weight_Kg
+        Transport_Mode
+        Manual_Distance_Km
+        Origin_Hub
+        Destination_Hub
+        Current_Hub
+        Gross_Amount
+        Loyalty_Discount
+        Net_Amount
+        Payment_Status
+        Shipment_Status
+        Requested_On
+        Expected_Delivery
+        Latest_Tracking_Text
+    )
+    filters
+    (
+        Customer
+        Transport_Mode
+        Origin_Hub
+        Destination_Hub
+        Current_Hub
+        Payment_Status
+        Shipment_Status
+        Requested_On
+        Expected_Delivery
+        "Open Shipments" : (Shipment_Status != "Delivered" && Shipment_Status != "Cancelled")
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Shipment_Status ascending
+    )
+    sort by
+    (
+        Requested_On descending
+        Shipment_Number descending
+    )
+}

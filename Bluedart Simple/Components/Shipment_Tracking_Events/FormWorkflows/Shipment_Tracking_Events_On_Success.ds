@@ -1,0 +1,30 @@
+Shipment_Tracking_Events_On_Success as "Synchronize Latest Tracking Summary"
+{
+    type = form
+    form = Shipment_Tracking_Events
+    record event = on add
+    description = "Keeps the shipment's latest customer-facing tracking summary aligned with new visible events."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Customer_Visible == true)
+                {
+                    shipmentRecord = Shipment_Requests[ID == input.Shipment];
+                    if(shipmentRecord.count() > 0)
+                    {
+                        summaryText = input.Event_Type;
+                        if(ifnull(input.Details,"") != "")
+                        {
+                            summaryText = input.Details;
+                        }
+                        shipmentRecord.Latest_Tracking_Text = summaryText;
+                    }
+                }
+            )
+        }
+    }
+}

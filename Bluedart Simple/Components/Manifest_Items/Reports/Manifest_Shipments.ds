@@ -1,0 +1,39 @@
+default list Manifest_Shipments
+{
+    displayName = "Manifest Shipments"
+    show all rows from Manifest_Items
+    (
+        Manifest_Item_ID
+        Manifest
+        Shipment
+        Leg_Sequence
+        Assigned_Agent_User
+        Item_Status
+        Loaded_On
+        Unloaded_On
+        Exception_Notes
+    )
+    filters
+    (
+        Manifest
+        Shipment
+        Assigned_Agent_User
+        Item_Status
+        Loaded_On
+        Unloaded_On
+        "Open Handling Items" : (Item_Status == "Loaded" || Item_Status == "Departed" || Item_Status == "Exception")
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Manifest ascending
+    )
+    sort by
+    (
+        Leg_Sequence ascending
+        Manifest_Item_ID ascending
+    )
+}

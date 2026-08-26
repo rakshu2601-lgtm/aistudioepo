@@ -1,0 +1,29 @@
+KYC_Document_Rules_On_Validate as "Validate KYC Document Rule"
+{
+    type = form
+    form = KYC_Document_Rules
+    record event = on add or edit
+    description = "Prevents duplicate active document mappings for the same customer type."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Active == true)
+                {
+                    duplicateRules = KYC_Document_Rules[Customer_Type == input.Customer_Type && Document_Name == input.Document_Name && Active == true];
+                    for each duplicateRule in duplicateRules
+                    {
+                        if(duplicateRule.ID != input.ID)
+                        {
+                            alert "An active KYC rule already exists for this customer type and document name.";
+                            cancel submit;
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,659 @@
+Shipment_Lifecycle as "Shipment Lifecycle"
+{
+    type = blueprint
+    form = Shipment_Requests
+
+    start
+    {
+        start stage = "Requested"
+    }
+
+    stages
+    {
+        "Requested" { }
+        "Quoted" { }
+        "Confirmed" { }
+        "Pickup Assigned" { }
+        "Picked Up" { }
+        "In Transit" { }
+        "At Hub" { }
+        "Delivery Assigned" { }
+        "Out for Delivery" { }
+        "Delivered" { }
+        "Cancelled" { }
+    }
+
+    transitions
+    {
+        Quote_Shipment as "Quote Shipment"
+        {
+            type = normal
+            from stage = "Requested"
+            to stage = "Quoted"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin","Operations_Employee","Hub_Manager"}
+                )
+                transition criteria = ( Manual_Distance_Km is not null && Origin_Hub is not null && Destination_Hub is not null && Applied_Rate is not null && Gross_Amount > 0 )
+                confirmation before execution
+                (
+                    message = "Send this INR shipment quote to the customer?"
+                    confirm button text = "Send Quote"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Quoted_On = zoho.currenttime;
+                        Payment_Status = "Not Due";
+                        Latest_Tracking_Text = "Shipment quoted and awaiting customer confirmation.";
+                        customerRecord = Customers[ID == input.Customer];
+                        if(customerRecord.count() > 0)
+                        {
+                            sendmail
+                            (
+                                from : zoho.adminuserid
+                                to : customerRecord.Customer_Email
+                                subject : "Shipment quote ready"
+                                message : "Your shipment quote is ready for confirmation. Net amount: INR " + input.Net_Amount.toString() + "."
+                            )
+                        }
+                        trackingID = insert into Shipment_Tracking_Events
+                        [
+                            Shipment = input.ID
+                            Customer_Portal_User = input.Customer_Portal_User
+                            Event_Type = "Quoted"
+                            Event_Time = zoho.currenttime
+                            Hub = input.Origin_Hub
+                            Location_Text = "Origin hub"
+                            Details = "Shipment quoted after manual distance and hub confirmation."
+                            Customer_Visible = true
+                        ];
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Shipment Quotation"
+                            Entity_Type = "Shipment_Requests"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Shipment Quoted"
+                            Before_Value = "Requested"
+                            After_Value = "Quoted"
+                            Details = "Rate " + input.Applied_Rate.toString() + " produced gross INR " + input.Gross_Amount.toString() + " and net INR " + input.Net_Amount.toString() + "."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Confirm_Shipment as "Confirm Shipment"
+        {
+            type = normal
+            from stage = "Quoted"
+            to stage = "Confirmed"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Customer_Portal","Logistics_Admin","Operations_Employee"}
+                )
+                transition criteria = ( Applied_Rate is not null && Net_Amount >= 0 )
+                confirmation before execution
+                (
+                    message = "Confirm this shipment and apply the selected loyalty discount?"
+                    confirm button text = "Confirm Shipment"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Confirmed_On = zoho.currenttime;
+                        if(input.Net_Amount == 0)
+                        {
+                            Payment_Status = "Waived";
+                        }
+                        else
+                        {
+                            Payment_Status = "Pending";
+                        }
+                        Latest_Tracking_Text = "Shipment confirmed and awaiting pickup assignment.";
+                        customerRecord = Customers[ID == input.Customer];
+                        if(input.Use_Loyalty == true && input.Loyalty_Points_To_Use > 0 && customerRecord.count() > 0)
+                        {
+                            priorRedemption = Loyalty_Redemptions[Shipment == input.ID && Redemption_Type == "Shipment Discount" && Redemption_Status != "Cancelled"];
+                            if(priorRedemption.count() == 0)
+                            {
+                                redemptionID = insert into Loyalty_Redemptions
+                                [
+                                    Customer = input.Customer
+                                    Customer_Portal_User = input.Customer_Portal_User
+                                    Redemption_Type = "Shipment Discount"
+                                    Shipment = input.ID
+                                    Program = customerRecord.Current_Loyalty_Program
+                                    Points_Requested = input.Loyalty_Points_To_Use
+                                    Amount_Value = input.Loyalty_Discount
+                                    Redemption_Status = "Applied"
+                                    Requested_On = zoho.currenttime
+                                    Review_Notes = "Automatically applied when the customer confirmed the shipment."
+                                ];
+                                newBalance = customerRecord.Current_Points_Balance - input.Loyalty_Points_To_Use;
+                                transactionID = insert into Loyalty_Transactions
+                                [
+                                    Customer = input.Customer
+                                    Customer_Portal_User = input.Customer_Portal_User
+                                    Shipment = input.ID
+                                    Program = customerRecord.Current_Loyalty_Program
+                                    Transaction_Type = "Redeem"
+                                    Points = 0 - input.Loyalty_Points_To_Use
+                                    Monetary_Value = input.Loyalty_Discount
+                                    Transaction_Date = zoho.currenttime
+                                    Remaining_Points = 0
+                                    Used_Points = input.Loyalty_Points_To_Use
+                                    Transaction_Status = "Posted"
+                                    Reference_Text = "Shipment discount redemption"
+                                    Balance_After = newBalance
+                                ];
+                                redemptionRecord = Loyalty_Redemptions[ID == redemptionID];
+                                if(redemptionRecord.count() > 0)
+                                {
+                                    redemptionRecord.Generated_Transaction = transactionID;
+                                }
+                                pointsToAllocate = input.Loyalty_Points_To_Use;
+                                earnLots = Loyalty_Transactions[Customer == input.Customer && Transaction_Type == "Earn" && Transaction_Status == "Posted" && Remaining_Points > 0] sort by Expiry_Date, Transaction_Date;
+                                for each earnLot in earnLots
+                                {
+                                    if(pointsToAllocate > 0)
+                                    {
+                                        lotAvailable = earnLot.Remaining_Points;
+                                        lotUsed = lotAvailable;
+                                        if(lotUsed > pointsToAllocate)
+                                        {
+                                            lotUsed = pointsToAllocate;
+                                        }
+                                        earnLot.Remaining_Points = lotAvailable - lotUsed;
+                                        earnLot.Used_Points = ifnull(earnLot.Used_Points,0) + lotUsed;
+                                        pointsToAllocate = pointsToAllocate - lotUsed;
+                                    }
+                                }
+                                customerRecord.Current_Points_Balance = newBalance;
+                                Available_Points = newBalance;
+                            }
+                        }
+                        trackingID = insert into Shipment_Tracking_Events
+                        [
+                            Shipment = input.ID
+                            Customer_Portal_User = input.Customer_Portal_User
+                            Event_Type = "Confirmed"
+                            Event_Time = zoho.currenttime
+                            Hub = input.Origin_Hub
+                            Location_Text = "Origin hub"
+                            Details = "Shipment confirmed and ready for pickup assignment."
+                            Customer_Visible = true
+                        ];
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Shipment Confirmation"
+                            Entity_Type = "Shipment_Requests"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Shipment Confirmed"
+                            Before_Value = "Quoted"
+                            After_Value = "Confirmed"
+                            Details = "Shipment confirmed with net amount INR " + input.Net_Amount.toString() + "."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Assign_Pickup as "Assign Pickup"
+        {
+            type = normal
+            from stage = "Confirmed"
+            to stage = "Pickup Assigned"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin","Hub_Manager"}
+                )
+                transition criteria = ( Origin_Hub is not null && Pickup_Agent is not null )
+                confirmation before execution
+                (
+                    message = "Assign this pickup to the selected origin-hub agent?"
+                    confirm button text = "Assign Pickup"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        agentRecord = Employees[ID == input.Pickup_Agent];
+                        existingTask = Agent_Tasks[Shipment == input.ID && Task_Type == "Pickup" && Task_Status != "Completed"];
+                        if(agentRecord.count() > 0 && existingTask.count() == 0)
+                        {
+                            taskID = insert into Agent_Tasks
+                            [
+                                Task_Type = "Pickup"
+                                Shipment = input.ID
+                                Hub = input.Origin_Hub
+                                Assigned_Agent = input.Pickup_Agent
+                                Agent_User = agentRecord.Internal_User
+                                Scheduled_At = zoho.currenttime
+                                Contact_Name = input.Pickup_Contact_Name
+                                Contact_Phone = input.Pickup_Phone
+                                Task_Address = input.Pickup_Address
+                                Task_Status = "Assigned"
+                                Agent_Notes = "Pickup generated from shipment confirmation."
+                            ];
+                            agentRecord.Availability_Status = "Assigned";
+                        }
+                        Latest_Tracking_Text = "Pickup assigned to an origin-hub agent.";
+                        trackingID = insert into Shipment_Tracking_Events
+                        [
+                            Shipment = input.ID
+                            Customer_Portal_User = input.Customer_Portal_User
+                            Event_Type = "Pickup Assigned"
+                            Event_Time = zoho.currenttime
+                            Hub = input.Origin_Hub
+                            Location_Text = "Origin hub"
+                            Details = "Pickup assigned to an agent."
+                            Customer_Visible = true
+                        ];
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Pickup Assignment"
+                            Entity_Type = "Shipment_Requests"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Pickup Assigned"
+                            Before_Value = "Confirmed"
+                            After_Value = "Pickup Assigned"
+                            Details = "Pickup assigned to employee record " + input.Pickup_Agent.toString() + "."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Record_Pickup as "Record Pickup"
+        {
+            type = normal
+            from stage = "Pickup Assigned"
+            to stage = "Picked Up"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin","Hub_Manager","Hub_Agent"}
+                )
+                transition criteria = ( Origin_Hub is not null )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Picked_Up_On = zoho.currenttime;
+                        Current_Hub = input.Origin_Hub;
+                        Latest_Tracking_Text = "Shipment picked up and received at the origin hub.";
+                        trackingID = insert into Shipment_Tracking_Events
+                        [
+                            Shipment = input.ID
+                            Customer_Portal_User = input.Customer_Portal_User
+                            Event_Type = "Picked Up"
+                            Event_Time = zoho.currenttime
+                            Hub = input.Origin_Hub
+                            Location_Text = "Origin hub"
+                            Details = "Shipment picked up by the assigned agent."
+                            Customer_Visible = true
+                        ];
+                    )
+                }
+            }
+        }
+
+        Dispatch_Shipment as "Dispatch Shipment"
+        {
+            type = normal
+            from stage = "Picked Up"
+            to stage = "In Transit"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin","Hub_Manager","Hub_Agent"}
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Latest_Tracking_Text = "Shipment departed the current hub and is in transit.";
+                        trackingID = insert into Shipment_Tracking_Events
+                        [
+                            Shipment = input.ID
+                            Customer_Portal_User = input.Customer_Portal_User
+                            Event_Type = "Departed Hub"
+                            Event_Time = zoho.currenttime
+                            Hub = input.Current_Hub
+                            Location_Text = "Departed hub"
+                            Details = "Shipment dispatched on a manifest leg."
+                            Customer_Visible = true
+                        ];
+                    )
+                }
+            }
+        }
+
+        Receive_At_Hub as "Receive at Hub"
+        {
+            type = normal
+            from stage = "In Transit"
+            to stage = "At Hub"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin","Hub_Manager","Hub_Agent"}
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Latest_Tracking_Text = "Shipment arrived at a hub.";
+                        trackingID = insert into Shipment_Tracking_Events
+                        [
+                            Shipment = input.ID
+                            Customer_Portal_User = input.Customer_Portal_User
+                            Event_Type = "Arrived Hub"
+                            Event_Time = zoho.currenttime
+                            Hub = input.Current_Hub
+                            Location_Text = "Arrival hub"
+                            Details = "Shipment arrived on a manifest leg."
+                            Customer_Visible = true
+                        ];
+                    )
+                }
+            }
+        }
+
+        Assign_Delivery as "Assign Delivery"
+        {
+            type = normal
+            from stage = "At Hub"
+            to stage = "Delivery Assigned"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin","Hub_Manager"}
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Latest_Tracking_Text = "Shipment assigned for final delivery.";
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Delivery Assignment"
+                            Entity_Type = "Shipment_Requests"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Delivery Assigned"
+                            Before_Value = "At Hub"
+                            After_Value = "Delivery Assigned"
+                            Details = "Final-delivery task assigned by hub operations."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Start_Delivery as "Start Delivery"
+        {
+            type = normal
+            from stage = "Delivery Assigned"
+            to stage = "Out for Delivery"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin","Hub_Manager","Hub_Agent"}
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Latest_Tracking_Text = "Shipment is out for delivery.";
+                        trackingID = insert into Shipment_Tracking_Events
+                        [
+                            Shipment = input.ID
+                            Customer_Portal_User = input.Customer_Portal_User
+                            Event_Type = "Out for Delivery"
+                            Event_Time = zoho.currenttime
+                            Hub = input.Current_Hub
+                            Location_Text = "Delivery route"
+                            Details = "Final-delivery agent started the task."
+                            Customer_Visible = true
+                        ];
+                    )
+                }
+            }
+        }
+
+        Complete_Delivery as "Complete Delivery"
+        {
+            type = normal
+            from stage = "Out for Delivery"
+            to stage = "Delivered"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Logistics_Admin","Hub_Manager","Hub_Agent"}
+                )
+                confirmation before execution
+                (
+                    message = "Confirm successful delivery after proof has been captured?"
+                    confirm button text = "Mark Delivered"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Delivered_On = zoho.currenttime;
+                        Latest_Tracking_Text = "Shipment delivered successfully.";
+                        customerRecord = Customers[ID == input.Customer];
+                        priorEarn = Loyalty_Transactions[Shipment == input.ID && Transaction_Type == "Earn"];
+                        if(customerRecord.count() > 0 && customerRecord.Current_Loyalty_Program != null && priorEarn.count() == 0)
+                        {
+                            programRecord = Loyalty_Programs[ID == customerRecord.Current_Loyalty_Program];
+                            if(programRecord.count() > 0 && programRecord.Active == true)
+                            {
+                                earnedPoints = (input.Net_Amount * programRecord.Points_Per_Rupee).round(0).toNumber();
+                                if(earnedPoints > 0)
+                                {
+                                    expiryDate = null;
+                                    if(programRecord.Expiry_Months > 0)
+                                    {
+                                        expiryDate = zoho.currentdate.addMonth(programRecord.Expiry_Months);
+                                    }
+                                    newBalance = customerRecord.Current_Points_Balance + earnedPoints;
+                                    transactionID = insert into Loyalty_Transactions
+                                    [
+                                        Customer = input.Customer
+                                        Customer_Portal_User = input.Customer_Portal_User
+                                        Shipment = input.ID
+                                        Program = programRecord.ID
+                                        Transaction_Type = "Earn"
+                                        Points = earnedPoints
+                                        Monetary_Value = 0
+                                        Transaction_Date = zoho.currenttime
+                                        Expiry_Date = expiryDate
+                                        Remaining_Points = earnedPoints
+                                        Used_Points = 0
+                                        Transaction_Status = "Posted"
+                                        Reference_Text = "Points earned on delivered shipment"
+                                        Balance_After = newBalance
+                                    ];
+                                    customerRecord.Current_Points_Balance = newBalance;
+                                    customerRecord.Overall_Points_Earned = customerRecord.Overall_Points_Earned + earnedPoints;
+                                    Available_Points = newBalance;
+                                }
+                            }
+                        }
+                        trackingID = insert into Shipment_Tracking_Events
+                        [
+                            Shipment = input.ID
+                            Customer_Portal_User = input.Customer_Portal_User
+                            Event_Type = "Delivered"
+                            Event_Time = zoho.currenttime
+                            Hub = input.Destination_Hub
+                            Location_Text = "Delivery address"
+                            Details = "Shipment delivered successfully."
+                            Customer_Visible = true
+                        ];
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Delivery Completion"
+                            Entity_Type = "Shipment_Requests"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Shipment Delivered"
+                            Before_Value = "Out for Delivery"
+                            After_Value = "Delivered"
+                            Details = "Delivery completed and eligible loyalty points posted once."
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Cancel_Shipment as "Cancel Shipment"
+        {
+            type = common
+            from stage = "Requested"
+            to stage = "Cancelled"
+            common stages = {"Quoted","Confirmed","Pickup Assigned","Picked Up","In Transit","At Hub","Delivery Assigned","Out for Delivery"}
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Customer_Portal","Logistics_Admin","Operations_Employee","Hub_Manager"}
+                )
+                confirmation before execution
+                (
+                    message = "Cancel this undelivered shipment and reverse any posted loyalty discount?"
+                    confirm button text = "Cancel Shipment"
+                    cancel button text = "Keep Shipment"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        previousStatus = input.Shipment_Status;
+                        Latest_Tracking_Text = "Shipment cancelled.";
+                        customerRecord = Customers[ID == input.Customer];
+                        redemptionRecord = Loyalty_Redemptions[Shipment == input.ID && Redemption_Type == "Shipment Discount" && Redemption_Status == "Applied"];
+                        if(customerRecord.count() > 0 && redemptionRecord.count() > 0 && redemptionRecord.Generated_Transaction != null)
+                        {
+                            originalTransaction = Loyalty_Transactions[ID == redemptionRecord.Generated_Transaction];
+                            reversalExists = Loyalty_Transactions[Shipment == input.ID && Transaction_Type == "Reverse" && Reference_Text == "Shipment cancellation reversal"];
+                            if(originalTransaction.count() > 0 && reversalExists.count() == 0)
+                            {
+                                pointsToRestore = 0 - originalTransaction.Points;
+                                newBalance = customerRecord.Current_Points_Balance + pointsToRestore;
+                                reversalID = insert into Loyalty_Transactions
+                                [
+                                    Customer = input.Customer
+                                    Customer_Portal_User = input.Customer_Portal_User
+                                    Shipment = input.ID
+                                    Program = originalTransaction.Program
+                                    Transaction_Type = "Reverse"
+                                    Points = pointsToRestore
+                                    Monetary_Value = originalTransaction.Monetary_Value
+                                    Transaction_Date = zoho.currenttime
+                                    Remaining_Points = pointsToRestore
+                                    Used_Points = 0
+                                    Transaction_Status = "Posted"
+                                    Reference_Text = "Shipment cancellation reversal"
+                                    Balance_After = newBalance
+                                ];
+                                originalTransaction.Transaction_Status = "Reversed";
+                                redemptionRecord.Redemption_Status = "Cancelled";
+                                customerRecord.Current_Points_Balance = newBalance;
+                                Available_Points = newBalance;
+                            }
+                        }
+                        trackingID = insert into Shipment_Tracking_Events
+                        [
+                            Shipment = input.ID
+                            Customer_Portal_User = input.Customer_Portal_User
+                            Event_Type = "Cancelled"
+                            Event_Time = zoho.currenttime
+                            Hub = input.Current_Hub
+                            Location_Text = "Shipment operations"
+                            Details = "Shipment cancelled before delivery."
+                            Customer_Visible = true
+                        ];
+                        auditID = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            User_Email = zoho.loginuserid
+                            User_Profile = "Shipment Cancellation"
+                            Entity_Type = "Shipment_Requests"
+                            Entity_Record_ID = input.ID.toString()
+                            Action = "Shipment Cancelled"
+                            Before_Value = previousStatus
+                            After_Value = "Cancelled"
+                            Details = "Undelivered shipment cancelled; posted loyalty discount reversed when applicable."
+                            Severity = "Warning"
+                        ];
+                    )
+                }
+            }
+        }
+    }
+}

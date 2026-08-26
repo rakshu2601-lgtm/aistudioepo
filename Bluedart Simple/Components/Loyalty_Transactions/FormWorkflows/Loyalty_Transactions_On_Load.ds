@@ -1,0 +1,36 @@
+Loyalty_Transactions_On_Load as "Protect Loyalty Ledger on Load"
+{
+    type = form
+    form = Loyalty_Transactions
+    record event = on add or edit
+    description = "Protects system-maintained ownership, balances, lot values, and posted ledger history."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Customer_Portal_User;
+                disable Balance_After;
+                disable Created_By;
+                isAdministrator = thisapp.permissions.isUserInProfile("Logistics_Admin");
+                if(input.ID != null && isAdministrator == false)
+                {
+                    disable Customer;
+                    disable Shipment;
+                    disable Program;
+                    disable Transaction_Type;
+                    disable Points;
+                    disable Monetary_Value;
+                    disable Transaction_Date;
+                    disable Expiry_Date;
+                    disable Remaining_Points;
+                    disable Used_Points;
+                    disable Transaction_Status;
+                    disable Reference_Text;
+                }
+            )
+        }
+    }
+}

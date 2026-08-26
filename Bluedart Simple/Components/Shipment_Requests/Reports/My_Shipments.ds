@@ -1,0 +1,40 @@
+list My_Shipments
+{
+    displayName = "My Shipments"
+    show all rows from Shipment_Requests [Customer_Portal_User == zoho.loginuserid]
+    (
+        Shipment_Number
+        Pickup_Contact_Name
+        Pickup_Address
+        Delivery_Contact_Name
+        Delivery_Address
+        Weight_Kg
+        Transport_Mode
+        Gross_Amount
+        Loyalty_Discount
+        Net_Amount
+        Payment_Status
+        Shipment_Status
+        Requested_On
+        Quoted_On
+        Confirmed_On
+        Expected_Delivery
+        Picked_Up_On
+        Delivered_On
+        Latest_Tracking_Text
+    )
+    filters
+    (
+        Transport_Mode
+        Payment_Status
+        Shipment_Status
+        Requested_On
+        Expected_Delivery
+        "Active Shipments" : (Shipment_Status != "Delivered" && Shipment_Status != "Cancelled")
+    )
+    sort by
+    (
+        Requested_On descending
+        Shipment_Number descending
+    )
+}

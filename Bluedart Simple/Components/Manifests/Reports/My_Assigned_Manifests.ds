@@ -1,0 +1,42 @@
+list My_Assigned_Manifests
+{
+    displayName = "My Assigned Manifests"
+    show all rows from Manifests [Assigned_Agent_User == zoho.loginuserid]
+    (
+        Manifest_Number
+        Manifest_Type
+        Origin_Hub
+        Destination_Hub
+        Transport_Mode
+        Vehicle_or_Carrier_Details
+        Planned_Departure
+        Planned_Arrival
+        Actual_Departure
+        Actual_Arrival
+        Manifest_Status
+        Notes
+    )
+    filters
+    (
+        Manifest_Type
+        Origin_Hub
+        Destination_Hub
+        Transport_Mode
+        Planned_Departure
+        Manifest_Status
+        "My Open Legs" : (Manifest_Status != "Closed" && Manifest_Status != "Cancelled")
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Manifest_Status ascending
+    )
+    sort by
+    (
+        Planned_Departure ascending
+        Manifest_Number ascending
+    )
+}

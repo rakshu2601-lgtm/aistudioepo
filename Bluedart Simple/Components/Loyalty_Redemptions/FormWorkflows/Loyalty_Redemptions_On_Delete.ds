@@ -1,0 +1,18 @@
+Loyalty_Redemptions_On_Delete as "Protect Redemption History"
+{
+    type = form
+    form = Loyalty_Redemptions
+    record event = on delete
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Redemption history cannot be deleted. Cancel an eligible request through its lifecycle instead.";
+                cancel delete;
+            )
+        }
+    }
+}

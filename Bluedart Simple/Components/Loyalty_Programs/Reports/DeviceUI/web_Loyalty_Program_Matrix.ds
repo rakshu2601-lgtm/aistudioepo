@@ -1,0 +1,5 @@
+report Loyalty_Program_Matrix
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Program_ID Customer_Type Tier_Name Points_Per_Rupee Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Program_ID Customer_Type Tier_Name Min_Lifetime_Points Max_Lifetime_Points Points_Per_Rupee Redemption_Value_Per_Point Minimum_Redemption_Points Max_Shipment_Discount_Percent Expiry_Months Effective_From Effective_To Priority Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

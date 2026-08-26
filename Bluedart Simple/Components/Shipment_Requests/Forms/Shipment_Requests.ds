@@ -1,0 +1,580 @@
+form Shipment_Requests
+{
+    title
+    {
+        displayname = "Shipment Requests"
+        on add = "Request Shipment"
+        on edit = "Edit Shipment Request"
+    }
+    success message = "Shipment request saved successfully."
+    record owner = Customer_Portal_User
+
+    Request_Details
+    (
+        type = section
+        displayname = "Request Details"
+        row = 1
+        column = 0
+    )
+    Shipment_Number
+    (
+        type = autonumber
+        displayname = "Shipment Number"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Customer
+    (
+        type = picklist
+        displayname = "Customer"
+        values = Customers.ID
+        displayformat = [Customer_Name.first_name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Customer_Portal_User
+    (
+        type = picklist
+        displayname = "Customer Portal User"
+        module = users
+        user type = "portal users"
+        displayformat = [name]
+        row = 1
+        column = 2
+        width = medium
+    )
+    Requested_By_Type
+    (
+        type = picklist
+        displayname = "Requested By Type"
+        values = {"Customer","Employee"}
+        initial value = "Customer"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Requested_By_Employee
+    (
+        type = picklist
+        displayname = "Requested By Employee"
+        values = Employees.ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Requested_On
+    (
+        type = datetime
+        displayname = "Requested On"
+        initial value = "${zoho.currenttime}"
+        mins_displayinterval = 5
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    Pickup_Details
+    (
+        type = section
+        displayname = "Pickup Details"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Pickup_Contact_Name
+    (
+        type = text
+        displayname = "Pickup Contact Name"
+        maxchar = 120
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Pickup_Phone
+    (
+        type = phonenumber
+        displayname = "Pickup Phone"
+        allowedcountries = {in}
+        defaultcountry = "in"
+        personal data = true
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Pickup_Address
+    (
+        type = address
+        displayname = "Pickup Address"
+        capture_coordinates = true
+        adjust_using_map = true
+        address_line_1
+        (
+            type = address_line_1
+            displayname = "Address Line 1"
+        )
+        address_line_2
+        (
+            type = address_line_2
+            displayname = "Address Line 2"
+        )
+        district_city
+        (
+            type = district_city
+            displayname = "City"
+        )
+        state_province
+        (
+            type = state_province
+            displayname = "State"
+        )
+        postal_Code
+        (
+            type = postal_Code
+            displayname = "PIN Code"
+        )
+        country
+        (
+            type = country
+            displayname = "Country"
+        )
+        latitude
+        (
+            type = latitude
+            displayname = "Latitude"
+            visibility = false
+        )
+        longitude
+        (
+            type = longitude
+            displayname = "Longitude"
+            visibility = false
+        )
+        row = 2
+        column = 1
+        width = medium
+    )
+
+    Delivery_Details
+    (
+        type = section
+        displayname = "Delivery Details"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Delivery_Contact_Name
+    (
+        type = text
+        displayname = "Delivery Contact Name"
+        maxchar = 120
+        row = 3
+        column = 1
+        width = medium
+    )
+    must have Delivery_Phone
+    (
+        type = phonenumber
+        displayname = "Delivery Phone"
+        allowedcountries = {in}
+        defaultcountry = "in"
+        personal data = true
+        row = 3
+        column = 2
+        width = medium
+    )
+    must have Delivery_Address
+    (
+        type = address
+        displayname = "Delivery Address"
+        capture_coordinates = true
+        adjust_using_map = true
+        address_line_1
+        (
+            type = address_line_1
+            displayname = "Address Line 1"
+        )
+        address_line_2
+        (
+            type = address_line_2
+            displayname = "Address Line 2"
+        )
+        district_city
+        (
+            type = district_city
+            displayname = "City"
+        )
+        state_province
+        (
+            type = state_province
+            displayname = "State"
+        )
+        postal_Code
+        (
+            type = postal_Code
+            displayname = "PIN Code"
+        )
+        country
+        (
+            type = country
+            displayname = "Country"
+        )
+        latitude
+        (
+            type = latitude
+            displayname = "Latitude"
+            visibility = false
+        )
+        longitude
+        (
+            type = longitude
+            displayname = "Longitude"
+            visibility = false
+        )
+        row = 3
+        column = 1
+        width = medium
+    )
+
+    Package_and_Routing
+    (
+        type = section
+        displayname = "Package and Routing"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    Package_Description
+    (
+        type = textarea
+        displayname = "Package Description"
+        height = 90px
+        row = 4
+        column = 1
+        width = medium
+    )
+    must have Weight_Kg
+    (
+        type = decimal
+        displayname = "Weight (kg)"
+        format = commadotindian
+        decimalplace = 2
+        row = 4
+        column = 2
+        width = medium
+    )
+    Dimensions_Cm
+    (
+        type = text
+        displayname = "Dimensions (cm)"
+        description [ type = tooltip  message = "Enter length x width x height in centimetres." ]
+        maxchar = 80
+        row = 4
+        column = 1
+        width = medium
+    )
+    must have Transport_Mode
+    (
+        type = picklist
+        displayname = "Transport Mode"
+        values = {"Road","Air","Rail","Sea"}
+        row = 4
+        column = 2
+        width = medium
+    )
+    Manual_Distance_Km
+    (
+        type = decimal
+        displayname = "Confirmed Distance (km)"
+        format = commadotindian
+        decimalplace = 2
+        row = 4
+        column = 1
+        width = medium
+    )
+    Origin_Hub
+    (
+        type = picklist
+        displayname = "Origin Hub"
+        values = Hubs[Status == "Active"].ID
+        displayformat = [Hub_Name]
+        searchable = true
+        row = 4
+        column = 2
+        width = medium
+    )
+    Destination_Hub
+    (
+        type = picklist
+        displayname = "Destination Hub"
+        values = Hubs[Status == "Active"].ID
+        displayformat = [Hub_Name]
+        searchable = true
+        row = 4
+        column = 1
+        width = medium
+    )
+    Current_Hub
+    (
+        type = picklist
+        displayname = "Current Hub"
+        values = Hubs[Status == "Active"].ID
+        displayformat = [Hub_Name]
+        searchable = true
+        row = 4
+        column = 2
+        width = medium
+    )
+    Pickup_Agent
+    (
+        type = picklist
+        displayname = "Pickup Agent"
+        values = Employees[Employee_Type == "Agent" && Active == true].ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 4
+        column = 1
+        width = medium
+    )
+
+    Quote_and_Payment
+    (
+        type = section
+        displayname = "Quote and Payment"
+        visibility = true
+        row = 5
+        column = 1
+    )
+    Applied_Rate
+    (
+        type = picklist
+        displayname = "Applied Rate"
+        values = Transport_Rates.ID
+        displayformat = [Rate_Name]
+        searchable = true
+        row = 5
+        column = 1
+        width = medium
+    )
+    Base_Transport_Amount
+    (
+        type = INR
+        displayname = "Base Transport Amount (INR)"
+        format = commadotindian
+        initial value = 0
+        decimalplace = 2
+        maxchar = 16
+        row = 5
+        column = 2
+        width = medium
+    )
+    Fuel_Surcharge
+    (
+        type = INR
+        displayname = "Fuel Surcharge (INR)"
+        format = commadotindian
+        initial value = 0
+        decimalplace = 2
+        maxchar = 16
+        row = 5
+        column = 1
+        width = medium
+    )
+    Gross_Amount
+    (
+        type = INR
+        displayname = "Gross Amount (INR)"
+        format = commadotindian
+        initial value = 0
+        decimalplace = 2
+        maxchar = 16
+        row = 5
+        column = 2
+        width = medium
+    )
+    Payment_Status
+    (
+        type = picklist
+        displayname = "Payment Status"
+        values = {"Not Due","Pending","Paid","Partially Paid","Waived"}
+        initial value = "Not Due"
+        row = 5
+        column = 1
+        width = medium
+    )
+
+    Loyalty_Discount_Details
+    (
+        type = section
+        displayname = "Loyalty Discount"
+        visibility = true
+        row = 6
+        column = 1
+    )
+    Use_Loyalty
+    (
+        type = checkbox
+        displayname = "Use Loyalty Points"
+        initial value = false
+        row = 6
+        column = 1
+        width = medium
+    )
+    Available_Points
+    (
+        type = number
+        displayname = "Available Points"
+        format = commadotindian
+        initial value = 0
+        row = 6
+        column = 2
+        width = medium
+    )
+    Loyalty_Points_To_Use
+    (
+        type = number
+        displayname = "Loyalty Points to Use"
+        format = commadotindian
+        initial value = 0
+        row = 6
+        column = 2
+        width = medium
+    )
+    Loyalty_Discount
+    (
+        type = INR
+        displayname = "Loyalty Discount (INR)"
+        format = commadotindian
+        initial value = 0
+        decimalplace = 2
+        maxchar = 16
+        row = 6
+        column = 1
+        width = medium
+    )
+    Net_Amount
+    (
+        type = INR
+        displayname = "Net Amount (INR)"
+        format = commadotindian
+        initial value = 0
+        decimalplace = 2
+        maxchar = 16
+        row = 6
+        column = 2
+        width = medium
+    )
+
+    Shipment_Lifecycle_Details
+    (
+        type = section
+        displayname = "Shipment Lifecycle"
+        visibility = true
+        row = 7
+        column = 1
+    )
+    Shipment_Status
+    (
+        type = picklist
+        displayname = "Shipment Status"
+        values = {"Requested","Quoted","Confirmed","Pickup Assigned","Picked Up","In Transit","At Hub","Delivery Assigned","Out for Delivery","Delivered","Cancelled"}
+        initial value = "Requested"
+        row = 7
+        column = 1
+        width = medium
+    )
+    Quoted_On
+    (
+        type = datetime
+        displayname = "Quoted On"
+        mins_displayinterval = 5
+        row = 7
+        column = 2
+        width = medium
+    )
+    Confirmed_On
+    (
+        type = datetime
+        displayname = "Confirmed On"
+        mins_displayinterval = 5
+        row = 7
+        column = 1
+        width = medium
+    )
+    Expected_Delivery
+    (
+        type = datetime
+        displayname = "Expected Delivery"
+        mins_displayinterval = 5
+        row = 7
+        column = 2
+        width = medium
+    )
+    Picked_Up_On
+    (
+        type = datetime
+        displayname = "Picked Up On"
+        mins_displayinterval = 5
+        row = 7
+        column = 1
+        width = medium
+    )
+    Delivered_On
+    (
+        type = datetime
+        displayname = "Delivered On"
+        mins_displayinterval = 5
+        row = 7
+        column = 2
+        width = medium
+    )
+    Latest_Tracking_Text
+    (
+        type = text
+        displayname = "Latest Tracking Update"
+        maxchar = 255
+        row = 7
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit Shipment Request"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Shipment"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Close"
+            )
+        }
+    }
+
+    blueprint components
+    {
+        stages = {"Requested","Quoted","Confirmed","Pickup Assigned","Picked Up","In Transit","At Hub","Delivery Assigned","Out for Delivery","Delivered","Cancelled"}
+    }
+}

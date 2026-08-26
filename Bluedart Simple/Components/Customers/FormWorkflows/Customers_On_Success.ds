@@ -1,0 +1,61 @@
+Customers_On_Success as "Complete Customer Onboarding Setup"
+{
+    type = form
+    form = Customers
+    record event = on add
+    description = "Creates portal access, applies onboarding status, and seeds data-driven KYC requests."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                portalAssignment = thisapp.portal.assignUserInProfile(input.Customer_Email, "Customer_Portal");
+                customerRecord = Customers[ID == input.ID];
+                if(customerRecord.count() > 0)
+                {
+                    customerRecord.Portal_User = input.Customer_Email;
+                    if(input.Customer_Type == "Retail")
+                    {
+                        customerRecord.Onboarding_Status = "Active";
+                        customerRecord.KYC_Status = "Not Required";
+                        customerRecord.Onboarded_On = zoho.currenttime;
+                    }
+                    else
+                    {
+                        customerRecord.Onboarding_Status = "Pending KYC";
+                        customerRecord.KYC_Status = "Awaiting Request";
+                        activeRules = KYC_Document_Rules[Customer_Type == input.Customer_Type && Active == true] sort by Sort_Order;
+                        for each activeRule in activeRules
+                        {
+                            requestID = insert into KYC_Document_Requests
+                            [
+                                Customer = input.ID
+                                Customer_Portal_User = input.Customer_Email
+                                Rule = activeRule.ID
+                                Requested_Document_Name = activeRule.Document_Name
+                                Instructions = activeRule.Instructions
+                                Required_Document = activeRule.Required_Document
+                                Requested_On = zoho.currenttime
+                                Verification_Status = "Draft"
+                            ];
+                        }
+                    }
+                }
+                auditID = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    User_Email = zoho.loginuserid
+                    User_Profile = "Customer Onboarding Workflow"
+                    Entity_Type = "Customers"
+                    Entity_Record_ID = input.ID.toString()
+                    Action = "Customer Onboarded"
+                    After_Value = input.Customer_Type
+                    Details = "Portal access assigned and onboarding status initialized."
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

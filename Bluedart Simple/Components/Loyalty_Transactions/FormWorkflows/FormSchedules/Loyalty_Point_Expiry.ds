@@ -1,0 +1,64 @@
+Loyalty_Point_Expiry as "Loyalty Point Expiry"
+{
+    type = schedule
+    form = Loyalty_Transactions[Transaction_Type == "Earn" && Transaction_Status == "Posted" && Remaining_Points > 0]
+    start = Expiry_Date at "00:15:00"
+    frequency = daily
+    time zone = "Asia/Kolkata"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                if(input.Expiry_Date != null && input.Expiry_Date <= zoho.currentdate && input.Transaction_Status == "Posted" && input.Remaining_Points > 0)
+                {
+                    pointsToExpire = input.Remaining_Points;
+                    expiryID = insert into Loyalty_Transactions
+                    [
+                        Customer = input.Customer
+                        Customer_Portal_User = input.Customer_Portal_User
+                        Shipment = input.Shipment
+                        Program = input.Program
+                        Transaction_Type = "Expire"
+                        Points = 0 - pointsToExpire
+                        Monetary_Value = 0
+                        Transaction_Date = zoho.currenttime
+                        Remaining_Points = 0
+                        Used_Points = pointsToExpire
+                        Transaction_Status = "Posted"
+                        Reference_Text = "Expiry of earn transaction " + input.Transaction_ID.toString()
+                    ];
+                    input.Remaining_Points = 0;
+                    input.Used_Points = ifnull(input.Used_Points,0) + pointsToExpire;
+                    input.Transaction_Status = "Expired";
+                    ledgerBalance = ifnull(Loyalty_Transactions[Customer == input.Customer].sum(Points),0);
+                    customerRecord = Customers[ID == input.Customer];
+                    if(customerRecord.count() > 0)
+                    {
+                        customerRecord.Current_Points_Balance = ledgerBalance;
+                    }
+                    expiryRecord = Loyalty_Transactions[ID == expiryID];
+                    if(expiryRecord.count() > 0)
+                    {
+                        expiryRecord.Balance_After = ledgerBalance;
+                    }
+                    auditID = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        User_Email = zoho.loginuserid
+                        User_Profile = "Loyalty Expiry Schedule"
+                        Entity_Type = "Loyalty_Transactions"
+                        Entity_Record_ID = expiryID.toString()
+                        Action = "Points Expired"
+                        Before_Value = pointsToExpire.toString()
+                        After_Value = ledgerBalance.toString()
+                        Details = "Expired remaining points from earn transaction " + input.Transaction_ID.toString() + "."
+                        Severity = "Info"
+                    ];
+                }
+            )
+        }
+    }
+}

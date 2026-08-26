@@ -1,0 +1,209 @@
+"Operations_Employee"
+{
+    name = "Operations_Employee"
+    type = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+    description = "Customer onboarding and shipment operations"
+    ModulePermissions
+    {
+        Hubs
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Hubs={"View"}
+                Hub_Map={"View"}
+            }
+        }
+        Employees
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Employees={"View"}
+                Active_Agents={"View"}
+            }
+        }
+        KYC_Document_Rules
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                KYC_Document_Rule_List={"View"}
+            }
+        }
+        Customers
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Customer_ID{visibility:true,readonly:true}
+                Customer_Name{visibility:true,readonly:false}
+                Customer_Email{visibility:true,readonly:false}
+                Customer_Phone{visibility:true,readonly:false}
+                Customer_Type{visibility:true,readonly:false}
+                Primary_Address{visibility:true,readonly:false}
+                Company_Name{visibility:true,readonly:false}
+                GSTIN{visibility:true,readonly:false}
+                PAN{visibility:true,readonly:false}
+                CIN_or_Udyam_Number{visibility:true,readonly:false}
+                Billing_Contact_Name{visibility:true,readonly:false}
+                Billing_Email{visibility:true,readonly:false}
+                Portal_User{visibility:true,readonly:true}
+                Onboarding_Status{visibility:true,readonly:true}
+                KYC_Status{visibility:true,readonly:true}
+                Onboarded_On{visibility:true,readonly:true}
+                Active{visibility:true,readonly:true}
+                Current_Loyalty_Program{visibility:true,readonly:true}
+                Overall_Points_Earned{visibility:true,readonly:true}
+                Current_Points_Balance{visibility:true,readonly:true}
+            }
+            ReportPermissions
+            {
+                All_Customers={"View","Edit"}
+                Customer_Onboarding_Board={"View","Edit"}
+                Customer_Map={"View"}
+            }
+        }
+        KYC_Document_Requests
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Request_ID{visibility:true,readonly:true}
+                Customer{visibility:true,readonly:false}
+                Customer_Portal_User{visibility:true,readonly:true}
+                Rule{visibility:true,readonly:false}
+                Requested_Document_Name{visibility:true,readonly:false}
+                Instructions{visibility:true,readonly:false}
+                Required_Document{visibility:true,readonly:false}
+                Requested_By{visibility:true,readonly:true}
+                Requested_On{visibility:true,readonly:true}
+                Verification_Status{visibility:true,readonly:true}
+                Uploaded_Document{visibility:true,readonly:true}
+                Uploaded_On{visibility:true,readonly:true}
+                Reviewed_By{visibility:true,readonly:true}
+                Reviewed_On{visibility:true,readonly:true}
+                Review_Notes{visibility:true,readonly:true}
+                Rejection_Reason{visibility:true,readonly:true}
+            }
+            ReportPermissions
+            {
+                KYC_Review_Queue={"View","Edit"}
+                KYC_Verification_Board={"View","Edit"}
+            }
+        }
+        Transport_Rates
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Active_Transport_Rates={"View"}
+                Rate_Matrix={"View"}
+            }
+        }
+        Loyalty_Programs
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Loyalty_Program_Matrix={"View"}
+            }
+        }
+        Shipment_Requests
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Shipments={"View","Edit"}
+                Shipment_Status_Board={"View","Edit"}
+                Shipment_Timeline={"View"}
+            }
+        }
+        Manifests
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Manifests={"View","Edit"}
+                Manifest_Board={"View","Edit"}
+            }
+        }
+        Manifest_Items
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Manifest_Shipments={"View","Edit"}
+                Shipment_Journey_Legs={"View","Edit"}
+            }
+        }
+        Agent_Tasks
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Agent_Task_Board={"View","Edit"}
+                Agent_Task_Calendar={"View","Edit"}
+            }
+        }
+        Shipment_Tracking_Events
+        {
+            enabled = Create,Viewall,Tab,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Shipment_Tracking_History={"View"}
+                Tracking_Timeline={"View"}
+            }
+        }
+        Loyalty_Transactions
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Loyalty_Ledger={"View"}
+            }
+        }
+        Loyalty_Redemptions
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Redemption_Number{visibility:true,readonly:true}
+                Customer{visibility:true,readonly:false}
+                Customer_Portal_User{visibility:true,readonly:true}
+                Redemption_Type{visibility:true,readonly:false}
+                Shipment{visibility:true,readonly:false}
+                Program{visibility:true,readonly:true}
+                Points_Requested{visibility:true,readonly:false}
+                Amount_Value{visibility:true,readonly:true}
+                Redemption_Status{visibility:true,readonly:true}
+                Requested_On{visibility:true,readonly:true}
+                Generated_Transaction{visibility:false}
+                Reviewed_By{visibility:true,readonly:true}
+                Reviewed_On{visibility:true,readonly:true}
+                Payment_Reference{visibility:true,readonly:true}
+                Review_Notes{visibility:true,readonly:false}
+            }
+            ReportPermissions
+            {
+                Redemption_Queue={"View","Edit"}
+                Redemption_Board={"View"}
+            }
+        }
+    }
+}

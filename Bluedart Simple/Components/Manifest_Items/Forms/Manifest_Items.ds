@@ -1,0 +1,145 @@
+form Manifest_Items
+{
+    title
+    {
+        displayname = "Manifest Items"
+        on add = "Add Shipment to Manifest"
+        on edit = "Edit Manifest Shipment"
+    }
+    success message = "Manifest shipment saved successfully."
+    record owner = Assigned_Agent_User
+
+    Journey_Leg_Link
+    (
+        type = section
+        displayname = "Journey Leg Link"
+        row = 1
+        column = 0
+    )
+    Manifest_Item_ID
+    (
+        type = autonumber
+        displayname = "Manifest Item ID"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Manifest
+    (
+        type = picklist
+        displayname = "Manifest"
+        values = Manifests.ID
+        displayformat = [Manifest_Number]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Shipment
+    (
+        type = picklist
+        displayname = "Shipment"
+        values = Shipment_Requests.ID
+        displayformat = [Shipment_Number]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Leg_Sequence
+    (
+        type = number
+        displayname = "Leg Sequence"
+        format = commadotindian
+        row = 1
+        column = 1
+        width = medium
+    )
+    Assigned_Agent_User
+    (
+        type = picklist
+        displayname = "Assigned Agent User"
+        module = users
+        displayformat = [name]
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    Handling_Status
+    (
+        type = section
+        displayname = "Handling Status"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Item_Status
+    (
+        type = picklist
+        displayname = "Item Status"
+        values = {"Loaded","Departed","Arrived","Exception"}
+        initial value = "Loaded"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Loaded_On
+    (
+        type = datetime
+        displayname = "Loaded On"
+        mins_displayinterval = 5
+        row = 2
+        column = 2
+        width = medium
+    )
+    Unloaded_On
+    (
+        type = datetime
+        displayname = "Unloaded On"
+        mins_displayinterval = 5
+        row = 2
+        column = 1
+        width = medium
+    )
+    Exception_Notes
+    (
+        type = textarea
+        displayname = "Exception Notes"
+        height = 90px
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Add Shipment"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Manifest Shipment"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Close"
+            )
+        }
+    }
+}

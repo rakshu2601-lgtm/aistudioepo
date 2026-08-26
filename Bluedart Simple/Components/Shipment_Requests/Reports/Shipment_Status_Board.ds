@@ -1,0 +1,46 @@
+kanban Shipment_Status_Board
+{
+    displayName = "Shipment Status Board"
+    show all rows from Shipment_Requests
+    (
+        Shipment_Number
+        Customer
+        Pickup_Contact_Name
+        Delivery_Contact_Name
+        Weight_Kg
+        Transport_Mode
+        Origin_Hub
+        Destination_Hub
+        Current_Hub
+        Net_Amount
+        Payment_Status
+        Shipment_Status
+        Requested_On
+        Expected_Delivery
+        Latest_Tracking_Text
+    )
+    filters
+    (
+        Customer
+        Transport_Mode
+        Origin_Hub
+        Destination_Hub
+        Current_Hub
+        Payment_Status
+        Shipment_Status
+        "Operational Shipments" : (Shipment_Status != "Delivered" && Shipment_Status != "Cancelled")
+    )
+    sort by
+    (
+        Expected_Delivery ascending
+        Requested_On ascending
+    )
+    options
+    (
+        display field = Shipment_Status
+        othercolumn = "Other"
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

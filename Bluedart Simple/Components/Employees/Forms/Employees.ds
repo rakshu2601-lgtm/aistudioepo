@@ -1,0 +1,163 @@
+form Employees
+{
+    title
+    {
+        displayname = "Employees"
+        on add = "Add Employee"
+        on edit = "Edit Employee"
+    }
+    success message = "Employee saved successfully."
+
+    Employee_Identity
+    (
+        type = section
+        displayname = "Employee Identity"
+        row = 1
+        column = 0
+    )
+    Employee_ID
+    (
+        type = autonumber
+        displayname = "Employee ID"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Employee_Name
+    (
+        type = name
+        displayname = "Employee Name"
+        prefix
+        (
+            type = prefix
+            displayname = "Title"
+            value = {"Mr.","Mrs.","Ms.","Dr."}
+        )
+        first_name
+        (
+            type = first_name
+            displayname = "First Name"
+        )
+        last_name
+        (
+            type = last_name
+            displayname = "Last Name"
+        )
+        suffix
+        (
+            type = suffix
+            displayname = "Suffix"
+            visibility = false
+        )
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have unique Work_Email
+    (
+        type = email
+        displayname = "Work Email"
+        personal data = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Phone
+    (
+        type = phonenumber
+        displayname = "Phone"
+        allowedcountries = {in}
+        defaultcountry = "in"
+        personal data = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Employment_Details
+    (
+        type = section
+        displayname = "Employment Details"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Internal_User
+    (
+        type = picklist
+        displayname = "Internal User"
+        module = users
+        displayformat = [name]
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Employee_Type
+    (
+        type = picklist
+        displayname = "Employee Type"
+        values = {"Administrator","Hub Manager","Operations Employee","Agent"}
+        row = 2
+        column = 2
+        width = medium
+    )
+    Hub
+    (
+        type = picklist
+        displayname = "Hub"
+        values = Hubs.ID
+        displayformat = [Hub_Name]
+        searchable = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Availability_Status
+    (
+        type = picklist
+        displayname = "Availability Status"
+        values = {"Available","Assigned","Off Duty","Inactive"}
+        initial value = "Available"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Employee"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Employee"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

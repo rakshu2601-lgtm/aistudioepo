@@ -1,0 +1,5 @@
+report All_Shipments
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Shipment_Number Customer Transport_Mode Shipment_Status Net_Amount ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Shipment_Number Customer Pickup_Contact_Name Pickup_Phone Delivery_Contact_Name Delivery_Phone Weight_Kg Transport_Mode Origin_Hub Destination_Hub Current_Hub Gross_Amount Loyalty_Discount Net_Amount Payment_Status Shipment_Status Requested_On Expected_Delivery Latest_Tracking_Text ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

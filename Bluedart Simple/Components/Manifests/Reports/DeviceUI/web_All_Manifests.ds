@@ -1,0 +1,5 @@
+report All_Manifests
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Manifest_Number Origin_Hub Destination_Hub Assigned_Agent Manifest_Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Manifest_Number Manifest_Type Origin_Hub Destination_Hub Transport_Mode Assigned_Agent Vehicle_or_Carrier_Details Planned_Departure Planned_Arrival Actual_Departure Actual_Arrival Manifest_Status Notes ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

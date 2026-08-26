@@ -1,0 +1,23 @@
+Shipment_Tracking_Events_On_Delete as "Protect Tracking Event Deletion"
+{
+    type = form
+    form = Shipment_Tracking_Events
+    record event = on delete
+    description = "Prevents ordinary users from deleting append-only shipment history."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                isAdministrator = thisapp.permissions.isUserInProfile("Logistics_Admin");
+                if(isAdministrator == false)
+                {
+                    alert "Shipment tracking history is append-only and cannot be deleted.";
+                    cancel delete;
+                }
+            )
+        }
+    }
+}

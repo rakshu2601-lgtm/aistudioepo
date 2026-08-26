@@ -1,0 +1,49 @@
+kanban Agent_Task_Board
+{
+    displayName = "Agent Task Board"
+    show all rows from Agent_Tasks
+    (
+        Task_Number
+        Task_Type
+        Shipment
+        Hub
+        Assigned_Agent
+        Agent_User
+        Scheduled_At
+        Contact_Name
+        Contact_Phone
+        (
+            displayformat = formattednumber
+            linktodial = enable
+        )
+        Task_Address
+        Task_Status
+        Accepted_On
+        Started_On
+        Completed_On
+        Failure_Reason
+        Agent_Notes
+    )
+    filters
+    (
+        Task_Type
+        Hub
+        Assigned_Agent
+        Scheduled_At
+        Task_Status
+        "Open Tasks" : (Task_Status != "Completed" && Task_Status != "Failed")
+    )
+    sort by
+    (
+        Scheduled_At ascending
+        Task_Number descending
+    )
+    options
+    (
+        display field = Task_Status
+        othercolumn = "Other"
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

@@ -1,0 +1,41 @@
+Agent_Tasks_On_Success as "Notify Agent Task Assignment"
+{
+    type = form
+    form = Agent_Tasks[Task_Status == "Assigned"]
+    record event = on add
+    description = "Notifies the first assignee and records the initial assignment in the audit trail."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                agentRecord = Employees[ID == input.Assigned_Agent];
+                if(agentRecord.count() > 0)
+                {
+                    sendmail
+                    (
+                        from : zoho.adminuserid
+                        to : agentRecord.Work_Email
+                        subject : "New " + input.Task_Type + " task assigned"
+                        message : "Task " + input.Task_Number.toString() + " for shipment " + input.Shipment.toString() + " is assigned at your hub. Scheduled time: " + input.Scheduled_At.toString() + "."
+                    )
+                    agentRecord.Availability_Status = "Assigned";
+                }
+                auditID = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    User_Email = zoho.loginuserid
+                    User_Profile = "Agent Task Assignment"
+                    Entity_Type = "Agent_Tasks"
+                    Entity_Record_ID = input.ID.toString()
+                    Action = "Agent Task Assigned"
+                    After_Value = input.Assigned_Agent.toString()
+                    Details = "Task assigned to employee record " + input.Assigned_Agent.toString() + " at hub " + input.Hub.toString() + "."
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

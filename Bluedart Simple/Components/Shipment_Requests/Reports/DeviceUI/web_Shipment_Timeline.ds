@@ -1,0 +1,5 @@
+report Shipment_Timeline
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Shipment_Number Customer Transport_Mode Shipment_Status Requested_On ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Shipment_Number Customer Origin_Hub Destination_Hub Transport_Mode Shipment_Status Requested_On Expected_Delivery Latest_Tracking_Text ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

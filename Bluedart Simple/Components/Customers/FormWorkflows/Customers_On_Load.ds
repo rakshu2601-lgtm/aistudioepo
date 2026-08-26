@@ -1,0 +1,47 @@
+Customers_On_Load as "Configure Customer Form"
+{
+    type = form
+    form = Customers
+    record event = on add or edit
+    description = "Shows business fields when required and protects workflow-controlled account values."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Customer_Type == "Corporate" || input.Customer_Type == "Wholesale")
+                {
+                    show Company_Name;
+                    show GSTIN;
+                    show PAN;
+                    show CIN_or_Udyam_Number;
+                    show Billing_Contact_Name;
+                    show Billing_Email;
+                }
+                else
+                {
+                    hide Company_Name;
+                    hide GSTIN;
+                    hide PAN;
+                    hide CIN_or_Udyam_Number;
+                    hide Billing_Contact_Name;
+                    hide Billing_Email;
+                }
+                isAdministrator = thisapp.permissions.isUserInProfile("Logistics_Admin");
+                if(isAdministrator == false)
+                {
+                    disable Portal_User;
+                    disable Onboarding_Status;
+                    disable KYC_Status;
+                    disable Current_Loyalty_Program;
+                    disable Overall_Points_Earned;
+                    disable Current_Points_Balance;
+                    disable Onboarded_On;
+                    disable Active;
+                }
+            )
+        }
+    }
+}

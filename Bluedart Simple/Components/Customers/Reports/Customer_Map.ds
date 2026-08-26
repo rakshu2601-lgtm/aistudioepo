@@ -1,0 +1,38 @@
+map Customer_Map
+{
+    displayName = "Customer Map"
+    show all rows from Customers [Active == true]
+    (
+        Customer_ID
+        Customer_Name
+        Customer_Email
+        Customer_Phone
+        (
+            displayformat = formattednumber
+            linktodial = enable
+        )
+        Customer_Type
+        Primary_Address
+        Onboarding_Status
+        Active
+        (
+            displaytrue = "Active"
+            displayfalse = "Inactive"
+        )
+    )
+    filters
+    (
+        Customer_Type
+        Onboarding_Status
+    )
+    options
+    (
+        display field = Primary_Address
+        location
+        (
+            latitude = 20.5937
+            longitude = 78.9629
+        )
+        radius = 2500 Kms
+    )
+}

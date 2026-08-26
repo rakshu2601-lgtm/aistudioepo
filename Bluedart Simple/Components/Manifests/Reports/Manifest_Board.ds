@@ -1,0 +1,41 @@
+kanban Manifest_Board
+{
+    displayName = "Manifest Board"
+    show all rows from Manifests
+    (
+        Manifest_Number
+        Manifest_Type
+        Origin_Hub
+        Destination_Hub
+        Transport_Mode
+        Assigned_Agent
+        Vehicle_or_Carrier_Details
+        Planned_Departure
+        Planned_Arrival
+        Manifest_Status
+    )
+    filters
+    (
+        Manifest_Type
+        Origin_Hub
+        Destination_Hub
+        Transport_Mode
+        Assigned_Agent
+        Planned_Departure
+        Manifest_Status
+        "Active Journey Legs" : (Manifest_Status != "Closed" && Manifest_Status != "Cancelled")
+    )
+    sort by
+    (
+        Planned_Departure ascending
+        Manifest_Number ascending
+    )
+    options
+    (
+        display field = Manifest_Status
+        othercolumn = "Other"
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

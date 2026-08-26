@@ -1,0 +1,42 @@
+Manifests_On_Load as "Configure Manifest Leg Form"
+{
+    type = form
+    form = Manifests
+    record event = on add or edit
+    description = "Protects lifecycle fields and limits operational users to manifests connected with their own hub."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Assigned_Agent_User;
+                disable Actual_Departure;
+                disable Actual_Arrival;
+                disable Manifest_Status;
+                currentEmployee = Employees[Work_Email == zoho.loginuserid && Active == true];
+                isAdmin = thisapp.permissions.isUserInProfile("Logistics_Admin");
+                if(currentEmployee.count() > 0 && currentEmployee.Employee_Type == "Agent")
+                {
+                    disable Manifest_Type;
+                    disable Origin_Hub;
+                    disable Destination_Hub;
+                    disable Transport_Mode;
+                    disable Assigned_Agent;
+                    disable Vehicle_or_Carrier_Details;
+                    disable Planned_Departure;
+                    disable Planned_Arrival;
+                    disable Notes;
+                }
+                else if(isAdmin == false && currentEmployee.count() > 0 && currentEmployee.Hub != null)
+                {
+                    if(input.ID == null)
+                    {
+                        input.Origin_Hub = currentEmployee.Hub;
+                    }
+                }
+            )
+        }
+    }
+}

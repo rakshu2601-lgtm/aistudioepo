@@ -1,0 +1,131 @@
+Agent_Tasks_On_Validate as "Validate Agent Task"
+{
+    type = form
+    form = Agent_Tasks
+    record event = on add or edit
+    description = "Enforces hub-agent eligibility, ownership, shipment consistency, reassignment authority, and completion evidence."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                shipmentRecord = Shipment_Requests[ID == input.Shipment];
+                hubRecord = Hubs[ID == input.Hub];
+                agentRecord = Employees[ID == input.Assigned_Agent];
+                if(shipmentRecord.count() == 0 || hubRecord.count() == 0 || hubRecord.Status != "Active")
+                {
+                    alert "Select a valid shipment and active hub.";
+                    cancel submit;
+                }
+                if(agentRecord.count() == 0 || agentRecord.Employee_Type != "Agent" || agentRecord.Active == false || agentRecord.Internal_User == null)
+                {
+                    alert "Select an active hub agent with an internal user account.";
+                    cancel submit;
+                }
+                if(agentRecord.Hub != input.Hub)
+                {
+                    alert "The assigned agent must belong to the selected hub.";
+                    cancel submit;
+                }
+                input.Agent_User = agentRecord.Internal_User;
+                expectedHub = null;
+                expectedContactName = "";
+                if(input.Task_Type == "Pickup")
+                {
+                    expectedHub = shipmentRecord.Origin_Hub;
+                    expectedContactName = shipmentRecord.Pickup_Contact_Name;
+                }
+                else
+                {
+                    expectedHub = shipmentRecord.Destination_Hub;
+                    expectedContactName = shipmentRecord.Delivery_Contact_Name;
+                }
+                if(expectedHub != input.Hub)
+                {
+                    alert "The task hub must match the shipment's " + input.Task_Type.toLowerCase() + " hub.";
+                    cancel submit;
+                }
+                duplicateOpenTasks = Agent_Tasks[Shipment == input.Shipment && Task_Type == input.Task_Type && Task_Status != "Completed" && Task_Status != "Failed"];
+                for each duplicateTask in duplicateOpenTasks
+                {
+                    if(duplicateTask.ID != input.ID)
+                    {
+                        alert "This shipment already has an open " + input.Task_Type.toLowerCase() + " task.";
+                        cancel submit;
+                    }
+                }
+                isAdministrator = thisapp.permissions.isUserInProfile("Logistics_Admin");
+                isHubManager = thisapp.permissions.isUserInProfile("Hub_Manager");
+                isAgent = thisapp.permissions.isUserInProfile("Hub_Agent");
+                isOperations = thisapp.permissions.isUserInProfile("Operations_Employee");
+                currentEmployee = Employees[Work_Email == zoho.loginuserid && Active == true];
+                if(isAdministrator == false)
+                {
+                    if(currentEmployee.count() == 0)
+                    {
+                        alert "Only active logistics employees can save agent tasks.";
+                        cancel submit;
+                    }
+                    if(isHubManager == true && currentEmployee.Hub != input.Hub)
+                    {
+                        alert "Hub managers can manage tasks only at their assigned hub.";
+                        cancel submit;
+                    }
+                    if(isOperations == true && input.ID != null)
+                    {
+                        alert "Operations employees can create and view tasks but cannot modify existing assignments.";
+                        cancel submit;
+                    }
+                    if(isAgent == true)
+                    {
+                        if(input.ID == null || input.Agent_User != zoho.loginuserid)
+                        {
+                            alert "Agents can update only their own assigned tasks.";
+                            cancel submit;
+                        }
+                        persistedTask = Agent_Tasks[ID == input.ID];
+                        if(persistedTask.Task_Type != input.Task_Type || persistedTask.Shipment != input.Shipment || persistedTask.Hub != input.Hub || persistedTask.Assigned_Agent != input.Assigned_Agent || persistedTask.Agent_User != input.Agent_User || persistedTask.Scheduled_At != input.Scheduled_At || persistedTask.Contact_Name != input.Contact_Name || persistedTask.Contact_Phone != input.Contact_Phone || persistedTask.Task_Address != input.Task_Address || persistedTask.Task_Status != input.Task_Status || persistedTask.Accepted_On != input.Accepted_On || persistedTask.Started_On != input.Started_On || persistedTask.Completed_On != input.Completed_On)
+                        {
+                            alert "Task ownership, contact details, and lifecycle fields are controlled by authorized managers and blueprint transitions.";
+                            cancel submit;
+                        }
+                    }
+                    persistedTask = Agent_Tasks[ID == input.ID];
+                    if(input.ID != null && persistedTask.Assigned_Agent != input.Assigned_Agent)
+                    {
+                        if(persistedTask.Task_Status == "Completed")
+                        {
+                            alert "Completed tasks cannot be reassigned.";
+                            cancel submit;
+                        }
+                        if(isHubManager == false)
+                        {
+                            alert "Only a hub manager or logistics administrator may reassign a task.";
+                            cancel submit;
+                        }
+                    }
+                }
+                if(input.Task_Status == "Completed")
+                {
+                    if(input.Task_Type == "Pickup" && input.Proof_File == null)
+                    {
+                        alert "Upload pickup proof before completing the task.";
+                        cancel submit;
+                    }
+                    if(input.Task_Type == "Delivery" && (input.Recipient_Name in {""," ","null"} || (input.Proof_File == null && input.Recipient_Signature == null)))
+                    {
+                        alert "Enter the recipient name and capture a proof file or signature before completing delivery.";
+                        cancel submit;
+                    }
+                }
+                if(input.Task_Status == "Failed" && input.Failure_Reason in {""," ","null"})
+                {
+                    alert "Enter a failure reason before marking the task Failed.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

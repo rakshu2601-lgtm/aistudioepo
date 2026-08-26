@@ -1,0 +1,179 @@
+form Shipment_Tracking_Events
+{
+    title
+    {
+        displayname = "Shipment Tracking Events"
+        on add = "Record Tracking Event"
+        on edit = "Review Tracking Event"
+    }
+    success message = "Shipment tracking event recorded successfully."
+    record owner = Customer_Portal_User
+
+    Event_Context
+    (
+        type = section
+        displayname = "Event Context"
+        row = 1
+        column = 0
+    )
+    Event_ID
+    (
+        type = autonumber
+        displayname = "Event ID"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Shipment
+    (
+        type = picklist
+        displayname = "Shipment"
+        values = Shipment_Requests.ID
+        displayformat = [Shipment_Number]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Customer_Portal_User
+    (
+        type = picklist
+        displayname = "Customer Portal User"
+        module = users
+        user type = "portal users"
+        displayformat = [name]
+        row = 1
+        column = 2
+        width = medium
+    )
+    Manifest
+    (
+        type = picklist
+        displayname = "Manifest Leg"
+        values = Manifests.ID
+        displayformat = [Manifest_Number]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Agent_Task
+    (
+        type = picklist
+        displayname = "Agent Task"
+        values = Agent_Tasks.ID
+        displayformat = [Task_Number]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    Event_Details
+    (
+        type = section
+        displayname = "Event Details"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Event_Type
+    (
+        type = picklist
+        displayname = "Event Type"
+        values = {"Requested","Quoted","Confirmed","Pickup Assigned","Picked Up","Departed Hub","Arrived Hub","Out for Delivery","Delivered","Exception","Cancelled"}
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Event_Time
+    (
+        type = datetime
+        displayname = "Event Time"
+        initial value = "${zoho.currenttime}"
+        mins_displayinterval = 5
+        row = 2
+        column = 2
+        width = medium
+    )
+    Hub
+    (
+        type = picklist
+        displayname = "Hub"
+        values = Hubs.ID
+        displayformat = [Hub_Name]
+        searchable = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Location_Text
+    (
+        type = text
+        displayname = "Location"
+        maxchar = 180
+        row = 2
+        column = 2
+        width = medium
+    )
+    Details
+    (
+        type = textarea
+        displayname = "Event Details"
+        height = 100px
+        row = 2
+        column = 1
+        width = medium
+    )
+    Recorded_By
+    (
+        type = picklist
+        displayname = "Recorded By"
+        values = Employees.ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 2
+        column = 2
+        width = medium
+    )
+    Customer_Visible
+    (
+        type = checkbox
+        displayname = "Customer Visible"
+        initial value = true
+        row = 2
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Record Event"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Event"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Close"
+            )
+        }
+    }
+}

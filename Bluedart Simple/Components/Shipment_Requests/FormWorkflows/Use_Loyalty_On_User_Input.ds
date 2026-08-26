@@ -1,0 +1,50 @@
+Use_Loyalty_On_User_Input as "Configure Loyalty Discount"
+{
+    type = form
+    form = Shipment_Requests
+    record event = on add or edit
+    description = "Shows loyalty input and recalculates the INR discount from the customer's active programme."
+
+    on user input of Use_Loyalty
+    {
+        actions
+        {
+            custom deluge script
+            (
+                customerRecord = Customers[ID == input.Customer];
+                if(customerRecord.count() > 0)
+                {
+                    input.Available_Points = ifnull(customerRecord.Current_Points_Balance,0);
+                }
+                if(input.Use_Loyalty == true)
+                {
+                    show Loyalty_Points_To_Use;
+                }
+                else
+                {
+                    input.Loyalty_Points_To_Use = 0;
+                    input.Loyalty_Discount = 0;
+                    hide Loyalty_Points_To_Use;
+                }
+                if(input.Use_Loyalty == true && input.Loyalty_Points_To_Use > 0 && customerRecord.count() > 0 && customerRecord.Current_Loyalty_Program != null)
+                {
+                    programRecord = Loyalty_Programs[ID == customerRecord.Current_Loyalty_Program];
+                    if(programRecord.count() > 0)
+                    {
+                        input.Loyalty_Discount = (input.Loyalty_Points_To_Use * programRecord.Redemption_Value_Per_Point).round(2);
+                        maximumDiscount = input.Gross_Amount * programRecord.Max_Shipment_Discount_Percent / 100;
+                        if(input.Loyalty_Discount > maximumDiscount)
+                        {
+                            input.Loyalty_Discount = maximumDiscount.round(2);
+                        }
+                        if(input.Loyalty_Discount > input.Gross_Amount)
+                        {
+                            input.Loyalty_Discount = input.Gross_Amount;
+                        }
+                    }
+                }
+                input.Net_Amount = (input.Gross_Amount - input.Loyalty_Discount).round(2);
+            )
+        }
+    }
+}

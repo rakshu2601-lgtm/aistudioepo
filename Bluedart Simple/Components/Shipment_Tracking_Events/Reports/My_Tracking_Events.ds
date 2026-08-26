@@ -1,0 +1,36 @@
+list My_Tracking_Events
+{
+    displayName = "My Tracking Events"
+    show all rows from Shipment_Tracking_Events [Customer_Portal_User == zoho.loginuserid && Customer_Visible == true]
+    (
+        Event_ID
+        Shipment
+        Customer_Portal_User
+        Event_Type
+        Event_Time
+        Hub
+        Location_Text
+        Details
+        Customer_Visible
+    )
+    filters
+    (
+        Shipment
+        Event_Type
+        Event_Time
+        Hub
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Shipment ascending
+    )
+    sort by
+    (
+        Event_Time descending
+        Event_ID descending
+    )
+}

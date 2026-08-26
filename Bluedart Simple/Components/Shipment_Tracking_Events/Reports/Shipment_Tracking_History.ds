@@ -1,0 +1,49 @@
+default list Shipment_Tracking_History
+{
+    displayName = "Shipment Tracking History"
+    show all rows from Shipment_Tracking_Events
+    (
+        Event_ID
+        Shipment
+        Customer_Portal_User
+        Manifest
+        Agent_Task
+        Event_Type
+        Event_Time
+        Hub
+        Location_Text
+        Details
+        Recorded_By
+        Customer_Visible
+        (
+            displaytrue = "Customer Visible"
+            displayfalse = "Internal Only"
+        )
+    )
+    filters
+    (
+        Shipment
+        Manifest
+        Agent_Task
+        Event_Type
+        Event_Time
+        Hub
+        Recorded_By
+        Customer_Visible
+        "Exceptions" : (Event_Type == "Exception")
+        "Customer Updates" : (Customer_Visible == true)
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Shipment ascending
+    )
+    sort by
+    (
+        Event_Time descending
+        Event_ID descending
+    )
+}

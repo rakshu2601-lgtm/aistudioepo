@@ -1,0 +1,34 @@
+kanban Redemption_Board
+{
+    displayName = "Redemption Board"
+    show all rows from Loyalty_Redemptions
+    (
+        Redemption_Number
+        Customer
+        Redemption_Type
+        Shipment
+        Points_Requested
+        Amount_Value
+        Redemption_Status
+        Requested_On
+        Reviewed_By
+    )
+    filters
+    (
+        Redemption_Type
+        Customer
+        Reviewed_By
+    )
+    sort by
+    (
+        Requested_On descending
+    )
+    options
+    (
+        display field = Redemption_Status
+        othercolumn = "Other"
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

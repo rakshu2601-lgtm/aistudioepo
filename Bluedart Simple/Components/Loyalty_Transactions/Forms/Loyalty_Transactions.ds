@@ -1,0 +1,227 @@
+form Loyalty_Transactions
+{
+    title
+    {
+        displayname = "Loyalty Transactions"
+        on add = "Post Loyalty Transaction"
+        on edit = "Review Loyalty Transaction"
+    }
+    success message = "Loyalty transaction posted successfully."
+    record owner = Customer_Portal_User
+
+    Transaction_Context
+    (
+        type = section
+        displayname = "Transaction Context"
+        row = 1
+        column = 0
+    )
+    Transaction_ID
+    (
+        type = autonumber
+        displayname = "Transaction ID"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Customer
+    (
+        type = picklist
+        displayname = "Customer"
+        values = Customers.ID
+        displayformat = [Customer_Name.first_name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Customer_Portal_User
+    (
+        type = picklist
+        displayname = "Customer Portal User"
+        module = users
+        user type = "portal users"
+        displayformat = [name]
+        row = 1
+        column = 2
+        width = medium
+    )
+    Shipment
+    (
+        type = picklist
+        displayname = "Shipment"
+        values = Shipment_Requests.ID
+        displayformat = [Shipment_Number]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Program
+    (
+        type = picklist
+        displayname = "Loyalty Programme"
+        values = Loyalty_Programs.ID
+        displayformat = [Tier_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    Points_Movement
+    (
+        type = section
+        displayname = "Points Movement"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Transaction_Type
+    (
+        type = picklist
+        displayname = "Transaction Type"
+        values = {"Earn","Redeem","Adjust","Expire","Reverse"}
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Points
+    (
+        type = number
+        displayname = "Signed Points"
+        format = commadotindian
+        row = 2
+        column = 2
+        width = medium
+    )
+    Monetary_Value
+    (
+        type = INR
+        displayname = "Monetary Value (INR)"
+        format = commadotindian
+        decimalplace = 2
+        maxchar = 16
+        initial value = 0
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Transaction_Date
+    (
+        type = datetime
+        displayname = "Transaction Date"
+        initial value = "${zoho.currenttime}"
+        mins_displayinterval = 5
+        row = 2
+        column = 2
+        width = medium
+    )
+    Expiry_Date
+    (
+        type = date
+        displayname = "Expiry Date"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Remaining_Points
+    (
+        type = number
+        displayname = "Remaining Points"
+        format = commadotindian
+        initial value = 0
+        row = 2
+        column = 2
+        width = medium
+    )
+    Used_Points
+    (
+        type = number
+        displayname = "Used Points"
+        format = commadotindian
+        initial value = 0
+        row = 2
+        column = 1
+        width = medium
+    )
+    Transaction_Status
+    (
+        type = picklist
+        displayname = "Transaction Status"
+        values = {"Posted","Reversed","Expired"}
+        initial value = "Posted"
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    Ledger_Reference
+    (
+        type = section
+        displayname = "Ledger Reference"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Reference_Text
+    (
+        type = text
+        displayname = "Reference"
+        maxchar = 255
+        row = 3
+        column = 1
+        width = medium
+    )
+    Balance_After
+    (
+        type = number
+        displayname = "Balance After"
+        format = commadotindian
+        row = 3
+        column = 2
+        width = medium
+    )
+    Created_By
+    (
+        type = picklist
+        displayname = "Created By"
+        values = Employees.ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 3
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Post Transaction"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Transaction"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Close"
+            )
+        }
+    }
+}

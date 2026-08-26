@@ -1,0 +1,56 @@
+default list KYC_Review_Queue
+{
+    displayName = "KYC Review Queue"
+    show all rows from KYC_Document_Requests
+    (
+        Request_ID
+        Customer
+        Requested_Document_Name
+        Required_Document
+        (
+            displaytrue = "Required"
+            displayfalse = "Optional"
+        )
+        Requested_By
+        Requested_On
+        (
+            displayformat = dateonly
+        )
+        Verification_Status
+        Uploaded_Document
+        Uploaded_On
+        (
+            displayformat = dateonly
+        )
+        Reviewed_By
+        Reviewed_On
+        (
+            displayformat = dateonly
+        )
+        Rejection_Reason
+        (
+            foldcontent = enable
+        )
+    )
+    filters
+    (
+        Customer
+        Required_Document
+        Verification_Status
+        Reviewed_By
+        "Awaiting Review" : (Verification_Status == "Uploaded")
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Verification_Status ascending
+    )
+    sort by
+    (
+        Uploaded_On ascending
+        Requested_On ascending
+    )
+}

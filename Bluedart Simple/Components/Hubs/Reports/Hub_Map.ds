@@ -1,0 +1,27 @@
+map Hub_Map
+{
+    displayName = "Hub Map"
+    show all rows from Hubs [Status == "Active"]
+    (
+        Hub_Code
+        Hub_Name
+        Hub_Address
+        Manager_User
+        Contact_Phone
+        (
+            displayformat = formattednumber
+            linktodial = enable
+        )
+        Status
+    )
+    options
+    (
+        display field = Hub_Address
+        location
+        (
+            latitude = 20.5937
+            longitude = 78.9629
+        )
+        radius = 2500 Kms
+    )
+}

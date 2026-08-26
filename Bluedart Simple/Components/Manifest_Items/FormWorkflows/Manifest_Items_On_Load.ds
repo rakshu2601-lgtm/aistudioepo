@@ -1,0 +1,50 @@
+Manifest_Items_On_Load as "Configure Manifest Shipment on Load"
+{
+    type = form
+    form = Manifest_Items
+    record event = on add or edit
+    description = "Filters eligible shipments, copies manifest ownership, and protects blueprint-managed handling fields."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Assigned_Agent_User;
+                disable Loaded_On;
+                disable Unloaded_On;
+                isAdministrator = thisapp.permissions.isUserInProfile("Logistics_Admin");
+                isAgent = thisapp.permissions.isUserInProfile("Hub_Agent");
+                if(input.Manifest != null)
+                {
+                    manifestRecord = Manifests[ID == input.Manifest];
+                    if(manifestRecord.count() > 0)
+                    {
+                        input.Assigned_Agent_User = manifestRecord.Assigned_Agent_User;
+                        clear Shipment;
+                        eligibleShipments = Shipment_Requests[((Shipment_Status == "Confirmed" && Origin_Hub == manifestRecord.Origin_Hub) || ((Shipment_Status == "Picked Up" || Shipment_Status == "At Hub") && Current_Hub == manifestRecord.Origin_Hub)) || ID == input.Shipment] sort by Shipment_Number;
+                        if(eligibleShipments.count() > 0)
+                        {
+                            Shipment:ui.add(eligibleShipments.ID.getall());
+                        }
+                    }
+                }
+                else
+                {
+                    clear Shipment;
+                    input.Assigned_Agent_User = null;
+                }
+                if(isAdministrator == false)
+                {
+                    disable Item_Status;
+                    if(isAgent == true && input.Assigned_Agent_User == zoho.loginuserid && input.ID != null)
+                    {
+                        enable Item_Status;
+                        enable Exception_Notes;
+                    }
+                }
+            )
+        }
+    }
+}

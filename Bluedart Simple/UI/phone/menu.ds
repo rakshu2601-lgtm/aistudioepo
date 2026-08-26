@@ -1,0 +1,100 @@
+menu
+{
+    unused
+    {
+        form Hubs { }
+        form Employees { }
+        form KYC_Document_Rules { }
+        form Customers { }
+        form Transport_Rates { }
+        form Loyalty_Programs { }
+        form Manifests { }
+        form Manifest_Items { }
+        form Shipment_Tracking_Events { }
+        form Loyalty_Transactions { }
+        form Audit_Log { }
+        report All_Hubs { }
+        report Hub_Map { }
+        report All_Employees { }
+        report Active_Agents { }
+        report KYC_Document_Rule_List { }
+        report All_Customers { }
+        report Customer_Onboarding_Board { }
+        report Customer_Map { }
+        report KYC_Review_Queue { }
+        report KYC_Verification_Board { }
+        report Active_Transport_Rates { }
+        report Rate_Matrix { }
+        report Loyalty_Program_Matrix { }
+        report All_Shipments { }
+        report Shipment_Status_Board { }
+        report Shipment_Timeline { }
+        report All_Manifests { }
+        report Manifest_Board { }
+        report Manifest_Shipments { }
+        report Shipment_Journey_Legs { }
+        report Agent_Task_Board { }
+        report Shipment_Tracking_History { }
+        report Tracking_Timeline { }
+        report Loyalty_Ledger { }
+        report Redemption_Queue { }
+        report Redemption_Board { }
+        report Audit_Trail { }
+        page Hub_Dashboard { }
+        page Admin_Dashboard { }
+    }
+
+    space Mobile_Logistics
+    {
+        displayname = "Mobile Logistics"
+        icon = "transportation-truck-front"
+
+        section Mobile_Dashboards
+        {
+            displayname = "Dashboards"
+            icon = "business-chart"
+            page Customer_Dashboard { icon = "users-circle-08" }
+            page Agent_Dashboard { icon = "transportation-car" }
+        }
+
+        section Customer_Self_Service
+        {
+            displayname = "Customer Self-Service"
+            icon = "users-single-01"
+            form Shipment_Requests { icon = "shopping-box" }
+            report My_Shipments { icon = "shopping-delivery" }
+            report My_Tracking_Events { icon = "shopping-delivery-track" }
+            form KYC_Document_Requests { icon = "files-upload" }
+            report My_KYC_Documents { icon = "files-user" }
+            report My_Loyalty_Transactions { icon = "business-wallet-90" }
+            form Loyalty_Redemptions { icon = "shopping-gift" }
+            report My_Redemptions { icon = "shopping-discount" }
+        }
+
+        section Agent_Work
+        {
+            displayname = "Agent Work"
+            icon = "users-single-position"
+            form Agent_Tasks { icon = "business-agenda" }
+            report My_Agent_Tasks { icon = "files-user" }
+            report Agent_Task_Calendar { icon = "location-appointment" }
+            report My_Assigned_Manifests { icon = "transportation-truck-front" }
+        }
+
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space,section,component}
+        }
+    }
+}

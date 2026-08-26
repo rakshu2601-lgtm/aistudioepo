@@ -1,0 +1,73 @@
+Transport_Rates_On_Validate as "Validate Transport Rate"
+{
+    type = form
+    form = Transport_Rates
+    record event = on add or edit
+    description = "Validates India-specific rate values, ranges, effective dates, and overlapping active pricing bands."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(ifnull(input.Min_Weight_Kg,0) < 0 || ifnull(input.Max_Weight_Kg,0) < 0 || ifnull(input.Min_Distance_Km,0) < 0 || ifnull(input.Max_Distance_Km,0) < 0)
+                {
+                    alert "Weight and distance values cannot be negative.";
+                    cancel submit;
+                }
+                if(input.Max_Weight_Kg < input.Min_Weight_Kg)
+                {
+                    alert "Maximum weight must be greater than or equal to minimum weight.";
+                    cancel submit;
+                }
+                if(input.Max_Distance_Km < input.Min_Distance_Km)
+                {
+                    alert "Maximum distance must be greater than or equal to minimum distance.";
+                    cancel submit;
+                }
+                if(ifnull(input.Base_Charge,0) < 0 || ifnull(input.Charge_Per_Kg,0) < 0 || ifnull(input.Charge_Per_Km,0) < 0 || ifnull(input.Minimum_Charge,0) < 0 || ifnull(input.Fuel_Surcharge_Percent,0) < 0)
+                {
+                    alert "Charges and fuel surcharge cannot be negative.";
+                    cancel submit;
+                }
+                if(ifnull(input.Priority,0) < 1)
+                {
+                    alert "Selection priority must be 1 or greater.";
+                    cancel submit;
+                }
+                if(input.Effective_To != null && input.Effective_To < input.Effective_From)
+                {
+                    alert "Effective To must be on or after Effective From.";
+                    cancel submit;
+                }
+                if(input.Active == true)
+                {
+                    candidateRates = Transport_Rates[Transport_Mode == input.Transport_Mode && Customer_Type == input.Customer_Type && Priority == input.Priority && Active == true];
+                    for each candidateRate in candidateRates
+                    {
+                        if(candidateRate.ID != input.ID)
+                        {
+                            dateOverlaps = true;
+                            if(candidateRate.Effective_To != null && input.Effective_From > candidateRate.Effective_To)
+                            {
+                                dateOverlaps = false;
+                            }
+                            if(input.Effective_To != null && candidateRate.Effective_From > input.Effective_To)
+                            {
+                                dateOverlaps = false;
+                            }
+                            weightOverlaps = input.Min_Weight_Kg <= candidateRate.Max_Weight_Kg && input.Max_Weight_Kg >= candidateRate.Min_Weight_Kg;
+                            distanceOverlaps = input.Min_Distance_Km <= candidateRate.Max_Distance_Km && input.Max_Distance_Km >= candidateRate.Min_Distance_Km;
+                            if(dateOverlaps == true && weightOverlaps == true && distanceOverlaps == true)
+                            {
+                                alert "An active rate with the same mode, customer type, priority, effective period, weight band, and distance band already overlaps this rate.";
+                                cancel submit;
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

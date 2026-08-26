@@ -1,0 +1,28 @@
+Employee_Type_On_User_Input as "Update Hub for Employee Type"
+{
+    type = form
+    form = Employees
+    record event = on add or edit
+    description = "Updates hub visibility when the employee type changes."
+
+    on user input of Employee_Type
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Employee_Type == "Administrator")
+                {
+                    input.Hub = null;
+                    hide Hub;
+                    disable Hub;
+                }
+                else
+                {
+                    show Hub;
+                    enable Hub;
+                }
+            )
+        }
+    }
+}

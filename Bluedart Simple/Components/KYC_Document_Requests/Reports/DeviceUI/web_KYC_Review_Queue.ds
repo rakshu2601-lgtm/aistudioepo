@@ -1,0 +1,5 @@
+report KYC_Review_Queue
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Request_ID Customer Requested_Document_Name Verification_Status Uploaded_On ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Request_ID Customer Requested_Document_Name Required_Document Requested_On Verification_Status Uploaded_Document Uploaded_On Reviewed_By Reviewed_On Rejection_Reason ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

@@ -1,0 +1,120 @@
+menu
+{
+    space India_Logistics
+    {
+        displayname = "India Logistics"
+        icon = "transportation-truck-front"
+
+        section Dashboards_Section
+        {
+            displayname = "Dashboards"
+            icon = "business-chart"
+            page Customer_Dashboard { icon = "users-circle-08" }
+            page Hub_Dashboard { icon = "location-map-pin" }
+            page Agent_Dashboard { icon = "transportation-car" }
+            page Admin_Dashboard { icon = "business-chart-bar-33" }
+        }
+
+        section Customer_KYC_Section
+        {
+            displayname = "Customer and KYC"
+            icon = "users-multiple-11"
+            form Customers { icon = "users-single-01" }
+            report All_Customers { icon = "users-contacts" }
+            report Customer_Onboarding_Board { icon = "business-progress" }
+            report Customer_Map { icon = "location-map" }
+            form KYC_Document_Rules { icon = "files-settings-46" }
+            report KYC_Document_Rule_List { icon = "files-single-content-03" }
+            form KYC_Document_Requests { icon = "files-upload" }
+            report KYC_Review_Queue { icon = "files-folder-time" }
+            report KYC_Verification_Board { icon = "files-check" }
+            report My_KYC_Documents { icon = "files-user" }
+        }
+
+        section Shipment_Operations_Section
+        {
+            displayname = "Shipment Operations"
+            icon = "shopping-delivery-track"
+            form Shipment_Requests { icon = "shopping-box" }
+            report All_Shipments { icon = "shopping-list" }
+            report Shipment_Status_Board { icon = "business-board-30" }
+            report My_Shipments { icon = "shopping-delivery" }
+            report Shipment_Timeline { icon = "business-money-time" }
+            form Shipment_Tracking_Events { icon = "location-route-open" }
+            report Shipment_Tracking_History { icon = "files-time" }
+            report Tracking_Timeline { icon = "location-road" }
+            report My_Tracking_Events { icon = "location-position-user" }
+        }
+
+        section Hub_Agent_Section
+        {
+            displayname = "Hub and Agent Operations"
+            icon = "location-pins"
+            form Hubs { icon = "business-building" }
+            report All_Hubs { icon = "location-pin" }
+            report Hub_Map { icon = "location-map-big" }
+            form Employees { icon = "users-badge-13" }
+            report All_Employees { icon = "users-multiple-19" }
+            report Active_Agents { icon = "users-single-position" }
+            form Manifests { icon = "transportation-truck-front" }
+            report All_Manifests { icon = "files-folder-14" }
+            report Manifest_Board { icon = "business-board-27" }
+            report My_Assigned_Manifests { icon = "files-folder-user" }
+            form Manifest_Items { icon = "shopping-box-3d-50" }
+            report Manifest_Shipments { icon = "shopping-box-3d-67" }
+            report Shipment_Journey_Legs { icon = "location-flag-points-31" }
+            form Agent_Tasks { icon = "business-agenda" }
+            report Agent_Task_Board { icon = "business-board-28" }
+            report My_Agent_Tasks { icon = "files-user" }
+            report Agent_Task_Calendar { icon = "location-appointment" }
+        }
+
+        section Loyalty_Section
+        {
+            displayname = "Loyalty"
+            icon = "shopping-award"
+            form Loyalty_Programs { icon = "business-award-48" }
+            report Loyalty_Program_Matrix { icon = "business-chart-bar-32" }
+            form Loyalty_Transactions { icon = "business-wallet-43" }
+            report Loyalty_Ledger { icon = "files-money" }
+            report My_Loyalty_Transactions { icon = "business-wallet-90" }
+            form Loyalty_Redemptions { icon = "shopping-gift" }
+            report Redemption_Queue { icon = "business-money-time" }
+            report Redemption_Board { icon = "business-board-29" }
+            report My_Redemptions { icon = "shopping-discount" }
+        }
+
+        section Configuration_Section
+        {
+            displayname = "Configuration"
+            icon = "files-settings-99"
+            form Transport_Rates { icon = "business-percentage-38" }
+            report Active_Transport_Rates { icon = "business-money-growth" }
+            report Rate_Matrix { icon = "business-calculator" }
+        }
+
+        section Audit_Section
+        {
+            displayname = "Audit"
+            icon = "business-safe"
+            form Audit_Log { icon = "files-locked" }
+            report Audit_Trail { icon = "files-archive-paper-check" }
+        }
+
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space,section,component}
+        }
+    }
+}

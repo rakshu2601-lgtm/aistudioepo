@@ -1,0 +1,40 @@
+timeline Tracking_Timeline
+{
+    displayName = "Tracking Timeline"
+    show all rows from Shipment_Tracking_Events
+    (
+        Event_ID
+        Shipment
+        Customer_Portal_User
+        Manifest
+        Agent_Task
+        Event_Type
+        Event_Time
+        Hub
+        Location_Text
+        Details
+        Recorded_By
+        Customer_Visible
+    )
+    filters
+    (
+        Shipment
+        Manifest
+        Agent_Task
+        Event_Type
+        Event_Time
+        Hub
+        Recorded_By
+        Customer_Visible
+        "Exceptions" : (Event_Type == "Exception")
+    )
+    sort by
+    (
+        Event_Time descending
+    )
+    options
+    (
+        display field = Event_Type
+        start date = Event_Time
+    )
+}

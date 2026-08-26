@@ -1,0 +1,126 @@
+Shipment_Requests_On_Validate as "Validate Shipment Request"
+{
+    type = form
+    form = Shipment_Requests
+    record event = on add or edit
+    description = "Enforces ownership, routing, quotation, and loyalty constraints for shipment requests."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                isPortalCustomer = thisapp.portal.isUserInProfile("Customer_Portal");
+                customerRecord = Customers[ID == input.Customer];
+                if(customerRecord.count() == 0 || customerRecord.Active == false || customerRecord.Onboarding_Status != "Active")
+                {
+                    alert "Select an active, fully onboarded customer.";
+                    cancel submit;
+                }
+                if(input.Customer_Portal_User != customerRecord.Portal_User)
+                {
+                    alert "The shipment owner must match the customer's portal user.";
+                    cancel submit;
+                }
+                if(isPortalCustomer == true && input.Customer_Portal_User != zoho.loginuserid)
+                {
+                    alert "You can create or update only your own shipment requests.";
+                    cancel submit;
+                }
+                if(ifnull(input.Weight_Kg,0) <= 0)
+                {
+                    alert "Weight must be greater than zero kilograms.";
+                    cancel submit;
+                }
+                if(input.Manual_Distance_Km != null && input.Manual_Distance_Km <= 0)
+                {
+                    alert "Confirmed distance must be greater than zero kilometres.";
+                    cancel submit;
+                }
+                if(input.Origin_Hub != null && input.Destination_Hub != null && input.Origin_Hub == input.Destination_Hub)
+                {
+                    alert "Origin and destination hubs must be different.";
+                    cancel submit;
+                }
+                if(input.Pickup_Agent != null)
+                {
+                    agentRecord = Employees[ID == input.Pickup_Agent];
+                    if(agentRecord.count() == 0 || agentRecord.Active == false || agentRecord.Employee_Type != "Agent" || agentRecord.Internal_User == null)
+                    {
+                        alert "Select an active pickup agent with an internal user account.";
+                        cancel submit;
+                    }
+                    if(input.Origin_Hub != null && agentRecord.Hub != input.Origin_Hub)
+                    {
+                        alert "The pickup agent must belong to the origin hub.";
+                        cancel submit;
+                    }
+                }
+                if(input.Shipment_Status != "Requested" && input.Shipment_Status != "Cancelled")
+                {
+                    if(input.Manual_Distance_Km == null || input.Origin_Hub == null || input.Destination_Hub == null || input.Applied_Rate == null || input.Gross_Amount <= 0)
+                    {
+                        alert "A confirmed distance, origin hub, destination hub, applied rate, and positive quote are required after the request stage.";
+                        cancel submit;
+                    }
+                }
+                if(input.Use_Loyalty == true)
+                {
+                    if(ifnull(input.Loyalty_Points_To_Use,0) <= 0)
+                    {
+                        alert "Enter the number of loyalty points to use.";
+                        cancel submit;
+                    }
+                    if(input.Loyalty_Points_To_Use > ifnull(customerRecord.Current_Points_Balance,0))
+                    {
+                        alert "The requested loyalty points exceed the customer's available balance.";
+                        cancel submit;
+                    }
+                    if(customerRecord.Current_Loyalty_Program == null)
+                    {
+                        alert "The customer does not have an active loyalty programme.";
+                        cancel submit;
+                    }
+                    programRecord = Loyalty_Programs[ID == customerRecord.Current_Loyalty_Program];
+                    if(programRecord.count() == 0 || programRecord.Active == false)
+                    {
+                        alert "The customer's loyalty programme is not active.";
+                        cancel submit;
+                    }
+                    if(input.Loyalty_Points_To_Use < programRecord.Minimum_Redemption_Points)
+                    {
+                        alert "The loyalty points are below the programme's minimum redemption.";
+                        cancel submit;
+                    }
+                    maximumDiscount = input.Gross_Amount * programRecord.Max_Shipment_Discount_Percent / 100;
+                    if(input.Loyalty_Discount > maximumDiscount || input.Loyalty_Discount > input.Gross_Amount)
+                    {
+                        alert "The loyalty discount exceeds the configured shipment limit.";
+                        cancel submit;
+                    }
+                }
+                else
+                {
+                    input.Loyalty_Points_To_Use = 0;
+                    input.Loyalty_Discount = 0;
+                    input.Net_Amount = input.Gross_Amount;
+                }
+                if(input.Net_Amount < 0)
+                {
+                    alert "Net amount cannot be negative.";
+                    cancel submit;
+                }
+                persistedShipment = Shipment_Requests[ID == input.ID];
+                if(isPortalCustomer == true && input.ID != null)
+                {
+                    if(persistedShipment.Customer != input.Customer || persistedShipment.Customer_Portal_User != input.Customer_Portal_User || persistedShipment.Requested_By_Type != input.Requested_By_Type || persistedShipment.Requested_By_Employee != input.Requested_By_Employee || persistedShipment.Manual_Distance_Km != input.Manual_Distance_Km || persistedShipment.Origin_Hub != input.Origin_Hub || persistedShipment.Destination_Hub != input.Destination_Hub || persistedShipment.Current_Hub != input.Current_Hub || persistedShipment.Pickup_Agent != input.Pickup_Agent || persistedShipment.Applied_Rate != input.Applied_Rate || persistedShipment.Base_Transport_Amount != input.Base_Transport_Amount || persistedShipment.Fuel_Surcharge != input.Fuel_Surcharge || persistedShipment.Gross_Amount != input.Gross_Amount || persistedShipment.Payment_Status != input.Payment_Status || persistedShipment.Shipment_Status != input.Shipment_Status || persistedShipment.Quoted_On != input.Quoted_On || persistedShipment.Confirmed_On != input.Confirmed_On || persistedShipment.Picked_Up_On != input.Picked_Up_On || persistedShipment.Delivered_On != input.Delivered_On || persistedShipment.Latest_Tracking_Text != input.Latest_Tracking_Text)
+                    {
+                        alert "Routing, quote, payment, and lifecycle fields are managed by authorized workflows.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

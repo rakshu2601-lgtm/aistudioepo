@@ -1,0 +1,28 @@
+Task_Type_On_User_Input as "Configure Task Proof Fields"
+{
+    type = form
+    form = Agent_Tasks
+    record event = on add or edit
+    description = "Shows recipient proof fields only for final-delivery tasks."
+
+    on user input of Task_Type
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Task_Type == "Delivery")
+                {
+                    show Recipient_Name;
+                    show Recipient_Signature;
+                }
+                else
+                {
+                    input.Recipient_Name = "";
+                    hide Recipient_Name;
+                    hide Recipient_Signature;
+                }
+            )
+        }
+    }
+}

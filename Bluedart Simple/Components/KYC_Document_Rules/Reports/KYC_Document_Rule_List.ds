@@ -1,0 +1,47 @@
+default list KYC_Document_Rule_List
+{
+    displayName = "KYC Document Rule List"
+    show all rows from KYC_Document_Rules
+    (
+        Rule_ID
+        Customer_Type
+        Document_Name
+        Instructions
+        (
+            foldcontent = enable
+        )
+        Allowed_File_Type
+        Required_Document
+        (
+            displaytrue = "Required"
+            displayfalse = "Optional"
+        )
+        Sort_Order
+        Active
+        (
+            displaytrue = "Active"
+            displayfalse = "Inactive"
+        )
+    )
+    filters
+    (
+        Customer_Type
+        Allowed_File_Type
+        Required_Document
+        Active
+        "Active Rules" : (Active == true)
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Customer_Type ascending
+    )
+    sort by
+    (
+        Sort_Order ascending
+        Document_Name ascending
+    )
+}

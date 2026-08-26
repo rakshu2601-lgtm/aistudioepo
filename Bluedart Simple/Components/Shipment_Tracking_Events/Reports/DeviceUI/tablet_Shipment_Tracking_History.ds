@@ -1,0 +1,5 @@
+report Shipment_Tracking_History
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Event_ID Shipment Event_Type Event_Time Hub ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on tap ( View Record ) on long press ( Edit Delete Duplicate View Record ) on left swipe ( Delete ) on right swipe ( Edit ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Event_ID Shipment Customer_Portal_User Manifest Agent_Task Event_Type Event_Time Hub Location_Text Details Recorded_By Customer_Visible ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

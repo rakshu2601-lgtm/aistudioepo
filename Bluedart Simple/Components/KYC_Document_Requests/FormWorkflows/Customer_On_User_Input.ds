@@ -1,0 +1,25 @@
+KYC_Customer_On_User_Input as "Set KYC Request Customer Owner"
+{
+    type = form
+    form = KYC_Document_Requests
+    record event = on add or edit
+    description = "Copies the selected customer's portal ownership into the request."
+
+    on user input of Customer
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Customer != null)
+                {
+                    customerRecord = Customers[ID == input.Customer];
+                    if(customerRecord.count() > 0)
+                    {
+                        input.Customer_Portal_User = customerRecord.Portal_User;
+                    }
+                }
+            )
+        }
+    }
+}

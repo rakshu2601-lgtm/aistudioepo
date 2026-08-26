@@ -1,0 +1,161 @@
+form Audit_Log
+{
+    title
+    {
+        displayname = "Audit Log"
+        on add = "Add Audit Entry"
+        on edit = "View Audit Entry"
+    }
+    success message = "Audit entry recorded."
+
+    Event_Identity
+    (
+        type = section
+        displayname = "Event Identity"
+        row = 1
+        column = 0
+    )
+    Log_ID
+    (
+        type = autonumber
+        displayname = "Log ID"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Event_Time
+    (
+        type = datetime
+        displayname = "Event Time"
+        initial value = "${zoho.currenttime}"
+        mins_displayinterval = 5
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have User_Email
+    (
+        type = email
+        displayname = "User Email"
+        row = 1
+        column = 2
+        width = medium
+    )
+    User_Profile
+    (
+        type = text
+        displayname = "User Profile / Workflow"
+        maxchar = 255
+        row = 1
+        column = 1
+        width = medium
+    )
+    Severity
+    (
+        type = picklist
+        displayname = "Severity"
+        values = {"Info","Warning","Critical"}
+        initial value = "Info"
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    Entity_and_Action
+    (
+        type = section
+        displayname = "Entity and Action"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Entity_Type
+    (
+        type = text
+        displayname = "Entity Type"
+        maxchar = 255
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Entity_Record_ID
+    (
+        type = text
+        displayname = "Entity Record ID"
+        maxchar = 255
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Action
+    (
+        type = text
+        displayname = "Action"
+        maxchar = 255
+        row = 2
+        column = 1
+        width = medium
+    )
+    Details
+    (
+        type = textarea
+        displayname = "Details"
+        height = 120px
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    Change_Snapshot
+    (
+        type = section
+        displayname = "Change Snapshot"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Before_Value
+    (
+        type = textarea
+        displayname = "Before Value"
+        height = 120px
+        row = 3
+        column = 1
+        width = medium
+    )
+    After_Value
+    (
+        type = textarea
+        displayname = "After Value"
+        height = 120px
+        row = 3
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

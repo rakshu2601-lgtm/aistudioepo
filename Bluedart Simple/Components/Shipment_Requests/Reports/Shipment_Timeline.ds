@@ -1,0 +1,36 @@
+timeline Shipment_Timeline
+{
+    displayName = "Shipment Timeline"
+    show all rows from Shipment_Requests [Shipment_Status != "Cancelled"]
+    (
+        Shipment_Number
+        Customer
+        Origin_Hub
+        Destination_Hub
+        Transport_Mode
+        Shipment_Status
+        Requested_On
+        Expected_Delivery
+        Latest_Tracking_Text
+    )
+    filters
+    (
+        Customer
+        Origin_Hub
+        Destination_Hub
+        Transport_Mode
+        Shipment_Status
+        Requested_On
+        Expected_Delivery
+    )
+    sort by
+    (
+        Requested_On descending
+    )
+    options
+    (
+        display field = Shipment_Number
+        start date = Requested_On
+        end date = Expected_Delivery
+    )
+}

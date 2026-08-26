@@ -1,0 +1,94 @@
+menu
+{
+    unused
+    {
+        form Hubs { }
+        form Employees { }
+        form KYC_Document_Rules { }
+        form Customers { }
+        form KYC_Document_Requests { }
+        form Transport_Rates { }
+        form Loyalty_Programs { }
+        form Shipment_Tracking_Events { }
+        form Loyalty_Transactions { }
+        form Loyalty_Redemptions { }
+        form Audit_Log { }
+        report All_Hubs { }
+        report Hub_Map { }
+        report All_Employees { }
+        report Active_Agents { }
+        report KYC_Document_Rule_List { }
+        report All_Customers { }
+        report Customer_Onboarding_Board { }
+        report Customer_Map { }
+        report KYC_Review_Queue { }
+        report KYC_Verification_Board { }
+        report My_KYC_Documents { }
+        report Active_Transport_Rates { }
+        report Rate_Matrix { }
+        report Loyalty_Program_Matrix { }
+        report All_Shipments { }
+        report My_Shipments { }
+        report Shipment_Timeline { }
+        report My_Assigned_Manifests { }
+        report Shipment_Journey_Legs { }
+        report My_Agent_Tasks { }
+        report Tracking_Timeline { }
+        report My_Tracking_Events { }
+        report Loyalty_Ledger { }
+        report My_Loyalty_Transactions { }
+        report Redemption_Queue { }
+        report Redemption_Board { }
+        report My_Redemptions { }
+        report Audit_Trail { }
+    }
+
+    space Hub_Operations
+    {
+        displayname = "Hub Operations"
+        icon = "business-building"
+
+        section Tablet_Dashboards
+        {
+            displayname = "Dashboards"
+            icon = "business-chart"
+            page Customer_Dashboard { icon = "users-circle-08" }
+            page Hub_Dashboard { icon = "location-map-pin" }
+            page Agent_Dashboard { icon = "transportation-car" }
+            page Admin_Dashboard { icon = "business-chart-bar-33" }
+        }
+
+        section Journey_Operations
+        {
+            displayname = "Journey Operations"
+            icon = "location-road"
+            form Manifests { icon = "transportation-truck-front" }
+            report All_Manifests { icon = "files-folder-14" }
+            report Manifest_Board { icon = "business-board-27" }
+            form Manifest_Items { icon = "shopping-box-3d-50" }
+            report Manifest_Shipments { icon = "shopping-box-3d-67" }
+            form Shipment_Requests { icon = "shopping-box" }
+            report Shipment_Status_Board { icon = "business-board-30" }
+            form Agent_Tasks { icon = "business-agenda" }
+            report Agent_Task_Board { icon = "business-board-28" }
+            report Agent_Task_Calendar { icon = "location-appointment" }
+            report Shipment_Tracking_History { icon = "shopping-delivery-track" }
+        }
+
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space,section,component}
+        }
+    }
+}

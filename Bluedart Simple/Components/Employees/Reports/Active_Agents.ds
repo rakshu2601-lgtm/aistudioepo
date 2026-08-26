@@ -1,0 +1,41 @@
+list Active_Agents
+{
+    displayName = "Active Agents"
+    show all rows from Employees [Employee_Type == "Agent" && Active == true]
+    (
+        Employee_ID
+        Employee_Name
+        Work_Email
+        Phone
+        (
+            displayformat = formattednumber
+            linktodial = enable
+        )
+        Hub
+        Availability_Status
+        Employee_Type
+        Active
+        (
+            displaytrue = "Active"
+            displayfalse = "Inactive"
+        )
+    )
+    filters
+    (
+        Hub
+        Availability_Status
+        "Available Agents" : (Availability_Status == "Available")
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Hub ascending
+    )
+    sort by
+    (
+        Work_Email ascending
+    )
+}

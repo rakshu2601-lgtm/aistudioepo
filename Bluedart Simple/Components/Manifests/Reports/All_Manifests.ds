@@ -1,0 +1,45 @@
+default list All_Manifests
+{
+    displayName = "All Manifests"
+    show all rows from Manifests
+    (
+        Manifest_Number
+        Manifest_Type
+        Origin_Hub
+        Destination_Hub
+        Transport_Mode
+        Assigned_Agent
+        Vehicle_or_Carrier_Details
+        Planned_Departure
+        Planned_Arrival
+        Actual_Departure
+        Actual_Arrival
+        Manifest_Status
+        Notes
+    )
+    filters
+    (
+        Manifest_Type
+        Origin_Hub
+        Destination_Hub
+        Transport_Mode
+        Assigned_Agent
+        Planned_Departure
+        Planned_Arrival
+        Manifest_Status
+        "Open Manifests" : (Manifest_Status != "Closed" && Manifest_Status != "Cancelled")
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Manifest_Status ascending
+    )
+    sort by
+    (
+        Planned_Departure ascending
+        Manifest_Number descending
+    )
+}

@@ -1,0 +1,49 @@
+Shipment_Requests_On_Success as "Initialize Shipment Request"
+{
+    type = form
+    form = Shipment_Requests
+    record event = on add
+    description = "Initializes request ownership and writes the immutable audit trail entry."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                shipmentRecord = Shipment_Requests[ID == input.ID];
+                customerRecord = Customers[ID == input.Customer];
+                if(shipmentRecord.count() > 0 && customerRecord.count() > 0)
+                {
+                    shipmentRecord.Customer_Portal_User = customerRecord.Portal_User;
+                    shipmentRecord.Available_Points = ifnull(customerRecord.Current_Points_Balance,0);
+                    shipmentRecord.Shipment_Status = "Requested";
+                    shipmentRecord.Payment_Status = "Not Due";
+                    shipmentRecord.Latest_Tracking_Text = "Shipment request received and awaiting quotation.";
+                }
+                trackingID = insert into Shipment_Tracking_Events
+                [
+                    Shipment = input.ID
+                    Customer_Portal_User = customerRecord.Portal_User
+                    Event_Type = "Requested"
+                    Event_Time = zoho.currenttime
+                    Location_Text = "Shipment request received"
+                    Details = "Shipment request received and awaiting quotation."
+                    Customer_Visible = true
+                ];
+                auditID = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    User_Email = zoho.loginuserid
+                    User_Profile = input.Requested_By_Type
+                    Entity_Type = "Shipment_Requests"
+                    Entity_Record_ID = input.ID.toString()
+                    Action = "Shipment Requested"
+                    After_Value = "Requested"
+                    Details = "Shipment request created and queued for manual distance and hub confirmation."
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

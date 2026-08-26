@@ -1,0 +1,325 @@
+form Customers
+{
+    title
+    {
+        displayname = "Customers"
+        on add = "Register Customer"
+        on edit = "Edit Customer Profile"
+    }
+    success message = "Customer profile saved successfully."
+    record owner = Portal_User
+
+    Customer_Identity
+    (
+        type = section
+        displayname = "Customer Identity"
+        row = 1
+        column = 0
+    )
+    Customer_ID
+    (
+        type = autonumber
+        displayname = "Customer ID"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Customer_Name
+    (
+        type = name
+        displayname = "Customer Name"
+        prefix
+        (
+            type = prefix
+            displayname = "Title"
+            value = {"Mr.","Mrs.","Ms.","Dr."}
+        )
+        first_name
+        (
+            type = first_name
+            displayname = "First Name"
+        )
+        last_name
+        (
+            type = last_name
+            displayname = "Last Name"
+        )
+        suffix
+        (
+            type = suffix
+            displayname = "Suffix"
+            visibility = false
+        )
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have unique Customer_Email
+    (
+        type = email
+        displayname = "Customer Email"
+        personal data = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Customer_Phone
+    (
+        type = phonenumber
+        displayname = "Customer Phone"
+        allowedcountries = {in}
+        defaultcountry = "in"
+        personal data = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Customer_Type
+    (
+        type = picklist
+        displayname = "Customer Type"
+        values = {"Retail","Corporate","Wholesale"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Primary_Address
+    (
+        type = address
+        displayname = "Primary Address"
+        capture_coordinates = true
+        adjust_using_map = true
+        address_line_1
+        (
+            type = address_line_1
+            displayname = "Address Line 1"
+        )
+        address_line_2
+        (
+            type = address_line_2
+            displayname = "Address Line 2"
+        )
+        district_city
+        (
+            type = district_city
+            displayname = "City"
+        )
+        state_province
+        (
+            type = state_province
+            displayname = "State"
+        )
+        postal_Code
+        (
+            type = postal_Code
+            displayname = "PIN Code"
+        )
+        country
+        (
+            type = country
+            displayname = "Country"
+        )
+        latitude
+        (
+            type = latitude
+            displayname = "Latitude"
+            visibility = false
+        )
+        longitude
+        (
+            type = longitude
+            displayname = "Longitude"
+            visibility = false
+        )
+        row = 1
+        column = 2
+        width = medium
+    )
+    Business_Details
+    (
+        type = section
+        displayname = "Business Details"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Company_Name
+    (
+        type = text
+        displayname = "Company Name"
+        maxchar = 150
+        row = 2
+        column = 1
+        width = medium
+    )
+    GSTIN
+    (
+        type = text
+        displayname = "GSTIN"
+        maxchar = 15
+        row = 2
+        column = 2
+        width = medium
+    )
+    PAN
+    (
+        type = text
+        displayname = "PAN"
+        maxchar = 10
+        row = 2
+        column = 1
+        width = medium
+    )
+    CIN_or_Udyam_Number
+    (
+        type = text
+        displayname = "CIN or Udyam Number"
+        maxchar = 30
+        row = 2
+        column = 2
+        width = medium
+    )
+    Billing_Contact_Name
+    (
+        type = text
+        displayname = "Billing Contact Name"
+        maxchar = 100
+        row = 2
+        column = 1
+        width = medium
+    )
+    Billing_Email
+    (
+        type = email
+        displayname = "Billing Email"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Account_Status
+    (
+        type = section
+        displayname = "Account Status"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Portal_User
+    (
+        type = picklist
+        displayname = "Portal User"
+        module = users
+        user type = "portal users"
+        displayformat = [name]
+        row = 3
+        column = 1
+        width = medium
+    )
+    Onboarding_Status
+    (
+        type = picklist
+        displayname = "Onboarding Status"
+        values = {"New","Pending KYC","Active","Suspended","Rejected"}
+        initial value = "New"
+        row = 3
+        column = 2
+        width = medium
+    )
+    KYC_Status
+    (
+        type = picklist
+        displayname = "KYC Status"
+        values = {"Not Required","Awaiting Request","Documents Requested","Under Review","Approved","Rejected"}
+        initial value = "Not Required"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Onboarded_On
+    (
+        type = datetime
+        displayname = "Onboarded On"
+        mins_displayinterval = 5
+        row = 3
+        column = 2
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Loyalty_Summary
+    (
+        type = section
+        displayname = "Loyalty Summary"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    Current_Loyalty_Program
+    (
+        type = picklist
+        displayname = "Current Loyalty Program"
+        values = Loyalty_Programs.ID
+        displayformat = [Tier_Name]
+        searchable = true
+        row = 4
+        column = 1
+        width = medium
+    )
+    Overall_Points_Earned
+    (
+        type = number
+        displayname = "Overall Points Earned"
+        format = commadotindian
+        initial value = 0
+        row = 4
+        column = 2
+        width = medium
+    )
+    Current_Points_Balance
+    (
+        type = number
+        displayname = "Current Points Balance"
+        format = commadotindian
+        initial value = 0
+        row = 4
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Register Customer"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Profile"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}
