@@ -1,0 +1,51 @@
+Asset_Assignments_On_Validate as "Validate Asset Assignment"
+{
+    type = form
+    form = Asset_Assignments
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if (ifnull(input.Quantity,0) <= 0)
+                {
+                    alert "Quantity must be greater than zero.";
+                    cancel submit;
+                }
+                assetRecord = Assets[ID == input.Asset];
+                if (assetRecord.count() == 0)
+                {
+                    alert "The selected asset could not be found.";
+                    cancel submit;
+                }
+                if (assetRecord.Serial_Tracking_Required == true && ifnull(input.Serial_Number,"") == "")
+                {
+                    alert "Serial Number is required for this asset.";
+                    cancel submit;
+                }
+                if (input.ID == null && input.Status == "Assigned" && assetRecord.Current_Stock < input.Quantity)
+                {
+                    alert "There is not enough stock to complete this assignment.";
+                    cancel submit;
+                }
+                if (input.Status == "Returned" && (input.Returned_Date == null || ifnull(input.Condition_On_Return,"") == ""))
+                {
+                    alert "Returned Date and Condition on Return are required.";
+                    cancel submit;
+                }
+                if (input.ID != null)
+                {
+                    existingAssignment = Asset_Assignments[ID == input.ID];
+                    if (existingAssignment.count() > 0 && existingAssignment.Stock_Deducted == true && (existingAssignment.Asset != input.Asset || existingAssignment.Employee != input.Employee || existingAssignment.Quantity != input.Quantity || existingAssignment.Assigned_Date != input.Assigned_Date))
+                    {
+                        alert "Asset, employee, quantity, and assigned date cannot be changed after stock is deducted.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

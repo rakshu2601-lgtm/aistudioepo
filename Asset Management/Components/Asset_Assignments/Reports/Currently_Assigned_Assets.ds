@@ -1,0 +1,24 @@
+list Currently_Assigned_Assets
+{
+    displayName = "Currently Assigned Assets"
+    show all rows from Asset_Assignments [Status == "Assigned"]
+    (
+        Assignment_Number
+        Asset
+        Employee
+        Quantity
+        Assigned_Date
+        Expected_Return_Date
+        Serial_Number
+    )
+    filters
+    (
+        Asset
+        Employee
+        Expected_Return_Date
+    )
+    sort by
+    (
+        Expected_Return_Date ascending
+    )
+}

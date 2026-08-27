@@ -1,0 +1,5 @@
+report Recent_Stock_Activity
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Transaction_Number Asset Transaction_Type Quantity Transaction_Date Vendor Reference_Number Processed ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Transaction_Number Asset Transaction_Type Quantity Transaction_Date Vendor Reference_Number Processed ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

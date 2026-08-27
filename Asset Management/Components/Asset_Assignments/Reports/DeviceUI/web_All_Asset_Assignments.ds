@@ -1,0 +1,5 @@
+report All_Asset_Assignments
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Assignment_Number Asset Employee Quantity Assigned_Date Expected_Return_Date Status Serial_Number Returned_Date Condition_On_Return ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Assignment_Number Asset Employee Quantity Assigned_Date Expected_Return_Date Status Serial_Number Returned_Date Condition_On_Return ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

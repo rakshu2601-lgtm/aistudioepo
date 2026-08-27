@@ -1,0 +1,23 @@
+Assets_On_Edit_Validate as "Protect System Stock Fields"
+{
+    type = form
+    form = Assets
+    record event = on edit
+    description = "Prevents direct edits to stock balances and alert state"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                existingAsset = Assets[ID == input.ID];
+                if (existingAsset.count() > 0 && (existingAsset.Current_Stock != input.Current_Stock || existingAsset.Stock_Percentage != input.Stock_Percentage || existingAsset.Stock_Status != input.Stock_Status || existingAsset.Low_Stock_Alert_Sent != input.Low_Stock_Alert_Sent || existingAsset.Last_Alerted_At != input.Last_Alerted_At))
+                {
+                    alert "Stock balances and alert fields are maintained by inventory workflows.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

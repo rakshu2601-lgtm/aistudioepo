@@ -1,0 +1,7 @@
+"Employee"
+{
+    name = "Employee"
+    type = Users_Permissions
+    permissions = {Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false}
+    description = "Legacy profile retained without application access"
+}

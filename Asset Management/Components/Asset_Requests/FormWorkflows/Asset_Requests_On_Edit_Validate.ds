@@ -1,0 +1,22 @@
+Asset_Requests_On_Edit_Validate as "Protect Asset Request Status"
+{
+    type = form
+    form = Asset_Requests
+    record event = on edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                existingRequest = Asset_Requests[ID == input.ID];
+                if (existingRequest.count() > 0 && existingRequest.Request_Status != input.Request_Status)
+                {
+                    alert "Request status can only be changed through approval, cancellation, or fulfilment actions.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

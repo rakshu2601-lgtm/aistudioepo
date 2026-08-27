@@ -1,0 +1,26 @@
+Asset_Requests_On_Load as "Prepare Asset Request Form"
+{
+    type = form
+    form = Asset_Requests
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if (input.ID == null)
+                {
+                    input.Requested_By_Email = zoho.loginuser;
+                    input.Request_Status = "Pending Manager Approval";
+                }
+                disable Requested_By_Email;
+                disable Request_Status;
+                disable Approved_Date;
+                disable Fulfilled_Asset;
+                disable Fulfilled_Date;
+            )
+        }
+    }
+}

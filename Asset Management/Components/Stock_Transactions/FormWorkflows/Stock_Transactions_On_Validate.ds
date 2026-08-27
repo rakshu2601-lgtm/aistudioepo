@@ -1,0 +1,47 @@
+Stock_Transactions_On_Validate as "Validate Stock Transaction"
+{
+    type = form
+    form = Stock_Transactions
+    record event = on add or edit
+    description = "Validates quantity movements and prevents processed transactions from being changed"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if (ifnull(input.Quantity,0) <= 0)
+                {
+                    alert "Quantity must be greater than zero.";
+                    cancel submit;
+                }
+                if (input.Transaction_Type == "Receipt" && input.Vendor == null)
+                {
+                    alert "Vendor is required for a receipt.";
+                    cancel submit;
+                }
+                assetRecord = Assets[ID == input.Asset];
+                if (assetRecord.count() == 0)
+                {
+                    alert "The selected asset could not be found.";
+                    cancel submit;
+                }
+                if (input.Transaction_Type in {"Adjustment Decrease", "Retirement"} && assetRecord.Current_Stock < input.Quantity)
+                {
+                    alert "There is not enough stock for this transaction.";
+                    cancel submit;
+                }
+                if (input.ID != null)
+                {
+                    existingTransaction = Stock_Transactions[ID == input.ID];
+                    if (existingTransaction.count() > 0 && existingTransaction.Processed == true && (existingTransaction.Asset != input.Asset || existingTransaction.Transaction_Type != input.Transaction_Type || existingTransaction.Quantity != input.Quantity))
+                    {
+                        alert "Asset, transaction type, and quantity cannot be changed after processing.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

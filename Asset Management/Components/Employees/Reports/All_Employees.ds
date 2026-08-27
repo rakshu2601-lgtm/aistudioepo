@@ -1,0 +1,23 @@
+default list All_Employees
+{
+    displayName = "All Employees"
+    show all rows from Employees
+    (
+        Employee_ID
+        Employee_Name
+        Email
+        Department
+        Location
+        Active
+    )
+    filters
+    (
+        Department
+        Location
+        Active
+    )
+    sort by
+    (
+        Employee_Name ascending
+    )
+}

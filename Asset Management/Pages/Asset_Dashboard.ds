@@ -1,0 +1,19 @@
+<page linkname = "Asset_Dashboard" displayname = "Asset Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Asset_Dashboard_Snippet' elementName='Asset Dashboard'>
+          <![CDATA[htmlpage Asset_Dashboard_Snippet()
+             content
+             <%{%>
+                 <file name:Asset_Dashboard/Asset_Dashboard.dshtml/>
+             <%}%>
+         ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

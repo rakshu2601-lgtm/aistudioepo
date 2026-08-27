@@ -1,0 +1,18 @@
+default list All_Asset_Categories
+{
+    displayName = "All Asset Categories"
+    show all rows from Asset_Categories
+    (
+        Category_Name
+        Description
+        Active
+    )
+    filters
+    (
+        Active
+    )
+    sort by
+    (
+        Category_Name ascending
+    )
+}

@@ -1,0 +1,13 @@
+forms
+{
+    form Asset_Categories { label placement = top }
+    form Vendors { label placement = top }
+    form Employees { label placement = top }
+    form Alert_Settings { label placement = top }
+    form Assets { label placement = top }
+    form Stock_Transactions { label placement = top }
+    form Asset_Assignments { label placement = top }
+    form Inventory_Audit { label placement = top }
+    form Asset_Requests { label placement = top }
+    form Asset_Complaints { label placement = top }
+}

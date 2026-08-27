@@ -1,0 +1,46 @@
+Assets_On_Success as "Send Low Stock Alert"
+{
+    type = form
+    form = Assets
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                assetRecord = Assets[ID == input.ID];
+                if (assetRecord.count() > 0)
+                {
+                    if (assetRecord.Stock_Percentage < 10 && assetRecord.Low_Stock_Alert_Sent == false)
+                    {
+                        settingsRecord = Alert_Settings[Notifications_Enabled == true];
+                        if (settingsRecord.count() > 0)
+                        {
+                            ccList = List();
+                            if (ifnull(settingsRecord.CC_Recipients,"") != "")
+                            {
+                                ccList = settingsRecord.CC_Recipients.toList(",");
+                            }
+                            sendmail
+                            (
+                                from : zoho.adminuserid
+                                to : settingsRecord.Primary_Recipient
+                                cc : ccList
+                                subject : "Low stock alert: " + assetRecord.Asset_Name
+                                message : "Asset " + assetRecord.Asset_Name + " (" + assetRecord.Asset_Code + ") is at " + assetRecord.Current_Stock + " of " + assetRecord.Maximum_Stock + " units (" + assetRecord.Stock_Percentage.round(2) + "%)."
+                            )
+                            assetRecord.Low_Stock_Alert_Sent = true;
+                            assetRecord.Last_Alerted_At = zoho.currenttime;
+                        }
+                    }
+                    else if (assetRecord.Stock_Percentage >= 10 && assetRecord.Low_Stock_Alert_Sent == true)
+                    {
+                        assetRecord.Low_Stock_Alert_Sent = false;
+                    }
+                }
+            )
+        }
+    }
+}

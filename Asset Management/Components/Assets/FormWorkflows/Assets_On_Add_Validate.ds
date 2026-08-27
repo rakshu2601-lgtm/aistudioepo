@@ -1,0 +1,43 @@
+Assets_On_Validate as "Validate Asset Stock"
+{
+    type = form
+    form = Assets
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if (ifnull(input.Maximum_Stock,0) <= 0)
+                {
+                    alert "Maximum stock must be greater than zero.";
+                    cancel submit;
+                }
+                if (ifnull(input.Opening_Stock,0) < 0 || input.Opening_Stock > input.Maximum_Stock)
+                {
+                    alert "Opening stock must be between zero and maximum stock.";
+                    cancel submit;
+                }
+                if (input.ID == null)
+                {
+                    input.Current_Stock = input.Opening_Stock;
+                }
+                input.Stock_Percentage = (ifnull(input.Current_Stock,0) * 100.0) / input.Maximum_Stock;
+                if (ifnull(input.Current_Stock,0) == 0)
+                {
+                    input.Stock_Status = "Out of Stock";
+                }
+                else if (input.Stock_Percentage < 10)
+                {
+                    input.Stock_Status = "Low Stock";
+                }
+                else
+                {
+                    input.Stock_Status = "Healthy";
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,27 @@
+default list All_Stock_Transactions
+{
+    displayName = "All Stock Transactions"
+    show all rows from Stock_Transactions
+    (
+        Transaction_Number
+        Asset
+        Transaction_Type
+        Quantity
+        Transaction_Date
+        Vendor
+        Reference_Number
+        Unit_Cost
+        Processed
+    )
+    filters
+    (
+        Asset
+        Transaction_Type
+        Transaction_Date
+        Vendor
+    )
+    sort by
+    (
+        Transaction_Date descending
+    )
+}

@@ -1,0 +1,25 @@
+list Available_Assets
+{
+    displayName = "Assets with Stock"
+    show all rows from Assets [Current_Stock > 0 && Active == true]
+    (
+        Asset_Code
+        Asset_Name
+        Category
+        Current_Stock
+        Maximum_Stock
+        Stock_Percentage
+        Stock_Status
+        Active
+    )
+    filters
+    (
+        Category
+        Stock_Status
+        Active
+    )
+    sort by
+    (
+        Asset_Name ascending
+    )
+}

@@ -1,0 +1,3339 @@
+application "Asset-Management"
+{
+	date format = "dd-MMM-yyyy"
+	time zone = "Asia/Kolkata"
+	time format = "24-hr"
+
+
+
+	forms
+	{
+		form Alert_Settings
+		{
+		    title
+		    {
+		        displayname = "Alert Settings"
+		        on add = "Configure Low Stock Alerts"
+		        on edit = "Edit Low Stock Alerts"
+		    }
+		    success message = "Alert settings saved successfully."
+		    Notification_Settings
+		    (
+		        type = section
+		        displayname = "Notification Settings"
+		        row = 1
+		        column = 0
+		    )
+		    must have unique Setting_Name
+		    (
+		        type = text
+		        displayname = "Setting Name"
+		        initial value = "Low Stock Notifications"
+		        maxchar = 100
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Primary_Recipient
+		    (
+		        type = email
+		        displayname = "Primary Recipient"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    CC_Recipients
+		    (
+		        type = textarea
+		        displayname = "CC Recipients"
+		        description
+		        [
+		            type = tooltip
+		            message = "Optional comma-separated email addresses"
+		        ]
+		        height = 80px
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Notifications_Enabled
+		    (
+		        type = checkbox
+		        displayname = "Notifications Enabled"
+		        initial value = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Save Settings"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update Settings"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Asset_Assignments
+		{
+		    title
+		    {
+		        displayname = "Asset Assignments"
+		        on add = "Assign Asset"
+		        on edit = "Update Asset Assignment"
+		    }
+		    success message = "Asset assignment saved successfully"
+		    Assignment_Details
+		    (
+		        type = section
+		        displayname = "Assignment Details"
+		        row = 1
+		        column = 0
+		    )
+		    Assignment_Number
+		    (
+		        type = autonumber
+		        displayname = "Assignment Number"
+		        start index = 1001
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Asset
+		    (
+		        type = picklist
+		        values = Assets.ID
+		        displayformat = [Asset_Name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Employee
+		    (
+		        type = picklist
+		        values = Employees.ID
+		        displayformat = [Employee_Name]
+		        searchable = true
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Quantity
+		    (
+		        type = number
+		        initial value = 1
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Assigned_Date
+		    (
+		        type = date
+		        displayname = "Assigned Date"
+		        initial value = "${zoho.currentdate}"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Expected_Return_Date
+		    (
+		        type = date
+		        displayname = "Expected Return Date"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Status
+		    (
+		        type = picklist
+		        values = {"Assigned", "Returned", "Lost"}
+		        initial value = "Assigned"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Serial_Number
+		    (
+		        type = text
+		        displayname = "Serial Number"
+		        maxchar = 150
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Returned_Date
+		    (
+		        type = date
+		        displayname = "Returned Date"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Condition_On_Return
+		    (
+		        type = picklist
+		        displayname = "Condition on Return"
+		        values = {"Good", "Damaged", "Unusable"}
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Notes
+		    (
+		        type = textarea
+		        height = 100px
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Stock_Deducted
+		    (
+		        type = checkbox
+		        displayname = "Stock Deducted"
+		        initial value = false
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Stock_Restored
+		    (
+		        type = checkbox
+		        displayname = "Stock Restored"
+		        initial value = false
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Assign Asset"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update Assignment"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Asset_Categories
+		{
+		    title
+		    {
+		        displayname = "Asset Categories"
+		        on add = "Add Asset Category"
+		        on edit = "Edit Asset Category"
+		    }
+		    success message = "Asset category saved successfully."
+		    Category_Details
+		    (
+		        type = section
+		        displayname = "Category Details"
+		        row = 1
+		        column = 0
+		    )
+		    must have unique Category_Name
+		    (
+		        type = text
+		        displayname = "Category Name"
+		        maxchar = 100
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Description
+		    (
+		        type = textarea
+		        height = 100px
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Active
+		    (
+		        type = checkbox
+		        initial value = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Save"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Asset_Complaints
+		{
+		    title
+		    {
+		        displayname = "Asset Complaints"
+		        on add = "Raise Asset Complaint"
+		        on edit = "Update Asset Complaint"
+		    }
+		    success message = "Asset complaint saved successfully"
+		    Complaint_Details
+		    (
+		        type = section
+		        displayname = "Complaint Details"
+		        row = 1
+		        column = 0
+		    )
+		    Complaint_Number
+		    (
+		        type = autonumber
+		        displayname = "Complaint Number"
+		        start index = 1
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Reported_By_Email
+		    (
+		        type = email
+		        displayname = "Reported By Email"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Asset
+		    (
+		        type = picklist
+		        values = Assets.ID
+		        displayformat = [Asset_Code + " - " + Asset_Name]
+		        searchable = true
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Subject
+		    (
+		        type = text
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Description
+		    (
+		        type = textarea
+		        height = 120px
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Priority
+		    (
+		        type = picklist
+		        values = {"Low", "Medium", "High", "Critical"}
+		        initial value = "Medium"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Reported_Date_Time
+		    (
+		        type = datetime
+		        displayname = "Reported Date & Time"
+		        initial value = "${zoho.currenttime}"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Resolution
+		    (
+		        type = section
+		        displayname = "Resolution"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    must have Ticket_Status
+		    (
+		        type = picklist
+		        displayname = "Ticket Status"
+		        values = {"Open", "In Progress", "Resolved", "Closed"}
+		        initial value = "Open"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Assigned_Inventory_Email
+		    (
+		        type = email
+		        displayname = "Assigned Inventory Email"
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		    Resolution_Notes
+		    (
+		        type = textarea
+		        displayname = "Resolution Notes"
+		        height = 120px
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Resolved_Date_Time
+		    (
+		        type = datetime
+		        displayname = "Resolved Date & Time"
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		    Closed_Date_Time
+		    (
+		        type = datetime
+		        displayname = "Closed Date & Time"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit Complaint"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update Complaint"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Asset_Requests
+		{
+		    title
+		    {
+		        displayname = "Asset Requests"
+		        on add = "Request an Asset"
+		        on edit = "Edit Asset Request"
+		    }
+		    success message = "Asset request submitted successfully"
+		    Request_Details
+		    (
+		        type = section
+		        displayname = "Request Details"
+		        row = 1
+		        column = 0
+		    )
+		    Request_Number
+		    (
+		        type = autonumber
+		        displayname = "Request Number"
+		        start index = 1
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Requested_By_Email
+		    (
+		        type = email
+		        displayname = "Requested By Email"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Manager_Email
+		    (
+		        type = email
+		        displayname = "Manager Email"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Asset_Category
+		    (
+		        type = picklist
+		        displayname = "Asset Category"
+		        values = Asset_Categories[Active == true].ID
+		        displayformat = [Category_Name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Business_Justification
+		    (
+		        type = textarea
+		        displayname = "Business Justification"
+		        height = 100px
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Needed_By
+		    (
+		        type = date
+		        displayname = "Needed By"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Request_Date
+		    (
+		        type = date
+		        displayname = "Request Date"
+		        initial value = "${zoho.currentdate}"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Processing
+		    (
+		        type = section
+		        displayname = "Processing"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    must have Request_Status
+		    (
+		        type = picklist
+		        displayname = "Request Status"
+		        values = {"Pending Manager Approval", "Approved", "Rejected", "Fulfilled", "Cancelled"}
+		        initial value = "Pending Manager Approval"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Manager_Comments
+		    (
+		        type = textarea
+		        displayname = "Manager Comments"
+		        height = 100px
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		    Approved_Date
+		    (
+		        type = datetime
+		        displayname = "Approved Date"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Fulfilled_Asset
+		    (
+		        type = picklist
+		        displayname = "Fulfilled Asset"
+		        values = Assets.ID
+		        displayformat = [Asset_Code + " - " + Asset_Name]
+		        searchable = true
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		    Fulfilled_Date
+		    (
+		        type = datetime
+		        displayname = "Fulfilled Date"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Inventory_Notes
+		    (
+		        type = textarea
+		        displayname = "Inventory Notes"
+		        height = 100px
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit Request"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update Request"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Assets
+		{
+		    title
+		    {
+		        on add = "Add Asset"
+		        on edit = "Edit Asset"
+		    }
+		    success message = "Asset saved successfully."
+		    Asset_Details
+		    (
+		        type = section
+		        displayname = "Asset Details"
+		        row = 1
+		        column = 0
+		    )
+		    must have unique Asset_Code
+		    (
+		        type = text
+		        displayname = "Asset Code"
+		        maxchar = 50
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Asset_Name
+		    (
+		        type = text
+		        displayname = "Asset Name"
+		        maxchar = 150
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Category
+		    (
+		        type = picklist
+		        values = Asset_Categories.ID
+		        displayformat = [Category_Name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Manufacturer
+		    (
+		        type = text
+		        maxchar = 100
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Model
+		    (
+		        type = text
+		        maxchar = 100
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Serial_Tracking_Required
+		    (
+		        type = checkbox
+		        displayname = "Serial Tracking Required"
+		        initial value = false
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Active
+		    (
+		        type = checkbox
+		        initial value = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Stock_Levels
+		    (
+		        type = section
+		        displayname = "Stock Levels"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    must have Maximum_Stock
+		    (
+		        type = number
+		        displayname = "Maximum Stock"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    must have Opening_Stock
+		    (
+		        type = number
+		        displayname = "Opening Stock"
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		    Current_Stock
+		    (
+		        type = number
+		        displayname = "Current Stock"
+		        initial value = 0
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Stock_Percentage
+		    (
+		        type = decimal
+		        displayname = "Stock Percentage"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		    Stock_Status
+		    (
+		        type = picklist
+		        displayname = "Stock Status"
+		        values = {"Healthy", "Low Stock", "Out of Stock"}
+		        initial value = "Healthy"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Low_Stock_Alert_Sent
+		    (
+		        type = checkbox
+		        displayname = "Low Stock Alert Sent"
+		        initial value = false
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		    Last_Alerted_At
+		    (
+		        type = datetime
+		        displayname = "Last Alerted At"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Save"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Employees
+		{
+		    title
+		    {
+		        on add = "Add Employee"
+		        on edit = "Edit Employee"
+		    }
+		    success message = "Employee saved successfully."
+		    Employee_Details
+		    (
+		        type = section
+		        displayname = "Employee Details"
+		        row = 1
+		        column = 0
+		    )
+		    must have unique Employee_ID
+		    (
+		        type = text
+		        displayname = "Employee ID"
+		        maxchar = 50
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Employee_Name
+		    (
+		        type = text
+		        displayname = "Employee Name"
+		        maxchar = 150
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have unique Email
+		    (
+		        type = email
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Department
+		    (
+		        type = text
+		        maxchar = 100
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Location
+		    (
+		        type = text
+		        maxchar = 100
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Active
+		    (
+		        type = checkbox
+		        initial value = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Save"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Inventory_Audit
+		{
+		    title
+		    {
+		        displayname = "Inventory Audit"
+		        on add = "Add Inventory Audit"
+		        on edit = "Edit Inventory Audit"
+		    }
+		    success message = "Inventory audit saved"
+		    Audit_Details
+		    (
+		        type = section
+		        displayname = "Audit Details"
+		        row = 1
+		        column = 0
+		    )
+		    must have Asset
+		    (
+		        type = picklist
+		        values = Assets.ID
+		        displayformat = [Asset_Name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Source_Type
+		    (
+		        type = picklist
+		        displayname = "Source Type"
+		        values = {"Asset Opening", "Stock Transaction", "Assignment", "Return"}
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Source_Record_ID
+		    (
+		        type = text
+		        displayname = "Source Record ID"
+		        maxchar = 50
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Action
+		    (
+		        type = text
+		        maxchar = 100
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Quantity_Change
+		    (
+		        type = number
+		        displayname = "Quantity Change"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Stock_Before
+		    (
+		        type = number
+		        displayname = "Stock Before"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Stock_After
+		    (
+		        type = number
+		        displayname = "Stock After"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Performed_By
+		    (
+		        type = email
+		        displayname = "Performed By"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Performed_At
+		    (
+		        type = datetime
+		        displayname = "Performed At"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Details
+		    (
+		        type = textarea
+		        height = 100px
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Save"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Stock_Transactions
+		{
+		    title
+		    {
+		        displayname = "Stock Transactions"
+		        on add = "Record Stock Transaction"
+		        on edit = "Edit Stock Transaction"
+		    }
+		    success message = "Stock transaction saved successfully"
+		    Transaction_Details
+		    (
+		        type = section
+		        displayname = "Transaction Details"
+		        row = 1
+		        column = 0
+		    )
+		    Transaction_Number
+		    (
+		        type = autonumber
+		        displayname = "Transaction Number"
+		        start index = 1001
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Asset
+		    (
+		        type = picklist
+		        values = Assets.ID
+		        displayformat = [Asset_Name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Transaction_Type
+		    (
+		        type = picklist
+		        displayname = "Transaction Type"
+		        values = {"Receipt", "Adjustment Increase", "Adjustment Decrease", "Retirement"}
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Quantity
+		    (
+		        type = number
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Transaction_Date
+		    (
+		        type = date
+		        displayname = "Transaction Date"
+		        initial value = "${zoho.currentdate}"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Vendor
+		    (
+		        type = picklist
+		        values = Vendors.ID
+		        displayformat = [Vendor_Name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Reference_Number
+		    (
+		        type = text
+		        displayname = "Reference Number"
+		        maxchar = 100
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Unit_Cost
+		    (
+		        type = decimal
+		        displayname = "Unit Cost"
+		        decimalplace = 2
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Notes
+		    (
+		        type = textarea
+		        height = 100px
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Processed
+		    (
+		        type = checkbox
+		        initial value = false
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Record Transaction"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update Transaction"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Vendors
+		{
+		    title
+		    {
+		        on add = "Add Vendor"
+		        on edit = "Edit Vendor"
+		    }
+		    success message = "Vendor saved successfully."
+		    Vendor_Details
+		    (
+		        type = section
+		        displayname = "Vendor Details"
+		        row = 1
+		        column = 0
+		    )
+		    must have unique Vendor_Name
+		    (
+		        type = text
+		        displayname = "Vendor Name"
+		        maxchar = 150
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Contact_Name
+		    (
+		        type = text
+		        displayname = "Contact Name"
+		        maxchar = 100
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Email
+		    (
+		        type = email
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Phone
+		    (
+		        type = phonenumber
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Website
+		    (
+		        type = url
+		        target = new window
+		        enable = linkname, title
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Active
+		    (
+		        type = checkbox
+		        initial value = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Notes
+		    (
+		        type = textarea
+		        height = 100px
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Save"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+	}
+
+	reports
+	{
+		default list Alert_Configuration
+		{
+		    displayName = "Alert Configuration"
+		    show all rows from Alert_Settings
+		    (
+		        Setting_Name
+		        Primary_Recipient
+		        CC_Recipients
+		        Notifications_Enabled
+		    )
+		    sort by
+		    (
+		        Setting_Name ascending
+		    )
+		}
+
+		default list All_Asset_Assignments
+		{
+		    displayName = "All Asset Assignments"
+		    show all rows from Asset_Assignments
+		    (
+		        Assignment_Number
+		        Asset
+		        Employee
+		        Quantity
+		        Assigned_Date
+		        Expected_Return_Date
+		        Status
+		        Serial_Number
+		        Returned_Date
+		        Condition_On_Return
+		    )
+		    filters
+		    (
+		        Asset
+		        Employee
+		        Status
+		        Assigned_Date
+		    )
+		    sort by
+		    (
+		        Assigned_Date descending
+		    )
+		    conditional formatting
+		    (
+		        "Currently Assigned"
+		        {
+		            condition = (Status == "Assigned")
+		            fields = [Assignment_Number, Asset, Employee, Status]
+		            format = "background-color:#FFF4CC;color:#7A5600;font-weight:bold"
+		        }
+		        "Returned"
+		        {
+		            condition = (Status == "Returned")
+		            fields = [Assignment_Number, Asset, Employee, Status]
+		            format = "background-color:#E8F7EE;color:#176B3A"
+		        }
+		        "Lost"
+		        {
+		            condition = (Status == "Lost")
+		            fields = [Assignment_Number, Asset, Employee, Status]
+		            format = "background-color:#FFE7E7;color:#A61B1B;font-weight:bold"
+		        }
+		    )
+		}
+
+		list Currently_Assigned_Assets
+		{
+		    displayName = "Currently Assigned Assets"
+		    show all rows from Asset_Assignments [Status == "Assigned"]
+		    (
+		        Assignment_Number
+		        Asset
+		        Employee
+		        Quantity
+		        Assigned_Date
+		        Expected_Return_Date
+		        Serial_Number
+		    )
+		    filters
+		    (
+		        Asset
+		        Employee
+		        Expected_Return_Date
+		    )
+		    sort by
+		    (
+		        Expected_Return_Date ascending
+		    )
+		}
+
+		list Returned_Assets
+		{
+		    displayName = "Returned Assets"
+		    show all rows from Asset_Assignments [Status == "Returned"]
+		    (
+		        Assignment_Number
+		        Asset
+		        Employee
+		        Quantity
+		        Assigned_Date
+		        Returned_Date
+		        Condition_On_Return
+		        Serial_Number
+		    )
+		    filters
+		    (
+		        Asset
+		        Employee
+		        Returned_Date
+		        Condition_On_Return
+		    )
+		    sort by
+		    (
+		        Returned_Date descending
+		    )
+		}
+
+		default list All_Asset_Categories
+		{
+		    displayName = "All Asset Categories"
+		    show all rows from Asset_Categories
+		    (
+		        Category_Name
+		        Description
+		        Active
+		    )
+		    filters
+		    (
+		        Active
+		    )
+		    sort by
+		    (
+		        Category_Name ascending
+		    )
+		}
+
+		list All_Asset_Complaints
+		{
+		    displayName = "All Asset Complaints"
+		    show all rows from Asset_Complaints
+		    (
+		        Complaint_Number
+		        Reported_By_Email
+		        Asset
+		        Subject
+		        Priority
+		        Reported_Date_Time
+		        Ticket_Status
+		        Assigned_Inventory_Email
+		        Resolution_Notes
+		        Resolved_Date_Time
+		        Closed_Date_Time
+		    )
+		    filters
+		    (
+		        Ticket_Status
+		        Priority
+		    )
+		    sort by
+		    (
+		        Reported_Date_Time descending
+		    )
+		}
+
+		default list My_Asset_Complaints
+		{
+		    displayName = "My Asset Complaints"
+		    show all rows from Asset_Complaints [Reported_By_Email == zoho.loginuser]
+		    (
+		        Complaint_Number
+		        Asset
+		        Subject
+		        Priority
+		        Reported_Date_Time
+		        Ticket_Status
+		        Resolution_Notes
+		    )
+		    sort by
+		    (
+		        Reported_Date_Time descending
+		    )
+		}
+
+		list Open_Asset_Complaints
+		{
+		    displayName = "Open Asset Complaints"
+		    show all rows from Asset_Complaints [Ticket_Status == "Open" || Ticket_Status == "In Progress"]
+		    (
+		        Complaint_Number
+		        Reported_By_Email
+		        Asset
+		        Subject
+		        Priority
+		        Reported_Date_Time
+		        Ticket_Status
+		        Assigned_Inventory_Email
+		    )
+		    group by
+		    (
+		        properties
+		        (
+		            display record count = true
+		        )
+		        Ticket_Status ascending
+		    )
+		    sort by
+		    (
+		        Priority custom
+		        Reported_Date_Time ascending
+		    )
+		}
+
+		list All_Asset_Requests
+		{
+		    displayName = "All Asset Requests"
+		    show all rows from Asset_Requests
+		    (
+		        Request_Number
+		        Requested_By_Email
+		        Manager_Email
+		        Asset_Category
+		        Request_Date
+		        Needed_By
+		        Request_Status
+		        Fulfilled_Asset
+		        Fulfilled_Date
+		        Inventory_Notes
+		    )
+		    filters
+		    (
+		        Request_Status
+		        Asset_Category
+		    )
+		    sort by
+		    (
+		        Request_Date descending
+		    )
+		}
+
+		list Approved_Requests
+		{
+		    displayName = "Approved Requests"
+		    show all rows from Asset_Requests [Request_Status == "Approved"]
+		    (
+		        Request_Number
+		        Requested_By_Email
+		        Asset_Category
+		        Needed_By
+		        Request_Status
+		        Inventory_Notes
+		    )
+		    sort by
+		    (
+		        Needed_By ascending
+		    )
+		}
+
+		list Manager_Approval_Queue
+		{
+		    displayName = "Manager Approval Queue"
+		    show all rows from Asset_Requests [Manager_Email == zoho.loginuser && Request_Status == "Pending Manager Approval"]
+		    (
+		        Request_Number
+		        Requested_By_Email
+		        Manager_Email
+		        Asset_Category
+		        Needed_By
+		        Business_Justification
+		        Request_Status
+		        custom action "Approve Request"
+		        (
+		            workflow = Approve_Asset_Request
+		            show action for each record = true
+		            column header = "Approve Request"
+		            success message = "Request approved"
+		            condition = (Request_Status == "Pending Manager Approval")
+		            confirmation before execution
+		            (
+		                message for individual record = "Approve this asset request?"
+		                confirm button text = "Approve"
+		                cancel button text = "Cancel"
+		            )
+		        )
+		        custom action "Reject Request"
+		        (
+		            workflow = Reject_Asset_Request
+		            show action for each record = true
+		            column header = "Reject Request"
+		            success message = "Request rejected"
+		            condition = (Request_Status == "Pending Manager Approval")
+		            confirmation before execution
+		            (
+		                message for individual record = "Reject this asset request?"
+		                confirm button text = "Reject"
+		                cancel button text = "Cancel"
+		            )
+		        )
+		    )
+		    sort by
+		    (
+		        Needed_By ascending
+		    )
+		}
+
+		default list My_Asset_Requests
+		{
+		    displayName = "My Asset Requests"
+		    show all rows from Asset_Requests [Requested_By_Email == zoho.loginuser]
+		    (
+		        Request_Number
+		        Asset_Category
+		        Request_Date
+		        Needed_By
+		        Request_Status
+		        Fulfilled_Asset
+		        Manager_Comments
+		        custom action "Cancel Request"
+		        (
+		            workflow = Cancel_Asset_Request
+		            show action for each record = true
+		            column header = "Cancel Request"
+		            success message = "Request cancelled"
+		            condition = (Request_Status == "Pending Manager Approval")
+		            confirmation before execution
+		            (
+		                message for individual record = "Cancel this asset request?"
+		                confirm button text = "Cancel Request"
+		                cancel button text = "Keep Request"
+		            )
+		        )
+		    )
+		    sort by
+		    (
+		        Request_Date descending
+		    )
+		}
+
+		default list All_Assets
+		{
+		    displayName = "All Assets"
+		    show all rows from Assets
+		    (
+		        Asset_Code
+		        Asset_Name
+		        Category
+		        Manufacturer
+		        Model
+		        Maximum_Stock
+		        Current_Stock
+		        Stock_Percentage
+		        Stock_Status
+		        Active
+		    )
+		    filters
+		    (
+		        Category
+		        Stock_Status
+		        Active
+		    )
+		    group by
+		    (
+		        properties
+		        (
+		            display record count = true
+		        )
+		        Category ascending
+		    )
+		    sort by
+		    (
+		        Asset_Name ascending
+		    )
+		    conditional formatting
+		    (
+		        "Low Stock"
+		        {
+		            condition = (Stock_Status == "Low Stock")
+		            fields = [Asset_Code, Asset_Name, Current_Stock, Stock_Percentage, Stock_Status]
+		            format = "background-color:#FFF4E5;color:#9A6700;font-weight:bold"
+		        }
+		        "Out of Stock"
+		        {
+		            condition = (Stock_Status == "Out of Stock")
+		            fields = [Asset_Code, Asset_Name, Current_Stock, Stock_Percentage, Stock_Status]
+		            format = "background-color:#FDE8E8;color:#B42318;font-weight:bold"
+		        }
+		    )
+		}
+
+		list Available_Assets
+		{
+		    displayName = "Assets with Stock"
+		    show all rows from Assets [Current_Stock > 0 && Active == true]
+		    (
+		        Asset_Code
+		        Asset_Name
+		        Category
+		        Current_Stock
+		        Maximum_Stock
+		        Stock_Percentage
+		        Stock_Status
+		        Active
+		    )
+		    filters
+		    (
+		        Category
+		        Stock_Status
+		        Active
+		    )
+		    sort by
+		    (
+		        Asset_Name ascending
+		    )
+		}
+
+		list Low_Stock_Assets
+		{
+		    displayName = "Low Stock Assets"
+		    show all rows from Assets [Stock_Percentage < 10]
+		    (
+		        Asset_Code
+		        Asset_Name
+		        Category
+		        Current_Stock
+		        Maximum_Stock
+		        Stock_Percentage
+		        Stock_Status
+		        Last_Alerted_At
+		    )
+		    sort by
+		    (
+		        Stock_Percentage ascending
+		    )
+		    conditional formatting
+		    (
+		        "Low Stock"
+		        {
+		            condition = (Stock_Status == "Low Stock")
+		            fields = [Asset_Code, Asset_Name, Current_Stock, Stock_Percentage, Stock_Status]
+		            format = "background-color:#FFF4E5;color:#9A6700;font-weight:bold"
+		        }
+		        "Out of Stock"
+		        {
+		            condition = (Stock_Status == "Out of Stock")
+		            fields = [Asset_Code, Asset_Name, Current_Stock, Stock_Percentage, Stock_Status]
+		            format = "background-color:#FDE8E8;color:#B42318;font-weight:bold"
+		        }
+		    )
+		}
+
+		list My_Assigned_Assets
+		{
+		    displayName = "Asset Stock Summary"
+		    show all rows from Assets
+		    (
+		        Asset_Code
+		        Asset_Name
+		        Category
+		        Current_Stock
+		        Maximum_Stock
+		        Stock_Percentage
+		        Stock_Status
+		        Active
+		    )
+		    filters
+		    (
+		        Category
+		        Stock_Status
+		        Active
+		    )
+		    sort by
+		    (
+		        Stock_Percentage ascending
+		    )
+		}
+
+		default list All_Employees
+		{
+		    displayName = "All Employees"
+		    show all rows from Employees
+		    (
+		        Employee_ID
+		        Employee_Name
+		        Email
+		        Department
+		        Location
+		        Active
+		    )
+		    filters
+		    (
+		        Department
+		        Location
+		        Active
+		    )
+		    sort by
+		    (
+		        Employee_Name ascending
+		    )
+		}
+
+		default list Inventory_Audit_Log
+		{
+		    displayName = "Inventory Audit Log"
+		    show all rows from Inventory_Audit
+		    (
+		        Asset
+		        Source_Type
+		        Source_Record_ID
+		        Action
+		        Quantity_Change
+		        Stock_Before
+		        Stock_After
+		        Performed_By
+		        Performed_At
+		        Details
+		    )
+		    filters
+		    (
+		        Asset
+		        Source_Type
+		        Performed_By
+		        Performed_At
+		    )
+		    sort by
+		    (
+		        Performed_At descending
+		    )
+		}
+
+		default list All_Stock_Transactions
+		{
+		    displayName = "All Stock Transactions"
+		    show all rows from Stock_Transactions
+		    (
+		        Transaction_Number
+		        Asset
+		        Transaction_Type
+		        Quantity
+		        Transaction_Date
+		        Vendor
+		        Reference_Number
+		        Unit_Cost
+		        Processed
+		    )
+		    filters
+		    (
+		        Asset
+		        Transaction_Type
+		        Transaction_Date
+		        Vendor
+		    )
+		    sort by
+		    (
+		        Transaction_Date descending
+		    )
+		}
+
+		list Recent_Stock_Activity
+		{
+		    displayName = "Recent Stock Activity"
+		    show all rows from Stock_Transactions
+		    (
+		        Transaction_Number
+		        Asset
+		        Transaction_Type
+		        Quantity
+		        Transaction_Date
+		        Vendor
+		        Reference_Number
+		        Processed
+		    )
+		    filters
+		    (
+		        Asset
+		        Transaction_Type
+		        Transaction_Date
+		    )
+		    sort by
+		    (
+		        Transaction_Date descending
+		    )
+		}
+
+		list Stock_Receipts
+		{
+		    displayName = "Stock Receipts"
+		    show all rows from Stock_Transactions [Transaction_Type == "Receipt"]
+		    (
+		        Transaction_Number
+		        Asset
+		        Transaction_Type
+		        Quantity
+		        Transaction_Date
+		        Vendor
+		        Reference_Number
+		        Unit_Cost
+		        Processed
+		    )
+		    filters
+		    (
+		        Asset
+		        Vendor
+		        Transaction_Date
+		    )
+		    sort by
+		    (
+		        Transaction_Date descending
+		    )
+		}
+
+		default list All_Vendors
+		{
+		    displayName = "All Vendors"
+		    show all rows from Vendors
+		    (
+		        Vendor_Name
+		        Contact_Name
+		        Email
+		        Phone
+		        Active
+		    )
+		    filters
+		    (
+		        Active
+		        Vendor_Name
+		    )
+		    sort by
+		    (
+		        Vendor_Name ascending
+		    )
+		}
+	}
+
+	pages
+	{
+		page Asset_Dashboard
+		{
+					displayname = "Asset Dashboard"
+					Content="<zml>\n\t<layout>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='Asset_Dashboard_Snippet' elementName='Asset Dashboard'>\n\t\t\t\t\t<![CDATA[htmlpage Asset_Dashboard_Snippet()\n\t\t\t\t\t\t content\n\t\t\t\t\t\t &lt;%{%&gt;\n\t\t\t\t\t\t\t\t <file name:Asset_Dashboard/Asset_Dashboard.dshtml/>\n\t\t\t\t\t\t &lt;%}%&gt;\n\t\t\t\t ]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t</layout>\n</zml>"
+		}
+
+		page IT_Asset_Dashboard(string CategoryFilter, string StockFilter)
+		{
+					displayname = "IT Asset Dashboard"
+					Content="<zml>\n\t<layout>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='ITAssetHeader' elementName='IT Asset Header'>\n\t\t\t\t\t<![CDATA[htmlpage ITAssetHeader()\ncontent\n&lt;%{%&gt;\n\t<file name:IT_Asset_Dashboard/Dashboard.dshtml/>\n&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='ITAssetKPIs' elementName='IT Asset KPIs'>\n\t\t\t\t\t<![CDATA[htmlpage ITAssetKPIs()\ncontent\n&lt;%{%&gt;\n\t<file name:IT_Asset_Dashboard/KPIs.dshtml/>\n&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t\t<row>\n\t\t\t<column width='66%'>\n\t\t\t\t<dsp id='CategoryStockHealth' elementName='Category Stock Health'>\n\t\t\t\t\t<![CDATA[htmlpage CategoryStockHealth()\ncontent\n&lt;%{%&gt;\n\t<file name:IT_Asset_Dashboard/CategoryStockHealth.dshtml/>\n&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t\t<column width='34%'>\n\t\t\t\t<dsp id='AssetStatusDistribution' elementName='Asset Status Distribution'>\n\t\t\t\t\t<![CDATA[htmlpage AssetStatusDistribution()\ncontent\n&lt;%{%&gt;\n\t<file name:IT_Asset_Dashboard/AssetStatusDistribution.dshtml/>\n&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t\t<row>\n\t\t\t<column width='50%'>\n\t\t\t\t<dsp id='RecentStockMovements' elementName='Recent Stock Movements'>\n\t\t\t\t\t<![CDATA[htmlpage RecentStockMovements()\ncontent\n&lt;%{%&gt;\n\t<file name:IT_Asset_Dashboard/RecentStockMovements.dshtml/>\n&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t\t<column width='50%'>\n\t\t\t\t<dsp id='LowStockAlerts' elementName='Low Stock Alerts'>\n\t\t\t\t\t<![CDATA[htmlpage LowStockAlerts()\ncontent\n&lt;%{%&gt;\n\t<file name:IT_Asset_Dashboard/LowStockAlerts.dshtml/>\n&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t\t<row>\n\t\t\t<column width='50%'>\n\t\t\t\t<dsp id='RequestWorkload' elementName='Request Workload'>\n\t\t\t\t\t<![CDATA[htmlpage RequestWorkload()\ncontent\n&lt;%{%&gt;\n\t<file name:IT_Asset_Dashboard/RequestWorkload.dshtml/>\n&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t\t<column width='50%'>\n\t\t\t\t<dsp id='ComplaintWorkload' elementName='Complaint Workload'>\n\t\t\t\t\t<![CDATA[htmlpage ComplaintWorkload()\ncontent\n&lt;%{%&gt;\n\t<file name:IT_Asset_Dashboard/ComplaintWorkload.dshtml/>\n&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t</layout>\n</zml>"
+		}
+	}
+
+	workflow
+	{
+		form
+		{
+			Alert_Settings_On_Validate as "Validate Alert Settings"
+			{
+			    type = form
+			    form = Alert_Settings
+			    record event = on add
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                existingSettings = Alert_Settings[ID != 0];
+			                if (existingSettings.count() > 0)
+			                {
+			                    alert "Only one alert settings record is allowed.";
+			                    cancel submit;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Asset_Assignments_On_Load as "Prepare Asset Assignment Form"
+			{
+			    type = form
+			    form = Asset_Assignments
+			    record event = on add or edit
+			
+			    on load
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                hide Stock_Deducted;
+			                hide Stock_Restored;
+			                disable Stock_Deducted;
+			                disable Stock_Restored;
+			                if (input.Status == "Returned")
+			                {
+			                    show Returned_Date;
+			                    show Condition_On_Return;
+			                }
+			                else
+			                {
+			                    hide Returned_Date;
+			                    hide Condition_On_Return;
+			                }
+			                if (input.Stock_Deducted == true)
+			                {
+			                    disable Asset;
+			                    disable Employee;
+			                    disable Quantity;
+			                    disable Assigned_Date;
+			                    disable Serial_Number;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Asset_Assignments_On_Success as "Process Asset Assignment"
+			{
+			    type = form
+			    form = Asset_Assignments
+			    record event = on add or edit
+			    description = "Deducts and restores stock exactly once and records each movement in the inventory audit"
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                assignmentRecord = Asset_Assignments[ID == input.ID];
+			                if (assignmentRecord.count() > 0)
+			                {
+			                    assetRecord = Assets[ID == assignmentRecord.Asset];
+			                    if (assetRecord.count() > 0)
+			                    {
+			                        movementRequired = false;
+			                        quantityChange = 0;
+			                        movementAction = "";
+			                        sourceType = "Assignment";
+			                        if (assignmentRecord.Status == "Assigned" && assignmentRecord.Stock_Deducted == false)
+			                        {
+			                            movementRequired = true;
+			                            quantityChange = 0 - assignmentRecord.Quantity;
+			                            movementAction = "Asset Assigned";
+			                            assignmentRecord.Stock_Deducted = true;
+			                        }
+			                        else if (assignmentRecord.Status == "Returned" && assignmentRecord.Stock_Deducted == true && assignmentRecord.Stock_Restored == false)
+			                        {
+			                            movementRequired = true;
+			                            quantityChange = assignmentRecord.Quantity;
+			                            movementAction = "Asset Returned";
+			                            sourceType = "Return";
+			                            assignmentRecord.Stock_Restored = true;
+			                        }
+			                        if (movementRequired)
+			                        {
+			                            stockBefore = ifnull(assetRecord.Current_Stock,0);
+			                            stockAfter = stockBefore + quantityChange;
+			                            assetRecord.Current_Stock = stockAfter;
+			                            stockPercent = 0.0;
+			                            if (assetRecord.Maximum_Stock > 0)
+			                            {
+			                                stockPercent = (stockAfter * 100.0) / assetRecord.Maximum_Stock;
+			                            }
+			                            assetRecord.Stock_Percentage = stockPercent;
+			                            if (stockAfter == 0)
+			                            {
+			                                assetRecord.Stock_Status = "Out of Stock";
+			                            }
+			                            else if (stockPercent < 10)
+			                            {
+			                                assetRecord.Stock_Status = "Low Stock";
+			                            }
+			                            else
+			                            {
+			                                assetRecord.Stock_Status = "Healthy";
+			                            }
+			                            if (stockPercent < 10 && assetRecord.Low_Stock_Alert_Sent == false)
+			                            {
+			                                settingsRecord = Alert_Settings[Notifications_Enabled == true];
+			                                if (settingsRecord.count() > 0)
+			                                {
+			                                    ccList = List();
+			                                    if (ifnull(settingsRecord.CC_Recipients,"") != "")
+			                                    {
+			                                        ccList = settingsRecord.CC_Recipients.toList(",");
+			                                    }
+			                                    sendmail
+			                                    (
+			                                        from : zoho.adminuserid
+			                                        to : settingsRecord.Primary_Recipient
+			                                        cc : ccList
+			                                        subject : "Low stock alert: " + assetRecord.Asset_Name
+			                                        message : "Asset " + assetRecord.Asset_Name + " (" + assetRecord.Asset_Code + ") is at " + stockAfter + " of " + assetRecord.Maximum_Stock + " units (" + stockPercent.round(2) + "%)."
+			                                    )
+			                                    assetRecord.Low_Stock_Alert_Sent = true;
+			                                    assetRecord.Last_Alerted_At = zoho.currenttime;
+			                                }
+			                            }
+			                            else if (stockPercent >= 10 && assetRecord.Low_Stock_Alert_Sent == true)
+			                            {
+			                                assetRecord.Low_Stock_Alert_Sent = false;
+			                            }
+			                            auditID = insert into Inventory_Audit
+			                            [
+			                                Asset = assetRecord.ID
+			                                Source_Type = sourceType
+			                                Source_Record_ID = assignmentRecord.ID.toString()
+			                                Action = movementAction
+			                                Quantity_Change = quantityChange
+			                                Stock_Before = stockBefore
+			                                Stock_After = stockAfter
+			                                Performed_By = zoho.loginuser
+			                                Performed_At = zoho.currenttime
+			                                Details = ifnull(assignmentRecord.Notes,"")
+			                            ];
+			                        }
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Asset_Assignments_On_Validate as "Validate Asset Assignment"
+			{
+			    type = form
+			    form = Asset_Assignments
+			    record event = on add or edit
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if (ifnull(input.Quantity,0) <= 0)
+			                {
+			                    alert "Quantity must be greater than zero.";
+			                    cancel submit;
+			                }
+			                assetRecord = Assets[ID == input.Asset];
+			                if (assetRecord.count() == 0)
+			                {
+			                    alert "The selected asset could not be found.";
+			                    cancel submit;
+			                }
+			                if (assetRecord.Serial_Tracking_Required == true && ifnull(input.Serial_Number,"") == "")
+			                {
+			                    alert "Serial Number is required for this asset.";
+			                    cancel submit;
+			                }
+			                if (input.ID == null && input.Status == "Assigned" && assetRecord.Current_Stock < input.Quantity)
+			                {
+			                    alert "There is not enough stock to complete this assignment.";
+			                    cancel submit;
+			                }
+			                if (input.Status == "Returned" && (input.Returned_Date == null || ifnull(input.Condition_On_Return,"") == ""))
+			                {
+			                    alert "Returned Date and Condition on Return are required.";
+			                    cancel submit;
+			                }
+			                if (input.ID != null)
+			                {
+			                    existingAssignment = Asset_Assignments[ID == input.ID];
+			                    if (existingAssignment.count() > 0 && existingAssignment.Stock_Deducted == true && (existingAssignment.Asset != input.Asset || existingAssignment.Employee != input.Employee || existingAssignment.Quantity != input.Quantity || existingAssignment.Assigned_Date != input.Assigned_Date))
+			                    {
+			                        alert "Asset, employee, quantity, and assigned date cannot be changed after stock is deducted.";
+			                        cancel submit;
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Status_On_User_Input as "Update Return Fields"
+			{
+			    type = form
+			    form = Asset_Assignments
+			    record event = on add or edit
+			
+			    on user input of Status
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if (input.Status == "Returned")
+			                {
+			                    show Returned_Date;
+			                    show Condition_On_Return;
+			                    enable Returned_Date;
+			                    enable Condition_On_Return;
+			                }
+			                else
+			                {
+			                    hide Returned_Date;
+			                    hide Condition_On_Return;
+			                    input.Returned_Date = null;
+			                    input.Condition_On_Return = "";
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Asset_Complaints_On_Load as "Prepare Asset Complaint Form"
+			{
+			    type = form
+			    form = Asset_Complaints
+			    record event = on add or edit
+			
+			    on load
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if (input.ID == null)
+			                {
+			                    input.Reported_By_Email = zoho.loginuser;
+			                    input.Ticket_Status = "Open";
+			                }
+			                disable Reported_By_Email;
+			                disable Resolved_Date_Time;
+			                disable Closed_Date_Time;
+			                availableAssets = Assets[Active == true].ID.getAll();
+			                input.Asset:ui.add(list());
+			                if (availableAssets.size() > 0)
+			                {
+			                    input.Asset:ui.add(availableAssets);
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Asset_Complaints_On_Success as "Process Asset Complaint"
+			{
+			    type = form
+			    form = Asset_Complaints
+			    record event = on add or edit
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                complaintRecord = Asset_Complaints[ID == input.ID];
+			                if (complaintRecord.count() > 0)
+			                {
+			                    if (input.Ticket_Status == "Resolved" && input.Resolved_Date_Time == null)
+			                    {
+			                        complaintRecord.Resolved_Date_Time = zoho.currenttime;
+			                    }
+			                    if (input.Ticket_Status == "Closed" && input.Closed_Date_Time == null)
+			                    {
+			                        complaintRecord.Closed_Date_Time = zoho.currenttime;
+			                    }
+			                    if (input.Ticket_Status in {"In Progress", "Resolved", "Closed"})
+			                    {
+			                        sendmail
+			                        (
+			                            from : zoho.adminuserid
+			                            to : input.Reported_By_Email
+			                            subject : "Asset complaint #" + input.Complaint_Number + " updated"
+			                            message : "Your asset complaint is now " + input.Ticket_Status + ".<br><br>Resolution notes: " + ifnull(input.Resolution_Notes, "Not yet provided")
+			                        )
+			                    }
+			                    if (input.Priority == "Critical" && input.Ticket_Status == "Open")
+			                    {
+			                        settingsRecord = Alert_Settings[Setting_Name == "Low Stock Notifications" && Notifications_Enabled == true];
+			                        if (settingsRecord.count() > 0)
+			                        {
+			                            sendmail
+			                            (
+			                                from : zoho.adminuserid
+			                                to : settingsRecord.Primary_Recipient
+			                                subject : "Critical asset complaint #" + input.Complaint_Number
+			                                message : "A critical complaint was raised by " + input.Reported_By_Email + " for asset " + input.Asset + ".<br><br>" + input.Description
+			                            )
+			                        }
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Asset_Complaints_On_Validate as "Validate Asset Complaint"
+			{
+			    type = form
+			    form = Asset_Complaints
+			    record event = on add or edit
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                assetRecord = Assets[ID == input.Asset];
+			                if (assetRecord.count() == 0)
+			                {
+			                    alert "The selected asset could not be found.";
+			                    cancel submit;
+			                }
+			                if (input.ID == null && input.Reported_By_Email != zoho.loginuser)
+			                {
+			                    alert "Reported By Email must match the signed-in user.";
+			                    cancel submit;
+			                }
+			                if (input.Ticket_Status in {"Resolved", "Closed"} && ifnull(input.Resolution_Notes, "") == "")
+			                {
+			                    alert "Resolution Notes are required before resolving or closing a complaint.";
+			                    cancel submit;
+			                }
+			                if (input.Ticket_Status == "Closed" && input.Resolved_Date_Time == null)
+			                {
+			                    alert "A complaint must be resolved before it can be closed.";
+			                    cancel submit;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Asset_Requests_On_Add_Validate as "Validate New Asset Request"
+			{
+			    type = form
+			    form = Asset_Requests
+			    record event = on add
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if (input.Requested_By_Email != zoho.loginuser)
+			                {
+			                    alert "You can only submit an asset request for your own login.";
+			                    cancel submit;
+			                }
+			                if (input.Request_Status != "Pending Manager Approval")
+			                {
+			                    alert "New requests must start in Pending Manager Approval status.";
+			                    cancel submit;
+			                }
+			                if (input.Manager_Email == input.Requested_By_Email)
+			                {
+			                    alert "Manager email must be different from the requester email.";
+			                    cancel submit;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Asset_Requests_On_Edit_Validate as "Protect Asset Request Status"
+			{
+			    type = form
+			    form = Asset_Requests
+			    record event = on edit
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                existingRequest = Asset_Requests[ID == input.ID];
+			                if (existingRequest.count() > 0 && existingRequest.Request_Status != input.Request_Status)
+			                {
+			                    alert "Request status can only be changed through approval, cancellation, or fulfilment actions.";
+			                    cancel submit;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Asset_Requests_On_Load as "Prepare Asset Request Form"
+			{
+			    type = form
+			    form = Asset_Requests
+			    record event = on add or edit
+			
+			    on load
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if (input.ID == null)
+			                {
+			                    input.Requested_By_Email = zoho.loginuser;
+			                    input.Request_Status = "Pending Manager Approval";
+			                }
+			                disable Requested_By_Email;
+			                disable Request_Status;
+			                disable Approved_Date;
+			                disable Fulfilled_Asset;
+			                disable Fulfilled_Date;
+			            )
+			        }
+			    }
+			}
+
+			Assets_On_Validate as "Validate Asset Stock"
+			{
+			    type = form
+			    form = Assets
+			    record event = on add or edit
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if (ifnull(input.Maximum_Stock,0) <= 0)
+			                {
+			                    alert "Maximum stock must be greater than zero.";
+			                    cancel submit;
+			                }
+			                if (ifnull(input.Opening_Stock,0) < 0 || input.Opening_Stock > input.Maximum_Stock)
+			                {
+			                    alert "Opening stock must be between zero and maximum stock.";
+			                    cancel submit;
+			                }
+			                if (input.ID == null)
+			                {
+			                    input.Current_Stock = input.Opening_Stock;
+			                }
+			                input.Stock_Percentage = (ifnull(input.Current_Stock,0) * 100.0) / input.Maximum_Stock;
+			                if (ifnull(input.Current_Stock,0) == 0)
+			                {
+			                    input.Stock_Status = "Out of Stock";
+			                }
+			                else if (input.Stock_Percentage < 10)
+			                {
+			                    input.Stock_Status = "Low Stock";
+			                }
+			                else
+			                {
+			                    input.Stock_Status = "Healthy";
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Assets_On_Edit_Validate as "Protect System Stock Fields"
+			{
+			    type = form
+			    form = Assets
+			    record event = on edit
+			    description = "Prevents direct edits to stock balances and alert state"
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                existingAsset = Assets[ID == input.ID];
+			                if (existingAsset.count() > 0 && (existingAsset.Current_Stock != input.Current_Stock || existingAsset.Stock_Percentage != input.Stock_Percentage || existingAsset.Stock_Status != input.Stock_Status || existingAsset.Low_Stock_Alert_Sent != input.Low_Stock_Alert_Sent || existingAsset.Last_Alerted_At != input.Last_Alerted_At))
+			                {
+			                    alert "Stock balances and alert fields are maintained by inventory workflows.";
+			                    cancel submit;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Assets_On_Success as "Send Low Stock Alert"
+			{
+			    type = form
+			    form = Assets
+			    record event = on add or edit
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                assetRecord = Assets[ID == input.ID];
+			                if (assetRecord.count() > 0)
+			                {
+			                    if (assetRecord.Stock_Percentage < 10 && assetRecord.Low_Stock_Alert_Sent == false)
+			                    {
+			                        settingsRecord = Alert_Settings[Notifications_Enabled == true];
+			                        if (settingsRecord.count() > 0)
+			                        {
+			                            ccList = List();
+			                            if (ifnull(settingsRecord.CC_Recipients,"") != "")
+			                            {
+			                                ccList = settingsRecord.CC_Recipients.toList(",");
+			                            }
+			                            sendmail
+			                            (
+			                                from : zoho.adminuserid
+			                                to : settingsRecord.Primary_Recipient
+			                                cc : ccList
+			                                subject : "Low stock alert: " + assetRecord.Asset_Name
+			                                message : "Asset " + assetRecord.Asset_Name + " (" + assetRecord.Asset_Code + ") is at " + assetRecord.Current_Stock + " of " + assetRecord.Maximum_Stock + " units (" + assetRecord.Stock_Percentage.round(2) + "%)."
+			                            )
+			                            assetRecord.Low_Stock_Alert_Sent = true;
+			                            assetRecord.Last_Alerted_At = zoho.currenttime;
+			                        }
+			                    }
+			                    else if (assetRecord.Stock_Percentage >= 10 && assetRecord.Low_Stock_Alert_Sent == true)
+			                    {
+			                        assetRecord.Low_Stock_Alert_Sent = false;
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Stock_Transactions_On_Load as "Prepare Stock Transaction Form"
+			{
+			    type = form
+			    form = Stock_Transactions
+			    record event = on add or edit
+			
+			    on load
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                disable Processed;
+			                if (input.ID != null && input.Processed == true)
+			                {
+			                    disable Asset;
+			                    disable Transaction_Type;
+			                    disable Quantity;
+			                    disable Transaction_Date;
+			                    disable Vendor;
+			                    disable Reference_Number;
+			                    disable Unit_Cost;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Stock_Transactions_On_Success as "Process Stock Transaction"
+			{
+			    type = form
+			    form = Stock_Transactions
+			    record event = on add or edit
+			    description = "Posts each stock movement once, recalculates stock health, sends threshold alerts, and writes an audit record"
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                transactionRecord = Stock_Transactions[ID == input.ID];
+			                if (transactionRecord.count() > 0 && transactionRecord.Processed == false)
+			                {
+			                    assetRecord = Assets[ID == transactionRecord.Asset];
+			                    if (assetRecord.count() > 0)
+			                    {
+			                        stockBefore = ifnull(assetRecord.Current_Stock,0);
+			                        quantityChange = transactionRecord.Quantity;
+			                        if (transactionRecord.Transaction_Type in {"Adjustment Decrease", "Retirement"})
+			                        {
+			                            quantityChange = 0 - transactionRecord.Quantity;
+			                        }
+			                        stockAfter = stockBefore + quantityChange;
+			                        assetRecord.Current_Stock = stockAfter;
+			                        stockPercent = 0.0;
+			                        if (assetRecord.Maximum_Stock > 0)
+			                        {
+			                            stockPercent = (stockAfter * 100.0) / assetRecord.Maximum_Stock;
+			                        }
+			                        assetRecord.Stock_Percentage = stockPercent;
+			                        if (stockAfter == 0)
+			                        {
+			                            assetRecord.Stock_Status = "Out of Stock";
+			                        }
+			                        else if (stockPercent < 10)
+			                        {
+			                            assetRecord.Stock_Status = "Low Stock";
+			                        }
+			                        else
+			                        {
+			                            assetRecord.Stock_Status = "Healthy";
+			                        }
+			                        if (stockPercent < 10 && assetRecord.Low_Stock_Alert_Sent == false)
+			                        {
+			                            settingsRecord = Alert_Settings[Notifications_Enabled == true];
+			                            if (settingsRecord.count() > 0)
+			                            {
+			                                ccList = List();
+			                                if (ifnull(settingsRecord.CC_Recipients,"") != "")
+			                                {
+			                                    ccList = settingsRecord.CC_Recipients.toList(",");
+			                                }
+			                                sendmail
+			                                (
+			                                    from : zoho.adminuserid
+			                                    to : settingsRecord.Primary_Recipient
+			                                    cc : ccList
+			                                    subject : "Low stock alert: " + assetRecord.Asset_Name
+			                                    message : "Asset " + assetRecord.Asset_Name + " (" + assetRecord.Asset_Code + ") is at " + stockAfter + " of " + assetRecord.Maximum_Stock + " units (" + stockPercent.round(2) + "%)."
+			                                )
+			                                assetRecord.Low_Stock_Alert_Sent = true;
+			                                assetRecord.Last_Alerted_At = zoho.currenttime;
+			                            }
+			                        }
+			                        else if (stockPercent >= 10 && assetRecord.Low_Stock_Alert_Sent == true)
+			                        {
+			                            assetRecord.Low_Stock_Alert_Sent = false;
+			                        }
+			                        transactionRecord.Processed = true;
+			                        auditID = insert into Inventory_Audit
+			                        [
+			                            Asset = assetRecord.ID
+			                            Source_Type = "Stock Transaction"
+			                            Source_Record_ID = transactionRecord.ID.toString()
+			                            Action = transactionRecord.Transaction_Type
+			                            Quantity_Change = quantityChange
+			                            Stock_Before = stockBefore
+			                            Stock_After = stockAfter
+			                            Performed_By = zoho.loginuser
+			                            Performed_At = zoho.currenttime
+			                            Details = ifnull(transactionRecord.Notes,"")
+			                        ];
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Stock_Transactions_On_Validate as "Validate Stock Transaction"
+			{
+			    type = form
+			    form = Stock_Transactions
+			    record event = on add or edit
+			    description = "Validates quantity movements and prevents processed transactions from being changed"
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if (ifnull(input.Quantity,0) <= 0)
+			                {
+			                    alert "Quantity must be greater than zero.";
+			                    cancel submit;
+			                }
+			                if (input.Transaction_Type == "Receipt" && input.Vendor == null)
+			                {
+			                    alert "Vendor is required for a receipt.";
+			                    cancel submit;
+			                }
+			                assetRecord = Assets[ID == input.Asset];
+			                if (assetRecord.count() == 0)
+			                {
+			                    alert "The selected asset could not be found.";
+			                    cancel submit;
+			                }
+			                if (input.Transaction_Type in {"Adjustment Decrease", "Retirement"} && assetRecord.Current_Stock < input.Quantity)
+			                {
+			                    alert "There is not enough stock for this transaction.";
+			                    cancel submit;
+			                }
+			                if (input.ID != null)
+			                {
+			                    existingTransaction = Stock_Transactions[ID == input.ID];
+			                    if (existingTransaction.count() > 0 && existingTransaction.Processed == true && (existingTransaction.Asset != input.Asset || existingTransaction.Transaction_Type != input.Transaction_Type || existingTransaction.Quantity != input.Quantity))
+			                    {
+			                        alert "Asset, transaction type, and quantity cannot be changed after processing.";
+			                        cancel submit;
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Transaction_Type_On_User_Input as "Update Transaction Fields"
+			{
+			    type = form
+			    form = Stock_Transactions
+			    record event = on add or edit
+			
+			    on user input of Transaction_Type
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if (input.Transaction_Type == "Receipt")
+			                {
+			                    show Vendor;
+			                    enable Vendor;
+			                }
+			                else
+			                {
+			                    hide Vendor;
+			                    input.Vendor = null;
+			                }
+			            )
+			        }
+			    }
+			}
+		}
+
+		functions
+		{
+			Approve_Asset_Request as "Approve Asset Request"
+			{
+			    type = functions
+			    form = Asset_Requests
+			    execution type = for each record
+			
+			    on start
+			    {
+			        actions
+			        {
+			            on click
+			            (
+			                if (input.Manager_Email != zoho.loginuser || input.Request_Status != "Pending Manager Approval")
+			                {
+			                    info "You are not authorized to approve this request.";
+			                }
+			                else
+			                {
+			                    input.Request_Status = "Approved";
+			                    input.Approved_Date = zoho.currenttime;
+			                    recipients = "";
+			                    settingsRecord = Alert_Settings[Setting_Name == "Low Stock Notifications" && Notifications_Enabled == true];
+			                    if (settingsRecord.count() > 0)
+			                    {
+			                        recipients = settingsRecord.CC_Recipients;
+			                    }
+			                    sendmail
+			                    (
+			                        from : zoho.adminuserid
+			                        to : input.Requested_By_Email
+			                        cc : recipients
+			                        subject : "Asset request approved"
+			                        message : "Your asset request #" + input.Request_Number + " has been approved and is ready for inventory fulfilment."
+			                    )
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Cancel_Asset_Request as "Cancel Asset Request"
+			{
+			    type = functions
+			    form = Asset_Requests
+			    execution type = for each record
+			
+			    on start
+			    {
+			        actions
+			        {
+			            on click
+			            (
+			                if (input.Requested_By_Email != zoho.loginuser || input.Request_Status != "Pending Manager Approval")
+			                {
+			                    info "Only the requester can cancel a pending request.";
+			                }
+			                else
+			                {
+			                    input.Request_Status = "Cancelled";
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Reject_Asset_Request as "Reject Asset Request"
+			{
+			    type = functions
+			    form = Asset_Requests
+			    execution type = for each record
+			
+			    on start
+			    {
+			        actions
+			        {
+			            on click
+			            (
+			                if (input.Manager_Email != zoho.loginuser || input.Request_Status != "Pending Manager Approval")
+			                {
+			                    info "You are not authorized to reject this request.";
+			                }
+			                else
+			                {
+			                    input.Request_Status = "Rejected";
+			                    sendmail
+			                    (
+			                        from : zoho.adminuserid
+			                        to : input.Requested_By_Email
+			                        subject : "Asset request rejected"
+			                        message : "Your asset request #" + input.Request_Number + " has been rejected by your manager."
+			                    )
+			                }
+			            )
+			        }
+			    }
+			}
+		}
+	}
+
+	share_settings
+	{
+	"Employee"
+	{
+	    name = "Employee"
+	    type = Users_Permissions
+	    permissions = {Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false}
+	    description = "Legacy profile retained without application access"
+	}
+	"Inventory_Administrator"
+	{
+	    name = "Inventory_Administrator"
+	    type = Users_Permissions
+	    permissions = {Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false}
+	    description = "Legacy profile retained without application access"
+	}
+	"Inventory_Team"
+	{
+	    name = "Inventory_Team"
+	    type = Users_Permissions
+	    permissions = {Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false}
+	    description = "Legacy profile retained without application access"
+	}
+	"IT_Administrator"
+	{
+	    name = "IT_Administrator"
+	    type = Users_Permissions
+	    permissions = {Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false}
+	    description = "Full administration of IT assets, settings, reports, and dashboard"
+	    ModulePermissions
+	    {
+	        Asset_Categories
+	        {
+	            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Asset_Categories={"View","Edit","Delete"}
+	            }
+	        }
+	        Vendors
+	        {
+	            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Vendors={"View","Edit","Delete"}
+	            }
+	        }
+	        Employees
+	        {
+	            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Employees={"View","Edit","Delete"}
+	            }
+	        }
+	        Alert_Settings
+	        {
+	            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                Alert_Configuration={"View","Edit","Delete"}
+	            }
+	        }
+	        Assets
+	        {
+	            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Assets={"View","Edit","Delete"}
+	                Low_Stock_Assets={"View","Edit","Delete"}
+	            }
+	        }
+	        Stock_Transactions
+	        {
+	            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Stock_Transactions={"View","Edit","Delete"}
+	                Stock_Receipts={"View","Edit","Delete"}
+	                Recent_Stock_Activity={"View","Edit","Delete"}
+	            }
+	        }
+	        Asset_Assignments
+	        {
+	            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Asset_Assignments={"View","Edit","Delete"}
+	                Currently_Assigned_Assets={"View","Edit","Delete"}
+	                Returned_Assets={"View","Edit","Delete"}
+	            }
+	        }
+	        Inventory_Audit
+	        {
+	            enabled = Viewall,Export,Tab,View,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                Inventory_Audit_Log={"View"}
+	            }
+	        }
+	        Asset_Dashboard
+	        {
+	            enabled = tab
+	        }
+	    }
+	}
+	"IT_Staff"
+	{
+	    name = "IT_Staff"
+	    type = Users_Permissions
+	    permissions = {Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false}
+	    description = "Operational access for inventory, stock movements, and asset assignments"
+	    ModulePermissions
+	    {
+	        Asset_Categories
+	        {
+	            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Asset_Categories={"View","Edit"}
+	            }
+	        }
+	        Vendors
+	        {
+	            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Vendors={"View","Edit"}
+	            }
+	        }
+	        Employees
+	        {
+	            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Employees={"View","Edit"}
+	            }
+	        }
+	        Assets
+	        {
+	            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+	            allFieldsVisible = false
+	            FieldPermissions
+	            {
+	                Asset_Code{visibility:true,readonly:false}
+	                Asset_Name{visibility:true,readonly:false}
+	                Category{visibility:true,readonly:false}
+	                Manufacturer{visibility:true,readonly:false}
+	                Model{visibility:true,readonly:false}
+	                Serial_Tracking_Required{visibility:true,readonly:false}
+	                Active{visibility:true,readonly:false}
+	                Maximum_Stock{visibility:true,readonly:false}
+	                Opening_Stock{visibility:true,readonly:false}
+	                Current_Stock{visibility:true,readonly:true}
+	                Stock_Percentage{visibility:true,readonly:true}
+	                Stock_Status{visibility:true,readonly:true}
+	                Low_Stock_Alert_Sent{visibility:true,readonly:true}
+	                Last_Alerted_At{visibility:true,readonly:true}
+	            }
+	            ReportPermissions
+	            {
+	                All_Assets={"View","Edit"}
+	                Low_Stock_Assets={"View","Edit"}
+	            }
+	        }
+	        Stock_Transactions
+	        {
+	            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+	            allFieldsVisible = false
+	            FieldPermissions
+	            {
+	                Transaction_Number{visibility:true,readonly:true}
+	                Asset{visibility:true,readonly:false}
+	                Transaction_Type{visibility:true,readonly:false}
+	                Quantity{visibility:true,readonly:false}
+	                Transaction_Date{visibility:true,readonly:false}
+	                Vendor{visibility:true,readonly:false}
+	                Reference_Number{visibility:true,readonly:false}
+	                Unit_Cost{visibility:true,readonly:false}
+	                Notes{visibility:true,readonly:false}
+	                Processed{visibility:true,readonly:true}
+	            }
+	            ReportPermissions
+	            {
+	                All_Stock_Transactions={"View","Edit"}
+	                Stock_Receipts={"View","Edit"}
+	                Recent_Stock_Activity={"View","Edit"}
+	            }
+	        }
+	        Asset_Assignments
+	        {
+	            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+	            allFieldsVisible = false
+	            FieldPermissions
+	            {
+	                Assignment_Number{visibility:true,readonly:true}
+	                Asset{visibility:true,readonly:false}
+	                Employee{visibility:true,readonly:false}
+	                Quantity{visibility:true,readonly:false}
+	                Assigned_Date{visibility:true,readonly:false}
+	                Expected_Return_Date{visibility:true,readonly:false}
+	                Status{visibility:true,readonly:false}
+	                Serial_Number{visibility:true,readonly:false}
+	                Returned_Date{visibility:true,readonly:false}
+	                Condition_On_Return{visibility:true,readonly:false}
+	                Notes{visibility:true,readonly:false}
+	                Stock_Deducted{visibility:true,readonly:true}
+	                Stock_Restored{visibility:true,readonly:true}
+	            }
+	            ReportPermissions
+	            {
+	                All_Asset_Assignments={"View","Edit"}
+	                Currently_Assigned_Assets={"View","Edit"}
+	                Returned_Assets={"View","Edit"}
+	            }
+	        }
+	        Inventory_Audit
+	        {
+	            enabled = Viewall,Export,Tab,View,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                Inventory_Audit_Log={"View"}
+	            }
+	        }
+	        Asset_Dashboard
+	        {
+	            enabled = tab
+	        }
+	    }
+	}
+	"Manager"
+	{
+	    name = "Manager"
+	    type = Users_Permissions
+	    permissions = {Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false}
+	    description = "Legacy profile retained without application access"
+	}
+	}
+
+	web
+	{
+	forms
+	{
+	    form Asset_Categories { label placement = top }
+	    form Vendors { label placement = top }
+	    form Employees { label placement = top }
+	    form Alert_Settings { label placement = top }
+	    form Assets { label placement = top }
+	    form Stock_Transactions { label placement = top }
+	    form Asset_Assignments { label placement = top }
+	    form Inventory_Audit { label placement = top }
+	    form Asset_Requests { label placement = top }
+	    form Asset_Complaints { label placement = top }
+	}
+	reports
+	{
+		report Alert_Configuration
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Setting_Name Primary_Recipient CC_Recipients Notifications_Enabled ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Setting_Name Primary_Recipient CC_Recipients Notifications_Enabled ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report All_Asset_Assignments
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Assignment_Number Asset Employee Quantity Assigned_Date Expected_Return_Date Status Serial_Number Returned_Date Condition_On_Return ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Assignment_Number Asset Employee Quantity Assigned_Date Expected_Return_Date Status Serial_Number Returned_Date Condition_On_Return ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Currently_Assigned_Assets
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Assignment_Number Asset Employee Quantity Assigned_Date Expected_Return_Date Serial_Number ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Assignment_Number Asset Employee Quantity Assigned_Date Expected_Return_Date Serial_Number ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Returned_Assets
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Assignment_Number Asset Employee Quantity Assigned_Date Returned_Date Condition_On_Return Serial_Number ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Assignment_Number Asset Employee Quantity Assigned_Date Returned_Date Condition_On_Return Serial_Number ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report All_Asset_Categories
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Category_Name Description Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Category_Name Description Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report All_Asset_Complaints
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Complaint_Number Reported_By_Email Asset Subject Priority Reported_Date_Time Ticket_Status Assigned_Inventory_Email Resolution_Notes Resolved_Date_Time Closed_Date_Time ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Complaint_Number Reported_By_Email Asset Subject Priority Reported_Date_Time Ticket_Status Assigned_Inventory_Email Resolution_Notes Resolved_Date_Time Closed_Date_Time ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report My_Asset_Complaints
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Complaint_Number Asset Subject Priority Reported_Date_Time Ticket_Status Resolution_Notes ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Complaint_Number Asset Subject Priority Reported_Date_Time Ticket_Status Resolution_Notes ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Open_Asset_Complaints
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Complaint_Number Reported_By_Email Asset Subject Priority Reported_Date_Time Ticket_Status Assigned_Inventory_Email ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Complaint_Number Reported_By_Email Asset Subject Priority Reported_Date_Time Ticket_Status Assigned_Inventory_Email ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report All_Asset_Requests
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Request_Number Requested_By_Email Manager_Email Asset_Category Request_Date Needed_By Request_Status Fulfilled_Asset Fulfilled_Date Inventory_Notes ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Request_Number Requested_By_Email Manager_Email Asset_Category Request_Date Needed_By Request_Status Fulfilled_Asset Fulfilled_Date Inventory_Notes ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Approved_Requests
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Request_Number Requested_By_Email Asset_Category Needed_By Request_Status Inventory_Notes ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Request_Number Requested_By_Email Asset_Category Needed_By Request_Status Inventory_Notes ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Manager_Approval_Queue
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Request_Number Requested_By_Email Manager_Email Asset_Category Needed_By Business_Justification Request_Status "Approve Request" "Reject Request" ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Request_Number Requested_By_Email Manager_Email Asset_Category Needed_By Business_Justification Request_Status "Approve Request" "Reject Request" ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report My_Asset_Requests
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Request_Number Asset_Category Request_Date Needed_By Request_Status Fulfilled_Asset Manager_Comments "Cancel Request" ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Request_Number Asset_Category Request_Date Needed_By Request_Status Fulfilled_Asset Manager_Comments "Cancel Request" ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report All_Assets
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Asset_Code Asset_Name Category Manufacturer Model Maximum_Stock Current_Stock Stock_Percentage Stock_Status Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Asset_Code Asset_Name Category Manufacturer Model Maximum_Stock Current_Stock Stock_Percentage Stock_Status Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Available_Assets
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Asset_Code Asset_Name Category Current_Stock Maximum_Stock Stock_Percentage Stock_Status Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Asset_Code Asset_Name Category Current_Stock Maximum_Stock Stock_Percentage Stock_Status Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Low_Stock_Assets
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Asset_Code Asset_Name Category Current_Stock Maximum_Stock Stock_Percentage Stock_Status Last_Alerted_At ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Asset_Code Asset_Name Category Current_Stock Maximum_Stock Stock_Percentage Stock_Status Last_Alerted_At ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report My_Assigned_Assets
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Asset_Code Asset_Name Category Current_Stock Maximum_Stock Stock_Percentage Stock_Status Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Asset_Code Asset_Name Category Current_Stock Maximum_Stock Stock_Percentage Stock_Status Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report All_Employees
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Employee_ID Employee_Name Email Department Location Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Employee_ID Employee_Name Email Department Location Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Inventory_Audit_Log
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Asset Source_Type Source_Record_ID Action Quantity_Change Stock_Before Stock_After Performed_By Performed_At Details ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Asset Source_Type Source_Record_ID Action Quantity_Change Stock_Before Stock_After Performed_By Performed_At Details ) ) ) menu ( header ( Edit ) ) )
+		}
+	
+		report All_Stock_Transactions
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Transaction_Number Asset Transaction_Type Quantity Transaction_Date Vendor Reference_Number Unit_Cost Processed ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Transaction_Number Asset Transaction_Type Quantity Transaction_Date Vendor Reference_Number Unit_Cost Processed ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Recent_Stock_Activity
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Transaction_Number Asset Transaction_Type Quantity Transaction_Date Vendor Reference_Number Processed ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Transaction_Number Asset Transaction_Type Quantity Transaction_Date Vendor Reference_Number Processed ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Stock_Receipts
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Transaction_Number Asset Transaction_Type Quantity Transaction_Date Vendor Reference_Number Unit_Cost Processed ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Transaction_Number Asset Transaction_Type Quantity Transaction_Date Vendor Reference_Number Unit_Cost Processed ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report All_Vendors
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Vendor_Name Contact_Name Email Phone Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Vendor_Name Contact_Name Email Phone Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	}
+	menu
+	{
+	    unused
+	    {
+	        page IT_Asset_Dashboard { icon = "business-chart" }
+	        form Asset_Requests { icon = "business-handout" }
+	        form Asset_Complaints { icon = "objects-support-16" }
+	        report My_Asset_Requests { icon = "business-notes" }
+	        report All_Asset_Requests { icon = "business-handout" }
+	        report Manager_Approval_Queue { icon = "business-agenda" }
+	        report Approved_Requests { icon = "business-badge" }
+	        report My_Asset_Complaints { icon = "objects-support-17" }
+	        report All_Asset_Complaints { icon = "business-notes" }
+	        report Open_Asset_Complaints { icon = "objects-cone" }
+	        report Available_Assets { icon = "tech-laptop" }
+	        report My_Assigned_Assets { icon = "business-chart-growth" }
+	        report Recent_Stock_Activity { icon = "business-progress" }
+	    }
+	    space Asset_Management
+	    {
+	        displayname = "Asset Management"
+	        icon = "tech-computer"
+	        section Dashboard_Section
+	        {
+	            displayname = "Dashboard"
+	            icon = "business-chart"
+	            page Asset_Dashboard { icon = "business-chart-bar-33" }
+	        }
+	        section Inventory_Section
+	        {
+	            displayname = "Inventory"
+	            icon = "business-stock"
+	            form Assets { icon = "tech-computer-monitor" }
+	            report All_Assets { icon = "tech-desktop" }
+	            report Low_Stock_Assets { icon = "business-percentage-38" }
+	            form Asset_Categories { icon = "objects-puzzle-09" }
+	            report All_Asset_Categories { icon = "objects-puzzle-10" }
+	        }
+	        section Operations_Section
+	        {
+	            displayname = "Operations"
+	            icon = "business-progress"
+	            form Stock_Transactions { icon = "tech-sync" }
+	            report All_Stock_Transactions { icon = "business-notes" }
+	            report Stock_Receipts { icon = "business-handout" }
+	            form Asset_Assignments { icon = "users-single-body" }
+	            report All_Asset_Assignments { icon = "business-agenda" }
+	            report Currently_Assigned_Assets { icon = "tech-laptop" }
+	            report Returned_Assets { icon = "business-badge" }
+	        }
+	        section People_Suppliers_Section
+	        {
+	            displayname = "People & Suppliers"
+	            icon = "users-multiple-19"
+	            form Employees { icon = "users-single-body" }
+	            report All_Employees { icon = "users-multiple-11" }
+	            form Vendors { icon = "business-briefcase-24" }
+	            report All_Vendors { icon = "business-building" }
+	        }
+	        section Administration_Section
+	        {
+	            displayname = "Administration"
+	            icon = "objects-key-25"
+	            form Alert_Settings { icon = "business-goal-65" }
+	            report Alert_Configuration { icon = "business-goal-64" }
+	        }
+	        section Audit_Section
+	        {
+	            displayname = "Audit"
+	            icon = "files-single-copy-04"
+	            form Inventory_Audit { icon = "files-single-copy-04" }
+	            report Inventory_Audit_Log { icon = "files-archive-3d-content" }
+	        }
+	        section SharedAnalytics_Section
+	        {
+	            type = shared_user_report_section
+	            displayname = "Reports"
+	            icon = "business-chart-bar-33"
+	        }
+	    }
+	    preference
+	    {
+	        icon
+	        {
+	            style = outline
+	            show = {space,section,component}
+	        }
+	    }
+	}
+	customize
+	{
+	    layout
+	    {
+	        theme = "theme_2"
+	        variant = "variant_2"
+	    }
+	    font = "lato"
+	    color options
+	    {
+	        name = "Asset Blue"
+	        brand color = "#2563EB"
+	        type = "custom"
+	        dark mode color = "#60A5FA"
+	    }
+	    logo
+	    {
+	        preference = "app_icon"
+	        placement = "left"
+	    }
+	}
+	}
+}

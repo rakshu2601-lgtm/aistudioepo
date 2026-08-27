@@ -1,0 +1,26 @@
+Transaction_Type_On_User_Input as "Update Transaction Fields"
+{
+    type = form
+    form = Stock_Transactions
+    record event = on add or edit
+
+    on user input of Transaction_Type
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if (input.Transaction_Type == "Receipt")
+                {
+                    show Vendor;
+                    enable Vendor;
+                }
+                else
+                {
+                    hide Vendor;
+                    input.Vendor = null;
+                }
+            )
+        }
+    }
+}

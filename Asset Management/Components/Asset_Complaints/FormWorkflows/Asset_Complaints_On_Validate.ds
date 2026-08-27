@@ -1,0 +1,37 @@
+Asset_Complaints_On_Validate as "Validate Asset Complaint"
+{
+    type = form
+    form = Asset_Complaints
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                assetRecord = Assets[ID == input.Asset];
+                if (assetRecord.count() == 0)
+                {
+                    alert "The selected asset could not be found.";
+                    cancel submit;
+                }
+                if (input.ID == null && input.Reported_By_Email != zoho.loginuser)
+                {
+                    alert "Reported By Email must match the signed-in user.";
+                    cancel submit;
+                }
+                if (input.Ticket_Status in {"Resolved", "Closed"} && ifnull(input.Resolution_Notes, "") == "")
+                {
+                    alert "Resolution Notes are required before resolving or closing a complaint.";
+                    cancel submit;
+                }
+                if (input.Ticket_Status == "Closed" && input.Resolved_Date_Time == null)
+                {
+                    alert "A complaint must be resolved before it can be closed.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

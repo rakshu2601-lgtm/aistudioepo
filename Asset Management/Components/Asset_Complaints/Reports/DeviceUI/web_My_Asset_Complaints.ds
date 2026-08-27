@@ -1,0 +1,5 @@
+report My_Asset_Complaints
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Complaint_Number Asset Subject Priority Reported_Date_Time Ticket_Status Resolution_Notes ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Complaint_Number Asset Subject Priority Reported_Date_Time Ticket_Status Resolution_Notes ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

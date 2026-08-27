@@ -1,0 +1,21 @@
+customize
+{
+    layout
+    {
+        theme = "theme_2"
+        variant = "variant_2"
+    }
+    font = "lato"
+    color options
+    {
+        name = "Asset Blue"
+        brand color = "#2563EB"
+        type = "custom"
+        dark mode color = "#60A5FA"
+    }
+    logo
+    {
+        preference = "app_icon"
+        placement = "left"
+    }
+}

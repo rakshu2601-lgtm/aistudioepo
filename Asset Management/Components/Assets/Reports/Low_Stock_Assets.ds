@@ -1,0 +1,34 @@
+list Low_Stock_Assets
+{
+    displayName = "Low Stock Assets"
+    show all rows from Assets [Stock_Percentage < 10]
+    (
+        Asset_Code
+        Asset_Name
+        Category
+        Current_Stock
+        Maximum_Stock
+        Stock_Percentage
+        Stock_Status
+        Last_Alerted_At
+    )
+    sort by
+    (
+        Stock_Percentage ascending
+    )
+    conditional formatting
+    (
+        "Low Stock"
+        {
+            condition = (Stock_Status == "Low Stock")
+            fields = [Asset_Code, Asset_Name, Current_Stock, Stock_Percentage, Stock_Status]
+            format = "background-color:#FFF4E5;color:#9A6700;font-weight:bold"
+        }
+        "Out of Stock"
+        {
+            condition = (Stock_Status == "Out of Stock")
+            fields = [Asset_Code, Asset_Name, Current_Stock, Stock_Percentage, Stock_Status]
+            format = "background-color:#FDE8E8;color:#B42318;font-weight:bold"
+        }
+    )
+}

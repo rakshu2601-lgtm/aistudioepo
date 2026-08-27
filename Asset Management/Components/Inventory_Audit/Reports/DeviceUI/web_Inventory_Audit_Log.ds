@@ -1,0 +1,5 @@
+report Inventory_Audit_Log
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Asset Source_Type Source_Record_ID Action Quantity_Change Stock_Before Stock_After Performed_By Performed_At Details ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Asset Source_Type Source_Record_ID Action Quantity_Change Stock_Before Stock_After Performed_By Performed_At Details ) ) ) menu ( header ( Edit ) ) )
+}

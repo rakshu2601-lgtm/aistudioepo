@@ -1,0 +1,5 @@
+report My_Asset_Requests
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Request_Number Asset_Category Request_Date Needed_By Request_Status Fulfilled_Asset Manager_Comments "Cancel Request" ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Request_Number Asset_Category Request_Date Needed_By Request_Status Fulfilled_Asset Manager_Comments "Cancel Request" ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

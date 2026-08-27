@@ -1,0 +1,18 @@
+default list My_Asset_Complaints
+{
+    displayName = "My Asset Complaints"
+    show all rows from Asset_Complaints [Reported_By_Email == zoho.loginuser]
+    (
+        Complaint_Number
+        Asset
+        Subject
+        Priority
+        Reported_Date_Time
+        Ticket_Status
+        Resolution_Notes
+    )
+    sort by
+    (
+        Reported_Date_Time descending
+    )
+}

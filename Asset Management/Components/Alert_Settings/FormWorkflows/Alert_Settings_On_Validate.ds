@@ -1,0 +1,22 @@
+Alert_Settings_On_Validate as "Validate Alert Settings"
+{
+    type = form
+    form = Alert_Settings
+    record event = on add
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                existingSettings = Alert_Settings[ID != 0];
+                if (existingSettings.count() > 0)
+                {
+                    alert "Only one alert settings record is allowed.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,17 @@
+list Approved_Requests
+{
+    displayName = "Approved Requests"
+    show all rows from Asset_Requests [Request_Status == "Approved"]
+    (
+        Request_Number
+        Requested_By_Email
+        Asset_Category
+        Needed_By
+        Request_Status
+        Inventory_Notes
+    )
+    sort by
+    (
+        Needed_By ascending
+    )
+}

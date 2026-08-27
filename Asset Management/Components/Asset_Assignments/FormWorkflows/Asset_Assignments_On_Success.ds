@@ -1,0 +1,107 @@
+Asset_Assignments_On_Success as "Process Asset Assignment"
+{
+    type = form
+    form = Asset_Assignments
+    record event = on add or edit
+    description = "Deducts and restores stock exactly once and records each movement in the inventory audit"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                assignmentRecord = Asset_Assignments[ID == input.ID];
+                if (assignmentRecord.count() > 0)
+                {
+                    assetRecord = Assets[ID == assignmentRecord.Asset];
+                    if (assetRecord.count() > 0)
+                    {
+                        movementRequired = false;
+                        quantityChange = 0;
+                        movementAction = "";
+                        sourceType = "Assignment";
+                        if (assignmentRecord.Status == "Assigned" && assignmentRecord.Stock_Deducted == false)
+                        {
+                            movementRequired = true;
+                            quantityChange = 0 - assignmentRecord.Quantity;
+                            movementAction = "Asset Assigned";
+                            assignmentRecord.Stock_Deducted = true;
+                        }
+                        else if (assignmentRecord.Status == "Returned" && assignmentRecord.Stock_Deducted == true && assignmentRecord.Stock_Restored == false)
+                        {
+                            movementRequired = true;
+                            quantityChange = assignmentRecord.Quantity;
+                            movementAction = "Asset Returned";
+                            sourceType = "Return";
+                            assignmentRecord.Stock_Restored = true;
+                        }
+                        if (movementRequired)
+                        {
+                            stockBefore = ifnull(assetRecord.Current_Stock,0);
+                            stockAfter = stockBefore + quantityChange;
+                            assetRecord.Current_Stock = stockAfter;
+                            stockPercent = 0.0;
+                            if (assetRecord.Maximum_Stock > 0)
+                            {
+                                stockPercent = (stockAfter * 100.0) / assetRecord.Maximum_Stock;
+                            }
+                            assetRecord.Stock_Percentage = stockPercent;
+                            if (stockAfter == 0)
+                            {
+                                assetRecord.Stock_Status = "Out of Stock";
+                            }
+                            else if (stockPercent < 10)
+                            {
+                                assetRecord.Stock_Status = "Low Stock";
+                            }
+                            else
+                            {
+                                assetRecord.Stock_Status = "Healthy";
+                            }
+                            if (stockPercent < 10 && assetRecord.Low_Stock_Alert_Sent == false)
+                            {
+                                settingsRecord = Alert_Settings[Notifications_Enabled == true];
+                                if (settingsRecord.count() > 0)
+                                {
+                                    ccList = List();
+                                    if (ifnull(settingsRecord.CC_Recipients,"") != "")
+                                    {
+                                        ccList = settingsRecord.CC_Recipients.toList(",");
+                                    }
+                                    sendmail
+                                    (
+                                        from : zoho.adminuserid
+                                        to : settingsRecord.Primary_Recipient
+                                        cc : ccList
+                                        subject : "Low stock alert: " + assetRecord.Asset_Name
+                                        message : "Asset " + assetRecord.Asset_Name + " (" + assetRecord.Asset_Code + ") is at " + stockAfter + " of " + assetRecord.Maximum_Stock + " units (" + stockPercent.round(2) + "%)."
+                                    )
+                                    assetRecord.Low_Stock_Alert_Sent = true;
+                                    assetRecord.Last_Alerted_At = zoho.currenttime;
+                                }
+                            }
+                            else if (stockPercent >= 10 && assetRecord.Low_Stock_Alert_Sent == true)
+                            {
+                                assetRecord.Low_Stock_Alert_Sent = false;
+                            }
+                            auditID = insert into Inventory_Audit
+                            [
+                                Asset = assetRecord.ID
+                                Source_Type = sourceType
+                                Source_Record_ID = assignmentRecord.ID.toString()
+                                Action = movementAction
+                                Quantity_Change = quantityChange
+                                Stock_Before = stockBefore
+                                Stock_After = stockAfter
+                                Performed_By = zoho.loginuser
+                                Performed_At = zoho.currenttime
+                                Details = ifnull(assignmentRecord.Notes,"")
+                            ];
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

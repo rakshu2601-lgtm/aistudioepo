@@ -1,0 +1,28 @@
+default list Inventory_Audit_Log
+{
+    displayName = "Inventory Audit Log"
+    show all rows from Inventory_Audit
+    (
+        Asset
+        Source_Type
+        Source_Record_ID
+        Action
+        Quantity_Change
+        Stock_Before
+        Stock_After
+        Performed_By
+        Performed_At
+        Details
+    )
+    filters
+    (
+        Asset
+        Source_Type
+        Performed_By
+        Performed_At
+    )
+    sort by
+    (
+        Performed_At descending
+    )
+}

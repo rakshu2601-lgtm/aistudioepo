@@ -1,0 +1,52 @@
+Asset_Complaints_On_Success as "Process Asset Complaint"
+{
+    type = form
+    form = Asset_Complaints
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                complaintRecord = Asset_Complaints[ID == input.ID];
+                if (complaintRecord.count() > 0)
+                {
+                    if (input.Ticket_Status == "Resolved" && input.Resolved_Date_Time == null)
+                    {
+                        complaintRecord.Resolved_Date_Time = zoho.currenttime;
+                    }
+                    if (input.Ticket_Status == "Closed" && input.Closed_Date_Time == null)
+                    {
+                        complaintRecord.Closed_Date_Time = zoho.currenttime;
+                    }
+                    if (input.Ticket_Status in {"In Progress", "Resolved", "Closed"})
+                    {
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : input.Reported_By_Email
+                            subject : "Asset complaint #" + input.Complaint_Number + " updated"
+                            message : "Your asset complaint is now " + input.Ticket_Status + ".<br><br>Resolution notes: " + ifnull(input.Resolution_Notes, "Not yet provided")
+                        )
+                    }
+                    if (input.Priority == "Critical" && input.Ticket_Status == "Open")
+                    {
+                        settingsRecord = Alert_Settings[Setting_Name == "Low Stock Notifications" && Notifications_Enabled == true];
+                        if (settingsRecord.count() > 0)
+                        {
+                            sendmail
+                            (
+                                from : zoho.adminuserid
+                                to : settingsRecord.Primary_Recipient
+                                subject : "Critical asset complaint #" + input.Complaint_Number
+                                message : "A critical complaint was raised by " + input.Reported_By_Email + " for asset " + input.Asset + ".<br><br>" + input.Description
+                            )
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

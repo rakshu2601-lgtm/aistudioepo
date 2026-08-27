@@ -1,0 +1,128 @@
+"IT_Staff"
+{
+    name = "IT_Staff"
+    type = Users_Permissions
+    permissions = {Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false}
+    description = "Operational access for inventory, stock movements, and asset assignments"
+    ModulePermissions
+    {
+        Asset_Categories
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Asset_Categories={"View","Edit"}
+            }
+        }
+        Vendors
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Vendors={"View","Edit"}
+            }
+        }
+        Employees
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Employees={"View","Edit"}
+            }
+        }
+        Assets
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Asset_Code{visibility:true,readonly:false}
+                Asset_Name{visibility:true,readonly:false}
+                Category{visibility:true,readonly:false}
+                Manufacturer{visibility:true,readonly:false}
+                Model{visibility:true,readonly:false}
+                Serial_Tracking_Required{visibility:true,readonly:false}
+                Active{visibility:true,readonly:false}
+                Maximum_Stock{visibility:true,readonly:false}
+                Opening_Stock{visibility:true,readonly:false}
+                Current_Stock{visibility:true,readonly:true}
+                Stock_Percentage{visibility:true,readonly:true}
+                Stock_Status{visibility:true,readonly:true}
+                Low_Stock_Alert_Sent{visibility:true,readonly:true}
+                Last_Alerted_At{visibility:true,readonly:true}
+            }
+            ReportPermissions
+            {
+                All_Assets={"View","Edit"}
+                Low_Stock_Assets={"View","Edit"}
+            }
+        }
+        Stock_Transactions
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Transaction_Number{visibility:true,readonly:true}
+                Asset{visibility:true,readonly:false}
+                Transaction_Type{visibility:true,readonly:false}
+                Quantity{visibility:true,readonly:false}
+                Transaction_Date{visibility:true,readonly:false}
+                Vendor{visibility:true,readonly:false}
+                Reference_Number{visibility:true,readonly:false}
+                Unit_Cost{visibility:true,readonly:false}
+                Notes{visibility:true,readonly:false}
+                Processed{visibility:true,readonly:true}
+            }
+            ReportPermissions
+            {
+                All_Stock_Transactions={"View","Edit"}
+                Stock_Receipts={"View","Edit"}
+                Recent_Stock_Activity={"View","Edit"}
+            }
+        }
+        Asset_Assignments
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Assignment_Number{visibility:true,readonly:true}
+                Asset{visibility:true,readonly:false}
+                Employee{visibility:true,readonly:false}
+                Quantity{visibility:true,readonly:false}
+                Assigned_Date{visibility:true,readonly:false}
+                Expected_Return_Date{visibility:true,readonly:false}
+                Status{visibility:true,readonly:false}
+                Serial_Number{visibility:true,readonly:false}
+                Returned_Date{visibility:true,readonly:false}
+                Condition_On_Return{visibility:true,readonly:false}
+                Notes{visibility:true,readonly:false}
+                Stock_Deducted{visibility:true,readonly:true}
+                Stock_Restored{visibility:true,readonly:true}
+            }
+            ReportPermissions
+            {
+                All_Asset_Assignments={"View","Edit"}
+                Currently_Assigned_Assets={"View","Edit"}
+                Returned_Assets={"View","Edit"}
+            }
+        }
+        Inventory_Audit
+        {
+            enabled = Viewall,Export,Tab,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Inventory_Audit_Log={"View"}
+            }
+        }
+        Asset_Dashboard
+        {
+            enabled = tab
+        }
+    }
+}

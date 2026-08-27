@@ -1,0 +1,31 @@
+Reject_Asset_Request as "Reject Asset Request"
+{
+    type = functions
+    form = Asset_Requests
+    execution type = for each record
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                if (input.Manager_Email != zoho.loginuser || input.Request_Status != "Pending Manager Approval")
+                {
+                    info "You are not authorized to reject this request.";
+                }
+                else
+                {
+                    input.Request_Status = "Rejected";
+                    sendmail
+                    (
+                        from : zoho.adminuserid
+                        to : input.Requested_By_Email
+                        subject : "Asset request rejected"
+                        message : "Your asset request #" + input.Request_Number + " has been rejected by your manager."
+                    )
+                }
+            )
+        }
+    }
+}

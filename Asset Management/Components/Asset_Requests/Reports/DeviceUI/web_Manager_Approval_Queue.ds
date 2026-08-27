@@ -1,0 +1,5 @@
+report Manager_Approval_Queue
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Request_Number Requested_By_Email Manager_Email Asset_Category Needed_By Business_Justification Request_Status "Approve Request" "Reject Request" ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Request_Number Requested_By_Email Manager_Email Asset_Category Needed_By Business_Justification Request_Status "Approve Request" "Reject Request" ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

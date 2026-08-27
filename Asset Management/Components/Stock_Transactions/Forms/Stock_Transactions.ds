@@ -1,0 +1,134 @@
+form Stock_Transactions
+{
+    title
+    {
+        displayname = "Stock Transactions"
+        on add = "Record Stock Transaction"
+        on edit = "Edit Stock Transaction"
+    }
+    success message = "Stock transaction saved successfully"
+    Transaction_Details
+    (
+        type = section
+        displayname = "Transaction Details"
+        row = 1
+        column = 0
+    )
+    Transaction_Number
+    (
+        type = autonumber
+        displayname = "Transaction Number"
+        start index = 1001
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Asset
+    (
+        type = picklist
+        values = Assets.ID
+        displayformat = [Asset_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Transaction_Type
+    (
+        type = picklist
+        displayname = "Transaction Type"
+        values = {"Receipt", "Adjustment Increase", "Adjustment Decrease", "Retirement"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Quantity
+    (
+        type = number
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Transaction_Date
+    (
+        type = date
+        displayname = "Transaction Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Vendor
+    (
+        type = picklist
+        values = Vendors.ID
+        displayformat = [Vendor_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Reference_Number
+    (
+        type = text
+        displayname = "Reference Number"
+        maxchar = 100
+        row = 1
+        column = 2
+        width = medium
+    )
+    Unit_Cost
+    (
+        type = decimal
+        displayname = "Unit Cost"
+        decimalplace = 2
+        row = 1
+        column = 1
+        width = medium
+    )
+    Notes
+    (
+        type = textarea
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Processed
+    (
+        type = checkbox
+        initial value = false
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Record Transaction"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Transaction"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

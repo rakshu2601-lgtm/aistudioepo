@@ -1,0 +1,87 @@
+form Alert_Settings
+{
+    title
+    {
+        displayname = "Alert Settings"
+        on add = "Configure Low Stock Alerts"
+        on edit = "Edit Low Stock Alerts"
+    }
+    success message = "Alert settings saved successfully."
+    Notification_Settings
+    (
+        type = section
+        displayname = "Notification Settings"
+        row = 1
+        column = 0
+    )
+    must have unique Setting_Name
+    (
+        type = text
+        displayname = "Setting Name"
+        initial value = "Low Stock Notifications"
+        maxchar = 100
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Primary_Recipient
+    (
+        type = email
+        displayname = "Primary Recipient"
+        row = 1
+        column = 1
+        width = medium
+    )
+    CC_Recipients
+    (
+        type = textarea
+        displayname = "CC Recipients"
+        description
+        [
+            type = tooltip
+            message = "Optional comma-separated email addresses"
+        ]
+        height = 80px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Notifications_Enabled
+    (
+        type = checkbox
+        displayname = "Notifications Enabled"
+        initial value = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Settings"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Settings"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

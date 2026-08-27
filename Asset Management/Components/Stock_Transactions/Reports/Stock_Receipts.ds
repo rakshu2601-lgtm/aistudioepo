@@ -1,0 +1,26 @@
+list Stock_Receipts
+{
+    displayName = "Stock Receipts"
+    show all rows from Stock_Transactions [Transaction_Type == "Receipt"]
+    (
+        Transaction_Number
+        Asset
+        Transaction_Type
+        Quantity
+        Transaction_Date
+        Vendor
+        Reference_Number
+        Unit_Cost
+        Processed
+    )
+    filters
+    (
+        Asset
+        Vendor
+        Transaction_Date
+    )
+    sort by
+    (
+        Transaction_Date descending
+    )
+}

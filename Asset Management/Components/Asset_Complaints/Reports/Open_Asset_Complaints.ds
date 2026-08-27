@@ -1,0 +1,28 @@
+list Open_Asset_Complaints
+{
+    displayName = "Open Asset Complaints"
+    show all rows from Asset_Complaints [Ticket_Status == "Open" || Ticket_Status == "In Progress"]
+    (
+        Complaint_Number
+        Reported_By_Email
+        Asset
+        Subject
+        Priority
+        Reported_Date_Time
+        Ticket_Status
+        Assigned_Inventory_Email
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Ticket_Status ascending
+    )
+    sort by
+    (
+        Priority custom
+        Reported_Date_Time ascending
+    )
+}

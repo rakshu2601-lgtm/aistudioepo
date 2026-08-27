@@ -1,0 +1,15 @@
+default list Alert_Configuration
+{
+    displayName = "Alert Configuration"
+    show all rows from Alert_Settings
+    (
+        Setting_Name
+        Primary_Recipient
+        CC_Recipients
+        Notifications_Enabled
+    )
+    sort by
+    (
+        Setting_Name ascending
+    )
+}

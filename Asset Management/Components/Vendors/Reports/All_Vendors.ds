@@ -1,0 +1,21 @@
+default list All_Vendors
+{
+    displayName = "All Vendors"
+    show all rows from Vendors
+    (
+        Vendor_Name
+        Contact_Name
+        Email
+        Phone
+        Active
+    )
+    filters
+    (
+        Active
+        Vendor_Name
+    )
+    sort by
+    (
+        Vendor_Name ascending
+    )
+}

@@ -1,0 +1,91 @@
+"IT_Administrator"
+{
+    name = "IT_Administrator"
+    type = Users_Permissions
+    permissions = {Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false}
+    description = "Full administration of IT assets, settings, reports, and dashboard"
+    ModulePermissions
+    {
+        Asset_Categories
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Asset_Categories={"View","Edit","Delete"}
+            }
+        }
+        Vendors
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Vendors={"View","Edit","Delete"}
+            }
+        }
+        Employees
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Employees={"View","Edit","Delete"}
+            }
+        }
+        Alert_Settings
+        {
+            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Alert_Configuration={"View","Edit","Delete"}
+            }
+        }
+        Assets
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Assets={"View","Edit","Delete"}
+                Low_Stock_Assets={"View","Edit","Delete"}
+            }
+        }
+        Stock_Transactions
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Stock_Transactions={"View","Edit","Delete"}
+                Stock_Receipts={"View","Edit","Delete"}
+                Recent_Stock_Activity={"View","Edit","Delete"}
+            }
+        }
+        Asset_Assignments
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Asset_Assignments={"View","Edit","Delete"}
+                Currently_Assigned_Assets={"View","Edit","Delete"}
+                Returned_Assets={"View","Edit","Delete"}
+            }
+        }
+        Inventory_Audit
+        {
+            enabled = Viewall,Export,Tab,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Inventory_Audit_Log={"View"}
+            }
+        }
+        Asset_Dashboard
+        {
+            enabled = tab
+        }
+    }
+}

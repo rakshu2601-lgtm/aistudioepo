@@ -1,0 +1,27 @@
+Stock_Transactions_On_Load as "Prepare Stock Transaction Form"
+{
+    type = form
+    form = Stock_Transactions
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Processed;
+                if (input.ID != null && input.Processed == true)
+                {
+                    disable Asset;
+                    disable Transaction_Type;
+                    disable Quantity;
+                    disable Transaction_Date;
+                    disable Vendor;
+                    disable Reference_Number;
+                    disable Unit_Cost;
+                }
+            )
+        }
+    }
+}

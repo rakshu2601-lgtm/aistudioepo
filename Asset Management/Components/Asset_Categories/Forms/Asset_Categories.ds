@@ -1,0 +1,71 @@
+form Asset_Categories
+{
+    title
+    {
+        displayname = "Asset Categories"
+        on add = "Add Asset Category"
+        on edit = "Edit Asset Category"
+    }
+    success message = "Asset category saved successfully."
+    Category_Details
+    (
+        type = section
+        displayname = "Category Details"
+        row = 1
+        column = 0
+    )
+    must have unique Category_Name
+    (
+        type = text
+        displayname = "Category Name"
+        maxchar = 100
+        row = 1
+        column = 1
+        width = medium
+    )
+    Description
+    (
+        type = textarea
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        initial value = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

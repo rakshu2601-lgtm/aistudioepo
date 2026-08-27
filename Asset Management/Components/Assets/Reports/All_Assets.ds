@@ -1,0 +1,50 @@
+default list All_Assets
+{
+    displayName = "All Assets"
+    show all rows from Assets
+    (
+        Asset_Code
+        Asset_Name
+        Category
+        Manufacturer
+        Model
+        Maximum_Stock
+        Current_Stock
+        Stock_Percentage
+        Stock_Status
+        Active
+    )
+    filters
+    (
+        Category
+        Stock_Status
+        Active
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Category ascending
+    )
+    sort by
+    (
+        Asset_Name ascending
+    )
+    conditional formatting
+    (
+        "Low Stock"
+        {
+            condition = (Stock_Status == "Low Stock")
+            fields = [Asset_Code, Asset_Name, Current_Stock, Stock_Percentage, Stock_Status]
+            format = "background-color:#FFF4E5;color:#9A6700;font-weight:bold"
+        }
+        "Out of Stock"
+        {
+            condition = (Stock_Status == "Out of Stock")
+            fields = [Asset_Code, Asset_Name, Current_Stock, Stock_Percentage, Stock_Status]
+            format = "background-color:#FDE8E8;color:#B42318;font-weight:bold"
+        }
+    )
+}

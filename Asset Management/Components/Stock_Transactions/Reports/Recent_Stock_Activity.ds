@@ -1,0 +1,25 @@
+list Recent_Stock_Activity
+{
+    displayName = "Recent Stock Activity"
+    show all rows from Stock_Transactions
+    (
+        Transaction_Number
+        Asset
+        Transaction_Type
+        Quantity
+        Transaction_Date
+        Vendor
+        Reference_Number
+        Processed
+    )
+    filters
+    (
+        Asset
+        Transaction_Type
+        Transaction_Date
+    )
+    sort by
+    (
+        Transaction_Date descending
+    )
+}

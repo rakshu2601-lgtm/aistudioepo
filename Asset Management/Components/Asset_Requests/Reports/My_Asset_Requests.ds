@@ -1,0 +1,32 @@
+default list My_Asset_Requests
+{
+    displayName = "My Asset Requests"
+    show all rows from Asset_Requests [Requested_By_Email == zoho.loginuser]
+    (
+        Request_Number
+        Asset_Category
+        Request_Date
+        Needed_By
+        Request_Status
+        Fulfilled_Asset
+        Manager_Comments
+        custom action "Cancel Request"
+        (
+            workflow = Cancel_Asset_Request
+            show action for each record = true
+            column header = "Cancel Request"
+            success message = "Request cancelled"
+            condition = (Request_Status == "Pending Manager Approval")
+            confirmation before execution
+            (
+                message for individual record = "Cancel this asset request?"
+                confirm button text = "Cancel Request"
+                cancel button text = "Keep Request"
+            )
+        )
+    )
+    sort by
+    (
+        Request_Date descending
+    )
+}

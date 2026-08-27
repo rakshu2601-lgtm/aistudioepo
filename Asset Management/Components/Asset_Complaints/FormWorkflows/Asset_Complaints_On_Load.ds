@@ -1,0 +1,30 @@
+Asset_Complaints_On_Load as "Prepare Asset Complaint Form"
+{
+    type = form
+    form = Asset_Complaints
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if (input.ID == null)
+                {
+                    input.Reported_By_Email = zoho.loginuser;
+                    input.Ticket_Status = "Open";
+                }
+                disable Reported_By_Email;
+                disable Resolved_Date_Time;
+                disable Closed_Date_Time;
+                availableAssets = Assets[Active == true].ID.getAll();
+                input.Asset:ui.add(list());
+                if (availableAssets.size() > 0)
+                {
+                    input.Asset:ui.add(availableAssets);
+                }
+            )
+        }
+    }
+}

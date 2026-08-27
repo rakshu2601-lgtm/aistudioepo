@@ -1,0 +1,49 @@
+default list All_Asset_Assignments
+{
+    displayName = "All Asset Assignments"
+    show all rows from Asset_Assignments
+    (
+        Assignment_Number
+        Asset
+        Employee
+        Quantity
+        Assigned_Date
+        Expected_Return_Date
+        Status
+        Serial_Number
+        Returned_Date
+        Condition_On_Return
+    )
+    filters
+    (
+        Asset
+        Employee
+        Status
+        Assigned_Date
+    )
+    sort by
+    (
+        Assigned_Date descending
+    )
+    conditional formatting
+    (
+        "Currently Assigned"
+        {
+            condition = (Status == "Assigned")
+            fields = [Assignment_Number, Asset, Employee, Status]
+            format = "background-color:#FFF4CC;color:#7A5600;font-weight:bold"
+        }
+        "Returned"
+        {
+            condition = (Status == "Returned")
+            fields = [Assignment_Number, Asset, Employee, Status]
+            format = "background-color:#E8F7EE;color:#176B3A"
+        }
+        "Lost"
+        {
+            condition = (Status == "Lost")
+            fields = [Assignment_Number, Asset, Employee, Status]
+            format = "background-color:#FFE7E7;color:#A61B1B;font-weight:bold"
+        }
+    )
+}

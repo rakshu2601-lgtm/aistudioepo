@@ -1,0 +1,26 @@
+list All_Asset_Requests
+{
+    displayName = "All Asset Requests"
+    show all rows from Asset_Requests
+    (
+        Request_Number
+        Requested_By_Email
+        Manager_Email
+        Asset_Category
+        Request_Date
+        Needed_By
+        Request_Status
+        Fulfilled_Asset
+        Fulfilled_Date
+        Inventory_Notes
+    )
+    filters
+    (
+        Request_Status
+        Asset_Category
+    )
+    sort by
+    (
+        Request_Date descending
+    )
+}

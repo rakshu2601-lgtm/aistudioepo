@@ -1,0 +1,39 @@
+Approve_Asset_Request as "Approve Asset Request"
+{
+    type = functions
+    form = Asset_Requests
+    execution type = for each record
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                if (input.Manager_Email != zoho.loginuser || input.Request_Status != "Pending Manager Approval")
+                {
+                    info "You are not authorized to approve this request.";
+                }
+                else
+                {
+                    input.Request_Status = "Approved";
+                    input.Approved_Date = zoho.currenttime;
+                    recipients = "";
+                    settingsRecord = Alert_Settings[Setting_Name == "Low Stock Notifications" && Notifications_Enabled == true];
+                    if (settingsRecord.count() > 0)
+                    {
+                        recipients = settingsRecord.CC_Recipients;
+                    }
+                    sendmail
+                    (
+                        from : zoho.adminuserid
+                        to : input.Requested_By_Email
+                        cc : recipients
+                        subject : "Asset request approved"
+                        message : "Your asset request #" + input.Request_Number + " has been approved and is ready for inventory fulfilment."
+                    )
+                }
+            )
+        }
+    }
+}

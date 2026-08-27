@@ -1,0 +1,26 @@
+list Returned_Assets
+{
+    displayName = "Returned Assets"
+    show all rows from Asset_Assignments [Status == "Returned"]
+    (
+        Assignment_Number
+        Asset
+        Employee
+        Quantity
+        Assigned_Date
+        Returned_Date
+        Condition_On_Return
+        Serial_Number
+    )
+    filters
+    (
+        Asset
+        Employee
+        Returned_Date
+        Condition_On_Return
+    )
+    sort by
+    (
+        Returned_Date descending
+    )
+}

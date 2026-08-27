@@ -1,0 +1,46 @@
+list Manager_Approval_Queue
+{
+    displayName = "Manager Approval Queue"
+    show all rows from Asset_Requests [Manager_Email == zoho.loginuser && Request_Status == "Pending Manager Approval"]
+    (
+        Request_Number
+        Requested_By_Email
+        Manager_Email
+        Asset_Category
+        Needed_By
+        Business_Justification
+        Request_Status
+        custom action "Approve Request"
+        (
+            workflow = Approve_Asset_Request
+            show action for each record = true
+            column header = "Approve Request"
+            success message = "Request approved"
+            condition = (Request_Status == "Pending Manager Approval")
+            confirmation before execution
+            (
+                message for individual record = "Approve this asset request?"
+                confirm button text = "Approve"
+                cancel button text = "Cancel"
+            )
+        )
+        custom action "Reject Request"
+        (
+            workflow = Reject_Asset_Request
+            show action for each record = true
+            column header = "Reject Request"
+            success message = "Request rejected"
+            condition = (Request_Status == "Pending Manager Approval")
+            confirmation before execution
+            (
+                message for individual record = "Reject this asset request?"
+                confirm button text = "Reject"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    sort by
+    (
+        Needed_By ascending
+    )
+}

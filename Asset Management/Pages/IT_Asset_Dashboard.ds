@@ -1,0 +1,97 @@
+<page linkname = "IT_Asset_Dashboard" parameters = "string CategoryFilter, string StockFilter" displayname = "IT Asset Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='ITAssetHeader' elementName='IT Asset Header'>
+          <![CDATA[htmlpage ITAssetHeader()
+content
+<%{%>
+  <file name:IT_Asset_Dashboard/Dashboard.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+    <row>
+      <column width='100%'>
+        <dsp id='ITAssetKPIs' elementName='IT Asset KPIs'>
+          <![CDATA[htmlpage ITAssetKPIs()
+content
+<%{%>
+  <file name:IT_Asset_Dashboard/KPIs.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+    <row>
+      <column width='66%'>
+        <dsp id='CategoryStockHealth' elementName='Category Stock Health'>
+          <![CDATA[htmlpage CategoryStockHealth()
+content
+<%{%>
+  <file name:IT_Asset_Dashboard/CategoryStockHealth.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+      <column width='34%'>
+        <dsp id='AssetStatusDistribution' elementName='Asset Status Distribution'>
+          <![CDATA[htmlpage AssetStatusDistribution()
+content
+<%{%>
+  <file name:IT_Asset_Dashboard/AssetStatusDistribution.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+    <row>
+      <column width='50%'>
+        <dsp id='RecentStockMovements' elementName='Recent Stock Movements'>
+          <![CDATA[htmlpage RecentStockMovements()
+content
+<%{%>
+  <file name:IT_Asset_Dashboard/RecentStockMovements.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+      <column width='50%'>
+        <dsp id='LowStockAlerts' elementName='Low Stock Alerts'>
+          <![CDATA[htmlpage LowStockAlerts()
+content
+<%{%>
+  <file name:IT_Asset_Dashboard/LowStockAlerts.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+    <row>
+      <column width='50%'>
+        <dsp id='RequestWorkload' elementName='Request Workload'>
+          <![CDATA[htmlpage RequestWorkload()
+content
+<%{%>
+  <file name:IT_Asset_Dashboard/RequestWorkload.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+      <column width='50%'>
+        <dsp id='ComplaintWorkload' elementName='Complaint Workload'>
+          <![CDATA[htmlpage ComplaintWorkload()
+content
+<%{%>
+  <file name:IT_Asset_Dashboard/ComplaintWorkload.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

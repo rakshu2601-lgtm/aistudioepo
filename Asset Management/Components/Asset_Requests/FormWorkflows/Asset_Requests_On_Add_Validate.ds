@@ -1,0 +1,31 @@
+Asset_Requests_On_Add_Validate as "Validate New Asset Request"
+{
+    type = form
+    form = Asset_Requests
+    record event = on add
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if (input.Requested_By_Email != zoho.loginuser)
+                {
+                    alert "You can only submit an asset request for your own login.";
+                    cancel submit;
+                }
+                if (input.Request_Status != "Pending Manager Approval")
+                {
+                    alert "New requests must start in Pending Manager Approval status.";
+                    cancel submit;
+                }
+                if (input.Manager_Email == input.Requested_By_Email)
+                {
+                    alert "Manager email must be different from the requester email.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,161 @@
+form Asset_Assignments
+{
+    title
+    {
+        displayname = "Asset Assignments"
+        on add = "Assign Asset"
+        on edit = "Update Asset Assignment"
+    }
+    success message = "Asset assignment saved successfully"
+    Assignment_Details
+    (
+        type = section
+        displayname = "Assignment Details"
+        row = 1
+        column = 0
+    )
+    Assignment_Number
+    (
+        type = autonumber
+        displayname = "Assignment Number"
+        start index = 1001
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Asset
+    (
+        type = picklist
+        values = Assets.ID
+        displayformat = [Asset_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Employee
+    (
+        type = picklist
+        values = Employees.ID
+        displayformat = [Employee_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Quantity
+    (
+        type = number
+        initial value = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Assigned_Date
+    (
+        type = date
+        displayname = "Assigned Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Expected_Return_Date
+    (
+        type = date
+        displayname = "Expected Return Date"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Status
+    (
+        type = picklist
+        values = {"Assigned", "Returned", "Lost"}
+        initial value = "Assigned"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Serial_Number
+    (
+        type = text
+        displayname = "Serial Number"
+        maxchar = 150
+        row = 1
+        column = 1
+        width = medium
+    )
+    Returned_Date
+    (
+        type = date
+        displayname = "Returned Date"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Condition_On_Return
+    (
+        type = picklist
+        displayname = "Condition on Return"
+        values = {"Good", "Damaged", "Unusable"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    Notes
+    (
+        type = textarea
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Stock_Deducted
+    (
+        type = checkbox
+        displayname = "Stock Deducted"
+        initial value = false
+        row = 1
+        column = 1
+        width = medium
+    )
+    Stock_Restored
+    (
+        type = checkbox
+        displayname = "Stock Restored"
+        initial value = false
+        row = 1
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Assign Asset"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Assignment"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

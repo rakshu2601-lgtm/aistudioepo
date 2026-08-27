@@ -1,0 +1,89 @@
+menu
+{
+    unused
+    {
+        page IT_Asset_Dashboard { icon = "business-chart" }
+        form Asset_Requests { icon = "business-handout" }
+        form Asset_Complaints { icon = "objects-support-16" }
+        report My_Asset_Requests { icon = "business-notes" }
+        report All_Asset_Requests { icon = "business-handout" }
+        report Manager_Approval_Queue { icon = "business-agenda" }
+        report Approved_Requests { icon = "business-badge" }
+        report My_Asset_Complaints { icon = "objects-support-17" }
+        report All_Asset_Complaints { icon = "business-notes" }
+        report Open_Asset_Complaints { icon = "objects-cone" }
+        report Available_Assets { icon = "tech-laptop" }
+        report My_Assigned_Assets { icon = "business-chart-growth" }
+        report Recent_Stock_Activity { icon = "business-progress" }
+    }
+    space Asset_Management
+    {
+        displayname = "Asset Management"
+        icon = "tech-computer"
+        section Dashboard_Section
+        {
+            displayname = "Dashboard"
+            icon = "business-chart"
+            page Asset_Dashboard { icon = "business-chart-bar-33" }
+        }
+        section Inventory_Section
+        {
+            displayname = "Inventory"
+            icon = "business-stock"
+            form Assets { icon = "tech-computer-monitor" }
+            report All_Assets { icon = "tech-desktop" }
+            report Low_Stock_Assets { icon = "business-percentage-38" }
+            form Asset_Categories { icon = "objects-puzzle-09" }
+            report All_Asset_Categories { icon = "objects-puzzle-10" }
+        }
+        section Operations_Section
+        {
+            displayname = "Operations"
+            icon = "business-progress"
+            form Stock_Transactions { icon = "tech-sync" }
+            report All_Stock_Transactions { icon = "business-notes" }
+            report Stock_Receipts { icon = "business-handout" }
+            form Asset_Assignments { icon = "users-single-body" }
+            report All_Asset_Assignments { icon = "business-agenda" }
+            report Currently_Assigned_Assets { icon = "tech-laptop" }
+            report Returned_Assets { icon = "business-badge" }
+        }
+        section People_Suppliers_Section
+        {
+            displayname = "People & Suppliers"
+            icon = "users-multiple-19"
+            form Employees { icon = "users-single-body" }
+            report All_Employees { icon = "users-multiple-11" }
+            form Vendors { icon = "business-briefcase-24" }
+            report All_Vendors { icon = "business-building" }
+        }
+        section Administration_Section
+        {
+            displayname = "Administration"
+            icon = "objects-key-25"
+            form Alert_Settings { icon = "business-goal-65" }
+            report Alert_Configuration { icon = "business-goal-64" }
+        }
+        section Audit_Section
+        {
+            displayname = "Audit"
+            icon = "files-single-copy-04"
+            form Inventory_Audit { icon = "files-single-copy-04" }
+            report Inventory_Audit_Log { icon = "files-archive-3d-content" }
+        }
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space,section,component}
+        }
+    }
+}

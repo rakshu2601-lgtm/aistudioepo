@@ -1,0 +1,30 @@
+Status_On_User_Input as "Update Return Fields"
+{
+    type = form
+    form = Asset_Assignments
+    record event = on add or edit
+
+    on user input of Status
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if (input.Status == "Returned")
+                {
+                    show Returned_Date;
+                    show Condition_On_Return;
+                    enable Returned_Date;
+                    enable Condition_On_Return;
+                }
+                else
+                {
+                    hide Returned_Date;
+                    hide Condition_On_Return;
+                    input.Returned_Date = null;
+                    input.Condition_On_Return = "";
+                }
+            )
+        }
+    }
+}

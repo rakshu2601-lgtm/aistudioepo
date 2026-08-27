@@ -1,0 +1,171 @@
+form Asset_Requests
+{
+    title
+    {
+        displayname = "Asset Requests"
+        on add = "Request an Asset"
+        on edit = "Edit Asset Request"
+    }
+    success message = "Asset request submitted successfully"
+    Request_Details
+    (
+        type = section
+        displayname = "Request Details"
+        row = 1
+        column = 0
+    )
+    Request_Number
+    (
+        type = autonumber
+        displayname = "Request Number"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Requested_By_Email
+    (
+        type = email
+        displayname = "Requested By Email"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Manager_Email
+    (
+        type = email
+        displayname = "Manager Email"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Asset_Category
+    (
+        type = picklist
+        displayname = "Asset Category"
+        values = Asset_Categories[Active == true].ID
+        displayformat = [Category_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Business_Justification
+    (
+        type = textarea
+        displayname = "Business Justification"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Needed_By
+    (
+        type = date
+        displayname = "Needed By"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Request_Date
+    (
+        type = date
+        displayname = "Request Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Processing
+    (
+        type = section
+        displayname = "Processing"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Request_Status
+    (
+        type = picklist
+        displayname = "Request Status"
+        values = {"Pending Manager Approval", "Approved", "Rejected", "Fulfilled", "Cancelled"}
+        initial value = "Pending Manager Approval"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Manager_Comments
+    (
+        type = textarea
+        displayname = "Manager Comments"
+        height = 100px
+        row = 2
+        column = 2
+        width = medium
+    )
+    Approved_Date
+    (
+        type = datetime
+        displayname = "Approved Date"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Fulfilled_Asset
+    (
+        type = picklist
+        displayname = "Fulfilled Asset"
+        values = Assets.ID
+        displayformat = [Asset_Code + " - " + Asset_Name]
+        searchable = true
+        row = 2
+        column = 2
+        width = medium
+    )
+    Fulfilled_Date
+    (
+        type = datetime
+        displayname = "Fulfilled Date"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Inventory_Notes
+    (
+        type = textarea
+        displayname = "Inventory Notes"
+        height = 100px
+        row = 2
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit Request"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Request"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

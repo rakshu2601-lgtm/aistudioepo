@@ -1,0 +1,38 @@
+Asset_Assignments_On_Load as "Prepare Asset Assignment Form"
+{
+    type = form
+    form = Asset_Assignments
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                hide Stock_Deducted;
+                hide Stock_Restored;
+                disable Stock_Deducted;
+                disable Stock_Restored;
+                if (input.Status == "Returned")
+                {
+                    show Returned_Date;
+                    show Condition_On_Return;
+                }
+                else
+                {
+                    hide Returned_Date;
+                    hide Condition_On_Return;
+                }
+                if (input.Stock_Deducted == true)
+                {
+                    disable Asset;
+                    disable Employee;
+                    disable Quantity;
+                    disable Assigned_Date;
+                    disable Serial_Number;
+                }
+            )
+        }
+    }
+}
