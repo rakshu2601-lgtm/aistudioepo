@@ -1,0 +1,19 @@
+<page linkname = "FOH_Manager_Dashboard" displayname = "FOH Manager Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='FOH_Manager_Dashboard_Snippet' elementName='FOH Manager Dashboard'>
+          <![CDATA[htmlpage FOH_Manager_Dashboard_Snippet()
+content
+<%{%>
+<file name:FOH_Manager_Dashboard.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

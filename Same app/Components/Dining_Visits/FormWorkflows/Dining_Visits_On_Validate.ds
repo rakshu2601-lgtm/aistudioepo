@@ -1,0 +1,7 @@
+Dining_Visits_On_Validate as "Validate Dining Visit"
+{
+ type = form
+ form = Dining_Visits
+ record event = on add or edit
+ on validate { actions { custom deluge script ( if(ifnull(input.Party_Size,0) <= 0) { alert "Party size must be greater than zero."; cancel submit; } tableRec = Dining_Tables[ID == input.Dining_Table]; if(tableRec.Active != true || tableRec.Capacity < input.Party_Size) { alert "Dining table is inactive or too small."; cancel submit; } if(Dining_Visits[ID != input.ID && Dining_Table == input.Dining_Table && Visit_Status != "Closed" && Visit_Status != "Abandoned"].count() > 0) { alert "This table already has an active dining visit."; cancel submit; } if((input.Visit_Status == "Paid" || input.Visit_Status == "Closed") && ifnull(input.POS_Check_ID,"").trim() == "" && input.POS_Sync_Status != "Manual") { alert "Enter the POS check ID or mark the sync status as Manual before closing."; cancel submit; } ) } }
+}

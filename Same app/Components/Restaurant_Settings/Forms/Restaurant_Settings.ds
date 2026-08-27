@@ -1,0 +1,193 @@
+form Restaurant_Settings
+{
+    title
+    {
+        displayname = "Restaurant Settings"
+        on add = "Configure Restaurant"
+        on edit = "Update Restaurant Settings"
+    }
+    success message = "Restaurant settings saved successfully."
+    Settings_Section
+    (
+        type = section
+        displayname = "Venue Configuration"
+        row = 1
+        column = 0
+    )
+    must have Restaurant_Name
+    (
+        type = text
+        displayname = "Restaurant Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have unique Venue_Code
+    (
+        type = text
+        displayname = "Venue Code"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Contact_Email
+    (
+        type = email
+        displayname = "Contact Email"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Contact_Phone
+    (
+        type = phonenumber
+        displayname = "Contact Phone"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Venue_Address
+    (
+        type = address
+        displayname = "Venue Address"
+        capture_coordinates = true
+        adjust_using_map = true
+        address_line_1
+        (
+            type = address_line_1
+            displayname = "Street Address"
+        )
+        address_line_2
+        (
+            type = address_line_2
+            displayname = "Address Line 2"
+        )
+        district_city
+        (
+            type = district_city
+            displayname = "City"
+        )
+        state_province
+        (
+            type = state_province
+            displayname = "State / Province"
+        )
+        postal_Code
+        (
+            type = postal_Code
+            displayname = "Postal Code"
+        )
+        country
+        (
+            type = country
+            displayname = "Country"
+        )
+        latitude
+        (
+            type = latitude
+            displayname = "Latitude"
+            visibility = false
+        )
+        longitude
+        (
+            type = longitude
+            displayname = "Longitude"
+            visibility = false
+        )
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Time_Zone
+    (
+        type = picklist
+        displayname = "Time Zone"
+        values = {"Asia/Kolkata","Asia/Dubai","Europe/London","America/New_York","America/Chicago","America/Los_Angeles","Other"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Currency_Code
+    (
+        type = picklist
+        displayname = "Currency Code"
+        values = {"INR","USD","GBP","EUR","AED"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Default_Reservation_Duration_Minutes
+    (
+        type = number
+        displayname = "Default Reservation Duration (Minutes)"
+        initial value = 90
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Table_Turn_Buffer_Minutes
+    (
+        type = number
+        displayname = "Table Turn Buffer (Minutes)"
+        initial value = 15
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Arrival_Grace_Period_Minutes
+    (
+        type = number
+        displayname = "Arrival Grace Period (Minutes)"
+        initial value = 15
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Default_Wait_Quote_Minutes
+    (
+        type = number
+        displayname = "Default Wait Quote (Minutes)"
+        initial value = 20
+        row = 1
+        column = 2
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Settings"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Settings"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

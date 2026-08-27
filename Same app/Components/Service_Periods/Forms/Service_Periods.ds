@@ -1,0 +1,131 @@
+form Service_Periods
+{
+    title
+    {
+        displayname = "Service Periods"
+        on add = "Add Service Period"
+        on edit = "Edit Service Period"
+    }
+    success message = "Service period saved successfully."
+    Service_Details
+    (
+        type = section
+        displayname = "Service Details"
+        row = 1
+        column = 0
+    )
+    must have Service_Name
+    (
+        type = text
+        displayname = "Service Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have unique Service_Code
+    (
+        type = text
+        displayname = "Service Code"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Days_Of_Week
+    (
+        type = checkboxes
+        displayname = "Days of Week"
+        values = {"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"}
+        layout = 2
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Start_Time
+    (
+        type = time
+        displayname = "Start Time"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have End_Time
+    (
+        type = time
+        displayname = "End Time"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Last_Seating_Time
+    (
+        type = time
+        displayname = "Last Seating Time"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Booking_Interval_Minutes
+    (
+        type = number
+        displayname = "Booking Interval (Minutes)"
+        initial value = 15
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Default_Duration_Minutes
+    (
+        type = number
+        displayname = "Default Duration (Minutes)"
+        initial value = 90
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Maximum_Covers
+    (
+        type = number
+        displayname = "Maximum Covers"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Service"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Service"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

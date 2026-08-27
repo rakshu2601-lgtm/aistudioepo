@@ -1,0 +1,28 @@
+default list All_Dining_Tables
+{
+    displayName = "All Dining Tables"
+    show all rows from Dining_Tables
+    (
+        Table_Number
+        Dining_Area
+        Capacity
+        Table_Type
+        Combination_Group
+        Combinable
+        POS_Table_ID
+        Operational_Status
+        Block_Reason
+        Active
+    )
+    filters
+    (
+        Dining_Area
+        Table_Type
+        Operational_Status
+        Active
+    )
+    sort by
+    (
+        Table_Number ascending
+    )
+}

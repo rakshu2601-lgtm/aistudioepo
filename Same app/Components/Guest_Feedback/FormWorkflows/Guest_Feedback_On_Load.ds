@@ -1,0 +1,7 @@
+Guest_Feedback_On_Load as "Prepare Guest Feedback"
+{
+ type = form
+ form = Guest_Feedback
+ record event = on add or edit
+ on load { actions { custom deluge script ( if(input.Follow_Up_Required != true) { hide Recovery_Action; hide Manager_Notes; } else { show Recovery_Action; show Manager_Notes; } ) } }
+}

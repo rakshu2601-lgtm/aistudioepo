@@ -1,0 +1,14 @@
+forms
+{
+    form Restaurant_Settings { label placement = left }
+    form Dining_Areas { label placement = left }
+    form Dining_Tables { label placement = left }
+    form Guests { label placement = left }
+    form Service_Periods { label placement = left }
+    form Reservations { label placement = left }
+    form Waitlist_Entries { label placement = left }
+    form Dining_Visits { label placement = left }
+    form Guest_Feedback { label placement = left }
+    form POS_Sync_Log { label placement = left }
+    form Audit_Log { label placement = left }
+}

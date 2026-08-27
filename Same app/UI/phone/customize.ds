@@ -1,0 +1,14 @@
+customize
+{
+    layout = bottombar
+    font = "lato"
+    style = "3"
+    color options
+    {
+        name = "Warm Dining"
+        brand color = "#A4492D"
+        type = "custom"
+        dark mode color = "#D9825B"
+    }
+    logo { preference = "app_icon" }
+}

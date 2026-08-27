@@ -1,0 +1,7 @@
+Waitlist_Entries_On_Validate as "Validate Waitlist Entry"
+{
+ type = form
+ form = Waitlist_Entries
+ record event = on add or edit
+ on validate { actions { custom deluge script ( if(ifnull(input.Party_Size,0) <= 0 || ifnull(input.Quoted_Wait_Minutes,0) <= 0) { alert "Party size and quoted wait must be greater than zero."; cancel submit; } if(Waitlist_Entries[ID != input.ID && Guest == input.Guest && (Waitlist_Status == "Waiting" || Waitlist_Status == "Notified" || Waitlist_Status == "Arrived")].count() > 0) { alert "This guest already has an active waitlist entry."; cancel submit; } if(input.Waitlist_Status == "Seated") { if(input.Assigned_Table == null) { alert "Assign a table before seating the party."; cancel submit; } tableRec = Dining_Tables[ID == input.Assigned_Table]; if(tableRec.Active != true || tableRec.Capacity < input.Party_Size || tableRec.Operational_Status != "Available") { alert "The assigned table is unavailable or too small."; cancel submit; } } if((input.Waitlist_Status == "Removed" || input.Waitlist_Status == "Expired") && ifnull(input.Removal_Reason,"").trim() == "") { alert "Removal reason is required."; cancel submit; } ) } }
+}

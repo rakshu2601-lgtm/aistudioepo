@@ -1,0 +1,7 @@
+POS_Sync_Log_On_Load as "Protect POS Sync Data"
+{
+ type = form
+ form = POS_Sync_Log
+ record event = on add or edit
+ on load { actions { custom deluge script ( disable Entity_Type; disable Local_Record_ID; disable External_Record_ID; disable Operation; disable Direction; disable Attempt_Count; disable Last_Attempt_Date_Time; disable Request_Payload; disable Response_Payload; disable Correlation_ID; ) } }
+}

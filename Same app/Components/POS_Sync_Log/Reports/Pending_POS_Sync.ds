@@ -1,0 +1,7 @@
+list Pending_POS_Sync
+{
+ displayName = "Pending POS Sync"
+ show all rows from POS_Sync_Log [Sync_Status == "Pending" || Sync_Status == "Processing"] ( Sync_Number Entity_Type Local_Record_ID External_Record_ID Operation Direction Sync_Status Attempt_Count Last_Attempt_Date_Time Next_Retry_Date_Time Correlation_ID )
+ filters ( Entity_Type Operation Direction Sync_Status )
+ sort by ( Sync_Number ascending )
+}

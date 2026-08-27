@@ -1,0 +1,5 @@
+report All_Dining_Tables
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Table_Number Dining_Area Capacity Table_Type Operational_Status Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Table_Number Dining_Area Capacity Table_Type Combination_Group Combinable POS_Table_ID Operational_Status Block_Reason Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

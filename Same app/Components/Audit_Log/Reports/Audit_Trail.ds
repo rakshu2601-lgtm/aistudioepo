@@ -1,0 +1,7 @@
+default list Audit_Trail
+{
+ displayName = "Audit Trail"
+ show all rows from Audit_Log ( Audit_Number Event_Date_Time Actor_Email Action_Type Entity_Type Entity_Record_ID Entity_Reference Change_Summary Before_Value After_Value Source )
+ filters ( Action_Type Entity_Type Source Actor_Email )
+ sort by ( Event_Date_Time descending )
+}

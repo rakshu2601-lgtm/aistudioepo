@@ -1,0 +1,19 @@
+<page linkname = "Host_Operations" displayname = "Host Operations"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Host_Operations_Snippet' elementName='Host_Operations_Snippet'>
+          <![CDATA[htmlpage Host_Operations_Snippet()
+            content
+            <%{%>
+              <file name:Host_Operations.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

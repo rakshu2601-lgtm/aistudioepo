@@ -1,0 +1,7 @@
+Audit_Log_On_Validate as "Validate Audit Event"
+{
+ type = form
+ form = Audit_Log
+ record event = on add or edit
+ on validate { actions { custom deluge script ( if(ifnull(input.Entity_Type,"").trim() == "" || ifnull(input.Change_Summary,"").trim() == "" || ifnull(input.Action_Type,"").trim() == "") { alert "Audit entity, action, and change summary are required."; cancel submit; } ) } }
+}

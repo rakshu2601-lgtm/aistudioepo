@@ -1,0 +1,24 @@
+"FOH_Manager"
+{
+    name = "FOH_Manager"
+    type = Users_Permissions
+    permissions = {Chat:true,Predefined:false,ApiAccess:false,PIIAccess:true,ePHIAccess:false}
+    description = "Front-of-house manager with operational, configuration, exception, feedback, POS staging, and audit oversight."
+    ModulePermissions
+    {
+        Restaurant_Settings { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search,Export allFieldsVisible = true ReportPermissions { Restaurant_Settings_Report={"View","Edit","Delete"} } }
+        Dining_Areas { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search,Export allFieldsVisible = true ReportPermissions { All_Dining_Areas={"View","Edit","Delete"} Active_Dining_Areas={"View","Edit","Delete"} } }
+        Dining_Tables { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search,Export allFieldsVisible = true ReportPermissions { All_Dining_Tables={"View","Edit","Delete"} Live_Table_Status={"View","Edit"} Available_Tables={"View","Edit"} } }
+        Guests { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search,Export allFieldsVisible = true ReportPermissions { All_Guests={"View","Edit","Delete"} VIP_Guests={"View","Edit"} Guests_With_Allergies={"View","Edit"} } }
+        Service_Periods { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search,Export allFieldsVisible = true ReportPermissions { All_Service_Periods={"View","Edit","Delete"} Active_Service_Periods={"View","Edit"} } }
+        Reservations { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search,Export allFieldsVisible = true ReportPermissions { All_Reservations={"View","Edit","Delete"} Reservation_Calendar={"View","Edit"} Reservation_Status_Board={"View","Edit"} Todays_Reservations={"View","Edit"} Arrival_Exceptions={"View","Edit"} } }
+        Waitlist_Entries { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search,Export allFieldsVisible = true ReportPermissions { All_Waitlist_Entries={"View","Edit","Delete"} Live_Waitlist={"View","Edit"} Active_Waitlist={"View","Edit"} } }
+        Dining_Visits { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search,Export allFieldsVisible = true ReportPermissions { All_Dining_Visits={"View","Edit","Delete"} Live_Dining_Room={"View","Edit"} Completed_Visits={"View"} POS_Check_Exceptions={"View","Edit"} } }
+        Guest_Feedback { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search,Export allFieldsVisible = true ReportPermissions { All_Guest_Feedback={"View","Edit","Delete"} Low_Rating_Feedback={"View","Edit"} Feedback_Follow_Up={"View","Edit"} } }
+        POS_Sync_Log { enabled = Viewall,Modifyall,Tab,View,Edit,Search,Export allFieldsVisible = true ReportPermissions { All_POS_Sync_Logs={"View","Edit"} Pending_POS_Sync={"View","Edit"} Failed_POS_Sync={"View","Edit"} POS_Sync_Status_Board={"View","Edit"} } }
+        Audit_Log { enabled = Viewall,Tab,View,Search,Export allFieldsVisible = true ReportPermissions { Audit_Trail={"View"} Operational_Exceptions={"View"} } }
+        Host_Operations { enabled = tab }
+        Live_Floor_Board { enabled = tab }
+        FOH_Manager_Dashboard { enabled = tab }
+    }
+}

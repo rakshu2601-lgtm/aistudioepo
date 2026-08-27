@@ -1,0 +1,53 @@
+menu
+{
+    unused
+    {
+        form Restaurant_Settings { icon = "food-store" } form Dining_Areas { icon = "location-map" } form Service_Periods { icon = "business-agenda" } form POS_Sync_Log { icon = "shopping-pos" } form Audit_Log { icon = "business-safe" }
+        report Restaurant_Settings_Report { icon = "business-notes" } report All_Dining_Areas { icon = "business-notes" } report Active_Dining_Areas { icon = "location-position-marker" } report All_Dining_Tables { icon = "business-notes" } report All_Guests { icon = "users-contacts" } report VIP_Guests { icon = "business-award-48" } report Guests_With_Allergies { icon = "food-chili" } report All_Service_Periods { icon = "business-notes" } report Active_Service_Periods { icon = "business-progress" } report All_Reservations { icon = "business-notes" } report Reservation_Status_Board { icon = "business-board-30" } report Arrival_Exceptions { icon = "location-route-alert" } report All_Waitlist_Entries { icon = "business-notes" } report All_Dining_Visits { icon = "business-notes" } report Completed_Visits { icon = "business-badge" } report All_Guest_Feedback { icon = "business-notes" } report Feedback_Follow_Up { icon = "business-progress" } report All_POS_Sync_Logs { icon = "business-notes" } report Pending_POS_Sync { icon = "business-progress" } report Failed_POS_Sync { icon = "location-route-alert" } report POS_Sync_Status_Board { icon = "business-board-30" } report Audit_Trail { icon = "business-notes" } report Operational_Exceptions { icon = "location-route-alert" }
+        page FOH_Manager_Dashboard { icon = "business-chart-bar-33" }
+    }
+    space Restaurant_Operations
+    {
+        displayname = "Restaurant Dining"
+        icon = "food-cutlery-75"
+        section Host_Stand
+        {
+            displayname = "Host Stand"
+            icon = "location-appointment"
+            page Host_Operations { icon = "food-plate" }
+            form Reservations { icon = "location-appointment" }
+            report Todays_Reservations { icon = "business-agenda" }
+            report Reservation_Calendar { icon = "location-appointment" }
+            form Waitlist_Entries { icon = "users-multiple-19" }
+            report Active_Waitlist { icon = "users-network" }
+            report Live_Waitlist { icon = "business-progress" }
+        }
+        section Floor
+        {
+            displayname = "Floor"
+            icon = "furniture-table"
+            page Live_Floor_Board { icon = "furniture-table" }
+            form Dining_Tables { icon = "furniture-chair" }
+            report Live_Table_Status { icon = "business-board-30" }
+            report Available_Tables { icon = "furniture-table" }
+            form Dining_Visits { icon = "food-course" }
+            report Live_Dining_Room { icon = "food-cutlery-77" }
+            report POS_Check_Exceptions { icon = "shopping-receipt-list-43" }
+        }
+        section Guests_Section
+        {
+            displayname = "Guests"
+            icon = "users-contacts"
+            form Guests { icon = "users-add-27" }
+            form Guest_Feedback { icon = "users-badge-15" }
+            report Low_Rating_Feedback { icon = "business-businessman-03" }
+        }
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+    preference { icon { style = outline show = {space,section,component} } }
+}

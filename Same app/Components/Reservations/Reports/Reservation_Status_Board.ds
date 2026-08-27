@@ -1,0 +1,8 @@
+kanban Reservation_Status_Board
+{
+ displayName = "Reservation Status Board"
+ show all rows from Reservations ( Reservation_Number Guest Reservation_Date_Time Service_Period Party_Size Assigned_Table Reservation_Status )
+ filters ( Service_Period Assigned_Table Reservation_Status )
+ sort by ( Reservation_Date_Time ascending )
+ options ( display field = Reservation_Status filter type = manual sort order = custom record count = enable )
+}

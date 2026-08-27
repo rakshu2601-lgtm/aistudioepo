@@ -1,0 +1,26 @@
+list Active_Service_Periods
+{
+    displayName = "Active Service Periods"
+    show all rows from Service_Periods [Active == true]
+    (
+        Service_Name
+        Service_Code
+        Days_Of_Week
+        Start_Time
+        End_Time
+        Last_Seating_Time
+        Booking_Interval_Minutes
+        Default_Duration_Minutes
+        Maximum_Covers
+        Active
+    )
+    filters
+    (
+        Days_Of_Week
+    )
+    sort by
+    (
+        Start_Time ascending
+        Service_Name ascending
+    )
+}

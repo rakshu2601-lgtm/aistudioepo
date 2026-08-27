@@ -1,0 +1,28 @@
+Dining_Tables_On_Success as "Audit Dining Table Changes"
+{
+    type = form
+    form = Dining_Tables
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                insert into Audit_Log
+                [
+                    Event_Date_Time=zoho.currenttime
+                    Actor_Email=zoho.loginuser
+                    Action_Type="Status Change"
+                    Entity_Type="Dining Table"
+                    Entity_Record_ID=input.ID
+                    Entity_Reference=input.Table_Number
+                    Change_Summary="Dining table saved with operational status " + input.Operational_Status
+                    After_Value=input.Operational_Status
+                    Source="Form"
+                ];
+            )
+        }
+    }
+}

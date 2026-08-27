@@ -1,0 +1,7 @@
+Waitlist_Party_Size_On_User_Input as "Suggest Wait Quote"
+{
+ type = form
+ form = Waitlist_Entries
+ record event = on add or edit
+ on user input of Party_Size { actions { custom deluge script ( settings = Restaurant_Settings[Active == true]; if(settings.count() > 0 && ifnull(input.Quoted_Wait_Minutes,0) <= 0) { input.Quoted_Wait_Minutes = settings.Default_Wait_Quote_Minutes; } if(ifnull(input.Party_Size,0) > 0 && Dining_Tables[Active == true && Capacity >= input.Party_Size].count() == 0) { alert "No active table can fit this party size."; } ) } }
+}

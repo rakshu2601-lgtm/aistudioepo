@@ -1,0 +1,135 @@
+form Dining_Tables
+{
+    title
+    {
+        displayname = "Dining Tables"
+        on add = "Add Dining Table"
+        on edit = "Edit Dining Table"
+    }
+    success message = "Dining table saved successfully."
+    Table_Details
+    (
+        type = section
+        displayname = "Table Details"
+        row = 1
+        column = 0
+    )
+    must have unique Table_Number
+    (
+        type = text
+        displayname = "Table Number"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Dining_Area
+    (
+        type = picklist
+        displayname = "Dining Area"
+        values = Dining_Areas[Active == true].ID
+        displayformat = [Area_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Capacity
+    (
+        type = number
+        displayname = "Capacity"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Table_Type
+    (
+        type = picklist
+        displayname = "Table Type"
+        values = {"Standard","Booth","High Top","Counter","Communal","Outdoor","Accessible"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    Combination_Group
+    (
+        type = text
+        displayname = "Combination Group"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Combinable
+    (
+        type = checkbox
+        displayname = "Combinable"
+        initial value = false
+        row = 1
+        column = 2
+        width = medium
+    )
+    POS_Table_ID
+    (
+        type = text
+        displayname = "POS Table ID"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Operational_Status
+    (
+        type = picklist
+        displayname = "Operational Status"
+        values = {"Available","Reserved","Occupied","Needs Reset","Blocked","Out of Service"}
+        initial value = "Available"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Block_Reason
+    (
+        type = textarea
+        displayname = "Block Reason"
+        height = 80px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Table"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Table"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

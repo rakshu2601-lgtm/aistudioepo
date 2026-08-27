@@ -1,0 +1,21 @@
+form POS_Sync_Log
+{
+ title { displayname = "POS Sync Log" on add = "Add POS Sync Entry" on edit = "Update POS Sync Entry" }
+ success message = "POS staging entry saved."
+ Sync_Details ( type = section displayname = "Sync Details" row = 1 column = 0 )
+ Sync_Number ( type = autonumber displayname = "Sync Number" start index = 13001 row = 1 column = 1 )
+ must have Entity_Type ( type = picklist displayname = "Entity Type" values = {"Reservation","Table","Dining Visit","Guest"} row = 1 column = 1 width = medium )
+ must have Local_Record_ID ( type = number displayname = "Local Record ID" row = 1 column = 2 width = medium )
+ External_Record_ID ( type = text displayname = "External Record ID" row = 1 column = 1 width = medium )
+ must have Operation ( type = picklist displayname = "Operation" values = {"Create","Update","Status Sync","Lookup"} row = 1 column = 2 width = medium )
+ must have Direction ( type = picklist displayname = "Direction" values = {"Outbound","Inbound","Bidirectional"} row = 1 column = 1 width = medium )
+ must have Sync_Status ( type = picklist displayname = "Sync Status" values = {"Pending","Processing","Synced","Failed","Ignored"} initial value = "Pending" row = 1 column = 2 width = medium )
+ Attempt_Count ( type = number displayname = "Attempt Count" initial value = 0 row = 1 column = 1 width = medium )
+ Last_Attempt_Date_Time ( type = datetime displayname = "Last Attempt" row = 1 column = 2 width = medium )
+ Next_Retry_Date_Time ( type = datetime displayname = "Next Retry" row = 1 column = 1 width = medium )
+ Request_Payload ( type = textarea displayname = "Request Payload" height = 100px row = 1 column = 2 width = medium )
+ Response_Payload ( type = textarea displayname = "Response Payload" height = 100px row = 1 column = 1 width = medium )
+ Error_Message ( type = textarea displayname = "Error Message" height = 80px row = 1 column = 2 width = medium )
+ Correlation_ID ( type = text displayname = "Correlation ID" row = 1 column = 1 width = medium )
+ actions { on add { Submit ( type = submit displayname = "Save Staging Entry" ) Reset ( type = reset displayname = "Reset" ) } on edit { Update ( type = submit displayname = "Update Staging Entry" ) Cancel ( type = cancel displayname = "Cancel" ) } }
+}

@@ -1,0 +1,14 @@
+customize
+{
+    layout { theme = "theme_2" variant = "variant_2" }
+    font = "lato"
+    color options
+    {
+        name = "Warm Dining"
+        brand color = "#A4492D"
+        type = "custom"
+        dark mode color = "#D9825B"
+    }
+    logo { preference = "app_icon" placement = "left" }
+    custom css { content = ".zc-app-header{box-shadow:none}.zc-form-container,.zc-report-container{max-width:1440px}" }
+}

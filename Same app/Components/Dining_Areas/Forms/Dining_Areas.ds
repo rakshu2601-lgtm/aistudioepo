@@ -1,0 +1,98 @@
+form Dining_Areas
+{
+    title
+    {
+        displayname = "Dining Areas"
+        on add = "Add Dining Area"
+        on edit = "Edit Dining Area"
+    }
+    success message = "Dining area saved successfully."
+    Area_Details
+    (
+        type = section
+        displayname = "Area Details"
+        row = 1
+        column = 0
+    )
+    must have unique Area_Code
+    (
+        type = text
+        displayname = "Area Code"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have unique Area_Name
+    (
+        type = text
+        displayname = "Area Name"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Description
+    (
+        type = textarea
+        displayname = "Description"
+        height = 80px
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Display_Order
+    (
+        type = number
+        displayname = "Display Order"
+        initial value = 1
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Area_Type
+    (
+        type = picklist
+        displayname = "Area Type"
+        values = {"Main Dining","Patio","Bar","Private Room","Counter","Other"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Area"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Area"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

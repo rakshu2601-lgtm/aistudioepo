@@ -1,0 +1,7 @@
+list Low_Rating_Feedback
+{
+ displayName = "Low Rating Feedback"
+ show all rows from Guest_Feedback [Overall_Rating <= 2] ( Feedback_Number Guest Dining_Visit Feedback_Date_Time Overall_Rating Service_Rating Ambience_Rating Comments Would_Return Follow_Up_Required Follow_Up_Status Recovery_Action Manager_Notes )
+ filters ( Follow_Up_Status Would_Return )
+ sort by ( Feedback_Date_Time descending )
+}

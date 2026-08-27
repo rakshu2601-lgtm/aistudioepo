@@ -1,0 +1,17 @@
+form Audit_Log
+{
+ title { displayname = "Audit Log" on add = "Add Audit Event" on edit = "Edit Audit Event" }
+ Audit_Details ( type = section displayname = "Audit Details" row = 1 column = 0 )
+ Audit_Number ( type = autonumber displayname = "Audit Number" start index = 15001 row = 1 column = 1 )
+ must have Event_Date_Time ( type = datetime displayname = "Event Date & Time" initial value = "${zoho.currenttime}" row = 1 column = 1 width = medium )
+ must have Actor_Email ( type = email displayname = "Actor Email" row = 1 column = 2 width = medium )
+ must have Action_Type ( type = picklist displayname = "Action Type" values = {"Create","Update","Status Change","Assignment","Exception","Recovery","Sync Override"} row = 1 column = 1 width = medium )
+ must have Entity_Type ( type = text displayname = "Entity Type" row = 1 column = 2 width = medium )
+ must have Entity_Record_ID ( type = number displayname = "Entity Record ID" row = 1 column = 1 width = medium )
+ Entity_Reference ( type = text displayname = "Entity Reference" row = 1 column = 2 width = medium )
+ must have Change_Summary ( type = textarea displayname = "Change Summary" height = 100px row = 1 column = 1 width = medium )
+ Before_Value ( type = textarea displayname = "Before Value" height = 80px row = 1 column = 2 width = medium )
+ After_Value ( type = textarea displayname = "After Value" height = 80px row = 1 column = 1 width = medium )
+ must have Source ( type = picklist displayname = "Source" values = {"Form","Workflow","POS Staging","Manager Override"} row = 1 column = 2 width = medium )
+ actions { on add { Submit ( type = submit displayname = "Save Audit Event" ) Reset ( type = reset displayname = "Reset" ) } on edit { Update ( type = submit displayname = "Update Audit Event" ) Cancel ( type = cancel displayname = "Cancel" ) } }
+}

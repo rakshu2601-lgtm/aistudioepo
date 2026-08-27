@@ -1,0 +1,22 @@
+form Waitlist_Entries
+{
+ title { displayname = "Waitlist Entries" on add = "Add Walk-in Party" on edit = "Update Waitlist Entry" }
+ success message = "Waitlist entry saved successfully."
+ Waitlist_Details ( type = section displayname = "Waitlist Details" row = 1 column = 0 )
+ Waitlist_Number ( type = autonumber displayname = "Waitlist Number" start index = 7001 row = 1 column = 1 )
+ must have Guest ( type = picklist displayname = "Guest" values = Guests[Active == true].ID displayformat = [Guest_Name.first_name] searchable = true row = 1 column = 1 width = medium )
+ must have Party_Size ( type = number displayname = "Party Size" row = 1 column = 2 width = medium )
+ must have Joined_Date_Time ( type = datetime displayname = "Joined Date & Time" initial value = "${zoho.currenttime}" row = 1 column = 1 width = medium )
+ Preferred_Area ( type = picklist displayname = "Preferred Area" values = Dining_Areas[Active == true].ID displayformat = [Area_Name] searchable = true row = 1 column = 2 width = medium )
+ must have Quoted_Wait_Minutes ( type = number displayname = "Quoted Wait (Minutes)" row = 1 column = 1 width = medium )
+ must have Waitlist_Status ( type = picklist displayname = "Waitlist Status" values = {"Waiting","Notified","Arrived","Seated","Removed","Expired"} initial value = "Waiting" row = 1 column = 2 width = medium )
+ must have Priority ( type = picklist displayname = "Priority" values = {"Standard","VIP","Accessibility","Manager Priority"} initial value = "Standard" row = 1 column = 1 width = medium )
+ Notification_Method ( type = picklist displayname = "Notification Method" values = {"In Person","Phone","SMS","WhatsApp"} initial value = "In Person" row = 1 column = 2 width = medium )
+ Offered_Date_Time ( type = datetime displayname = "Offered Date & Time" row = 1 column = 1 width = medium )
+ Seated_Date_Time ( type = datetime displayname = "Seated Date & Time" row = 1 column = 2 width = medium )
+ Related_Reservation ( type = picklist displayname = "Related Reservation" values = Reservations.ID displayformat = [Reservation_Number] searchable = true row = 1 column = 1 width = medium )
+ Assigned_Table ( type = picklist displayname = "Assigned Table" values = Dining_Tables[Active == true].ID displayformat = [Table_Number] searchable = true row = 1 column = 2 width = medium )
+ Notes ( type = textarea displayname = "Notes" height = 80px row = 1 column = 1 width = medium )
+ Removal_Reason ( type = textarea displayname = "Removal Reason" height = 80px row = 1 column = 2 width = medium )
+ actions { on add { Submit ( type = submit displayname = "Add to Waitlist" ) Reset ( type = reset displayname = "Reset" ) } on edit { Update ( type = submit displayname = "Update Entry" ) Cancel ( type = cancel displayname = "Cancel" ) } }
+}

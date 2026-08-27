@@ -1,0 +1,25 @@
+Operational_Status_On_User_Input as "Update Block Reason Visibility"
+{
+    type = form
+    form = Dining_Tables
+    record event = on add or edit
+
+    on user input of Operational_Status
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Operational_Status == "Blocked" || input.Operational_Status == "Out of Service")
+                {
+                    show Block_Reason;
+                }
+                else
+                {
+                    input.Block_Reason = "";
+                    hide Block_Reason;
+                }
+            )
+        }
+    }
+}

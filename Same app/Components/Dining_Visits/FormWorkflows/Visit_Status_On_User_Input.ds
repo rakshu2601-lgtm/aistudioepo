@@ -1,0 +1,7 @@
+Visit_Status_On_User_Input as "Preview Visit Status Time"
+{
+ type = form
+ form = Dining_Visits
+ record event = on add or edit
+ on user input of Visit_Status { actions { custom deluge script ( if(input.Visit_Status == "Check Requested" && input.Check_Requested_Date_Time == null) { input.Check_Requested_Date_Time = zoho.currenttime; } if(input.Visit_Status == "Paid" && input.Paid_Date_Time == null) { input.Paid_Date_Time = zoho.currenttime; } if((input.Visit_Status == "Closed" || input.Visit_Status == "Abandoned") && input.Closed_Date_Time == null) { input.Closed_Date_Time = zoho.currenttime; } ) } }
+}

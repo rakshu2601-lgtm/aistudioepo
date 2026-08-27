@@ -1,0 +1,28 @@
+Guests_On_Success as "Audit Guest Preferences"
+{
+    type = form
+    form = Guests
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                insert into Audit_Log
+                [
+                    Event_Date_Time=zoho.currenttime
+                    Actor_Email=zoho.loginuser
+                    Action_Type="Update"
+                    Entity_Type="Guest"
+                    Entity_Record_ID=input.ID
+                    Entity_Reference=input.Guest_Number.toString()
+                    Change_Summary="Guest preferences, allergy context, or profile details saved."
+                    After_Value=ifnull(input.Allergy_Notes,"")
+                    Source="Form"
+                ];
+            )
+        }
+    }
+}

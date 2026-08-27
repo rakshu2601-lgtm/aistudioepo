@@ -1,0 +1,7 @@
+Guest_Feedback_On_Success as "Audit Feedback Follow-up"
+{
+ type = form
+ form = Guest_Feedback
+ record event = on add or edit
+ on success { actions { custom deluge script ( if(input.Overall_Rating <= 2 || input.Follow_Up_Status == "Resolved") { insert into Audit_Log [ Event_Date_Time=zoho.currenttime Actor_Email=zoho.loginuser Action_Type=if(input.Follow_Up_Status == "Resolved","Recovery","Exception") Entity_Type="Guest Feedback" Entity_Record_ID=input.ID Entity_Reference=input.Feedback_Number.toString() Change_Summary="Feedback rating " + input.Overall_Rating + ", follow-up " + input.Follow_Up_Status After_Value=input.Recovery_Action Source="Workflow" ]; } ) } }
+}

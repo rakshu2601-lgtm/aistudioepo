@@ -1,0 +1,7 @@
+Reservations_On_Success as "Process Reservation Status"
+{
+ type = form
+ form = Reservations
+ record event = on add or edit
+ on success { actions { custom deluge script ( nowTime = zoho.currenttime; reservationRec = Reservations[ID == input.ID]; if(input.Reservation_Status == "Arrived" && reservationRec.Arrival_Time == null) { reservationRec.Arrival_Time = nowTime; } if(input.Reservation_Status == "Seated" && reservationRec.Seated_Time == null) { reservationRec.Seated_Time = nowTime; } if(input.Reservation_Status == "Completed" && reservationRec.Completed_Time == null) { reservationRec.Completed_Time = nowTime; } if(input.Reservation_Status == "Cancelled" && reservationRec.Cancellation_Time == null) { reservationRec.Cancellation_Time = nowTime; } if(input.Assigned_Table != null && input.Reservation_Status in {"Tentative","Confirmed","Arrived"}) { tableRec = Dining_Tables[ID == input.Assigned_Table]; tableRec.Operational_Status = "Reserved"; } insert into POS_Sync_Log [ Entity_Type="Reservation" Local_Record_ID=input.ID Operation="Update" Direction="Outbound" Sync_Status="Pending" Attempt_Count=0 ]; insert into Audit_Log [ Event_Date_Time=nowTime Actor_Email=zoho.loginuser Action_Type="Status Change" Entity_Type="Reservation" Entity_Record_ID=input.ID Entity_Reference=input.Reservation_Number.toString() Change_Summary="Reservation saved as " + input.Reservation_Status After_Value=input.Reservation_Status Source="Workflow" ]; ) } }
+}

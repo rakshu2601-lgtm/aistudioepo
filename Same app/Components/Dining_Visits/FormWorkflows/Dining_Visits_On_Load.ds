@@ -1,0 +1,7 @@
+Dining_Visits_On_Load as "Prepare Dining Visit"
+{
+ type = form
+ form = Dining_Visits
+ record event = on add or edit
+ on load { actions { custom deluge script ( disable Seated_Date_Time; disable Check_Requested_Date_Time; disable Paid_Date_Time; disable Closed_Date_Time; disable POS_Sync_Status; ) } }
+}

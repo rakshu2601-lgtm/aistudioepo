@@ -1,0 +1,7 @@
+list Active_Waitlist
+{
+ displayName = "Active Waitlist"
+ show all rows from Waitlist_Entries [Waitlist_Status == "Waiting" || Waitlist_Status == "Notified" || Waitlist_Status == "Arrived"] ( Waitlist_Number Guest Party_Size Joined_Date_Time Preferred_Area Quoted_Wait_Minutes Waitlist_Status Priority Notification_Method Offered_Date_Time Assigned_Table )
+ filters ( Priority Preferred_Area Waitlist_Status )
+ sort by ( Priority descending Joined_Date_Time ascending )
+}

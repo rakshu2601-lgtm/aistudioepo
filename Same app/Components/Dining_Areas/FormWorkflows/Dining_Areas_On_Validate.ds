@@ -1,0 +1,22 @@
+Dining_Areas_On_Validate as "Validate Dining Area"
+{
+    type = form
+    form = Dining_Areas
+    record event = on add or edit
+    description = "Ensures dining areas use a positive display order."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(ifnull(input.Display_Order,0) <= 0)
+                {
+                    alert "Display order must be greater than zero.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

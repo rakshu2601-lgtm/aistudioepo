@@ -1,0 +1,7 @@
+Guest_Feedback_On_Validate as "Validate Guest Feedback"
+{
+ type = form
+ form = Guest_Feedback
+ record event = on add or edit
+ on validate { actions { custom deluge script ( if(input.Overall_Rating < 1 || input.Overall_Rating > 5 || input.Service_Rating < 1 || input.Service_Rating > 5 || input.Ambience_Rating < 1 || input.Ambience_Rating > 5) { alert "All ratings must be between 1 and 5."; cancel submit; } visitRec = Dining_Visits[ID == input.Dining_Visit]; if(visitRec.Guest != input.Guest) { alert "The selected guest does not match the dining visit."; cancel submit; } if(input.Overall_Rating <= 2 && (ifnull(input.Comments,"").trim() == "" || input.Follow_Up_Required != true)) { alert "Comments and follow-up are required for low ratings."; cancel submit; } if(input.Follow_Up_Status == "Resolved" && ifnull(input.Recovery_Action,"").trim() == "") { alert "Record the recovery action before resolving follow-up."; cancel submit; } ) } }
+}

@@ -1,0 +1,37 @@
+Guests_On_Validate as "Validate Guest Profile"
+{
+    type = form
+    form = Guests
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(ifnull(input.Mobile_Number,"").trim() == "" && ifnull(input.Email_Address,"").trim() == "")
+                {
+                    alert "Provide at least a mobile number or email address.";
+                    cancel submit;
+                }
+                if(input.Preferred_Contact_Method != "Phone" && input.Preferred_Contact_Method != "None" && input.Contact_Consent != true)
+                {
+                    alert "Contact consent is required for SMS, email, or WhatsApp communication.";
+                    cancel submit;
+                }
+                normalizedMobile = ifnull(input.Mobile_Number,"").replaceAll("[^0-9]","");
+                if(normalizedMobile != "" && Guests[ID != input.ID && Active == true && Mobile_Number == input.Mobile_Number].count() > 0)
+                {
+                    alert "A likely duplicate active guest exists with this mobile number.";
+                    cancel submit;
+                }
+                if(ifnull(input.Email_Address,"").trim() != "" && Guests[ID != input.ID && Active == true && Email_Address == input.Email_Address].count() > 0)
+                {
+                    alert "A likely duplicate active guest exists with this email address.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

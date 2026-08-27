@@ -1,0 +1,5 @@
+report Failed_POS_Sync
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Sync_Number Entity_Type Operation Direction Attempt_Count Last_Attempt_Date_Time Error_Message ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Sync_Number Entity_Type Local_Record_ID External_Record_ID Operation Direction Sync_Status Attempt_Count Last_Attempt_Date_Time Next_Retry_Date_Time Error_Message Correlation_ID ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

@@ -1,0 +1,25 @@
+Dining_Tables_On_Load as "Prepare Dining Table Form"
+{
+    type = form
+    form = Dining_Tables
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Operational_Status == "Blocked" || input.Operational_Status == "Out of Service")
+                {
+                    show Block_Reason;
+                }
+                else
+                {
+                    hide Block_Reason;
+                }
+                disable POS_Table_ID;
+            )
+        }
+    }
+}

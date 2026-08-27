@@ -1,0 +1,5 @@
+report All_Dining_Visits
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Visit_Number Guest Dining_Table Party_Size Visit_Status Server_Name Seated_Date_Time POS_Sync_Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Visit_Number Guest Reservation Waitlist_Entry Dining_Table Party_Size Visit_Status Server_Name Seated_Date_Time Check_Requested_Date_Time Paid_Date_Time Closed_Date_Time POS_Check_ID POS_Check_Total POS_Sync_Status ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}
