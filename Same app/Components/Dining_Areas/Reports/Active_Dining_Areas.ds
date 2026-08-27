@@ -1,22 +1,24 @@
 list Active_Dining_Areas
 {
-    displayName = "Active Dining Areas"
-    show all rows from Dining_Areas [Active == true]
-    (
-        Area_Code
-        Area_Name
-        Area_Type
-        Description
-        Display_Order
-        Active
-    )
-    filters
-    (
-        Area_Type
-    )
-    sort by
-    (
-        Display_Order ascending
-        Area_Name ascending
-    )
+
+			displayName = "Active Dining Areas"
+			show all rows from Dining_Areas  [Active == true]  
+			(
+				Area_Code
+				Area_Name
+				Area_Type
+				Description
+				Display_Order
+				Active
+			)
+			filters
+			(
+				Area_Type
+			)
+			sort by
+			(
+				Display_Order ascending
+				Area_Name ascending
+			)
+		
 }

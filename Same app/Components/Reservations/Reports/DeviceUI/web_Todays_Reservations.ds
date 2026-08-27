@@ -1,5 +1,85 @@
 report Todays_Reservations
 {
- quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Reservation_Number Guest Reservation_Date_Time Party_Size Assigned_Table Reservation_Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
- detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Reservation_Number Guest Reservation_Date_Time Expected_End_Date_Time Service_Period Party_Size Assigned_Table Reservation_Status Booking_Source Occasion Special_Requests ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+
+				quickview
+				(
+					layout
+					(
+						datablock1
+						(
+							fields
+							(
+								Reservation_Number
+								Guest
+								Reservation_Date_Time
+								Party_Size
+								Assigned_Table
+								Reservation_Status
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+								Duplicate 
+								Delete 
+							)
+						record
+						(
+							Edit   	   
+							Duplicate   	   
+							Delete   	   
+    					)
+						)
+    				action
+    				(
+						on click
+						(
+							View Record   	   
+    					)
+						on right click
+						(
+							Edit   	   
+							Delete   	   
+							Duplicate   	   
+							View Record   	   
+    					)
+     				)
+				)
+
+				detailview
+				(
+					layout
+					(
+						datablock1
+						(
+							fields
+							(
+								Reservation_Number
+								Guest
+								Reservation_Date_Time
+								Expected_End_Date_Time
+								Service_Period
+								Party_Size
+								Assigned_Table
+								Reservation_Status
+								Booking_Source
+								Occasion
+								Special_Requests
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+								Duplicate 
+								Delete 
+							)
+						)
+				)
+			
 }

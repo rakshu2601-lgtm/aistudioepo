@@ -1,127 +1,260 @@
 <%
-today = zoho.currentdate;
-now = zoho.currenttime;
-dayStart = today.toDateTime();
-dayEnd = dayStart.addDay(1);
-settingsGrace = 15;
-for each setting in Restaurant_Settings[Active == true]
-{
-    settingsGrace = setting.Arrival_Grace_Period_Minutes;
-}
-todayReservations = Reservations[Reservation_Date_Time >= dayStart && Reservation_Date_Time < dayEnd];
-reservationCount = todayReservations.count();
-expectedCovers = ifnull(todayReservations.sum(Party_Size),0);
-walkIns = Waitlist_Entries[Joined_Date_Time >= dayStart && Joined_Date_Time < dayEnd];
-walkInCount = walkIns.count();
-noShowCount = Reservations[Reservation_Date_Time >= dayStart && Reservation_Date_Time < dayEnd && Reservation_Status == "No Show"].count();
-quotedTotal = 0;
-quotedCount = 0;
-actualTotal = 0;
-actualCount = 0;
-for each waitMetric in walkIns
-{
-    quotedTotal = quotedTotal + ifnull(waitMetric.Quoted_Wait_Minutes,0);
-    quotedCount = quotedCount + 1;
-    if(waitMetric.Seated_Date_Time != null)
-    {
-        actualTotal = actualTotal + ((waitMetric.Seated_Date_Time - waitMetric.Joined_Date_Time) / 60000);
-        actualCount = actualCount + 1;
-    }
-}
-avgQuoted = if(quotedCount > 0,(quotedTotal / quotedCount).round(0),0);
-avgActualText = "Not yet derivable";
-if(actualCount > 0)
-{
-    avgActualText = (actualTotal / actualCount).round(0) + " min";
-}
-occupiedCount = Dining_Tables[Active == true && Operational_Status == "Occupied"].count();
-availableCount = Dining_Tables[Active == true && Operational_Status == "Available"].count();
-resetCount = Dining_Tables[Active == true && Operational_Status == "Needs Reset"].count();
-completedVisits = Dining_Visits[Closed_Date_Time >= dayStart && Closed_Date_Time < dayEnd && (Visit_Status == "Closed" || Visit_Status == "Paid")].count();
-todayFeedback = Guest_Feedback[Feedback_Date_Time >= dayStart && Feedback_Date_Time < dayEnd];
-avgRating = ifnull(todayFeedback.avg(Overall_Rating),0).round(1);
-activeWaits = Waitlist_Entries[Waitlist_Status == "Waiting" || Waitlist_Status == "Notified" || Waitlist_Status == "Arrived"] sort by Joined_Date_Time asc;
-lateArrivals = Reservations[Reservation_Date_Time >= dayStart && Reservation_Date_Time < now.subMinutes(settingsGrace) && Reservation_Status == "Confirmed"] sort by Reservation_Date_Time asc;
-lowFeedback = Guest_Feedback[Overall_Rating <= 2 && Follow_Up_Status != "Resolved" && Follow_Up_Status != "Not Required"] sort by Feedback_Date_Time asc;
-posPending = POS_Sync_Log[Sync_Status == "Pending" || Sync_Status == "Processing"].count();
-posFailed = POS_Sync_Log[Sync_Status == "Failed"].count();
-recentAudit = Audit_Log[Event_Date_Time >= now.subDay(7) && (Action_Type == "Exception" || Action_Type == "Recovery" || Action_Type == "Sync Override")] sort by Event_Date_Time desc;
-reservationStatuses = {"Tentative","Confirmed","Arrived","Seated","Completed","Cancelled","No Show"};
-tableStatuses = {"Available","Reserved","Occupied","Needs Reset","Blocked","Out of Service"};
-maxReservationStatus = 1;
-for each rs0 in reservationStatuses
-{
-    rsCount0 = Reservations[Reservation_Date_Time >= dayStart && Reservation_Date_Time < dayEnd && Reservation_Status == rs0].count();
-    if(rsCount0 > maxReservationStatus){maxReservationStatus = rsCount0;}
-}
-maxTableStatus = 1;
-for each ts0 in tableStatuses
-{
-    tsCount0 = Dining_Tables[Active == true && Operational_Status == ts0].count();
-    if(tsCount0 > maxTableStatus){maxTableStatus = tsCount0;}
-}
-isAllowed = true;
-%>
+	today = zoho.currentdate;
+	now = zoho.currenttime;
+	dayStart = today.toDateTime();
+	dayEnd = dayStart.addDay(1);
+	settingsGrace = 15;
+	for each  setting in Restaurant_Settings[Active == true]
+	{
+		settingsGrace = setting.Arrival_Grace_Period_Minutes;
+	}
+	todayReservations = Reservations[Reservation_Date_Time >= dayStart && Reservation_Date_Time < dayEnd];
+	reservationCount = todayReservations.count();
+	expectedCovers = ifnull(todayReservations.sum(Party_Size),0);
+	walkIns = Waitlist_Entries[Joined_Date_Time >= dayStart && Joined_Date_Time < dayEnd];
+	walkInCount = walkIns.count();
+	noShowCount = Reservations[Reservation_Date_Time >= dayStart && Reservation_Date_Time < dayEnd && Reservation_Status == "No Show"].count();
+	quotedTotal = 0;
+	quotedCount = 0;
+	actualTotal = 0;
+	actualCount = 0;
+	for each  waitMetric in walkIns
+	{
+		quotedTotal = quotedTotal + ifnull(waitMetric.Quoted_Wait_Minutes,0);
+		quotedCount = quotedCount + 1;
+		if(waitMetric.Seated_Date_Time != null)
+		{
+			actualTotal = actualTotal + ((waitMetric.Seated_Date_Time - waitMetric.Joined_Date_Time)) / 60000;
+			actualCount = actualCount + 1;
+		}
+	}
+	avgQuoted = if(quotedCount > 0,(quotedTotal / quotedCount).round(0),0);
+	avgActualText = "Not yet derivable";
+	if(actualCount > 0)
+	{
+		avgActualText = (actualTotal / actualCount).round(0) + " min";
+	}
+	occupiedCount = Dining_Tables[Active == true && Operational_Status == "Occupied"].count();
+	availableCount = Dining_Tables[Active == true && Operational_Status == "Available"].count();
+	resetCount = Dining_Tables[Active == true && Operational_Status == "Needs Reset"].count();
+	completedVisits = Dining_Visits[Closed_Date_Time >= dayStart && Closed_Date_Time < dayEnd && Visit_Status == "Closed" || Visit_Status == "Paid"].count();
+	todayFeedback = Guest_Feedback[Feedback_Date_Time >= dayStart && Feedback_Date_Time < dayEnd];
+	avgRating = ifnull(todayFeedback.avg(Overall_Rating),0).round(1);
+	activeWaits = Waitlist_Entries[Waitlist_Status == "Waiting" || Waitlist_Status == "Notified" || Waitlist_Status == "Arrived"] sort by Joined_Date_Time asc;
+	lateArrivals = Reservations[Reservation_Date_Time >= dayStart && Reservation_Date_Time < now.subMinutes(settingsGrace) && Reservation_Status == "Confirmed"] sort by Reservation_Date_Time asc;
+	lowFeedback = Guest_Feedback[Overall_Rating <= 2 && Follow_Up_Status != "Resolved" && Follow_Up_Status != "Not Required"] sort by Feedback_Date_Time asc;
+	posPending = POS_Sync_Log[Sync_Status == "Pending" || Sync_Status == "Processing"].count();
+	posFailed = POS_Sync_Log[Sync_Status == "Failed"].count();
+	recentAudit = Audit_Log[Event_Date_Time >= now.subDay(7) && Action_Type == "Exception" || Action_Type == "Recovery" || Action_Type == "Sync Override"] sort by Event_Date_Time desc;
+	reservationStatuses = {"Tentative","Confirmed","Arrived","Seated","Completed","Cancelled","No Show"};
+	tableStatuses = {"Available","Reserved","Occupied","Needs Reset","Blocked","Out of Service"};
+	maxReservationStatus = 1;
+	for each  rs0 in reservationStatuses
+	{
+		rsCount0 = Reservations[Reservation_Date_Time >= dayStart && Reservation_Date_Time < dayEnd && Reservation_Status == rs0].count();
+		if(rsCount0 > maxReservationStatus)
+		{
+			maxReservationStatus = rsCount0;
+		}
+	}
+	maxTableStatus = 1;
+	for each  ts0 in tableStatuses
+	{
+		tsCount0 = Dining_Tables[Active == true && Operational_Status == ts0].count();
+		if(tsCount0 > maxTableStatus)
+		{
+			maxTableStatus = tsCount0;
+		}
+	}
+	isAllowed = true;
+	%>
 <style>
 :root{--zcs-theme-brand-color:var(--zcs_brand_color);--zcs-light-bg-color:var(--zcs_brand_light_color);--zcs-page-bg-color:#f3f3f4;--zcs-white-color:#fff;--zcs-primary-text-color:var(--zcs_primary_text_color);--zcs-secondary-text-color:var(--zcs_secondary_text_color);--zcs-teritiary-text-color:var(--zcs_tertiary_text_color);--zcs-border-color:var(--zcs_tertiary_border_color)}
 *{box-sizing:border-box}.zcs-flex{display:flex}.zcs-inline-flex{display:inline-flex}.zcs-row{display:flex;flex-wrap:wrap}.zcs-direction-column{flex-direction:column}.zcs-align-items-center{align-items:center}.zcs-align-items-start{align-items:flex-start}.zcs-justify-center{justify-content:center}.zcs-justify-space-between{justify-content:space-between}.zcs-gap-4{gap:4px}.zcs-gap-6{gap:6px}.zcs-gap-8{gap:8px}.zcs-gap-12{gap:12px}.zcs-gap-16{gap:16px}.zcs-w-full{width:100%}.zcs-p-0{padding:0}.zcs-p-8{padding:8px}.zcs-p-12{padding:12px}.zcs-p-16{padding:16px}.zcs-p-20{padding:20px}.zcs-px-10{padding-left:10px;padding-right:10px}.zcs-px-12{padding-left:12px;padding-right:12px}.zcs-px-16{padding-left:16px;padding-right:16px}.zcs-px-30{padding-left:30px;padding-right:30px}.zcs-py-2{padding-top:2px;padding-bottom:2px}.zcs-py-8{padding-top:8px;padding-bottom:8px}.zcs-py-10{padding-top:10px;padding-bottom:10px}.zcs-py-24{padding-top:24px;padding-bottom:24px}.zcs-m-0{margin:0}.zcs-font-11{font-size:11px}.zcs-font-12{font-size:12px}.zcs-font-13{font-size:13px}.zcs-font-14{font-size:14px}.zcs-font-15{font-size:15px}.zcs-font-16{font-size:16px}.zcs-font-18{font-size:18px}.zcs-font-22{font-size:22px}.zcs-font-24{font-size:24px}.zcs-font-28{font-size:28px}.zcs-font-normal{font-weight:400}.zcs-font-medium{font-weight:500}.zcs-font-semibold{font-weight:600}.zcs-font-bold{font-weight:700}.zcs-lh-body{line-height:1.5}.zcs-lh-heading{line-height:1.25}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-secondary{color:var(--zcs-secondary-text-color)}.zcs-color-tertiary{color:var(--zcs-teritiary-text-color)}.zcs-color-theme{color:var(--zcs_brand_color)}.zcs-color-red{color:#fe455d}.zcs-color-yellow{color:#9a6508}.zcs-color-green{color:#179e6c}.zcs-box-border{box-sizing:border-box}.zcs-rounded-sm{border-radius:4px}.zcs-rounded-md{border-radius:6px}.zcs-rounded-xl{border-radius:12px}.zcs-text-left{text-align:left}.zcs-text-right{text-align:right}.zcs-card{background:var(--zcs-white-color);border:1px solid var(--zcs_tertiary_border_color);border-radius:12px}.zcs-page{padding:18px;background:var(--zcs-page-bg-color);color:var(--zcs-primary-text-color);font-family:inherit}.zcs-page-header{background:var(--zcs-white-color);border:1px solid var(--zcs_tertiary_border_color);border-radius:12px;margin-bottom:16px}.zcs-header-copy{min-width:260px}.zcs-header-actions{flex-wrap:wrap}.zcs-button{width:auto;min-width:5rem;min-height:36px;text-decoration:none}.zcs-primary-button{background:var(--zcs_brand_color);color:var(--zcs_brand_foreground_color);border:1px solid var(--zcs_brand_color)}.zcs-primary-outline-button{border:1px solid var(--zcs_brand_color);background:var(--zcs-white-color);color:var(--zcs_brand_color)}.zcs-kpis{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:12px;margin-bottom:16px}.zcs-kpi-card{min-height:112px}.zcs-kpi-icon{width:38px;height:38px;border-radius:10px;background:var(--zcs_brand_light_color);color:var(--zcs_brand_color);flex:0 0 auto}.zcs-main-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;margin-bottom:16px}.zcs-three-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:16px}.zcs-section-title{margin-bottom:12px}.zcs-badge{width:auto}.zcs-badge-filled-outline{border:1px solid}.zcs-badge-green{background:#e4fcf3;border-color:#179e6c;color:#147c57}.zcs-badge-red{background:#fde3e6;border-color:#fe455d;color:#c82e43}.zcs-badge-yellow{background:#fcf4e6;border-color:#faae13;color:#9a6508}.zcs-badge-blue{background:#e8efff;border-color:#2a6ffc;color:#245ac4}.zcs-badge-grey{background:#e8e8e8;border-color:#555;color:#333}.zcs-badge-orange{background:#f8f0eb;border-color:#f4660c;color:#bd4d08}.zcs-progress-list{display:flex;flex-direction:column;gap:12px}.zcs-progress-bar{height:8px;background:var(--zcs_component_hover_color);border-radius:4px;overflow:hidden}.zcs-progress-bar-indicator{height:100%;background:var(--zcs_brand_color);border-radius:inherit}.zcs-table-wrapper{border:1px solid var(--zcs_tertiary_border_color);background:var(--zcs-white-color);overflow:auto;border-radius:6px;max-height:340px}.zcs-table-wrapper table{border-collapse:collapse;min-width:620px}.zcs-table-wrapper thead{position:sticky;top:0;z-index:1}.zcs-table-wrapper th{background:#f9fafe;white-space:nowrap}.zcs-table-wrapper td{border-top:1px solid var(--zcs_tertiary_border_color)}.zcs-table-wrapper tbody tr:hover td{background:#f9fafe}.zcs-empty{padding:18px;text-align:center;color:var(--zcs-teritiary-text-color)}.zcs-service-row{padding:12px;border:1px solid var(--zcs_tertiary_border_color);border-radius:8px}.zcs-quick-actions-wrapper ul{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:8px}.zcs-quick-action-item{list-style:none}.zcs-quick-action-item:hover{border-color:var(--zcs_brand_color)}.zcs-quick-action-link{text-decoration:none}.zcs-pos-note{border-left:4px solid #2a6ffc;background:#e8efff}.zcs-denied{max-width:560px;margin:60px auto;text-align:center}@media(max-width:1200px){.zcs-kpis{grid-template-columns:repeat(3,1fr)}.zcs-three-grid{grid-template-columns:1fr 1fr}.zcs-quick-actions-wrapper ul{grid-template-columns:repeat(3,1fr)}}@media(max-width:850px){.zcs-main-grid,.zcs-three-grid{grid-template-columns:1fr}.zcs-kpis{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.zcs-page{padding:10px}.zcs-page-header{padding:16px}.zcs-header-actions{width:100%}.zcs-kpis{grid-template-columns:1fr}.zcs-quick-actions-wrapper ul{grid-template-columns:1fr}}
 </style>
-<% if(!isAllowed) { %>
-<div class='zcs-page'><div class='zcs-denied zcs-card zcs-p-20'><i class='zc-li-outline ui-1-lock zcs-font-28 zcs-color-red'></i><h2 class='zcs-font-22'>Manager access required</h2><p class='zcs-color-secondary'>This operating dashboard is restricted to FOH Managers and Administrators.</p></div></div>
-<% } else { %>
-<div class='zcs-page'>
-  <header class='zcs-page-header zcs-w-full zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-16 zcs-px-30 zcs-py-24'>
-    <div class='zcs-header-copy'><h1 class='zcs-font-24 zcs-font-semibold zcs-lh-heading zcs-m-0'>FOH Manager Dashboard</h1><div class='zcs-font-14 zcs-color-secondary'><%=today.toString("EEEE, dd MMMM yyyy")%> · shift oversight · updated <%=now.toString("hh:mm a")%></div></div>
-    <div class='zcs-header-actions zcs-flex zcs-align-items-center zcs-gap-8'><a class='zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md' href='#Report:Todays_Reservations'><i class='zc-li-outline ui-1-calendar-60'></i><span>Today's reservations</span></a><a class='zcs-button zcs-primary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md' href='#Report:Live_Table_Status'><i class='zc-li-outline furniture-table'></i><span>Live tables</span></a></div>
-  </header>
-  <div class='zcs-kpis'>
 <%
-metrics = List();
-metrics.add({"label":"Reservations","value":reservationCount,"icon":"ui-1-calendar-60"});
-metrics.add({"label":"Expected covers","value":expectedCovers,"icon":"users-single-01"});
-metrics.add({"label":"Walk-ins","value":walkInCount,"icon":"arrows-1-log-in"});
-metrics.add({"label":"No-shows","value":noShowCount,"icon":"ui-1-simple-remove"});
-metrics.add({"label":"Average quoted wait","value":avgQuoted + " min","icon":"ui-2-time"});
-metrics.add({"label":"Average actual wait","value":avgActualText,"icon":"ui-1-check-circle-08"});
-metrics.add({"label":"Occupied tables","value":occupiedCount,"icon":"furniture-table"});
-metrics.add({"label":"Available tables","value":availableCount,"icon":"ui-1-check-circle-08"});
-metrics.add({"label":"Needs reset","value":resetCount,"icon":"arrows-1-refresh-69"});
-metrics.add({"label":"Completed visits","value":completedVisits,"icon":"ui-1-check-square-09"});
-metrics.add({"label":"Average guest rating","value":avgRating + " / 5","icon":"ui-1-star"});
-for each metric in metrics
-{
-%><div class='zcs-kpi-card zcs-card zcs-p-16'><div class='zcs-flex zcs-justify-space-between zcs-gap-12'><div><div class='zcs-font-13 zcs-color-secondary'><%=metric.get("label")%></div><div class='zcs-font-24 zcs-font-semibold'><%=metric.get("value")%></div></div><div class='zcs-kpi-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline <%=metric.get("icon")%>'></i></div></div></div><%
-}
-%>
-  </div>
-  <div class='zcs-main-grid'>
-    <section class='zcs-card zcs-p-16'><div class='zcs-section-title zcs-flex zcs-align-items-center zcs-justify-space-between'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Reservation status distribution</h2><span class='zcs-font-12 zcs-color-secondary'>Today</span></div><div class='zcs-progress-list'>
-<% for each rs in reservationStatuses { rsCount = Reservations[Reservation_Date_Time >= dayStart && Reservation_Date_Time < dayEnd && Reservation_Status == rs].count(); rsPct = ((rsCount * 100.0) / maxReservationStatus).round(0); %><div class='zcs-progress-bar-wrapper zcs-flex zcs-direction-column zcs-gap-6'><div class='zcs-progress-bar'><div class='zcs-progress-bar-indicator' style='width:<%=rsPct%>%;'></div></div><p class='zcs-flex zcs-justify-space-between zcs-font-12 zcs-font-medium zcs-m-0'><span><%=rs%></span><span><%=rsCount%></span></p></div><% } %>
-    </div></section>
-    <section class='zcs-card zcs-p-16'><div class='zcs-section-title zcs-flex zcs-align-items-center zcs-justify-space-between'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Table status distribution</h2><a class='zcs-font-12 zcs-color-theme' href='#Report:Live_Table_Status'>Open board</a></div><div class='zcs-progress-list'>
-<% for each ts in tableStatuses { tsCount = Dining_Tables[Active == true && Operational_Status == ts].count(); tsPct = ((tsCount * 100.0) / maxTableStatus).round(0); %><div class='zcs-progress-bar-wrapper zcs-flex zcs-direction-column zcs-gap-6'><div class='zcs-progress-bar'><div class='zcs-progress-bar-indicator' style='width:<%=tsPct%>%;'></div></div><p class='zcs-flex zcs-justify-space-between zcs-font-12 zcs-font-medium zcs-m-0'><span><%=ts%></span><span><%=tsCount%></span></p></div><% } %>
-    </div></section>
-  </div>
-  <div class='zcs-three-grid'>
-    <section class='zcs-card zcs-p-16'><div class='zcs-section-title'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Service-period demand</h2><div class='zcs-font-12 zcs-color-secondary'>Today's reservations and covers</div></div><div class='zcs-flex zcs-direction-column zcs-gap-8'>
-<% serviceShown = 0; for each period in Service_Periods[Active == true] sort by Start_Time asc { periodReservations = Reservations[Reservation_Date_Time >= dayStart && Reservation_Date_Time < dayEnd && Service_Period == period.ID && Reservation_Status != "Cancelled"]; periodCovers = ifnull(periodReservations.sum(Party_Size),0); demandPct = if(period.Maximum_Covers > 0,((periodCovers * 100.0) / period.Maximum_Covers).round(0),0); if(demandPct > 100){demandPct = 100;} serviceShown = serviceShown + 1; %><div class='zcs-service-row'><div class='zcs-flex zcs-justify-space-between'><strong class='zcs-font-14'><%=period.Service_Name%></strong><span class='zcs-font-12'><%=periodReservations.count()%> reservations</span></div><div class='zcs-progress-bar' style='margin:8px 0'><div class='zcs-progress-bar-indicator' style='width:<%=demandPct%>%;'></div></div><div class='zcs-flex zcs-justify-space-between zcs-font-12 zcs-color-secondary'><span><%=periodCovers%> covers</span><span><%=period.Maximum_Covers%> capacity</span></div></div><% } if(serviceShown == 0){ %><div class='zcs-empty'>No active service periods configured.</div><% } %>
-    </div></section>
-    <section class='zcs-card zcs-p-16'><div class='zcs-section-title zcs-flex zcs-justify-space-between'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Longest active waits</h2><a class='zcs-font-12 zcs-color-theme' href='#Report:Active_Waitlist'>Open queue</a></div><div class='zcs-flex zcs-direction-column zcs-gap-8'>
-<% waitShown = 0; for each wait in activeWaits { if(waitShown < 5){ elapsed = ((now - wait.Joined_Date_Time) / 60000).round(0); waitClass = if(elapsed > wait.Quoted_Wait_Minutes,"zcs-badge-red","zcs-badge-yellow"); %><div class='zcs-service-row zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-8'><div><strong class='zcs-font-14'><%=wait.Guest.Guest_Name.first_name%> · party <%=wait.Party_Size%></strong><div class='zcs-font-12 zcs-color-secondary'>Quoted <%=wait.Quoted_Wait_Minutes%> min · <%=wait.Priority%></div></div><span class='zcs-badge zcs-badge-filled-outline <%=waitClass%> zcs-inline-flex zcs-px-10 zcs-py-2 zcs-rounded-sm zcs-font-12'><%=elapsed%> min</span></div><% waitShown = waitShown + 1; } } if(waitShown == 0){ %><div class='zcs-empty'>No active waits.</div><% } %>
-    </div></section>
-    <section class='zcs-card zcs-p-16'><div class='zcs-section-title zcs-flex zcs-justify-space-between'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Late-arrival exceptions</h2><a class='zcs-font-12 zcs-color-theme' href='#Report:Arrival_Exceptions'>Open exceptions</a></div><div class='zcs-flex zcs-direction-column zcs-gap-8'>
-<% lateShown = 0; for each late in lateArrivals { if(lateShown < 5){ lateMins = ((now - late.Reservation_Date_Time) / 60000).round(0); %><div class='zcs-service-row zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-8'><div><strong class='zcs-font-14'><%=late.Guest.Guest_Name.first_name%> · party <%=late.Party_Size%></strong><div class='zcs-font-12 zcs-color-secondary'><%=late.Reservation_Date_Time.toString("hh:mm a")%> · table <%=ifnull(late.Assigned_Table.Table_Number,"Unassigned")%></div></div><span class='zcs-badge zcs-badge-filled-outline zcs-badge-red zcs-inline-flex zcs-px-10 zcs-py-2 zcs-rounded-sm zcs-font-12'><%=lateMins%> min late</span></div><% lateShown = lateShown + 1; } } if(lateShown == 0){ %><div class='zcs-empty'>No late confirmed arrivals.</div><% } %>
-    </div></section>
-  </div>
-  <div class='zcs-main-grid'>
-    <section class='zcs-card zcs-p-16'><div class='zcs-section-title zcs-flex zcs-justify-space-between'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Low-rating follow-up queue</h2><div class='zcs-font-12 zcs-color-secondary'>Ratings 1–2 requiring manager attention</div></div><a class='zcs-font-12 zcs-color-theme' href='#Report:Feedback_Follow_Up'>Open follow-up</a></div><div class='zcs-table-wrapper'><table class='zcs-w-full'><thead><tr><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14'>Guest</th><th class='zcs-px-16 zcs-py-8 zcs-text-right zcs-font-14'>Rating</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14'>Status</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14'>Received</th></tr></thead><tbody>
-<% feedbackShown = 0; for each feedback in lowFeedback { if(feedbackShown < 8){ %><tr><td class='zcs-px-16 zcs-py-8 zcs-font-14'><%=feedback.Guest.Guest_Name.first_name%></td><td class='zcs-px-16 zcs-py-8 zcs-text-right zcs-font-14 zcs-color-red'><%=feedback.Overall_Rating%> / 5</td><td class='zcs-px-16 zcs-py-8'><span class='zcs-badge zcs-badge-filled-outline zcs-badge-orange zcs-inline-flex zcs-px-10 zcs-py-2 zcs-rounded-sm zcs-font-12'><%=feedback.Follow_Up_Status%></span></td><td class='zcs-px-16 zcs-py-8 zcs-font-13'><%=feedback.Feedback_Date_Time.toString("dd MMM, hh:mm a")%></td></tr><% feedbackShown = feedbackShown + 1; } } if(feedbackShown == 0){ %><tr><td colspan='4' class='zcs-empty'>No open low-rating follow-ups.</td></tr><% } %>
-</tbody></table></div></section>
-    <section class='zcs-card zcs-p-16'><div class='zcs-section-title zcs-flex zcs-justify-space-between'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>POS staging and integration status</h2><div class='zcs-font-12 zcs-color-secondary'>Readiness queue only; these are not POS sales figures</div></div><a class='zcs-font-12 zcs-color-theme' href='#Report:POS_Sync_Status_Board'>Open staging board</a></div><div class='zcs-row zcs-gap-12'><div class='zcs-card zcs-p-16' style='flex:1'><div class='zcs-font-13 zcs-color-secondary'>Pending or processing</div><div class='zcs-font-28 zcs-font-semibold zcs-color-yellow'><%=posPending%></div></div><div class='zcs-card zcs-p-16' style='flex:1'><div class='zcs-font-13 zcs-color-secondary'>Failed staging items</div><div class='zcs-font-28 zcs-font-semibold zcs-color-red'><%=posFailed%></div></div></div><div class='zcs-pos-note zcs-p-12 zcs-font-13' style='margin-top:12px'><i class='zc-li-outline ui-3-alert'></i> Vendor-neutral synchronization staging is monitored here. No sales, revenue, tender, or payment analytics are represented.</div><div class='zcs-flex zcs-gap-8' style='margin-top:12px'><a class='zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md' href='#Report:Pending_POS_Sync'>Pending</a><a class='zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md' href='#Report:Failed_POS_Sync'>Failed</a></div></section>
-  </div>
-  <section class='zcs-card zcs-p-16' style='margin-bottom:16px'><div class='zcs-section-title zcs-flex zcs-justify-space-between'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Recent audit exceptions</h2><div class='zcs-font-12 zcs-color-secondary'>Exception, recovery, and sync-override events from the last 7 days</div></div><a class='zcs-font-12 zcs-color-theme' href='#Report:Operational_Exceptions'>Open audit exceptions</a></div><div class='zcs-table-wrapper'><table class='zcs-w-full'><thead><tr><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14'>When</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14'>Type</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14'>Entity</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14'>Summary</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14'>Actor</th></tr></thead><tbody>
-<% auditShown = 0; for each audit in recentAudit { if(auditShown < 10){ auditClass = if(audit.Action_Type == "Exception","zcs-badge-red",if(audit.Action_Type == "Recovery","zcs-badge-green","zcs-badge-blue")); %><tr><td class='zcs-px-16 zcs-py-8 zcs-font-13'><%=audit.Event_Date_Time.toString("dd MMM, hh:mm a")%></td><td class='zcs-px-16 zcs-py-8'><span class='zcs-badge zcs-badge-filled-outline <%=auditClass%> zcs-inline-flex zcs-px-10 zcs-py-2 zcs-rounded-sm zcs-font-12'><%=audit.Action_Type%></span></td><td class='zcs-px-16 zcs-py-8 zcs-font-14'><%=audit.Entity_Type%> <%=ifnull(audit.Entity_Reference,"")%></td><td class='zcs-px-16 zcs-py-8 zcs-font-14'><%=audit.Change_Summary%></td><td class='zcs-px-16 zcs-py-8 zcs-font-13'><%=audit.Actor_Email%></td></tr><% auditShown = auditShown + 1; } } if(auditShown == 0){ %><tr><td colspan='5' class='zcs-empty'>No recent audit exceptions.</td></tr><% } %>
-</tbody></table></div></section>
-  <nav class='zcs-quick-actions-wrapper zcs-card zcs-flex zcs-direction-column zcs-gap-16 zcs-p-16'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Quick links</h2><ul class='zcs-p-0 zcs-m-0'><li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-10'><a class='zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-14 zcs-color-primary' href='#Report:Restaurant_Settings_Report'><i class='zc-li-outline ui-1-settings-gear-63'></i><span>Configuration</span></a></li><li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-10'><a class='zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-14 zcs-color-primary' href='#Report:All_Reservations'><i class='zc-li-outline files-2-doc'></i><span>Operational reports</span></a></li><li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-10'><a class='zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-14 zcs-color-primary' href='#Report:Feedback_Follow_Up'><i class='zc-li-outline ui-1-star'></i><span>Feedback follow-up</span></a></li><li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-10'><a class='zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-14 zcs-color-primary' href='#Report:Failed_POS_Sync'><i class='zc-li-outline ui-3-alert'></i><span>POS sync exceptions</span></a></li><li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-10'><a class='zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-14 zcs-color-primary' href='#Report:Audit_Trail'><i class='zc-li-outline files-single-folded-content'></i><span>Audit trail</span></a></li></ul></nav>
+	if(!isAllowed)
+	{
+		%>
+<div class='zcs-page'><div class='zcs-denied zcs-card zcs-p-20'><i class='zc-li-outline ui-1-lock zcs-font-28 zcs-color-red'></i><h2 class='zcs-font-22'>Manager access required</h2><p class='zcs-color-secondary'>This operating dashboard is restricted to FOH Managers and Administrators.</p></div></div>
+<%
+	}
+	else
+	{
+		%>
+<div class='zcs-page'>
+	<header class='zcs-page-header zcs-w-full zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-16 zcs-px-30 zcs-py-24'>
+		<div class='zcs-header-copy'><h1 class='zcs-font-24 zcs-font-semibold zcs-lh-heading zcs-m-0'>FOH Manager Dashboard</h1><div class='zcs-font-14 zcs-color-secondary'><%=today.toString("EEEE, dd MMMM yyyy")%> \u00B7 shift oversight \u00B7 updated <%=now.toString("hh:mm a")%></div></div>
+		<div class='zcs-header-actions zcs-flex zcs-align-items-center zcs-gap-8'><a class='zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md' href='#Report:Todays_Reservations'><i class='zc-li-outline ui-1-calendar-60'></i><span>Today's reservations</span></a><a class='zcs-button zcs-primary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md'href='#Report:Live_Table_Status'><i class='zc-li-outline furniture-table'></i><span>Live tables</span></a></div>
+	</header>
+	<div class='zcs-kpis'>
+<%
+		metrics = List();
+		metrics.add({"label":"Reservations","value":reservationCount,"icon":"ui-1-calendar-60"});
+		metrics.add({"label":"Expected covers","value":expectedCovers,"icon":"users-single-01"});
+		metrics.add({"label":"Walk-ins","value":walkInCount,"icon":"arrows-1-log-in"});
+		metrics.add({"label":"No-shows","value":noShowCount,"icon":"ui-1-simple-remove"});
+		metrics.add({"label":"Average quoted wait","value":avgQuoted + " min","icon":"ui-2-time"});
+		metrics.add({"label":"Average actual wait","value":avgActualText,"icon":"ui-1-check-circle-08"});
+		metrics.add({"label":"Occupied tables","value":occupiedCount,"icon":"furniture-table"});
+		metrics.add({"label":"Available tables","value":availableCount,"icon":"ui-1-check-circle-08"});
+		metrics.add({"label":"Needs reset","value":resetCount,"icon":"arrows-1-refresh-69"});
+		metrics.add({"label":"Completed visits","value":completedVisits,"icon":"ui-1-check-square-09"});
+		metrics.add({"label":"Average guest rating","value":avgRating + " / 5","icon":"ui-1-star"});
+		for each  metric in metrics
+		{
+			%>
+<div class='zcs-kpi-card zcs-card zcs-p-16'><div class='zcs-flex zcs-justify-space-between zcs-gap-12'><div><div class='zcs-font-13 zcs-color-secondary'><%=metric.get("label")%></div><div class='zcs-font-24 zcs-font-semibold'><%=metric.get("value")%></div></div><div class='zcs-kpi-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline <%=metric.get("icon")%>'></i></div></div></div>
+<%
+		}
+		%>
 </div>
-<% } %>
+	<div class='zcs-main-grid'>
+		<section class='zcs-card zcs-p-16'><div class='zcs-section-title zcs-flex zcs-align-items-center zcs-justify-space-between'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Reservation status distribution</h2><span class='zcs-font-12 zcs-color-secondary'>Today</span></div><div class='zcs-progress-list'>
+<%
+		for each  rs in reservationStatuses
+		{
+			rsCount = Reservations[Reservation_Date_Time >= dayStart && Reservation_Date_Time < dayEnd && Reservation_Status == rs].count();
+			rsPct = ((rsCount * 100.0) / maxReservationStatus).round(0);
+			%>
+<div class='zcs-progress-bar-wrapper zcs-flex zcs-direction-column zcs-gap-6'><div class='zcs-progress-bar'><div class='zcs-progress-bar-indicator' style='width:<%=rsPct%>%;'></div></div><p class='zcs-flex zcs-justify-space-between zcs-font-12 zcs-font-medium zcs-m-0'><span><%=rs%></span><span><%=rsCount%></span></p></div>
+<%
+		}
+		%>
+</div></section>
+		<section class='zcs-card zcs-p-16'><div class='zcs-section-title zcs-flex zcs-align-items-center zcs-justify-space-between'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Table status distribution</h2><a class='zcs-font-12 zcs-color-theme' href='#Report:Live_Table_Status'>Open board</a></div><div class='zcs-progress-list'>
+<%
+		for each  ts in tableStatuses
+		{
+			tsCount = Dining_Tables[Active == true && Operational_Status == ts].count();
+			tsPct = ((tsCount * 100.0) / maxTableStatus).round(0);
+			%>
+<div class='zcs-progress-bar-wrapper zcs-flex zcs-direction-column zcs-gap-6'><div class='zcs-progress-bar'><div class='zcs-progress-bar-indicator' style='width:<%=tsPct%>%;'></div></div><p class='zcs-flex zcs-justify-space-between zcs-font-12 zcs-font-medium zcs-m-0'><span><%=ts%></span><span><%=tsCount%></span></p></div>
+<%
+		}
+		%>
+</div></section>
+	</div>
+	<div class='zcs-three-grid'>
+		<section class='zcs-card zcs-p-16'><div class='zcs-section-title'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Service-period demand</h2><div class='zcs-font-12 zcs-color-secondary'>Today's reservations and covers</div></div><div class='zcs-flex zcs-direction-column zcs-gap-8'>
+<%
+		serviceShown = 0;
+		for each  period in Service_Periods[Active == true] sort by Start_Time asc
+		{
+			periodReservations = Reservations[Reservation_Date_Time >= dayStart && Reservation_Date_Time < dayEnd && Service_Period == period.ID && Reservation_Status != "Cancelled"];
+			periodCovers = ifnull(periodReservations.sum(Party_Size),0);
+			demandPct = if(period.Maximum_Covers > 0,((periodCovers * 100.0) / period.Maximum_Covers).round(0),0);
+			if(demandPct > 100)
+			{
+				demandPct = 100;
+			}
+			serviceShown = serviceShown + 1;
+			%>
+<div class='zcs-service-row'><div class='zcs-flex zcs-justify-space-between'><strong class='zcs-font-14'><%=period.Service_Name%></strong><span class='zcs-font-12'><%=periodReservations.count()%> reservations</span></div><div class='zcs-progress-bar' style='margin:8px 0'><div class='zcs-progress-bar-indicator' style='width:<%=demandPct%>%;'></div></div><div class='zcs-flex zcs-justify-space-between zcs-font-12 zcs-color-secondary'><span><%=periodCovers%> covers</span><span><%=period.Maximum_Covers%> capacity</span></div></div>
+<%
+		}
+		if(serviceShown == 0)
+		{
+			%>
+<div class='zcs-empty'>No active service periods configured.</div>
+<%
+		}
+		%>
+</div></section>
+		<section class='zcs-card zcs-p-16'><div class='zcs-section-title zcs-flex zcs-justify-space-between'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Longest active waits</h2><a class='zcs-font-12 zcs-color-theme' href='#Report:Active_Waitlist'>Open queue</a></div><div class='zcs-flex zcs-direction-column zcs-gap-8'>
+<%
+		waitShown = 0;
+		for each  wait in activeWaits
+		{
+			if(waitShown < 5)
+			{
+				elapsed = (((now - wait.Joined_Date_Time)) / 60000).round(0);
+				waitClass = if(elapsed > wait.Quoted_Wait_Minutes,"zcs-badge-red","zcs-badge-yellow");
+				%>
+<div class='zcs-service-row zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-8'><div><strong class='zcs-font-14'><%=wait.Guest.Guest_Name.first_name%> \u00B7 party <%=wait.Party_Size%></strong><div class='zcs-font-12 zcs-color-secondary'>Quoted <%=wait.Quoted_Wait_Minutes%> min \u00B7 <%=wait.Priority%></div></div><span class='zcs-badge zcs-badge-filled-outline <%=waitClass%> zcs-inline-flex zcs-px-10 zcs-py-2 zcs-rounded-sm zcs-font-12'><%=elapsed%> min</span></div>
+<%
+				waitShown = waitShown + 1;
+			}
+		}
+		if(waitShown == 0)
+		{
+			%>
+<div class='zcs-empty'>No active waits.</div>
+<%
+		}
+		%>
+</div></section>
+		<section class='zcs-card zcs-p-16'><div class='zcs-section-title zcs-flex zcs-justify-space-between'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Late-arrival exceptions</h2><a class='zcs-font-12 zcs-color-theme' href='#Report:Arrival_Exceptions'>Open exceptions</a></div><div class='zcs-flex zcs-direction-column zcs-gap-8'>
+<%
+		lateShown = 0;
+		for each  late in lateArrivals
+		{
+			if(lateShown < 5)
+			{
+				lateMins = (((now - late.Reservation_Date_Time)) / 60000).round(0);
+				%>
+<div class='zcs-service-row zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-8'><div><strong class='zcs-font-14'><%=late.Guest.Guest_Name.first_name%> \u00B7 party <%=late.Party_Size%></strong><div class='zcs-font-12 zcs-color-secondary'><%=late.Reservation_Date_Time.toString("hh:mm a")%> \u00B7 table <%=ifnull(late.Assigned_Table.Table_Number,"Unassigned")%></div></div><span class='zcs-badge zcs-badge-filled-outline zcs-badge-red zcs-inline-flex zcs-px-10 zcs-py-2 zcs-rounded-sm zcs-font-12'><%=lateMins%> min late</span></div>
+<%
+				lateShown = lateShown + 1;
+			}
+		}
+		if(lateShown == 0)
+		{
+			%>
+<div class='zcs-empty'>No late confirmed arrivals.</div>
+<%
+		}
+		%>
+</div></section>
+	</div>
+	<div class='zcs-main-grid'>
+		<section class='zcs-card zcs-p-16'><div class='zcs-section-title zcs-flex zcs-justify-space-between'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Low-rating follow-up queue</h2><div class='zcs-font-12 zcs-color-secondary'>Ratings 1\u20132 requiring manager attention</div></div><a class='zcs-font-12 zcs-color-theme' href='#Report:Feedback_Follow_Up'>Open follow-up</a></div><div class='zcs-table-wrapper'><table class='zcs-w-full'><thead><tr><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14'>Guest</th><th class='zcs-px-16 zcs-py-8 zcs-text-right zcs-font-14'>Rating</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14'>Status</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14'>Received</th></tr></thead><tbody>
+<%
+		feedbackShown = 0;
+		for each  feedback in lowFeedback
+		{
+			if(feedbackShown < 8)
+			{
+				%>
+<tr><td class='zcs-px-16 zcs-py-8 zcs-font-14'><%=feedback.Guest.Guest_Name.first_name%></td><td class='zcs-px-16 zcs-py-8 zcs-text-right zcs-font-14 zcs-color-red'><%=feedback.Overall_Rating%> / 5</td><td class='zcs-px-16 zcs-py-8'><span class='zcs-badge zcs-badge-filled-outline zcs-badge-orange zcs-inline-flex zcs-px-10 zcs-py-2 zcs-rounded-sm zcs-font-12'><%=feedback.Follow_Up_Status%></span></td><td class='zcs-px-16 zcs-py-8 zcs-font-13'><%=feedback.Feedback_Date_Time.toString("dd MMM, hh:mm a")%></td></tr>
+<%
+				feedbackShown = feedbackShown + 1;
+			}
+		}
+		if(feedbackShown == 0)
+		{
+			%>
+<tr><td colspan='4' class='zcs-empty'>No open low-rating follow-ups.</td></tr>
+<%
+		}
+		%>
+</tbody></table></div></section>
+		<section class='zcs-card zcs-p-16'><div class='zcs-section-title zcs-flex zcs-justify-space-between'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>POS staging and integration status</h2><div class='zcs-font-12 zcs-color-secondary'>Readiness queue only; these are not POS sales figures</div></div><a class='zcs-font-12 zcs-color-theme' href='#Report:POS_Sync_Status_Board'>Open staging board</a></div><div class='zcs-row zcs-gap-12'><div class='zcs-card zcs-p-16' style='flex:1'><div class='zcs-font-13 zcs-color-secondary'>Pending or processing</div><div class='zcs-font-28 zcs-font-semibold zcs-color-yellow'><%=posPending%></div></div><div class='zcs-card zcs-p-16' style='flex:1'><div class='zcs-font-13 zcs-color-secondary'>Failed staging items</div><div class='zcs-font-28 zcs-font-semibold zcs-color-red'><%=posFailed%></div></div></div><div class='zcs-pos-note zcs-p-12 zcs-font-13' style='margin-top:12px'><i class='zc-li-outline ui-3-alert'></i> Vendor-neutral synchronization staging is monitored here. No sales, revenue, tender, or payment analytics are represented.</div><div class='zcs-flex zcs-gap-8' style='margin-top:12px'><a class='zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md' href='#Report:Pending_POS_Sync'>Pending</a><a class='zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md' href='#Report:Failed_POS_Sync'>Failed</a></div></section>
+	</div>
+	<section class='zcs-card zcs-p-16' style='margin-bottom:16px'><div class='zcs-section-title zcs-flex zcs-justify-space-between'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Recent audit exceptions</h2><div class='zcs-font-12 zcs-color-secondary'>Exception, recovery, and sync-override events from the last 7 days</div></div><a class='zcs-font-12 zcs-color-theme' href='#Report:Operational_Exceptions'>Open audit exceptions</a></div><div class='zcs-table-wrapper'><table class='zcs-w-full'><thead><tr><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14'>When</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14'>Type</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14'>Entity</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14'>Summary</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14'>Actor</th></tr></thead><tbody>
+<%
+		auditShown = 0;
+		for each  audit in recentAudit
+		{
+			if(auditShown < 10)
+			{
+				auditClass = if(audit.Action_Type == "Exception","zcs-badge-red",if(audit.Action_Type == "Recovery","zcs-badge-green","zcs-badge-blue"));
+				%>
+<tr><td class='zcs-px-16 zcs-py-8 zcs-font-13'><%=audit.Event_Date_Time.toString("dd MMM, hh:mm a")%></td><td class='zcs-px-16 zcs-py-8'><span class='zcs-badge zcs-badge-filled-outline <%=auditClass%> zcs-inline-flex zcs-px-10 zcs-py-2 zcs-rounded-sm zcs-font-12'><%=audit.Action_Type%></span></td><td class='zcs-px-16 zcs-py-8 zcs-font-14'><%=audit.Entity_Type%> <%=ifnull(audit.Entity_Reference,"")%></td><td class='zcs-px-16 zcs-py-8 zcs-font-14'><%=audit.Change_Summary%></td><td class='zcs-px-16 zcs-py-8 zcs-font-13'><%=audit.Actor_Email%></td></tr>
+<%
+				auditShown = auditShown + 1;
+			}
+		}
+		if(auditShown == 0)
+		{
+			%>
+<tr><td colspan='5' class='zcs-empty'>No recent audit exceptions.</td></tr>
+<%
+		}
+		%>
+</tbody></table></div></section>
+	<nav class='zcs-quick-actions-wrapper zcs-card zcs-flex zcs-direction-column zcs-gap-16 zcs-p-16'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Quick links</h2><ul class='zcs-p-0 zcs-m-0'><li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-10'><a class='zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-14 zcs-color-primary' href='#Report:Restaurant_Settings_Report'><i class='zc-li-outline ui-1-settings-gear-63'></i><span>Configuration</span></a></li><li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-10'><a class='zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-14 zcs-color-primary' href='#Report:All_Reservations'><i class='zc-li-outline files-2-doc'></i><span>Operational reports</span></a></li><li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-10'><a class='zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-14 zcs-color-primary' href='#Report:Feedback_Follow_Up'><i class='zc-li-outline ui-1-star'></i><span>Feedback follow-up</span></a></li><li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-10'><a class='zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-14 zcs-color-primary' href='#Report:Failed_POS_Sync'><i class='zc-li-outline ui-3-alert'></i><span>POS sync exceptions</span></a></li><li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-10'><a class='zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-14 zcs-color-primary' href='#Report:Audit_Trail'><i class='zc-li-outline files-single-folded-content'></i><span>Audit trail</span></a></li></ul></nav>
+</div>
+<%
+	}
+%>

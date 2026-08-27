@@ -1,7 +1,36 @@
 Reservation_Status_On_User_Input as "Update Reservation Status Fields"
 {
- type = form
- form = Reservations
- record event = on add or edit
- on user input of Reservation_Status { actions { custom deluge script ( if(input.Reservation_Status == "Cancelled") { show Cancellation_Reason; } else { hide Cancellation_Reason; } if(input.Reservation_Status == "No Show") { show No_Show_Reason; } else { hide No_Show_Reason; } ) } }
+
+				type =  form
+				form = Reservations
+
+				record event = on add or edit
+
+				on user input of Reservation_Status
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											if(input.Reservation_Status == "Cancelled")
+										{
+											show Cancellation_Reason;
+										}
+										else
+										{
+											hide Cancellation_Reason;
+										}
+										if(input.Reservation_Status == "No Show")
+										{
+											show No_Show_Reason;
+										}
+										else
+										{
+											hide No_Show_Reason;
+										}
+						)
+					}
+				}
+
+			
 }

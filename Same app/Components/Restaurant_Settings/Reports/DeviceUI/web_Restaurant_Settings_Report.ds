@@ -1,5 +1,86 @@
 report Restaurant_Settings_Report
 {
- quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Restaurant_Name Venue_Code Contact_Email Contact_Phone Time_Zone Currency_Code Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
- detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Restaurant_Name Venue_Code Contact_Email Contact_Phone Time_Zone Currency_Code Default_Reservation_Duration_Minutes Table_Turn_Buffer_Minutes Arrival_Grace_Period_Minutes Default_Wait_Quote_Minutes Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+
+				quickview
+				(
+					layout
+					(
+						datablock1
+						(
+							fields
+							(
+								Restaurant_Name
+								Venue_Code
+								Contact_Email
+								Contact_Phone
+								Time_Zone
+								Currency_Code
+								Active
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+								Duplicate 
+								Delete 
+							)
+						record
+						(
+							Edit   	   
+							Duplicate   	   
+							Delete   	   
+    					)
+						)
+    				action
+    				(
+						on click
+						(
+							View Record   	   
+    					)
+						on right click
+						(
+							Edit   	   
+							Delete   	   
+							Duplicate   	   
+							View Record   	   
+    					)
+     				)
+				)
+
+				detailview
+				(
+					layout
+					(
+						datablock1
+						(
+							fields
+							(
+								Restaurant_Name
+								Venue_Code
+								Contact_Email
+								Contact_Phone
+								Time_Zone
+								Currency_Code
+								Default_Reservation_Duration_Minutes
+								Table_Turn_Buffer_Minutes
+								Arrival_Grace_Period_Minutes
+								Default_Wait_Quote_Minutes
+								Active
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+								Duplicate 
+								Delete 
+							)
+						)
+				)
+			
 }

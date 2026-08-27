@@ -1,7 +1,25 @@
 Service_Period_On_User_Input as "Apply Service Duration"
 {
- type = form
- form = Reservations
- record event = on add or edit
- on user input of Service_Period { actions { custom deluge script ( if(input.Service_Period != null && input.Reservation_Date_Time != null) { service = Service_Periods[ID == input.Service_Period]; input.Expected_End_Date_Time = input.Reservation_Date_Time.addMinutes(service.Default_Duration_Minutes); } ) } }
+
+				type =  form
+				form = Reservations
+
+				record event = on add or edit
+
+				on user input of Service_Period
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											if(input.Service_Period != null && input.Reservation_Date_Time != null)
+										{
+											service = Service_Periods[ID == input.Service_Period];
+											input.Expected_End_Date_Time = input.Reservation_Date_Time.addMinutes(service.Default_Duration_Minutes);
+										}
+						)
+					}
+				}
+
+			
 }

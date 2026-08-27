@@ -1,7 +1,63 @@
 Reservations_On_Validate as "Validate Reservation"
 {
- type = form
- form = Reservations
- record event = on add or edit
- on validate { actions { custom deluge script ( if(ifnull(input.Party_Size,0) <= 0) { alert "Party size must be greater than zero."; cancel submit; } service = Service_Periods[ID == input.Service_Period]; if(service.count() == 0 || service.Active != true) { alert "Select an active service period."; cancel submit; } input.Expected_End_Date_Time = input.Reservation_Date_Time.addMinutes(service.Default_Duration_Minutes); if(input.Assigned_Table != null) { tableRec = Dining_Tables[ID == input.Assigned_Table]; if(tableRec.Active != true || tableRec.Capacity < input.Party_Size) { alert "Assigned table is inactive or too small."; cancel submit; } overlap = Reservations[ID != input.ID && Assigned_Table == input.Assigned_Table && Reservation_Status != "Cancelled" && Reservation_Status != "No Show" && Reservation_Status != "Completed" && Reservation_Date_Time < input.Expected_End_Date_Time && Expected_End_Date_Time > input.Reservation_Date_Time].count(); if(overlap > 0) { alert "The assigned table has an overlapping reservation."; cancel submit; } } covers = Reservations[ID != input.ID && Service_Period == input.Service_Period && Reservation_Date_Time >= input.Reservation_Date_Time.toDate() && Reservation_Date_Time < input.Reservation_Date_Time.toDate().addDay(1) && Reservation_Status != "Cancelled" && Reservation_Status != "No Show"].sum(Party_Size); if(ifnull(covers,0) + input.Party_Size > service.Maximum_Covers) { alert "This service period has reached its cover capacity."; cancel submit; } if(input.Reservation_Status == "Cancelled" && ifnull(input.Cancellation_Reason,"").trim() == "") { alert "Cancellation reason is required."; cancel submit; } if(input.Reservation_Status == "No Show" && ifnull(input.No_Show_Reason,"").trim() == "") { alert "No-show reason is required."; cancel submit; } ) } }
+
+				type =  form
+				form = Reservations
+
+				record event = on add or edit
+
+				on validate
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											if(ifnull(input.Party_Size,0) <= 0)
+										{
+											alert "Party size must be greater than zero.";
+											cancel submit;
+										}
+										service = Service_Periods[ID == input.Service_Period];
+										if(service.count() == 0 || service.Active != true)
+										{
+											alert "Select an active service period.";
+											cancel submit;
+										}
+										input.Expected_End_Date_Time = input.Reservation_Date_Time.addMinutes(service.Default_Duration_Minutes);
+										if(input.Assigned_Table != null)
+										{
+											tableRec = Dining_Tables[ID == input.Assigned_Table];
+											if(tableRec.Active != true || tableRec.Capacity < input.Party_Size)
+											{
+												alert "Assigned table is inactive or too small.";
+												cancel submit;
+											}
+											overlap = Reservations[ID != input.ID && Assigned_Table == input.Assigned_Table && Reservation_Status != "Cancelled" && Reservation_Status != "No Show" && Reservation_Status != "Completed" && Reservation_Date_Time < input.Expected_End_Date_Time && Expected_End_Date_Time > input.Reservation_Date_Time].count();
+											if(overlap > 0)
+											{
+												alert "The assigned table has an overlapping reservation.";
+												cancel submit;
+											}
+										}
+										covers = Reservations[ID != input.ID && Service_Period == input.Service_Period && Reservation_Date_Time >= input.Reservation_Date_Time.toDate() && Reservation_Date_Time < input.Reservation_Date_Time.toDate().addDay(1) && Reservation_Status != "Cancelled" && Reservation_Status != "No Show"].sum(Party_Size);
+										if(ifnull(covers,0) + input.Party_Size > service.Maximum_Covers)
+										{
+											alert "This service period has reached its cover capacity.";
+											cancel submit;
+										}
+										if(input.Reservation_Status == "Cancelled" && ifnull(input.Cancellation_Reason,"").trim() == "")
+										{
+											alert "Cancellation reason is required.";
+											cancel submit;
+										}
+										if(input.Reservation_Status == "No Show" && ifnull(input.No_Show_Reason,"").trim() == "")
+										{
+											alert "No-show reason is required.";
+											cancel submit;
+										}
+						)
+					}
+				}
+
+			
 }

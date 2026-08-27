@@ -1,7 +1,62 @@
 Waitlist_Entries_On_Success as "Process Waitlist Status"
 {
- type = form
- form = Waitlist_Entries
- record event = on add or edit
- on success { actions { custom deluge script ( entry = Waitlist_Entries[ID == input.ID]; if(input.Waitlist_Status == "Notified" && entry.Offered_Date_Time == null) { entry.Offered_Date_Time = zoho.currenttime; } if(input.Waitlist_Status == "Seated") { if(entry.Seated_Date_Time == null) { entry.Seated_Date_Time = zoho.currenttime; } if(Dining_Visits[Waitlist_Entry == input.ID].count() == 0) { visitId = insert into Dining_Visits [ Guest=input.Guest Waitlist_Entry=input.ID Reservation=input.Related_Reservation Dining_Table=input.Assigned_Table Party_Size=input.Party_Size Visit_Status="Seated" Seated_Date_Time=zoho.currenttime POS_Sync_Status="Pending" ]; } tableRec = Dining_Tables[ID == input.Assigned_Table]; tableRec.Operational_Status = "Occupied"; insert into Audit_Log [ Event_Date_Time=zoho.currenttime Actor_Email=zoho.loginuser Action_Type="Assignment" Entity_Type="Waitlist Entry" Entity_Record_ID=input.ID Entity_Reference=input.Waitlist_Number.toString() Change_Summary="Waitlist party seated at table " + tableRec.Table_Number After_Value="Seated" Source="Workflow" ]; } ) } }
+
+				type =  form
+				form = Waitlist_Entries
+
+				record event = on add or edit
+
+				on success
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											entry = Waitlist_Entries[ID == input.ID];
+										if(input.Waitlist_Status == "Notified" && entry.Offered_Date_Time == null)
+										{
+											entry.Offered_Date_Time=zoho.currenttime;
+										}
+										if(input.Waitlist_Status == "Seated")
+										{
+											if(entry.Seated_Date_Time == null)
+											{
+												entry.Seated_Date_Time=zoho.currenttime;
+											}
+											if(Dining_Visits[Waitlist_Entry == input.ID].count() == 0)
+											{
+												visitId = insert into Dining_Visits
+												[
+													Guest=input.Guest
+													Waitlist_Entry=input.ID
+													Reservation=input.Related_Reservation
+													Dining_Table=input.Assigned_Table
+													Party_Size=input.Party_Size
+													Visit_Status="Seated"
+													Seated_Date_Time=zoho.currenttime
+													POS_Sync_Status="Pending"
+													Added_User=zoho.loginuser
+												];
+											}
+											tableRec = Dining_Tables[ID == input.Assigned_Table];
+											tableRec.Operational_Status="Occupied";
+											insert into Audit_Log
+											[
+												Event_Date_Time=zoho.currenttime
+												Actor_Email=zoho.loginuser
+												Action_Type="Assignment"
+												Entity_Type="Waitlist Entry"
+												Entity_Record_ID=input.ID
+												Entity_Reference=input.Waitlist_Number.toString()
+												Change_Summary="Waitlist party seated at table " + tableRec.Table_Number
+												After_Value="Seated"
+												Source="Workflow"
+												Added_User=zoho.loginuser
+											]
+										}
+						)
+					}
+				}
+
+			
 }

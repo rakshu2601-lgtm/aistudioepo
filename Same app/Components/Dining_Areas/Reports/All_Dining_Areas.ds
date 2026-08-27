@@ -1,23 +1,25 @@
 default list All_Dining_Areas
 {
-    displayName = "All Dining Areas"
-    show all rows from Dining_Areas
-    (
-        Area_Code
-        Area_Name
-        Area_Type
-        Description
-        Display_Order
-        Active
-    )
-    filters
-    (
-        Area_Type
-        Active
-    )
-    sort by
-    (
-        Display_Order ascending
-        Area_Name ascending
-    )
+
+			displayName = "All Dining Areas"
+			show all rows from Dining_Areas    
+			(
+				Area_Code
+				Area_Name
+				Area_Type
+				Description
+				Display_Order
+				Active
+			)
+			filters
+			(
+				Area_Type
+				Active
+			)
+			sort by
+			(
+				Display_Order ascending
+				Area_Name ascending
+			)
+		
 }

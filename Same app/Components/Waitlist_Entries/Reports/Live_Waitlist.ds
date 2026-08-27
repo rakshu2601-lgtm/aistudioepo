@@ -1,8 +1,35 @@
 kanban Live_Waitlist
 {
- displayName = "Live Waitlist"
- show all rows from Waitlist_Entries [Waitlist_Status != "Removed" && Waitlist_Status != "Expired"] ( Waitlist_Number Guest Party_Size Joined_Date_Time Preferred_Area Quoted_Wait_Minutes Waitlist_Status Priority Assigned_Table )
- filters ( Priority Preferred_Area Waitlist_Status )
- sort by ( Joined_Date_Time ascending )
- options ( display field = Waitlist_Status filter type = manual sort order = custom record count = enable )
+
+			displayName = "Live Waitlist"
+			show all rows from Waitlist_Entries  [Waitlist_Status != "Removed" && Waitlist_Status != "Expired"]  
+			(
+				Waitlist_Number
+				Guest
+				Party_Size
+				Joined_Date_Time
+				Preferred_Area
+				Quoted_Wait_Minutes
+				Waitlist_Status
+				Priority
+				Assigned_Table
+			)
+			filters
+			(
+				Priority
+				Preferred_Area
+				Waitlist_Status
+			)
+			sort by
+			(
+				Joined_Date_Time ascending
+			)
+			options
+			(
+	 			display field = Waitlist_Status
+				filter type  = manual
+				sort order  = custom
+				record count  = enable
+	 		)
+		
 }

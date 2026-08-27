@@ -1,7 +1,36 @@
 POS_Sync_Log_On_Success as "Audit POS Sync Override"
 {
- type = form
- form = POS_Sync_Log
- record event = on edit
- on success { actions { custom deluge script ( if(input.Sync_Status == "Pending" || input.Sync_Status == "Ignored") { insert into Audit_Log [ Event_Date_Time=zoho.currenttime Actor_Email=zoho.loginuser Action_Type="Sync Override" Entity_Type="POS Sync Log" Entity_Record_ID=input.ID Entity_Reference=input.Sync_Number.toString() Change_Summary="POS staging status manually set to " + input.Sync_Status After_Value=input.Sync_Status Source="POS Staging" ]; } ) } }
+
+				type =  form
+				form = POS_Sync_Log
+
+				record event = on edit
+
+				on success
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											if(input.Sync_Status == "Pending" || input.Sync_Status == "Ignored")
+										{
+											insert into Audit_Log
+											[
+												Event_Date_Time=zoho.currenttime
+												Actor_Email=zoho.loginuser
+												Action_Type="Sync Override"
+												Entity_Type="POS Sync Log"
+												Entity_Record_ID=input.ID
+												Entity_Reference=input.Sync_Number.toString()
+												Change_Summary="POS staging status manually set to " + input.Sync_Status
+												After_Value=input.Sync_Status
+												Source="POS Staging"
+												Added_User=zoho.loginuser
+											]
+										}
+						)
+					}
+				}
+
+			
 }

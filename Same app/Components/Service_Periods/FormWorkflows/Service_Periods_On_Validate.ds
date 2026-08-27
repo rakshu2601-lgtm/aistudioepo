@@ -1,36 +1,40 @@
 Service_Periods_On_Validate as "Validate Service Period"
 {
-    type = form
-    form = Service_Periods
-    record event = on add or edit
 
-    on validate
-    {
-        actions
-        {
-            custom deluge script
-            (
-                if(input.Start_Time >= input.End_Time)
-                {
-                    alert "Service start time must be before end time.";
-                    cancel submit;
-                }
-                if(input.Last_Seating_Time < input.Start_Time || input.Last_Seating_Time > input.End_Time)
-                {
-                    alert "Last seating time must fall within the service period.";
-                    cancel submit;
-                }
-                if(ifnull(input.Booking_Interval_Minutes,0) <= 0 || ifnull(input.Default_Duration_Minutes,0) <= 0 || ifnull(input.Maximum_Covers,0) <= 0)
-                {
-                    alert "Booking interval, default duration, and maximum covers must be greater than zero.";
-                    cancel submit;
-                }
-                if(input.Days_Of_Week == null || input.Days_Of_Week.isEmpty())
-                {
-                    alert "Select at least one operating day.";
-                    cancel submit;
-                }
-            )
-        }
-    }
+				type =  form
+				form = Service_Periods
+
+				record event = on add or edit
+
+				on validate
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											if(input.Start_Time >= input.End_Time)
+										{
+											alert "Service start time must be before end time.";
+											cancel submit;
+										}
+										if(input.Last_Seating_Time < input.Start_Time || input.Last_Seating_Time > input.End_Time)
+										{
+											alert "Last seating time must fall within the service period.";
+											cancel submit;
+										}
+										if(ifnull(input.Booking_Interval_Minutes,0) <= 0 || ifnull(input.Default_Duration_Minutes,0) <= 0 || ifnull(input.Maximum_Covers,0) <= 0)
+										{
+											alert "Booking interval, default duration, and maximum covers must be greater than zero.";
+											cancel submit;
+										}
+										if(input.Days_Of_Week == null || input.Days_Of_Week.isEmpty())
+										{
+											alert "Select at least one operating day.";
+											cancel submit;
+										}
+						)
+					}
+				}
+
+			
 }

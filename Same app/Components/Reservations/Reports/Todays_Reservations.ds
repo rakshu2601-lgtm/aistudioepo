@@ -1,7 +1,30 @@
 list Todays_Reservations
 {
- displayName = "Today's Reservations"
- show all rows from Reservations [Reservation_Date_Time >= zoho.currentdate && Reservation_Date_Time < zoho.currentdate.addDay(1)] ( Reservation_Number Guest Reservation_Date_Time Expected_End_Date_Time Service_Period Party_Size Assigned_Table Reservation_Status Booking_Source Occasion Special_Requests )
- filters ( Service_Period Reservation_Status Assigned_Table )
- sort by ( Reservation_Date_Time ascending )
+
+			displayName = "Today's Reservations"
+			show all rows from Reservations  [Reservation_Date_Time >= zoho.currentdate && Reservation_Date_Time < zoho.currentdate.addDay(1)]  
+			(
+				Reservation_Number
+				Guest
+				Reservation_Date_Time
+				Expected_End_Date_Time
+				Service_Period
+				Party_Size
+				Assigned_Table
+				Reservation_Status
+				Booking_Source
+				Occasion
+				Special_Requests
+			)
+			filters
+			(
+				Service_Period
+				Reservation_Status
+				Assigned_Table
+			)
+			sort by
+			(
+				Reservation_Date_Time ascending
+			)
+		
 }

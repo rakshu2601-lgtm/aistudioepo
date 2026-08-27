@@ -1,7 +1,30 @@
 POS_Sync_Log_On_Validate as "Validate POS Sync Entry"
 {
- type = form
- form = POS_Sync_Log
- record event = on add or edit
- on validate { actions { custom deluge script ( if(ifnull(input.Local_Record_ID,0) <= 0) { alert "Local record ID must be greater than zero."; cancel submit; } if(input.Sync_Status == "Failed" && ifnull(input.Error_Message,"").trim() == "") { alert "Error message is required for a failed sync entry."; cancel submit; } ) } }
+
+				type =  form
+				form = POS_Sync_Log
+
+				record event = on add or edit
+
+				on validate
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											if(ifnull(input.Local_Record_ID,0) <= 0)
+										{
+											alert "Local record ID must be greater than zero.";
+											cancel submit;
+										}
+										if(input.Sync_Status == "Failed" && ifnull(input.Error_Message,"").trim() == "")
+										{
+											alert "Error message is required for a failed sync entry.";
+											cancel submit;
+										}
+						)
+					}
+				}
+
+			
 }

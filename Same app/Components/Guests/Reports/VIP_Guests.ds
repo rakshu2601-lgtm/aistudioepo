@@ -1,23 +1,25 @@
 list VIP_Guests
 {
-    displayName = "VIP Guests"
-    show all rows from Guests [VIP_Guest == true && Active == true]
-    (
-        Guest_Number
-        Guest_Name
-        Mobile_Number
-        Email_Address
-        Dietary_Preferences
-        Allergy_Notes
-        Seating_Preferences
-        Total_Visits
-        Last_Visit_Date
-        VIP_Guest
-        Active
-    )
-    sort by
-    (
-        Last_Visit_Date descending
-        Guest_Name ascending
-    )
+
+			displayName = "VIP Guests"
+			show all rows from Guests  [VIP_Guest == true && Active == true]  
+			(
+				Guest_Number
+				Guest_Name 
+				Mobile_Number
+				Email_Address
+				Dietary_Preferences
+				Allergy_Notes
+				Seating_Preferences
+				Total_Visits
+				Last_Visit_Date
+				VIP_Guest
+				Active
+			)
+			sort by
+			(
+				Last_Visit_Date descending
+				Guest_Name.first_name ascending
+			)
+		
 }

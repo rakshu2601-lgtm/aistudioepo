@@ -1,89 +1,210 @@
 "Host"
 {
-    name = "Host"
-    type = Users_Permissions
-    permissions = {Chat:true,Predefined:false,ApiAccess:false,PIIAccess:true,ePHIAccess:false}
-    description = "Host staff managing guests, reservations, waitlist, table assignment, seating, and feedback capture."
-    ModulePermissions
-    {
-        Restaurant_Settings { enabled = Viewall,View,Search allFieldsVisible = true ReportPermissions { Restaurant_Settings_Report={"View"} } }
-        Dining_Areas { enabled = Viewall,View,Search allFieldsVisible = true ReportPermissions { All_Dining_Areas={"View"} Active_Dining_Areas={"View"} } }
-        Dining_Tables
-        {
-            enabled = Viewall,Modifyall,Tab,View,Edit,Search
-            allFieldsVisible = false
-            FieldPermissions
-            {
-                Table_Number{visibility:true,readonly:true}
-                Dining_Area{visibility:true,readonly:true}
-                Capacity{visibility:true,readonly:true}
-                Table_Type{visibility:true,readonly:true}
-                Combination_Group{visibility:true,readonly:true}
-                Combinable{visibility:true,readonly:true}
-                POS_Table_ID{visibility:false}
-                Operational_Status{visibility:true,readonly:false}
-                Block_Reason{visibility:true,readonly:false}
-                Active{visibility:true,readonly:true}
-            }
-            ReportPermissions { All_Dining_Tables={"View","Edit"} Live_Table_Status={"View","Edit"} Available_Tables={"View","Edit"} }
-        }
-        Guests
-        {
-            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search
-            allFieldsVisible = false
-            FieldPermissions
-            {
-                Guest_Number{visibility:true,readonly:true}
-                Guest_Name{visibility:true,readonly:false}
-                Mobile_Number{visibility:true,readonly:false}
-                Email_Address{visibility:true,readonly:false}
-                Preferred_Contact_Method{visibility:true,readonly:false}
-                Contact_Consent{visibility:true,readonly:false}
-                Active{visibility:true,readonly:false}
-                Dietary_Preferences{visibility:true,readonly:false}
-                Allergy_Notes{visibility:true,readonly:false}
-                Seating_Preferences{visibility:true,readonly:false}
-                VIP_Guest{visibility:true,readonly:true}
-                Total_Visits{visibility:true,readonly:true}
-                No_Show_Count{visibility:true,readonly:true}
-                Last_Visit_Date{visibility:true,readonly:true}
-                Guest_Notes{visibility:true,readonly:false}
-            }
-            ReportPermissions { All_Guests={"View","Edit","Delete"} VIP_Guests={"View"} Guests_With_Allergies={"View","Edit"} }
-        }
-        Service_Periods { enabled = Viewall,View,Search allFieldsVisible = true ReportPermissions { All_Service_Periods={"View"} Active_Service_Periods={"View"} } }
-        Reservations
-        {
-            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search
-            allFieldsVisible = false
-            FieldPermissions
-            {
-                Reservation_Number{visibility:true,readonly:true} Guest{visibility:true,readonly:false} Reservation_Date_Time{visibility:true,readonly:false} Expected_End_Date_Time{visibility:true,readonly:true} Service_Period{visibility:true,readonly:false} Party_Size{visibility:true,readonly:false} Assigned_Table{visibility:true,readonly:false} Reservation_Status{visibility:true,readonly:false} Booking_Source{visibility:true,readonly:false} Occasion{visibility:true,readonly:false} Special_Requests{visibility:true,readonly:false} Internal_Notes{visibility:true,readonly:false} Arrival_Time{visibility:true,readonly:true} Seated_Time{visibility:true,readonly:true} Completed_Time{visibility:true,readonly:true} Cancellation_Time{visibility:true,readonly:true} Cancellation_Reason{visibility:true,readonly:false} No_Show_Reason{visibility:true,readonly:false} POS_Reservation_ID{visibility:false} POS_Sync_Status{visibility:false}
-            }
-            ReportPermissions { All_Reservations={"View","Edit","Delete"} Reservation_Calendar={"View","Edit"} Reservation_Status_Board={"View","Edit"} Todays_Reservations={"View","Edit"} Arrival_Exceptions={"View","Edit"} }
-        }
-        Waitlist_Entries { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Waitlist_Entries={"View","Edit","Delete"} Live_Waitlist={"View","Edit"} Active_Waitlist={"View","Edit"} } }
-        Dining_Visits
-        {
-            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search
-            allFieldsVisible = false
-            FieldPermissions
-            {
-                Visit_Number{visibility:true,readonly:true} Guest{visibility:true,readonly:false} Reservation{visibility:true,readonly:false} Waitlist_Entry{visibility:true,readonly:false} Dining_Table{visibility:true,readonly:false} Party_Size{visibility:true,readonly:false} Visit_Status{visibility:true,readonly:false} Server_Name{visibility:true,readonly:false} Seated_Date_Time{visibility:true,readonly:true} Check_Requested_Date_Time{visibility:true,readonly:true} Paid_Date_Time{visibility:true,readonly:true} Closed_Date_Time{visibility:true,readonly:true} POS_Check_ID{visibility:false} POS_Check_Total{visibility:false} POS_Sync_Status{visibility:false} Service_Notes{visibility:true,readonly:false}
-            }
-            ReportPermissions { All_Dining_Visits={"View","Edit","Delete"} Live_Dining_Room={"View","Edit"} Completed_Visits={"View"} POS_Check_Exceptions={"View"} }
-        }
-        Guest_Feedback
-        {
-            enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search
-            allFieldsVisible = false
-            FieldPermissions
-            {
-                Feedback_Number{visibility:true,readonly:true} Guest{visibility:true,readonly:false} Dining_Visit{visibility:true,readonly:false} Feedback_Date_Time{visibility:true,readonly:false} Overall_Rating{visibility:true,readonly:false} Service_Rating{visibility:true,readonly:false} Ambience_Rating{visibility:true,readonly:false} Comments{visibility:true,readonly:false} Would_Return{visibility:true,readonly:false} Follow_Up_Required{visibility:true,readonly:true} Follow_Up_Status{visibility:true,readonly:true} Recovery_Action{visibility:false} Manager_Notes{visibility:false}
-            }
-            ReportPermissions { All_Guest_Feedback={"View","Edit"} Low_Rating_Feedback={"View"} Feedback_Follow_Up={"View"} }
-        }
-        Host_Operations { enabled = tab }
-        Live_Floor_Board { enabled = tab }
-    }
+
+				name = "Host"
+				type = Users_Permissions
+				permissions = {Chat:true, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false}
+				description = "Host staff managing guests, reservations, waitlist, table assignment, seating, and feedback capture.\n"
+				ModulePermissions
+				{
+					Dining_Tables
+					{
+						enabled= Create,Viewall,Modifyall,Tab,View,Edit,Search 
+						ReportPermissions
+						{
+							Available_Tables={"View","Edit"}
+							All_Dining_Tables={"View","Edit"}
+							Live_Table_Status={"View","Edit"}
+						}
+						FieldPermissions
+						{
+							POS_Table_ID{visibility:false,readonly:false}
+							Combinable{visibility:true,readonly:true}
+							Active{visibility:true,readonly:true}
+							Capacity{visibility:true,readonly:true}
+							Table_Details{visibility:false,readonly:false}
+							Table_Number{visibility:true,readonly:true}
+							Block_Reason{visibility:true,readonly:false}
+							Combination_Group{visibility:true,readonly:true}
+							Operational_Status{visibility:true,readonly:false}
+							Table_Type{visibility:true,readonly:true}
+							Dining_Area{visibility:true,readonly:true}
+						}
+					}
+					Waitlist_Entries
+					{
+						enabled= Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search 
+						allFieldsVisible= true 
+						ReportPermissions
+						{
+							Active_Waitlist={"View","Edit"}
+							All_Waitlist_Entries={"View","Edit","Delete"}
+							Live_Waitlist={"View","Edit"}
+						}
+					}
+					Dining_Visits
+					{
+						enabled= Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search 
+						ReportPermissions
+						{
+							Completed_Visits={"View"}
+							POS_Check_Exceptions={"View"}
+							All_Dining_Visits={"View","Edit","Delete"}
+							Live_Dining_Room={"View","Edit"}
+						}
+						FieldPermissions
+						{
+							Waitlist_Entry{visibility:true,readonly:false}
+							Dining_Table{visibility:true,readonly:false}
+							Server_Name{visibility:true,readonly:false}
+							Guest{visibility:true,readonly:false}
+							Check_Requested_Date_Time{visibility:true,readonly:true}
+							Party_Size{visibility:true,readonly:false}
+							Service_Notes{visibility:true,readonly:false}
+							Visit_Details{visibility:false,readonly:false}
+							POS_Sync_Status{visibility:false,readonly:false}
+							Reservation{visibility:true,readonly:false}
+							Visit_Status{visibility:true,readonly:false}
+							Closed_Date_Time{visibility:true,readonly:true}
+							POS_Context{visibility:false,readonly:false}
+							POS_Check_Total{visibility:false,readonly:false}
+							Seated_Date_Time{visibility:true,readonly:true}
+							POS_Check_ID{visibility:false,readonly:false}
+							Paid_Date_Time{visibility:true,readonly:true}
+							Visit_Number{visibility:true,readonly:true}
+						}
+					}
+					Guests
+					{
+						enabled= Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search 
+						ReportPermissions
+						{
+							All_Guests={"View","Edit","Delete"}
+							VIP_Guests={"View"}
+							Guests_With_Allergies={"View","Edit"}
+						}
+						FieldPermissions
+						{
+							Seating_Preferences{visibility:true,readonly:false}
+							Email_Address{visibility:true,readonly:false}
+							Guest_Name{visibility:true,readonly:false}
+							Guest_Number{visibility:true,readonly:true}
+							Allergy_Notes{visibility:true,readonly:false}
+							Contact_Consent{visibility:true,readonly:false}
+							Guest_Notes{visibility:true,readonly:false}
+							Last_Visit_Date{visibility:true,readonly:true}
+							Active{visibility:true,readonly:false}
+							Total_Visits{visibility:true,readonly:true}
+							Dietary_Preferences{visibility:true,readonly:false}
+							VIP_Guest{visibility:true,readonly:true}
+							Mobile_Number{visibility:true,readonly:false}
+							Guest_Preferences{visibility:false,readonly:false}
+							Guest_Profile{visibility:false,readonly:false}
+							Preferred_Contact_Method{visibility:true,readonly:false}
+							No_Show_Count{visibility:true,readonly:true}
+						}
+					}
+					Restaurant_Settings
+					{
+						enabled= Viewall,View,Search 
+						allFieldsVisible= true 
+						ReportPermissions
+						{
+							Restaurant_Settings_Report={"View"}
+						}
+					}
+					Dining_Areas
+					{
+						enabled= Viewall,View,Search 
+						allFieldsVisible= true 
+						ReportPermissions
+						{
+							Active_Dining_Areas={"View"}
+							All_Dining_Areas={"View"}
+						}
+					}
+					Guest_Feedback
+					{
+						enabled= Create,Viewall,Modifyall,Tab,View,Edit,Search 
+						ReportPermissions
+						{
+							All_Guest_Feedback={"View","Edit"}
+							Feedback_Follow_Up={"View"}
+							Low_Rating_Feedback={"View"}
+						}
+						FieldPermissions
+						{
+							Comments{visibility:true,readonly:false}
+							Feedback_Details{visibility:false,readonly:false}
+							Guest{visibility:true,readonly:false}
+							Would_Return{visibility:true,readonly:false}
+							Recovery_Action{visibility:false,readonly:false}
+							Overall_Rating{visibility:true,readonly:false}
+							Dining_Visit{visibility:true,readonly:false}
+							Service_Rating{visibility:true,readonly:false}
+							Follow_Up_Required{visibility:true,readonly:true}
+							Feedback_Date_Time{visibility:true,readonly:false}
+							Ambience_Rating{visibility:true,readonly:false}
+							Follow_Up_Status{visibility:true,readonly:true}
+							Feedback_Number{visibility:true,readonly:true}
+							Manager_Notes{visibility:false,readonly:false}
+						}
+					}
+					Reservations
+					{
+						enabled= Create,Viewall,Modifyall,Tab,View,Edit,Delete,Search 
+						ReportPermissions
+						{
+							Reservation_Calendar={"View","Edit"}
+							Todays_Reservations={"View","Edit"}
+							All_Reservations={"View","Edit","Delete"}
+							Arrival_Exceptions={"View","Edit"}
+							Reservation_Status_Board={"View","Edit"}
+						}
+						FieldPermissions
+						{
+							Booking_Source{visibility:true,readonly:false}
+							Cancellation_Reason{visibility:true,readonly:false}
+							Occasion{visibility:true,readonly:false}
+							POS_Reservation_ID{visibility:false,readonly:false}
+							Lifecycle{visibility:false,readonly:false}
+							Reservation_Date_Time{visibility:true,readonly:false}
+							Guest{visibility:true,readonly:false}
+							Cancellation_Time{visibility:true,readonly:true}
+							Completed_Time{visibility:true,readonly:true}
+							Party_Size{visibility:true,readonly:false}
+							POS_Sync_Status{visibility:false,readonly:false}
+							Special_Requests{visibility:true,readonly:false}
+							Service_Period{visibility:true,readonly:false}
+							Internal_Notes{visibility:true,readonly:false}
+							Reservation_Details{visibility:false,readonly:false}
+							Expected_End_Date_Time{visibility:true,readonly:true}
+							No_Show_Reason{visibility:true,readonly:false}
+							Reservation_Number{visibility:true,readonly:true}
+							Assigned_Table{visibility:true,readonly:false}
+							Seated_Time{visibility:true,readonly:true}
+							Reservation_Status{visibility:true,readonly:false}
+							Arrival_Time{visibility:true,readonly:true}
+						}
+					}
+					Service_Periods
+					{
+						enabled= Viewall,View,Search 
+						allFieldsVisible= true 
+						ReportPermissions
+						{
+							All_Service_Periods={"View"}
+							Active_Service_Periods={"View"}
+						}
+					}
+					Host_Operations
+					{
+						enabled = tab
+					}
+					Live_Floor_Board
+					{
+						enabled = tab
+					}
+				}
+			
 }

@@ -1,7 +1,34 @@
 default list All_Waitlist_Entries
 {
- displayName = "All Waitlist Entries"
- show all rows from Waitlist_Entries ( Waitlist_Number Guest Party_Size Joined_Date_Time Preferred_Area Quoted_Wait_Minutes Waitlist_Status Priority Notification_Method Offered_Date_Time Seated_Date_Time Related_Reservation Assigned_Table Removal_Reason )
- filters ( Waitlist_Status Priority Preferred_Area Notification_Method )
- sort by ( Joined_Date_Time descending )
+
+			displayName = "All Waitlist Entries"
+			show all rows from Waitlist_Entries    
+			(
+				Waitlist_Number
+				Guest
+				Party_Size
+				Joined_Date_Time
+				Preferred_Area
+				Quoted_Wait_Minutes
+				Waitlist_Status
+				Priority
+				Notification_Method
+				Offered_Date_Time
+				Seated_Date_Time
+				Related_Reservation
+				Assigned_Table
+				Removal_Reason
+			)
+			filters
+			(
+				Waitlist_Status
+				Priority
+				Preferred_Area
+				Notification_Method
+			)
+			sort by
+			(
+				Joined_Date_Time descending
+			)
+		
 }

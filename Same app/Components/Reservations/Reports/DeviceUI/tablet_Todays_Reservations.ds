@@ -1,1 +1,83 @@
-report Todays_Reservations { quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Reservation_Number Guest Reservation_Date_Time Party_Size Assigned_Table Reservation_Status ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on tap ( View Record ) on long press ( Edit View Record ) on right swipe ( Edit ) ) ) detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Reservation_Number Guest Reservation_Date_Time Expected_End_Date_Time Service_Period Party_Size Assigned_Table Reservation_Status Booking_Source Occasion Special_Requests ) ) ) menu ( header ( Edit ) ) ) }
+report Todays_Reservations
+{
+
+				quickview
+				(
+					layout
+					(
+		 				type = -1
+						datablock1
+						(
+							layout type = -1
+							fields
+							(
+								Reservation_Number
+								Guest
+								Reservation_Date_Time
+								Party_Size
+								Assigned_Table
+								Reservation_Status
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+							)
+						record
+						(
+							Edit   	   
+    					)
+						)
+    				action
+    				(
+						on tap
+						(
+							View Record   	   
+    					)
+						on long press
+						(
+							Edit   	   
+							View Record   	   
+    					)
+						on right swipe
+						(
+							Edit   	   
+    					)
+     				)
+				)
+
+				detailview
+				(
+					layout
+					(
+						datablock1
+						(
+							fields
+							(
+								Reservation_Number
+								Guest
+								Reservation_Date_Time
+								Expected_End_Date_Time
+								Service_Period
+								Party_Size
+								Assigned_Table
+								Reservation_Status
+								Booking_Source
+								Occasion
+								Special_Requests
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+							)
+						)
+				)
+			
+}

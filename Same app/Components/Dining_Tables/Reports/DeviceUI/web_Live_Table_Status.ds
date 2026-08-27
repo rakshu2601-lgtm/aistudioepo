@@ -1,5 +1,83 @@
 report Live_Table_Status
 {
- quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Table_Number Dining_Area Capacity Table_Type Operational_Status Block_Reason ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
- detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Table_Number Dining_Area Capacity Table_Type Operational_Status Block_Reason Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+
+				quickview
+				(
+					layout
+					(
+		 				type = -1
+						datablock1
+						(
+							layout type = -1
+							fields
+							(
+								Table_Number
+								Dining_Area
+								Capacity
+								Table_Type
+								Operational_Status
+								Block_Reason
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+								Duplicate 
+								Delete 
+							)
+						record
+						(
+							Edit   	   
+							Duplicate   	   
+							Delete   	   
+    					)
+						)
+    				action
+    				(
+						on click
+						(
+							View Record   	   
+    					)
+						on right click
+						(
+							Edit   	   
+							Delete   	   
+							Duplicate   	   
+							View Record   	   
+    					)
+     				)
+				)
+
+				detailview
+				(
+					layout
+					(
+						datablock1
+						(
+							fields
+							(
+								Table_Number
+								Dining_Area
+								Capacity
+								Table_Type
+								Operational_Status
+								Block_Reason
+								Active
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+								Duplicate 
+								Delete 
+							)
+						)
+				)
+			
 }

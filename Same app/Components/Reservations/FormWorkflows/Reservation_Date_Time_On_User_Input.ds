@@ -1,7 +1,30 @@
 Reservation_Date_Time_On_User_Input as "Calculate Reservation End"
 {
- type = form
- form = Reservations
- record event = on add or edit
- on user input of Reservation_Date_Time { actions { custom deluge script ( if(input.Reservation_Date_Time != null) { duration = 90; if(input.Service_Period != null) { service = Service_Periods[ID == input.Service_Period]; duration = service.Default_Duration_Minutes; } input.Expected_End_Date_Time = input.Reservation_Date_Time.addMinutes(duration); } ) } }
+
+				type =  form
+				form = Reservations
+
+				record event = on add or edit
+
+				on user input of Reservation_Date_Time
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											if(input.Reservation_Date_Time != null)
+										{
+											duration = 90;
+											if(input.Service_Period != null)
+											{
+												service = Service_Periods[ID == input.Service_Period];
+												duration = service.Default_Duration_Minutes;
+											}
+											input.Expected_End_Date_Time = input.Reservation_Date_Time.addMinutes(duration);
+										}
+						)
+					}
+				}
+
+			
 }

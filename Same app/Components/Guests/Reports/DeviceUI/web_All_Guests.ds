@@ -1,5 +1,88 @@
 report All_Guests
 {
- quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Guest_Number Guest_Name Mobile_Number Email_Address VIP_Guest Total_Visits Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
- detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Guest_Number Guest_Name Mobile_Number Email_Address Preferred_Contact_Method Dietary_Preferences Allergy_Notes Seating_Preferences VIP_Guest Total_Visits No_Show_Count Last_Visit_Date Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+
+				quickview
+				(
+					layout
+					(
+						datablock1
+						(
+							fields
+							(
+								Guest_Number
+								Guest_Name
+								Mobile_Number
+								Email_Address
+								VIP_Guest
+								Total_Visits
+								Active
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+								Duplicate 
+								Delete 
+							)
+						record
+						(
+							Edit   	   
+							Duplicate   	   
+							Delete   	   
+    					)
+						)
+    				action
+    				(
+						on click
+						(
+							View Record   	   
+    					)
+						on right click
+						(
+							Edit   	   
+							Delete   	   
+							Duplicate   	   
+							View Record   	   
+    					)
+     				)
+				)
+
+				detailview
+				(
+					layout
+					(
+						datablock1
+						(
+							fields
+							(
+								Guest_Number
+								Guest_Name
+								Mobile_Number
+								Email_Address
+								Preferred_Contact_Method
+								Dietary_Preferences
+								Allergy_Notes
+								Seating_Preferences
+								VIP_Guest
+								Total_Visits
+								No_Show_Count
+								Last_Visit_Date
+								Active
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+								Duplicate 
+								Delete 
+							)
+						)
+				)
+			
 }

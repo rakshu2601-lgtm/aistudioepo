@@ -1,28 +1,246 @@
 form Reservations
 {
- title { displayname = "Reservations" on add = "Add Reservation" on edit = "Edit Reservation" }
- success message = "Reservation saved successfully."
- Reservation_Details ( type = section displayname = "Reservation Details" row = 1 column = 0 )
- Reservation_Number ( type = autonumber displayname = "Reservation Number" start index = 5001 row = 1 column = 1 )
- must have Guest ( type = picklist displayname = "Guest" values = Guests[Active == true].ID displayformat = [Guest_Name.first_name] searchable = true row = 1 column = 1 width = medium )
- must have Reservation_Date_Time ( type = datetime displayname = "Reservation Date & Time" row = 1 column = 2 width = medium )
- Expected_End_Date_Time ( type = datetime displayname = "Expected End" row = 1 column = 1 width = medium )
- must have Service_Period ( type = picklist displayname = "Service Period" values = Service_Periods[Active == true].ID displayformat = [Service_Name] searchable = true row = 1 column = 2 width = medium )
- must have Party_Size ( type = number displayname = "Party Size" row = 1 column = 1 width = medium )
- Assigned_Table ( type = picklist displayname = "Assigned Table" values = Dining_Tables[Active == true].ID displayformat = [Table_Number] searchable = true row = 1 column = 2 width = medium )
- must have Reservation_Status ( type = picklist displayname = "Reservation Status" values = {"Tentative","Confirmed","Arrived","Seated","Completed","Cancelled","No Show"} initial value = "Confirmed" row = 1 column = 1 width = medium )
- must have Booking_Source ( type = picklist displayname = "Booking Source" values = {"Phone","Walk In Advance","Website","Concierge","Social","POS","Other"} row = 1 column = 2 width = medium )
- Occasion ( type = picklist displayname = "Occasion" values = {"None","Birthday","Anniversary","Business","Date Night","Celebration","Other"} initial value = "None" row = 1 column = 1 width = medium )
- Special_Requests ( type = textarea displayname = "Special Requests" height = 80px row = 1 column = 2 width = medium )
- Internal_Notes ( type = textarea displayname = "Internal Notes" height = 80px row = 1 column = 1 width = medium )
- Lifecycle ( type = section displayname = "Lifecycle & POS" visibility = true row = 2 column = 1 )
- Arrival_Time ( type = datetime displayname = "Arrival Time" row = 2 column = 1 width = medium )
- Seated_Time ( type = datetime displayname = "Seated Time" row = 2 column = 2 width = medium )
- Completed_Time ( type = datetime displayname = "Completed Time" row = 2 column = 1 width = medium )
- Cancellation_Time ( type = datetime displayname = "Cancellation Time" row = 2 column = 2 width = medium )
- Cancellation_Reason ( type = textarea displayname = "Cancellation Reason" height = 80px row = 2 column = 1 width = medium )
- No_Show_Reason ( type = textarea displayname = "No-show Reason" height = 80px row = 2 column = 2 width = medium )
- POS_Reservation_ID ( type = text displayname = "POS Reservation ID" row = 2 column = 1 width = medium )
- POS_Sync_Status ( type = picklist displayname = "POS Sync Status" values = {"Not Required","Pending","Synced","Failed"} initial value = "Pending" row = 2 column = 2 width = medium )
- actions { on add { Submit ( type = submit displayname = "Save Reservation" ) Reset ( type = reset displayname = "Reset" ) } on edit { Update ( type = submit displayname = "Update Reservation" ) Cancel ( type = cancel displayname = "Cancel" ) } }
+
+			title 
+    		{
+    			on add = "Add Reservation"
+   	 			on edit = "Edit Reservation"
+			}
+			success message = "Reservation saved successfully."
+			Reservation_Details
+			(
+				type = section
+				displayname = "Reservation Details"
+	 			row = 1
+	 			column = 0   
+				width = medium
+			)
+			Reservation_Number
+			(
+    			type = autonumber
+				displayname = "Reservation Number"
+				start index = 5001
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			must have Guest
+			(
+				type = picklist	
+				values  = Guests[Active == true].ID
+    			displayformat = [Guest_Name.first_name]
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			must have Reservation_Date_Time
+			(
+    			type = datetime
+				displayname = "Reservation Date & Time"
+				timedisplayoptions = "hh:mm:ss"
+				alloweddays = 0,1,2,3,4,5,6
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			Expected_End_Date_Time
+			(
+    			type = datetime
+				displayname = "Expected End"
+				timedisplayoptions = "hh:mm:ss"
+				alloweddays = 0,1,2,3,4,5,6
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			must have Service_Period
+			(
+				type = picklist	
+				displayname = "Service Period"
+				values  = Service_Periods[Active == true].ID
+    			displayformat = [Service_Name]
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			must have Party_Size
+			(
+				type = number
+				displayname = "Party Size"
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			Assigned_Table
+			(
+				type = picklist	
+				displayname = "Assigned Table"
+				values  = Dining_Tables[Active == true].ID
+    			displayformat = [Table_Number]
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			must have Reservation_Status
+			(
+				type = picklist
+				displayname = "Reservation Status"
+				values = {"Tentative","Confirmed","Arrived","Seated","Completed","Cancelled","No Show"}
+				initial value = "Confirmed"
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			must have Booking_Source
+			(
+				type = picklist
+				displayname = "Booking Source"
+				values = {"Phone","Walk In Advance","Website","Concierge","Social","POS","Other"}
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			Occasion
+			(
+				type = picklist
+				values = {"None","Birthday","Anniversary","Business","Date Night","Celebration","Other"}
+				initial value = "None"
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			Special_Requests
+			(
+    			type = textarea
+				displayname = "Special Requests"
+				height = 80px
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			Internal_Notes
+			(
+    			type = textarea
+				displayname = "Internal Notes"
+				height = 80px
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			Lifecycle
+			(
+				type = section
+				displayname = "Lifecycle & POS"
+				visibility = true
+	 			row = 2
+	 			column = 0   
+				width = medium
+			)
+			Arrival_Time
+			(
+    			type = datetime
+				displayname = "Arrival Time"
+				timedisplayoptions = "hh:mm:ss"
+				alloweddays = 0,1,2,3,4,5,6
+	 			row = 2
+	 			column = 1   
+				width = medium
+			)
+			Seated_Time
+			(
+    			type = datetime
+				displayname = "Seated Time"
+				timedisplayoptions = "hh:mm:ss"
+				alloweddays = 0,1,2,3,4,5,6
+	 			row = 2
+	 			column = 2   
+				width = medium
+			)
+			Completed_Time
+			(
+    			type = datetime
+				displayname = "Completed Time"
+				timedisplayoptions = "hh:mm:ss"
+				alloweddays = 0,1,2,3,4,5,6
+	 			row = 2
+	 			column = 1   
+				width = medium
+			)
+			Cancellation_Time
+			(
+    			type = datetime
+				displayname = "Cancellation Time"
+				timedisplayoptions = "hh:mm:ss"
+				alloweddays = 0,1,2,3,4,5,6
+	 			row = 2
+	 			column = 2   
+				width = medium
+			)
+			Cancellation_Reason
+			(
+    			type = textarea
+				displayname = "Cancellation Reason"
+				height = 80px
+	 			row = 2
+	 			column = 1   
+				width = medium
+			)
+			No_Show_Reason
+			(
+    			type = textarea
+				displayname = "No-show Reason"
+				height = 80px
+	 			row = 2
+	 			column = 2   
+				width = medium
+			)
+			POS_Reservation_ID
+			(
+    			type = text
+				displayname = "POS Reservation ID"
+	 			row = 2
+	 			column = 1   
+				width = medium
+			)
+			POS_Sync_Status
+			(
+				type = picklist
+				displayname = "POS Sync Status"
+				values = {"Not Required","Pending","Synced","Failed"}
+				initial value = "Pending"
+	 			row = 2
+	 			column = 2   
+				width = medium
+			)
+	
+			actions
+			{
+				on add
+				{
+					Submit
+					(
+   						type = submit
+   						displayname = "Save Reservation"
+					)
+					Reset
+					(
+   						type = reset
+   						displayname = "Reset"
+					)
+				}
+				on edit
+				{
+					Update
+					(
+   						type = submit
+   						displayname = "Update Reservation"
+					)
+					Cancel
+					(
+   						type = cancel
+   						displayname = "Cancel"
+					)
+				}
+			}
+		
 }

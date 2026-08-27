@@ -1,19 +1,20 @@
 <page linkname = "Live_Floor_Board" parameters = "string Area" displayname = "Live Floor Board"/>
 <content>
 <zml>
-  <layout>
-    <row>
-      <column width='100%'>
-        <dsp id='Live_Floor_Content' elementName='Live Floor Content'>
+	<layout>
+		<row>
+			<column width='100%'>
+				<dsp id='Live_Floor_Content' elementName='Live Floor Content' bgColor=\"\">
           <![CDATA[htmlpage Live_Floor_Content()
 content
-<%{%>
-<file name:Live_Floor_Content.dshtml/>
-<%}%>
-          ]]>
+			<%{%>
+            <file name:Live_Floor_Content.dshtml/>
+			<%}%>
+      
+      ]]>
         </dsp>
-      </column>
-    </row>
-  </layout>
+			</column>
+		</row>
+	</layout>
 </zml>
 </content>

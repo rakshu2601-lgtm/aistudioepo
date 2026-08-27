@@ -1,5 +1,86 @@
 report Feedback_Follow_Up
 {
- quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Feedback_Number Guest Feedback_Date_Time Overall_Rating Comments Follow_Up_Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
- detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Feedback_Number Guest Dining_Visit Feedback_Date_Time Overall_Rating Comments Follow_Up_Required Follow_Up_Status Recovery_Action Manager_Notes ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+
+				quickview
+				(
+					layout
+					(
+		 				type = -1
+						datablock1
+						(
+							layout type = -1
+							fields
+							(
+								Feedback_Number
+								Guest
+								Feedback_Date_Time
+								Overall_Rating
+								Comments
+								Follow_Up_Status
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+								Duplicate 
+								Delete 
+							)
+						record
+						(
+							Edit   	   
+							Duplicate   	   
+							Delete   	   
+    					)
+						)
+    				action
+    				(
+						on click
+						(
+							View Record   	   
+    					)
+						on right click
+						(
+							Edit   	   
+							Delete   	   
+							Duplicate   	   
+							View Record   	   
+    					)
+     				)
+				)
+
+				detailview
+				(
+					layout
+					(
+						datablock1
+						(
+							fields
+							(
+								Feedback_Number
+								Guest
+								Dining_Visit
+								Feedback_Date_Time
+								Overall_Rating
+								Comments
+								Follow_Up_Required
+								Follow_Up_Status
+								Recovery_Action
+								Manager_Notes
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+								Duplicate 
+								Delete 
+							)
+						)
+				)
+			
 }

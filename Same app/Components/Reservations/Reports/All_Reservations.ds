@@ -1,7 +1,35 @@
 default list All_Reservations
 {
- displayName = "All Reservations"
- show all rows from Reservations ( Reservation_Number Guest Reservation_Date_Time Expected_End_Date_Time Service_Period Party_Size Assigned_Table Reservation_Status Booking_Source Occasion Special_Requests Arrival_Time Seated_Time Completed_Time POS_Sync_Status )
- filters ( Reservation_Status Service_Period Assigned_Table Booking_Source )
- sort by ( Reservation_Date_Time descending )
+
+			displayName = "All Reservations"
+			show all rows from Reservations    
+			(
+				Reservation_Number
+				Guest
+				Reservation_Date_Time
+				Expected_End_Date_Time
+				Service_Period
+				Party_Size
+				Assigned_Table
+				Reservation_Status
+				Booking_Source
+				Occasion
+				Special_Requests
+				Arrival_Time
+				Seated_Time
+				Completed_Time
+				POS_Sync_Status
+			)
+			filters
+			(
+				Reservation_Status
+				Service_Period
+				Assigned_Table
+				Booking_Source
+			)
+			sort by
+			(
+				Reservation_Date_Time descending
+			)
+		
 }

@@ -1,7 +1,33 @@
 default list All_Guest_Feedback
 {
- displayName = "All Guest Feedback"
- show all rows from Guest_Feedback ( Feedback_Number Guest Dining_Visit Feedback_Date_Time Overall_Rating Service_Rating Ambience_Rating Comments Would_Return Follow_Up_Required Follow_Up_Status Recovery_Action Manager_Notes )
- filters ( Overall_Rating Would_Return Follow_Up_Status Follow_Up_Required )
- sort by ( Feedback_Date_Time descending )
+
+			displayName = "All Guest Feedback"
+			show all rows from Guest_Feedback    
+			(
+				Feedback_Number
+				Guest
+				Dining_Visit
+				Feedback_Date_Time
+				Overall_Rating
+				Service_Rating
+				Ambience_Rating
+				Comments
+				Would_Return
+				Follow_Up_Required
+				Follow_Up_Status
+				Recovery_Action
+				Manager_Notes
+			)
+			filters
+			(
+				Overall_Rating
+				Would_Return
+				Follow_Up_Status
+				Follow_Up_Required
+			)
+			sort by
+			(
+				Feedback_Date_Time descending
+			)
+		
 }

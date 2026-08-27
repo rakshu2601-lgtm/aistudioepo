@@ -1,7 +1,93 @@
 Dining_Visits_On_Success as "Process Dining Visit"
 {
- type = form
- form = Dining_Visits
- record event = on add or edit
- on success { actions { custom deluge script ( visitRec = Dining_Visits[ID == input.ID]; nowTime = zoho.currenttime; if(input.Visit_Status == "Check Requested" && visitRec.Check_Requested_Date_Time == null) { visitRec.Check_Requested_Date_Time = nowTime; } if(input.Visit_Status == "Paid" && visitRec.Paid_Date_Time == null) { visitRec.Paid_Date_Time = nowTime; } if((input.Visit_Status == "Closed" || input.Visit_Status == "Abandoned") && visitRec.Closed_Date_Time == null) { visitRec.Closed_Date_Time = nowTime; } tableRec = Dining_Tables[ID == input.Dining_Table]; if(input.Visit_Status == "Closed" || input.Visit_Status == "Paid" || input.Visit_Status == "Abandoned") { tableRec.Operational_Status = "Needs Reset"; } else { tableRec.Operational_Status = "Occupied"; } if(input.Reservation != null) { reservationRec = Reservations[ID == input.Reservation]; if(input.Visit_Status == "Closed") { reservationRec.Reservation_Status = "Completed"; reservationRec.Completed_Time = nowTime; } else { reservationRec.Reservation_Status = "Seated"; if(reservationRec.Seated_Time == null) { reservationRec.Seated_Time = nowTime; } } } if(input.Visit_Status == "Closed") { guestRec = Guests[ID == input.Guest]; if(guestRec.Last_Visit_Date == null || guestRec.Last_Visit_Date != nowTime.toDate()) { guestRec.Total_Visits = ifnull(guestRec.Total_Visits,0) + 1; guestRec.Last_Visit_Date = nowTime.toDate(); } } insert into POS_Sync_Log [ Entity_Type="Dining Visit" Local_Record_ID=input.ID External_Record_ID=input.POS_Check_ID Operation="Status Sync" Direction="Bidirectional" Sync_Status="Pending" Attempt_Count=0 ]; insert into Audit_Log [ Event_Date_Time=nowTime Actor_Email=zoho.loginuser Action_Type="Status Change" Entity_Type="Dining Visit" Entity_Record_ID=input.ID Entity_Reference=input.Visit_Number.toString() Change_Summary="Dining visit saved as " + input.Visit_Status After_Value=input.Visit_Status Source="Workflow" ]; ) } }
+
+				type =  form
+				form = Dining_Visits
+
+				record event = on add or edit
+
+				on success
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											visitRec = Dining_Visits[ID == input.ID];
+										nowTime = zoho.currenttime;
+										if(input.Visit_Status == "Check Requested" && visitRec.Check_Requested_Date_Time == null)
+										{
+											visitRec.Check_Requested_Date_Time=nowTime;
+										}
+										if(input.Visit_Status == "Paid" && visitRec.Paid_Date_Time == null)
+										{
+											visitRec.Paid_Date_Time=nowTime;
+										}
+										if(input.Visit_Status == "Closed" || input.Visit_Status == "Abandoned" && visitRec.Closed_Date_Time == null)
+										{
+											visitRec.Closed_Date_Time=nowTime;
+										}
+										tableRec = Dining_Tables[ID == input.Dining_Table];
+										if(input.Visit_Status == "Closed" || input.Visit_Status == "Paid" || input.Visit_Status == "Abandoned")
+										{
+											tableRec.Operational_Status="Needs Reset";
+										}
+										else
+										{
+											tableRec.Operational_Status="Occupied";
+										}
+										if(input.Reservation != null)
+										{
+											reservationRec = Reservations[ID == input.Reservation];
+											if(input.Visit_Status == "Closed")
+											{
+												reservationRec.Reservation_Status="Completed";
+												reservationRec.Completed_Time=nowTime;
+											}
+											else
+											{
+												reservationRec.Reservation_Status="Seated";
+												if(reservationRec.Seated_Time == null)
+												{
+													reservationRec.Seated_Time=nowTime;
+												}
+											}
+										}
+										if(input.Visit_Status == "Closed")
+										{
+											guestRec = Guests[ID == input.Guest];
+											if(guestRec.Last_Visit_Date == null || guestRec.Last_Visit_Date != nowTime.toDate())
+											{
+												guestRec.Total_Visits=ifnull(guestRec.Total_Visits,0) + 1;
+												guestRec.Last_Visit_Date=nowTime.toDate();
+											}
+										}
+										insert into POS_Sync_Log
+										[
+											Entity_Type="Dining Visit"
+											Local_Record_ID=input.ID
+											External_Record_ID=input.POS_Check_ID
+											Operation="Status Sync"
+											Direction="Bidirectional"
+											Sync_Status="Pending"
+											Attempt_Count=0
+											Added_User=zoho.loginuser
+										]
+										insert into Audit_Log
+										[
+											Event_Date_Time=nowTime
+											Actor_Email=zoho.loginuser
+											Action_Type="Status Change"
+											Entity_Type="Dining Visit"
+											Entity_Record_ID=input.ID
+											Entity_Reference=input.Visit_Number.toString()
+											Change_Summary="Dining visit saved as " + input.Visit_Status
+											After_Value=input.Visit_Status
+											Source="Workflow"
+											Added_User=zoho.loginuser
+										]
+						)
+					}
+				}
+
+			
 }

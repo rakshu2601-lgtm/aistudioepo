@@ -1,19 +1,23 @@
 Guests_On_Load as "Prepare Guest Profile"
 {
-    type = form
-    form = Guests
-    record event = on add or edit
 
-    on load
-    {
-        actions
-        {
-            custom deluge script
-            (
-                disable Total_Visits;
-                disable No_Show_Count;
-                disable Last_Visit_Date;
-            )
-        }
-    }
+				type =  form
+				form = Guests
+
+				record event = on add or edit
+
+				on load
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											disable Total_Visits;
+										disable No_Show_Count;
+										disable Last_Visit_Date;
+						)
+					}
+				}
+
+			
 }

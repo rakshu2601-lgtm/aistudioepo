@@ -1,5 +1,82 @@
 report Guests_With_Allergies
 {
- quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Guest_Number Guest_Name Mobile_Number Allergy_Notes Dietary_Preferences VIP_Guest ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
- detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Guest_Number Guest_Name Mobile_Number Dietary_Preferences Allergy_Notes Seating_Preferences VIP_Guest Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+
+				quickview
+				(
+					layout
+					(
+						datablock1
+						(
+							fields
+							(
+								Guest_Number
+								Guest_Name
+								Mobile_Number
+								Allergy_Notes
+								Dietary_Preferences
+								VIP_Guest
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+								Duplicate 
+								Delete 
+							)
+						record
+						(
+							Edit   	   
+							Duplicate   	   
+							Delete   	   
+    					)
+						)
+    				action
+    				(
+						on click
+						(
+							View Record   	   
+    					)
+						on right click
+						(
+							Edit   	   
+							Delete   	   
+							Duplicate   	   
+							View Record   	   
+    					)
+     				)
+				)
+
+				detailview
+				(
+					layout
+					(
+						datablock1
+						(
+							fields
+							(
+								Guest_Number
+								Guest_Name
+								Mobile_Number
+								Dietary_Preferences
+								Allergy_Notes
+								Seating_Preferences
+								VIP_Guest
+								Active
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+								Duplicate 
+								Delete 
+							)
+						)
+				)
+			
 }

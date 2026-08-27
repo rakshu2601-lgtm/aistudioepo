@@ -1,5 +1,87 @@
 report Live_Waitlist
 {
- quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Waitlist_Number Guest Party_Size Joined_Date_Time Quoted_Wait_Minutes Waitlist_Status Priority Assigned_Table ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
- detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Waitlist_Number Guest Party_Size Joined_Date_Time Preferred_Area Quoted_Wait_Minutes Waitlist_Status Priority Assigned_Table ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+
+				quickview
+				(
+					layout
+					(
+		 				type = -1
+						datablock1
+						(
+							layout type = -1
+							fields
+							(
+								Waitlist_Number
+								Guest
+								Party_Size
+								Joined_Date_Time
+								Quoted_Wait_Minutes
+								Waitlist_Status
+								Priority
+								Assigned_Table
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+								Duplicate 
+								Delete 
+							)
+						record
+						(
+							Edit   	   
+							Duplicate   	   
+							Delete   	   
+    					)
+						)
+    				action
+    				(
+						on click
+						(
+							View Record   	   
+    					)
+						on right click
+						(
+							Edit   	   
+							Delete   	   
+							Duplicate   	   
+							View Record   	   
+    					)
+     				)
+				)
+
+				detailview
+				(
+					layout
+					(
+						datablock1
+						(
+							fields
+							(
+								Waitlist_Number
+								Guest
+								Party_Size
+								Joined_Date_Time
+								Preferred_Area
+								Quoted_Wait_Minutes
+								Waitlist_Status
+								Priority
+								Assigned_Table
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+								Duplicate 
+								Delete 
+							)
+						)
+				)
+			
 }

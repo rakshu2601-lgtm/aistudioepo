@@ -1,7 +1,31 @@
 calendar Reservation_Calendar
 {
- displayName = "Reservation Calendar"
- show all rows from Reservations ( Reservation_Number Guest Reservation_Date_Time Expected_End_Date_Time Service_Period Party_Size Assigned_Table Reservation_Status )
- filters ( Service_Period Reservation_Status Assigned_Table )
- options ( display type = week week start day = monday display field = Guest start date = Reservation_Date_Time end date = Expected_End_Date_Time default date ( day = Today month = Currentmonth year = Currentyear ) )
+
+			displayName = "Reservation Calendar"
+			show all rows from Reservations    
+			(
+				Reservation_Number
+				Guest
+				Reservation_Date_Time
+				Expected_End_Date_Time
+				Service_Period
+				Party_Size
+				Assigned_Table
+				Reservation_Status
+			)
+			filters
+			(
+				Service_Period
+				Reservation_Status
+				Assigned_Table
+			)
+			options
+			(
+				display type = week
+				week start day = monday
+				display field = Guest
+				start date = Reservation_Date_Time
+				end date = Expected_End_Date_Time
+			)
+		
 }

@@ -1,7 +1,30 @@
 Waitlist_Status_On_User_Input as "Update Waitlist Status Fields"
 {
- type = form
- form = Waitlist_Entries
- record event = on add or edit
- on user input of Waitlist_Status { actions { custom deluge script ( if(input.Waitlist_Status == "Removed" || input.Waitlist_Status == "Expired") { show Removal_Reason; hide Assigned_Table; } else { hide Removal_Reason; show Assigned_Table; } ) } }
+
+				type =  form
+				form = Waitlist_Entries
+
+				record event = on add or edit
+
+				on user input of Waitlist_Status
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											if(input.Waitlist_Status == "Removed" || input.Waitlist_Status == "Expired")
+										{
+											show Removal_Reason;
+											hide Assigned_Table;
+										}
+										else
+										{
+											hide Removal_Reason;
+											show Assigned_Table;
+										}
+						)
+					}
+				}
+
+			
 }

@@ -1,7 +1,30 @@
 Waitlist_Entries_On_Load as "Prepare Waitlist Entry"
 {
- type = form
- form = Waitlist_Entries
- record event = on add or edit
- on load { actions { custom deluge script ( disable Offered_Date_Time; disable Seated_Date_Time; if(input.Waitlist_Status == "Removed" || input.Waitlist_Status == "Expired") { show Removal_Reason; } else { hide Removal_Reason; } ) } }
+
+				type =  form
+				form = Waitlist_Entries
+
+				record event = on add or edit
+
+				on load
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											disable Offered_Date_Time;
+										disable Seated_Date_Time;
+										if(input.Waitlist_Status == "Removed" || input.Waitlist_Status == "Expired")
+										{
+											show Removal_Reason;
+										}
+										else
+										{
+											hide Removal_Reason;
+										}
+						)
+					}
+				}
+
+			
 }

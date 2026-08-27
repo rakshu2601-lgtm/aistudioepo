@@ -1,7 +1,27 @@
 list Arrival_Exceptions
 {
- displayName = "Arrival Exceptions"
- show all rows from Reservations [Reservation_Status == "No Show" || (Reservation_Status == "Confirmed" && Reservation_Date_Time < zoho.currenttime)] ( Reservation_Number Guest Reservation_Date_Time Service_Period Party_Size Assigned_Table Reservation_Status Cancellation_Reason No_Show_Reason )
- filters ( Reservation_Status Service_Period )
- sort by ( Reservation_Date_Time descending )
+
+			displayName = "Arrival Exceptions"
+			show all rows from Reservations  [Reservation_Status == "No Show" || (Reservation_Status == "Confirmed" && Reservation_Date_Time < zoho.currenttime)]  
+			(
+				Reservation_Number
+				Guest
+				Reservation_Date_Time
+				Service_Period
+				Party_Size
+				Assigned_Table
+				Reservation_Status
+				Cancellation_Reason
+				No_Show_Reason
+			)
+			filters
+			(
+				Reservation_Status
+				Service_Period
+			)
+			sort by
+			(
+				Reservation_Date_Time descending
+			)
+		
 }

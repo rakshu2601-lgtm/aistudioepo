@@ -1,20 +1,167 @@
 form Guest_Feedback
 {
- title { displayname = "Guest Feedback" on add = "Capture Guest Feedback" on edit = "Update Feedback Follow-up" }
- success message = "Guest feedback saved successfully."
- Feedback_Details ( type = section displayname = "Feedback Details" row = 1 column = 0 )
- Feedback_Number ( type = autonumber displayname = "Feedback Number" start index = 11001 row = 1 column = 1 )
- must have Guest ( type = picklist displayname = "Guest" values = Guests.ID displayformat = [Guest_Name.first_name] searchable = true row = 1 column = 1 width = medium )
- must have Dining_Visit ( type = picklist displayname = "Dining Visit" values = Dining_Visits.ID displayformat = [Visit_Number] searchable = true row = 1 column = 2 width = medium )
- must have Feedback_Date_Time ( type = datetime displayname = "Feedback Date & Time" initial value = "${zoho.currenttime}" row = 1 column = 1 width = medium )
- must have Overall_Rating ( type = number displayname = "Overall Rating" row = 1 column = 2 width = medium )
- must have Service_Rating ( type = number displayname = "Service Rating" row = 1 column = 1 width = medium )
- must have Ambience_Rating ( type = number displayname = "Ambience Rating" row = 1 column = 2 width = medium )
- Comments ( type = textarea displayname = "Comments" height = 100px row = 1 column = 1 width = medium )
- Would_Return ( type = picklist displayname = "Would Return" values = {"Yes","Maybe","No"} row = 1 column = 2 width = medium )
- Follow_Up_Required ( type = checkbox displayname = "Follow-up Required" initial value = false row = 1 column = 1 width = medium )
- Follow_Up_Status ( type = picklist displayname = "Follow-up Status" values = {"Not Required","Open","In Progress","Resolved"} initial value = "Not Required" row = 1 column = 2 width = medium )
- Recovery_Action ( type = textarea displayname = "Recovery Action" height = 80px row = 1 column = 1 width = medium )
- Manager_Notes ( type = textarea displayname = "Manager Notes" height = 80px row = 1 column = 2 width = medium )
- actions { on add { Submit ( type = submit displayname = "Save Feedback" ) Reset ( type = reset displayname = "Reset" ) } on edit { Update ( type = submit displayname = "Update Follow-up" ) Cancel ( type = cancel displayname = "Cancel" ) } }
+
+			title 
+    		{
+				displayname = "Guest Feedback"
+    			on add = "Capture Guest Feedback"
+   	 			on edit = "Update Feedback Follow-up"
+			}
+			success message = "Guest feedback saved successfully."
+			Feedback_Details
+			(
+				type = section
+				displayname = "Feedback Details"
+	 			row = 1
+	 			column = 0   
+				width = medium
+			)
+			Feedback_Number
+			(
+    			type = autonumber
+				displayname = "Feedback Number"
+				start index = 11001
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			must have Guest
+			(
+				type = picklist	
+				values  = Guests.ID
+    			displayformat = [Guest_Name.first_name]
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			must have Dining_Visit
+			(
+				type = picklist	
+				displayname = "Dining Visit"
+				values  = Dining_Visits.ID
+    			displayformat = [Visit_Number]
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			must have Feedback_Date_Time
+			(
+    			type = datetime
+				displayname = "Feedback Date & Time"
+				initial value = "${zoho.currenttime}"
+				timedisplayoptions = "hh:mm:ss"
+				alloweddays = 0,1,2,3,4,5,6
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			must have Overall_Rating
+			(
+				type = number
+				displayname = "Overall Rating"
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			must have Service_Rating
+			(
+				type = number
+				displayname = "Service Rating"
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			must have Ambience_Rating
+			(
+				type = number
+				displayname = "Ambience Rating"
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			Comments
+			(
+    			type = textarea
+				height = 100px
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			Would_Return
+			(
+				type = picklist
+				displayname = "Would Return"
+				values = {"Yes","Maybe","No"}
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			Follow_Up_Required
+			(
+    			type = checkbox
+				displayname = "Follow-up Required"
+				initial value = false
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			Follow_Up_Status
+			(
+				type = picklist
+				displayname = "Follow-up Status"
+				values = {"Not Required","Open","In Progress","Resolved"}
+				initial value = "Not Required"
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			Recovery_Action
+			(
+    			type = textarea
+				displayname = "Recovery Action"
+				height = 80px
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			Manager_Notes
+			(
+    			type = textarea
+				displayname = "Manager Notes"
+				height = 80px
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+	
+			actions
+			{
+				on add
+				{
+					Submit
+					(
+   						type = submit
+   						displayname = "Save Feedback"
+					)
+					Reset
+					(
+   						type = reset
+   						displayname = "Reset"
+					)
+				}
+				on edit
+				{
+					Update
+					(
+   						type = submit
+   						displayname = "Update Follow-up"
+					)
+					Cancel
+					(
+   						type = cancel
+   						displayname = "Cancel"
+					)
+				}
+			}
+		
 }

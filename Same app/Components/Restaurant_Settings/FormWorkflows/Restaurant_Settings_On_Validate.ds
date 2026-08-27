@@ -1,27 +1,30 @@
 Restaurant_Settings_On_Validate as "Validate Restaurant Settings"
 {
-    type = form
-    form = Restaurant_Settings
-    record event = on add or edit
-    description = "Validates operating defaults and enforces one active settings record."
 
-    on validate
-    {
-        actions
-        {
-            custom deluge script
-            (
-                if(ifnull(input.Default_Reservation_Duration_Minutes,0) <= 0 || ifnull(input.Table_Turn_Buffer_Minutes,0) <= 0 || ifnull(input.Arrival_Grace_Period_Minutes,0) <= 0 || ifnull(input.Default_Wait_Quote_Minutes,0) <= 0)
-                {
-                    alert "Reservation duration, table buffer, arrival grace period, and default wait quote must all be greater than zero.";
-                    cancel submit;
-                }
-                if(input.Active == true && Restaurant_Settings[Active == true && ID != input.ID].count() > 0)
-                {
-                    alert "Only one restaurant settings record can be active.";
-                    cancel submit;
-                }
-            )
-        }
-    }
+				type =  form
+				form = Restaurant_Settings
+
+				record event = on add or edit
+
+				on validate
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											if(ifnull(input.Default_Reservation_Duration_Minutes,0) <= 0 || ifnull(input.Table_Turn_Buffer_Minutes,0) <= 0 || ifnull(input.Arrival_Grace_Period_Minutes,0) <= 0 || ifnull(input.Default_Wait_Quote_Minutes,0) <= 0)
+										{
+											alert "Reservation duration, table buffer, arrival grace period, and default wait quote must all be greater than zero.";
+											cancel submit;
+										}
+										if(input.Active == true && Restaurant_Settings[Active == true && ID != input.ID].count() > 0)
+										{
+											alert "Only one restaurant settings record can be active.";
+											cancel submit;
+										}
+						)
+					}
+				}
+
+			
 }

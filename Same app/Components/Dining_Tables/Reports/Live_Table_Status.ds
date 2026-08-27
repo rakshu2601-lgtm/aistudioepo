@@ -1,31 +1,33 @@
 kanban Live_Table_Status
 {
-    displayName = "Live Table Status"
-    show all rows from Dining_Tables [Active == true]
-    (
-        Table_Number
-        Dining_Area
-        Capacity
-        Table_Type
-        Operational_Status
-        Block_Reason
-        Active
-    )
-    filters
-    (
-        Dining_Area
-        Table_Type
-        Operational_Status
-    )
-    sort by
-    (
-        Table_Number ascending
-    )
-    options
-    (
-        display field = Operational_Status
-        filter type = manual
-        sort order = custom
-        record count = enable
-    )
+
+			displayName = "Live Table Status"
+			show all rows from Dining_Tables  [Active == true]  
+			(
+				Table_Number
+				Dining_Area
+				Capacity
+				Table_Type
+				Operational_Status
+				Block_Reason
+				Active
+			)
+			filters
+			(
+				Dining_Area
+				Table_Type
+				Operational_Status
+			)
+			sort by
+			(
+				Table_Number ascending
+			)
+			options
+			(
+	 			display field = Operational_Status
+				filter type  = manual
+				sort order  = custom
+				record count  = enable
+	 		)
+		
 }

@@ -1,28 +1,30 @@
 default list Restaurant_Settings_Report
 {
-    displayName = "Restaurant Settings"
-    show all rows from Restaurant_Settings
-    (
-        Restaurant_Name
-        Venue_Code
-        Contact_Email
-        Contact_Phone
-        Time_Zone
-        Currency_Code
-        Default_Reservation_Duration_Minutes
-        Table_Turn_Buffer_Minutes
-        Arrival_Grace_Period_Minutes
-        Default_Wait_Quote_Minutes
-        Active
-    )
-    filters
-    (
-        Active
-        Time_Zone
-        Currency_Code
-    )
-    sort by
-    (
-        Restaurant_Name ascending
-    )
+
+			displayName = "Restaurant Settings"
+			show all rows from Restaurant_Settings    
+			(
+				Restaurant_Name
+				Venue_Code
+				Contact_Email
+				Contact_Phone
+				Time_Zone
+				Currency_Code
+				Default_Reservation_Duration_Minutes
+				Table_Turn_Buffer_Minutes
+				Arrival_Grace_Period_Minutes
+				Default_Wait_Quote_Minutes
+				Active
+			)
+			filters
+			(
+				Active
+				Time_Zone
+				Currency_Code
+			)
+			sort by
+			(
+				Restaurant_Name ascending
+			)
+		
 }

@@ -1,214 +1,219 @@
 form Guests
 {
-    title
-    {
-        displayname = "Guests"
-        on add = "Add Guest"
-        on edit = "Edit Guest Profile"
-    }
-    success message = "Guest profile saved successfully."
-    Guest_Profile
-    (
-        type = section
-        displayname = "Guest Profile"
-        row = 1
-        column = 0
-    )
-    Guest_Number
-    (
-        type = autonumber
-        displayname = "Guest Number"
-        start index = 1001
-        row = 1
-        column = 1
-    )
-    must have Guest_Name
-    (
-        type = name
-        displayname = "Guest Name"
-        personal data = true
-        prefix
-        (
-            type = prefix
-            displayname = "Title"
-            value = {"Mr.","Mrs.","Ms.","Dr."}
-        )
-        first_name
-        (
-            type = first_name
-            displayname = "First Name"
-        )
-        last_name
-        (
-            type = last_name
-            displayname = "Last Name"
-        )
-        suffix
-        (
-            type = suffix
-            displayname = "Suffix"
-            visibility = false
-        )
-        row = 1
-        column = 1
-        width = medium
-    )
-    must have Mobile_Number
-    (
-        type = phonenumber
-        displayname = "Mobile Number"
-        personal data = true
-        row = 1
-        column = 2
-        width = medium
-    )
-    Email_Address
-    (
-        type = email
-        displayname = "Email Address"
-        personal data = true
-        row = 1
-        column = 1
-        width = medium
-    )
-    Preferred_Contact_Method
-    (
-        type = picklist
-        displayname = "Preferred Contact Method"
-        values = {"Phone","SMS","Email","WhatsApp","None"}
-        initial value = "Phone"
-        row = 1
-        column = 2
-        width = medium
-    )
-    Contact_Consent
-    (
-        type = checkbox
-        displayname = "Contact Consent"
-        initial value = false
-        row = 1
-        column = 1
-        width = medium
-    )
-    Active
-    (
-        type = checkbox
-        displayname = "Active"
-        initial value = true
-        row = 1
-        column = 2
-        width = medium
-    )
-    Guest_Preferences
-    (
-        type = section
-        displayname = "Dining Preferences"
-        visibility = true
-        row = 2
-        column = 1
-    )
-    Dietary_Preferences
-    (
-        type = checkboxes
-        displayname = "Dietary Preferences"
-        values = {"Vegetarian","Vegan","Halal","Kosher","Gluten Free","Dairy Free","Nut Free","Other"}
-        layout = 2
-        row = 2
-        column = 1
-        width = medium
-    )
-    Allergy_Notes
-    (
-        type = textarea
-        displayname = "Allergy Notes"
-        personal data = true
-        height = 80px
-        row = 2
-        column = 2
-        width = medium
-    )
-    Seating_Preferences
-    (
-        type = checkboxes
-        displayname = "Seating Preferences"
-        values = {"Booth","Quiet Area","Patio","Accessible","High Chair","Bar","No Preference"}
-        layout = 2
-        row = 2
-        column = 1
-        width = medium
-    )
-    VIP_Guest
-    (
-        type = checkbox
-        displayname = "VIP Guest"
-        initial value = false
-        row = 2
-        column = 2
-        width = medium
-    )
-    Total_Visits
-    (
-        type = number
-        displayname = "Total Visits"
-        initial value = 0
-        row = 2
-        column = 1
-        width = medium
-    )
-    No_Show_Count
-    (
-        type = number
-        displayname = "No-show Count"
-        initial value = 0
-        row = 2
-        column = 2
-        width = medium
-    )
-    Last_Visit_Date
-    (
-        type = date
-        displayname = "Last Visit Date"
-        row = 2
-        column = 1
-        width = medium
-    )
-    Guest_Notes
-    (
-        type = textarea
-        displayname = "Guest Notes"
-        personal data = true
-        height = 80px
-        row = 2
-        column = 2
-        width = medium
-    )
-    actions
-    {
-        on add
-        {
-            Submit
-            (
-                type = submit
-                displayname = "Save Guest"
-            )
-            Reset
-            (
-                type = reset
-                displayname = "Reset"
-            )
-        }
-        on edit
-        {
-            Update
-            (
-                type = submit
-                displayname = "Update Guest"
-            )
-            Cancel
-            (
-                type = cancel
-                displayname = "Cancel"
-            )
-        }
-    }
+
+			title 
+    		{
+    			on add = "Add Guest"
+   	 			on edit = "Edit Guest Profile"
+			}
+			success message = "Guest profile saved successfully."
+			Guest_Profile
+			(
+				type = section
+				displayname = "Guest Profile"
+	 			row = 1
+	 			column = 0   
+				width = medium
+			)
+			Guest_Number
+			(
+    			type = autonumber
+				displayname = "Guest Number"
+				start index = 1001
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			must have Guest_Name
+			(
+    			type = name
+				displayname = "Guest Name"
+     			prefix
+     			(
+	     			 type = prefix
+	     			 displayname ="Title"
+	     			 value = {"Mr.","Mrs.","Ms.","Dr."}
+     			) 
+     			first_name
+     			(
+	     			 type = first_name
+	     			 displayname ="First Name"
+     			) 
+     			last_name
+     			(
+	     			 type = last_name
+	     			 displayname ="Last Name"
+     			) 
+     			suffix
+     			(
+	     			 type = suffix
+	     			 displayname ="Suffix"
+	     			 visibility = false
+     			) 
+	 			row = 1
+	 			column = 1   
+				width = medium
+				personal data = true
+			)
+			must have Mobile_Number
+			(
+    			type = phonenumber
+				displayname = "Mobile Number"
+	 			row = 1
+	 			column = 2   
+				width = medium
+				personal data = true
+			)
+			Email_Address
+			(
+    			type = email
+				displayname = "Email Address"
+	 			row = 1
+	 			column = 1   
+				width = medium
+				personal data = true
+			)
+			Preferred_Contact_Method
+			(
+				type = picklist
+				displayname = "Preferred Contact Method"
+				values = {"Phone","SMS","Email","WhatsApp","None"}
+				initial value = "Phone"
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			Contact_Consent
+			(
+    			type = checkbox
+				displayname = "Contact Consent"
+				initial value = false
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			Active
+			(
+    			type = checkbox
+				initial value = true
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			Guest_Preferences
+			(
+				type = section
+				displayname = "Dining Preferences"
+				visibility = true
+	 			row = 2
+	 			column = 0   
+				width = medium
+			)
+			Dietary_Preferences
+			(
+				type = checkboxes	
+				displayname = "Dietary Preferences"
+				values = {"Vegetarian","Vegan","Halal","Kosher","Gluten Free","Dairy Free","Nut Free","Other"}
+				layout = 2
+	 			row = 2
+	 			column = 1   
+				width = medium
+			)
+			Allergy_Notes
+			(
+    			type = textarea
+				displayname = "Allergy Notes"
+				height = 80px
+	 			row = 2
+	 			column = 2   
+				width = medium
+				personal data = true
+			)
+			Seating_Preferences
+			(
+				type = checkboxes	
+				displayname = "Seating Preferences"
+				values = {"Booth","Quiet Area","Patio","Accessible","High Chair","Bar","No Preference"}
+				layout = 2
+	 			row = 2
+	 			column = 1   
+				width = medium
+			)
+			VIP_Guest
+			(
+    			type = checkbox
+				displayname = "VIP Guest"
+				initial value = false
+	 			row = 2
+	 			column = 2   
+				width = medium
+			)
+			Total_Visits
+			(
+				type = number
+				displayname = "Total Visits"
+				initial value = 0
+	 			row = 2
+	 			column = 1   
+				width = medium
+			)
+			No_Show_Count
+			(
+				type = number
+				displayname = "No-show Count"
+				initial value = 0
+	 			row = 2
+	 			column = 2   
+				width = medium
+			)
+			Last_Visit_Date
+			(
+    			type = date
+				displayname = "Last Visit Date"
+				alloweddays = 0,1,2,3,4,5,6
+	 			row = 2
+	 			column = 1   
+				width = medium
+			)
+			Guest_Notes
+			(
+    			type = textarea
+				displayname = "Guest Notes"
+				height = 80px
+	 			row = 2
+	 			column = 2   
+				width = medium
+				personal data = true
+			)
+	
+			actions
+			{
+				on add
+				{
+					Submit
+					(
+   						type = submit
+   						displayname = "Save Guest"
+					)
+					Reset
+					(
+   						type = reset
+   						displayname = "Reset"
+					)
+				}
+				on edit
+				{
+					Update
+					(
+   						type = submit
+   						displayname = "Update Guest"
+					)
+					Cancel
+					(
+   						type = cancel
+   						displayname = "Cancel"
+					)
+				}
+			}
+		
 }

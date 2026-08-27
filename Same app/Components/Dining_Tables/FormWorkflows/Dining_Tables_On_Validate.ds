@@ -1,36 +1,40 @@
 Dining_Tables_On_Validate as "Validate Dining Table"
 {
-    type = form
-    form = Dining_Tables
-    record event = on add or edit
 
-    on validate
-    {
-        actions
-        {
-            custom deluge script
-            (
-                if(ifnull(input.Capacity,0) <= 0)
-                {
-                    alert "Capacity must be greater than zero.";
-                    cancel submit;
-                }
-                if((input.Operational_Status == "Blocked" || input.Operational_Status == "Out of Service") && ifnull(input.Block_Reason,"").trim() == "")
-                {
-                    alert "Block reason is required for blocked or out-of-service tables.";
-                    cancel submit;
-                }
-                if(input.Combinable == true && ifnull(input.Combination_Group,"").trim() == "")
-                {
-                    alert "Combination group is required for a combinable table.";
-                    cancel submit;
-                }
-                if(input.ID != null && (input.Operational_Status == "Available" || input.Operational_Status == "Occupied") && Dining_Visits[Dining_Table == input.ID && Visit_Status != "Closed" && Visit_Status != "Abandoned"].count() > 0)
-                {
-                    alert "An active dining visit controls this table status. Update the visit instead.";
-                    cancel submit;
-                }
-            )
-        }
-    }
+				type =  form
+				form = Dining_Tables
+
+				record event = on add or edit
+
+				on validate
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											if(ifnull(input.Capacity,0) <= 0)
+										{
+											alert "Capacity must be greater than zero.";
+											cancel submit;
+										}
+										if(input.Operational_Status == "Blocked" || input.Operational_Status == "Out of Service" && ifnull(input.Block_Reason,"").trim() == "")
+										{
+											alert "Block reason is required for blocked or out-of-service tables.";
+											cancel submit;
+										}
+										if(input.Combinable == true && ifnull(input.Combination_Group,"").trim() == "")
+										{
+											alert "Combination group is required for a combinable table.";
+											cancel submit;
+										}
+										if(input.ID != null && input.Operational_Status == "Available" || input.Operational_Status == "Occupied" && Dining_Visits[Dining_Table == input.ID && Visit_Status != "Closed" && Visit_Status != "Abandoned"].count() > 0)
+										{
+											alert "An active dining visit controls this table status. Update the visit instead.";
+											cancel submit;
+										}
+						)
+					}
+				}
+
+			
 }

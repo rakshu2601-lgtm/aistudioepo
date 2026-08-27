@@ -1,8 +1,35 @@
 kanban Feedback_Follow_Up
 {
- displayName = "Feedback Follow-up"
- show all rows from Guest_Feedback [Follow_Up_Required == true] ( Feedback_Number Guest Dining_Visit Feedback_Date_Time Overall_Rating Comments Follow_Up_Required Follow_Up_Status Recovery_Action Manager_Notes )
- filters ( Overall_Rating Follow_Up_Status )
- sort by ( Feedback_Date_Time descending )
- options ( display field = Follow_Up_Status filter type = manual sort order = custom record count = enable )
+
+			displayName = "Feedback Follow-up"
+			show all rows from Guest_Feedback  [Follow_Up_Required == true]  
+			(
+				Feedback_Number
+				Guest
+				Dining_Visit
+				Feedback_Date_Time
+				Overall_Rating
+				Comments
+				Follow_Up_Required
+				Follow_Up_Status
+				Recovery_Action
+				Manager_Notes
+			)
+			filters
+			(
+				Overall_Rating
+				Follow_Up_Status
+			)
+			sort by
+			(
+				Feedback_Date_Time descending
+			)
+			options
+			(
+	 			display field = Follow_Up_Status
+				filter type  = manual
+				sort order  = custom
+				record count  = enable
+	 		)
+		
 }

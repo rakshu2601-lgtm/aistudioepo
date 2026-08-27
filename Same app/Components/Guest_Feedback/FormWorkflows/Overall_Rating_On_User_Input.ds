@@ -1,7 +1,34 @@
 Overall_Rating_On_User_Input as "Set Feedback Follow-up"
 {
- type = form
- form = Guest_Feedback
- record event = on add or edit
- on user input of Overall_Rating { actions { custom deluge script ( if(ifnull(input.Overall_Rating,0) <= 2 && ifnull(input.Overall_Rating,0) > 0) { input.Follow_Up_Required = true; input.Follow_Up_Status = "Open"; show Recovery_Action; show Manager_Notes; } else { input.Follow_Up_Required = false; input.Follow_Up_Status = "Not Required"; hide Recovery_Action; hide Manager_Notes; } ) } }
+
+				type =  form
+				form = Guest_Feedback
+
+				record event = on add or edit
+
+				on user input of Overall_Rating
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											if(ifnull(input.Overall_Rating,0) <= 2 && ifnull(input.Overall_Rating,0) > 0)
+										{
+											input.Follow_Up_Required = true;
+											input.Follow_Up_Status = "Open";
+											show Recovery_Action;
+											show Manager_Notes;
+										}
+										else
+										{
+											input.Follow_Up_Required = false;
+											input.Follow_Up_Status = "Not Required";
+											hide Recovery_Action;
+											hide Manager_Notes;
+										}
+						)
+					}
+				}
+
+			
 }

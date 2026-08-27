@@ -1,7 +1,0 @@
-Reservation_Party_Size_On_User_Input as "Check Party Capacity"
-{
- type = form
- form = Reservations
- record event = on add or edit
- on user input of Party_Size { actions { custom deluge script ( if(ifnull(input.Party_Size,0) > 0 && Dining_Tables[Active == true && Capacity >= input.Party_Size].count() == 0) { alert "No active table currently fits this party size."; } ) } }
-}

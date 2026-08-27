@@ -1,26 +1,28 @@
 list Available_Tables
 {
-    displayName = "Available Tables"
-    show all rows from Dining_Tables [Active == true && Operational_Status == "Available"]
-    (
-        Table_Number
-        Dining_Area
-        Capacity
-        Table_Type
-        Combinable
-        Combination_Group
-        Operational_Status
-        Active
-    )
-    filters
-    (
-        Dining_Area
-        Capacity
-        Table_Type
-    )
-    sort by
-    (
-        Capacity ascending
-        Table_Number ascending
-    )
+
+			displayName = "Available Tables"
+			show all rows from Dining_Tables  [Active == true && Operational_Status == "Available"]  
+			(
+				Table_Number
+				Dining_Area
+				Capacity
+				Table_Type
+				Combinable
+				Combination_Group
+				Operational_Status
+				Active
+			)
+			filters
+			(
+				Dining_Area
+				Capacity
+				Table_Type
+			)
+			sort by
+			(
+				Capacity ascending
+				Table_Number ascending
+			)
+		
 }

@@ -1,24 +1,208 @@
 form Dining_Visits
 {
- title { displayname = "Dining Visits" on add = "Seat Dining Party" on edit = "Update Dining Visit" }
- success message = "Dining visit saved successfully."
- Visit_Details ( type = section displayname = "Visit Details" row = 1 column = 0 )
- Visit_Number ( type = autonumber displayname = "Visit Number" start index = 9001 row = 1 column = 1 )
- must have Guest ( type = picklist displayname = "Guest" values = Guests[Active == true].ID displayformat = [Guest_Name.first_name] searchable = true row = 1 column = 1 width = medium )
- Reservation ( type = picklist displayname = "Reservation" values = Reservations.ID displayformat = [Reservation_Number] searchable = true row = 1 column = 2 width = medium )
- Waitlist_Entry ( type = picklist displayname = "Waitlist Entry" values = Waitlist_Entries.ID displayformat = [Waitlist_Number] searchable = true row = 1 column = 1 width = medium )
- must have Dining_Table ( type = picklist displayname = "Dining Table" values = Dining_Tables[Active == true].ID displayformat = [Table_Number] searchable = true row = 1 column = 2 width = medium )
- must have Party_Size ( type = number displayname = "Party Size" row = 1 column = 1 width = medium )
- must have Visit_Status ( type = picklist displayname = "Visit Status" values = {"Seated","Dining","Check Requested","Paid","Closed","Abandoned"} initial value = "Seated" row = 1 column = 2 width = medium )
- Server_Name ( type = text displayname = "Server Name" row = 1 column = 1 width = medium )
- must have Seated_Date_Time ( type = datetime displayname = "Seated Date & Time" initial value = "${zoho.currenttime}" row = 1 column = 2 width = medium )
- Check_Requested_Date_Time ( type = datetime displayname = "Check Requested Time" row = 1 column = 1 width = medium )
- Paid_Date_Time ( type = datetime displayname = "Paid Time" row = 1 column = 2 width = medium )
- Closed_Date_Time ( type = datetime displayname = "Closed Time" row = 1 column = 1 width = medium )
- POS_Context ( type = section displayname = "POS Context" visibility = true row = 2 column = 1 )
- POS_Check_ID ( type = text displayname = "POS Check ID" row = 2 column = 1 width = medium )
- POS_Check_Total ( type = decimal displayname = "POS Check Total" decimalplace = 2 row = 2 column = 2 width = medium )
- POS_Sync_Status ( type = picklist displayname = "POS Sync Status" values = {"Pending","Synced","Failed","Manual"} initial value = "Pending" row = 2 column = 1 width = medium )
- Service_Notes ( type = textarea displayname = "Service Notes" height = 80px row = 2 column = 2 width = medium )
- actions { on add { Submit ( type = submit displayname = "Start Visit" ) Reset ( type = reset displayname = "Reset" ) } on edit { Update ( type = submit displayname = "Update Visit" ) Cancel ( type = cancel displayname = "Cancel" ) } }
+
+			title 
+    		{
+				displayname = "Dining Visits"
+    			on add = "Seat Dining Party"
+   	 			on edit = "Update Dining Visit"
+			}
+			success message = "Dining visit saved successfully."
+			Visit_Details
+			(
+				type = section
+				displayname = "Visit Details"
+	 			row = 1
+	 			column = 0   
+				width = medium
+			)
+			Visit_Number
+			(
+    			type = autonumber
+				displayname = "Visit Number"
+				start index = 9001
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			must have Guest
+			(
+				type = picklist	
+				values  = Guests[Active == true].ID
+    			displayformat = [Guest_Name.first_name]
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			Reservation
+			(
+				type = picklist	
+				values  = Reservations.ID
+    			displayformat = [Reservation_Number]
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			Waitlist_Entry
+			(
+				type = picklist	
+				displayname = "Waitlist Entry"
+				values  = Waitlist_Entries.ID
+    			displayformat = [Waitlist_Number]
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			must have Dining_Table
+			(
+				type = picklist	
+				displayname = "Dining Table"
+				values  = Dining_Tables[Active == true].ID
+    			displayformat = [Table_Number]
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			must have Party_Size
+			(
+				type = number
+				displayname = "Party Size"
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			must have Visit_Status
+			(
+				type = picklist
+				displayname = "Visit Status"
+				values = {"Seated","Dining","Check Requested","Paid","Closed","Abandoned"}
+				initial value = "Seated"
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			Server_Name
+			(
+    			type = text
+				displayname = "Server Name"
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			must have Seated_Date_Time
+			(
+    			type = datetime
+				displayname = "Seated Date & Time"
+				initial value = "${zoho.currenttime}"
+				timedisplayoptions = "hh:mm:ss"
+				alloweddays = 0,1,2,3,4,5,6
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			Check_Requested_Date_Time
+			(
+    			type = datetime
+				displayname = "Check Requested Time"
+				timedisplayoptions = "hh:mm:ss"
+				alloweddays = 0,1,2,3,4,5,6
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			Paid_Date_Time
+			(
+    			type = datetime
+				displayname = "Paid Time"
+				timedisplayoptions = "hh:mm:ss"
+				alloweddays = 0,1,2,3,4,5,6
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			Closed_Date_Time
+			(
+    			type = datetime
+				displayname = "Closed Time"
+				timedisplayoptions = "hh:mm:ss"
+				alloweddays = 0,1,2,3,4,5,6
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			POS_Context
+			(
+				type = section
+				displayname = "POS Context"
+				visibility = true
+	 			row = 2
+	 			column = 0   
+				width = medium
+			)
+			POS_Check_ID
+			(
+    			type = text
+				displayname = "POS Check ID"
+	 			row = 2
+	 			column = 1   
+				width = medium
+			)
+			POS_Check_Total
+			(
+				type = decimal
+				displayname = "POS Check Total"
+	 			row = 2
+	 			column = 2   
+				width = medium
+			)
+			POS_Sync_Status
+			(
+				type = picklist
+				displayname = "POS Sync Status"
+				values = {"Pending","Synced","Failed","Manual"}
+				initial value = "Pending"
+	 			row = 2
+	 			column = 1   
+				width = medium
+			)
+			Service_Notes
+			(
+    			type = textarea
+				displayname = "Service Notes"
+				height = 80px
+	 			row = 2
+	 			column = 2   
+				width = medium
+			)
+	
+			actions
+			{
+				on add
+				{
+					Submit
+					(
+   						type = submit
+   						displayname = "Start Visit"
+					)
+					Reset
+					(
+   						type = reset
+   						displayname = "Reset"
+					)
+				}
+				on edit
+				{
+					Update
+					(
+   						type = submit
+   						displayname = "Update Visit"
+					)
+					Cancel
+					(
+   						type = cancel
+   						displayname = "Cancel"
+					)
+				}
+			}
+		
 }

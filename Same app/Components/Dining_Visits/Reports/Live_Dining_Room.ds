@@ -1,8 +1,35 @@
 kanban Live_Dining_Room
 {
- displayName = "Live Dining Room"
- show all rows from Dining_Visits [Visit_Status != "Closed" && Visit_Status != "Abandoned"] ( Visit_Number Guest Dining_Table Party_Size Visit_Status Server_Name Seated_Date_Time POS_Check_ID POS_Sync_Status )
- filters ( Dining_Table Server_Name Visit_Status )
- sort by ( Seated_Date_Time ascending )
- options ( display field = Visit_Status filter type = manual sort order = custom record count = enable )
+
+			displayName = "Live Dining Room"
+			show all rows from Dining_Visits  [Visit_Status != "Closed" && Visit_Status != "Abandoned"]  
+			(
+				Visit_Number
+				Guest
+				Dining_Table
+				Party_Size
+				Visit_Status
+				Server_Name
+				Seated_Date_Time
+				POS_Check_ID
+				POS_Sync_Status
+			)
+			filters
+			(
+				Dining_Table
+				Server_Name
+				Visit_Status
+			)
+			sort by
+			(
+				Seated_Date_Time ascending
+			)
+			options
+			(
+	 			display field = Visit_Status
+				filter type  = manual
+				sort order  = custom
+				record count  = enable
+	 		)
+		
 }

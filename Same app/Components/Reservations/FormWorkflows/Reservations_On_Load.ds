@@ -1,7 +1,42 @@
 Reservations_On_Load as "Prepare Reservation Form"
 {
- type = form
- form = Reservations
- record event = on add or edit
- on load { actions { custom deluge script ( disable Expected_End_Date_Time; disable Arrival_Time; disable Seated_Time; disable Completed_Time; disable Cancellation_Time; disable POS_Sync_Status; if(input.Reservation_Status == "Cancelled") { show Cancellation_Reason; } else { hide Cancellation_Reason; } if(input.Reservation_Status == "No Show") { show No_Show_Reason; } else { hide No_Show_Reason; } ) } }
+
+				type =  form
+				form = Reservations
+
+				record event = on add or edit
+
+				on load
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											disable Expected_End_Date_Time;
+										disable Arrival_Time;
+										disable Seated_Time;
+										disable Completed_Time;
+										disable Cancellation_Time;
+										disable POS_Sync_Status;
+										if(input.Reservation_Status == "Cancelled")
+										{
+											show Cancellation_Reason;
+										}
+										else
+										{
+											hide Cancellation_Reason;
+										}
+										if(input.Reservation_Status == "No Show")
+										{
+											show No_Show_Reason;
+										}
+										else
+										{
+											hide No_Show_Reason;
+										}
+						)
+					}
+				}
+
+			
 }

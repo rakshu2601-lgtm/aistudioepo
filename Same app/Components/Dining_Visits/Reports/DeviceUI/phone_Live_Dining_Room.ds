@@ -1,1 +1,82 @@
-report Live_Dining_Room { quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Visit_Number Guest Dining_Table Party_Size Visit_Status Server_Name Seated_Date_Time ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on tap ( View Record ) on long press ( Edit View Record ) on right swipe ( Edit ) ) ) detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Visit_Number Guest Dining_Table Party_Size Visit_Status Server_Name Seated_Date_Time POS_Check_ID POS_Sync_Status ) ) ) menu ( header ( Edit ) ) ) }
+report Live_Dining_Room
+{
+
+				quickview
+				(
+					layout
+					(
+		 				type = -1
+						datablock1
+						(
+							layout type = -1
+							fields
+							(
+								Visit_Number
+								Guest
+								Dining_Table
+								Party_Size
+								Visit_Status
+								Server_Name
+								Seated_Date_Time
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+							)
+						record
+						(
+							Edit   	   
+    					)
+						)
+    				action
+    				(
+						on tap
+						(
+							View Record   	   
+    					)
+						on long press
+						(
+							Edit   	   
+							View Record   	   
+    					)
+						on right swipe
+						(
+							Edit   	   
+    					)
+     				)
+				)
+
+				detailview
+				(
+					layout
+					(
+						datablock1
+						(
+							fields
+							(
+								Visit_Number
+								Guest
+								Dining_Table
+								Party_Size
+								Visit_Status
+								Server_Name
+								Seated_Date_Time
+								POS_Check_ID
+								POS_Sync_Status
+							)
+						)
+					)
+						menu
+						(
+							header
+							(
+								Edit 
+							)
+						)
+				)
+			
+}
