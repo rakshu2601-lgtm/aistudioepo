@@ -1,0 +1,26 @@
+<page linkname = "Task_Hub" parameters = "int total_tasks, int not_started_tasks, int in_progress_tasks, int completed_tasks, int overdue_tasks" displayname = "Task Hub"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Task_Hub_Workspace' elementName='Task_Hub_Workspace'>
+          <![CDATA[htmlpage Task_Hub_Workspace()
+            content
+            <%{%>
+              <file name:Task_Hub_Workspace.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>
+<script>
+total_tasks = Tasks.count();
+not_started_tasks = Tasks[Status == "Not Started"].count();
+in_progress_tasks = Tasks[Status == "In Progress"].count();
+completed_tasks = Tasks[Status == "Completed"].count();
+overdue_tasks = Tasks[Due_Date < zoho.currentdate && Status != "Completed"].count();
+</script>

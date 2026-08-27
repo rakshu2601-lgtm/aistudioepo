@@ -1,0 +1,38 @@
+kanban Task_Board
+{
+    displayName = "Task Board"
+    show all rows from Tasks
+    (
+        Task_Title
+        Status
+        Priority
+        Due_Date
+        Description
+    )
+    filters
+    (
+        Priority
+        Due_Date
+    )
+    sort by
+    (
+        Due_Date ascending
+        Priority descending
+    )
+    options
+    (
+        display field = Status
+        filter type = manual
+        sort order = ascending
+        record count = enable
+    )
+    conditional formatting
+    (
+        "High Priority"
+        {
+            condition = (Priority == "High" && Status != "Completed")
+            fields = [Task_Title, Priority]
+            format = "background-color:#FFEBEE;color:#C62828;font-weight:bold"
+        }
+    )
+}

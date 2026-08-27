@@ -1,0 +1,21 @@
+customize
+{
+    layout
+    {
+        theme = "theme_2"
+        variant = "variant_2"
+    }
+    font = "lato"
+    color options
+    {
+        name = "Task Blue"
+        brand color = "#1565C0"
+        type = "custom"
+        dark mode color = "#26A69A"
+    }
+    logo
+    {
+        preference = "app_icon"
+        placement = "left"
+    }
+}

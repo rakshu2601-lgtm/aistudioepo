@@ -1,0 +1,50 @@
+menu
+{
+    unused
+    {
+        form Tasks
+        {
+            icon = "files-check"
+        }
+        report All_Tasks
+        {
+            icon = "files-single-content-03"
+        }
+        report Task_Board
+        {
+            icon = "business-board-27"
+        }
+        report Task_Calendar
+        {
+            icon = "business-agenda"
+        }
+    }
+    space Personal_Productivity
+    {
+        displayname = "Personal Productivity"
+        icon = "business-goal-65"
+        section Task_Workspace
+        {
+            displayname = "Tasks"
+            icon = "files-check"
+            page Task_Hub
+            {
+                icon = "business-chart"
+            }
+        }
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space, section, component}
+        }
+    }
+}

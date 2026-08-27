@@ -1,0 +1,569 @@
+application "To-do"
+{
+	date format = "dd-MMM-yyyy"
+	time zone = "Asia/Kolkata"
+	time format = "12-hr"
+
+
+
+	forms
+	{
+		form Tasks
+		{
+		    title
+		    {
+		        displayname = "Tasks"
+		        on add = "Add Task"
+		        on edit = "Edit Task"
+		    }
+		    success message = "Task saved successfully."
+		    Task_Details
+		    (
+		        type = section
+		        displayname = "Task Details"
+		        row = 1
+		        column = 0
+		    )
+		    must have Task_Title
+		    (
+		        type = text
+		        displayname = "Task Title"
+		        maxchar = 150
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Description
+		    (
+		        type = textarea
+		        displayname = "Description"
+		        height = 100px
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Status
+		    (
+		        type = picklist
+		        displayname = "Status"
+		        values = {"Not Started", "In Progress", "Completed"}
+		        initial value = "Not Started"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Priority
+		    (
+		        type = picklist
+		        displayname = "Priority"
+		        values = {"Low", "Medium", "High"}
+		        initial value = "Medium"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Due_Date
+		    (
+		        type = date
+		        displayname = "Due Date"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Completed
+		    (
+		        type = checkbox
+		        displayname = "Completed"
+		        initial value = false
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+	}
+
+	reports
+	{
+		default list All_Tasks
+		{
+		    displayName = "All Tasks"
+		    show all rows from Tasks
+		    (
+		        Task_Title
+		        Status
+		        Priority
+		        Due_Date
+		        Completed
+		        Description
+		    )
+		    filters
+		    (
+		        Status
+		        Priority
+		        Due_Date
+		    )
+		    sort by
+		    (
+		        Due_Date ascending
+		        Priority descending
+		    )
+		    conditional formatting
+		    (
+		        "Completed Tasks"
+		        {
+		            condition = (Status == "Completed")
+		            fields = [Task_Title, Status, Due_Date]
+		            format = "background-color:#E8F5E9;color:#2E7D32;text-decoration:line-through"
+		        }
+		        "High Priority"
+		        {
+		            condition = (Priority == "High" && Status != "Completed")
+		            fields = [Task_Title, Priority, Due_Date]
+		            format = "background-color:#FFEBEE;color:#C62828;font-weight:bold"
+		        }
+		    )
+		}
+
+		kanban Task_Board
+		{
+		    displayName = "Task Board"
+		    show all rows from Tasks
+		    (
+		        Task_Title
+		        Status
+		        Priority
+		        Due_Date
+		        Description
+		    )
+		    filters
+		    (
+		        Priority
+		        Due_Date
+		    )
+		    sort by
+		    (
+		        Due_Date ascending
+		        Priority descending
+		    )
+		    options
+		    (
+		        display field = Status
+		        filter type = manual
+		        sort order = ascending
+		        record count = enable
+		    )
+		    conditional formatting
+		    (
+		        "High Priority"
+		        {
+		            condition = (Priority == "High" && Status != "Completed")
+		            fields = [Task_Title, Priority]
+		            format = "background-color:#FFEBEE;color:#C62828;font-weight:bold"
+		        }
+		    )
+		}
+
+		calendar Task_Calendar
+		{
+		    displayName = "Task Calendar"
+		    show all rows from Tasks [Due_Date is not null]
+		    (
+		        Task_Title
+		        Status
+		        Priority
+		        Due_Date
+		    )
+		    filters
+		    (
+		        Status
+		        Priority
+		    )
+		    options
+		    (
+		        display type = month
+		        week start day = monday
+		        display field = Task_Title
+		        start date = Due_Date
+		        default date
+		        (
+		            day = Today
+		            month = Currentmonth
+		            year = Currentyear
+		        )
+		    )
+		}
+	}
+
+	pages
+	{
+		page Task_Hub(int total_tasks, int not_started_tasks, int in_progress_tasks, int completed_tasks, int overdue_tasks)
+		{
+					displayname = "Task Hub"
+					Content="<zml>\n\t<layout>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='Task_Hub_Workspace' elementName='Task_Hub_Workspace'>\n\t\t\t\t\t<![CDATA[htmlpage Task_Hub_Workspace()\n\t\t\t\t\t\tcontent\n\t\t\t\t\t\t&lt;%{%&gt;\n\t\t\t\t\t\t\t&lt;style&gt;\n/* ===== zcs-global.css (page-scoped utility subset) ===== */\n:root{--zcs-theme-brand-color:var(--zcs_brand_color);--zcs-primary-text-color:var(--zcs_primary_text_color);--zcs-secondary-text-color:var(--zcs_secondary_text_color);--zcs-teritiary-text-color:var(--zcs_tertiary_text_color);--zcs-border-color:var(--zcs_tertiary_border_color);--zcs-white-color:#fff;--zcs-page-bg-color:#f3f3f4;font-size:16px;line-height:1.5}\n.zcs-flex{display:flex}.zcs-row{display:flex;flex-wrap:wrap}.zcs-direction-column{flex-direction:column}.zcs-align-items-center{align-items:center}.zcs-justify-center{justify-content:center}.zcs-justify-space-between{justify-content:space-between}.zcs-gap-4{gap:.25rem}.zcs-gap-8{gap:.5rem}.zcs-gap-12{gap:.75rem}.zcs-gap-16{gap:1rem}.zcs-w-full{width:100%}.zcs-box-border{box-sizing:border-box}.zcs-m-0{margin:0}.zcs-px-10{padding-left:.625rem;padding-right:.625rem}.zcs-px-16{padding-left:1rem;padding-right:1rem}.zcs-py-8{padding-top:.5rem;padding-bottom:.5rem}.zcs-py-12{padding-top:.75rem;padding-bottom:.75rem}.zcs-p-16{padding:1rem}.zcs-p-24{padding:1.5rem}.zcs-rounded-md{border-radius:.375rem}.zcs-rounded-xl{border-radius:.75rem}.zcs-font-13{font-size:.8125rem}.zcs-font-14{font-size:.875rem}.zcs-font-15{font-size:.9375rem}.zcs-font-16{font-size:1rem}.zcs-font-18{font-size:1.125rem}.zcs-font-24{font-size:1.5rem}.zcs-font-30{font-size:1.875rem}.zcs-font-normal{font-weight:400}.zcs-font-medium{font-weight:500}.zcs-font-semibold{font-weight:600}.zcs-font-bold{font-weight:700}.zcs-lh-body{line-height:1.5}.zcs-lh-heading{line-height:1.25}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-secondary{color:var(--zcs-secondary-text-color)}.zcs-color-tertiary{color:var(--zcs-teritiary-text-color)}.zcs-color-theme{color:var(--zcs-theme-brand-color)}.zcs-card{background:var(--zcs-white-color);border:1px solid var(--zcs-border-color);border-radius:12px}\n/* ZCS: header-heading-with-actions, button-primary-button */\n.zcs-page-header{background:linear-gradient(120deg,var(--zcs_brand_light_color),var(--zcs-white-color));border:1px solid var(--zcs-border-color);border-radius:12px}.zcs-button{width:auto;min-width:5rem;min-height:36px}.zcs-primary-button{background:var(--zcs_brand_color);color:var(--zcs_brand_foreground_color)}.zcs-primary-button:hover{background:var(--zcs_brand_dark_color)}.zcs-button:focus{outline:2px solid var(--zcs_brand_color);outline-offset:2px}.zcs-button-icon{width:16px;max-height:16px}\n/* ZCS card adaptation */\n.task-hub{font-family:inherit;background:var(--zcs-page-bg-color);padding:16px;box-sizing:border-box;color:var(--zcs-primary-text-color)}.task-hub-header{padding:20px 24px}.task-hub-title{font-size:24px;font-weight:600;margin:0}.task-hub-subtitle{margin:4px 0 0;color:var(--zcs-secondary-text-color);font-size:14px}.task-hub-kpis{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:12px;margin:16px 0}.task-kpi{padding:18px;min-height:118px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between}.task-kpi-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.task-kpi-label{font-size:13px;color:var(--zcs-secondary-text-color);font-weight:600}.task-kpi-icon{font-size:20px;color:var(--zcs_brand_color)}.task-kpi-value{font-size:30px;line-height:1;font-weight:700;color:var(--zcs-primary-text-color)}.task-kpi-overdue .task-kpi-icon,.task-kpi-overdue .task-kpi-value{color:#c33b46}\n/* ZCS: horizontal-tab-horizontal-tab-with-icon */\n.zcs-horizontal-tabpanel{background:var(--zcs-white-color);border:1px solid var(--zcs-border-color);border-radius:12px;overflow:hidden}.zcs-horizontal-tabhead{box-shadow:0 -1px 0 var(--zcs-border-color) inset;overflow-x:auto;list-style:none}.zcs-horizontal-tabitem{list-style:none;border-bottom:2px solid transparent}.zcs-horizontal-tablink{white-space:nowrap}.zcs-horizontal-tabitem:hover,.zcs-horizontal-tabitem:focus-within{border-bottom-color:var(--zcs_brand_color)}.zcs-horizontal-tabitem:hover .zcs-horizontal-tablink,.zcs-horizontal-tablink:focus{color:var(--zcs_brand_color)}.zcs-horizontal-tablink:focus{outline:2px solid var(--zcs_brand_color);outline-offset:-2px}.task-view-copy{padding:18px 20px;color:var(--zcs-secondary-text-color);font-size:14px}.task-hub a{text-decoration:none}\n@media(max-width:1100px){.task-hub-kpis{grid-template-columns:repeat(3,minmax(150px,1fr))}}@media(max-width:700px){.task-hub{padding:10px}.task-hub-header{align-items:flex-start;flex-direction:column;padding:16px}.task-hub-header .zcs-button{width:100%}.task-hub-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:430px){.task-hub-kpis{grid-template-columns:1fr}.task-hub-title{font-size:21px}}\n&lt;/style&gt;\n&lt;main class=&apos;task-hub&apos; aria-labelledby=&apos;task-hub-title&apos;&gt;\n\t&lt;header class=&apos;zcs-page-header task-hub-header zcs-w-full zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-16 zcs-box-border&apos;&gt;\n\t\t&lt;div&gt;\n\t\t\t&lt;h1 id=&apos;task-hub-title&apos; class=&apos;task-hub-title&apos;&gt;Task Hub&lt;/h1&gt;\n\t\t\t&lt;p class=&apos;task-hub-subtitle&apos;&gt;Review workload, add tasks, and open the view that fits your work.&lt;/p&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;a class=&apos;zcs-button zcs-primary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md zcs-box-border zcs-font-14 zcs-font-normal zcs-lh-body&apos; href=&apos;#Form:Tasks&apos; aria-label=&apos;Add a new task&apos;&gt;\n\t\t\t&lt;i class=&apos;zcs-button-icon zc-li-outline ui-1-simple-add&apos; aria-hidden=&apos;true&apos;&gt;&lt;/i&gt;&lt;span&gt;Add Task&lt;/span&gt;\n\t\t&lt;/a&gt;\n\t&lt;/header&gt;\n\t&lt;section class=&apos;task-hub-kpis&apos; aria-label=&apos;Task summary&apos;&gt;\n\t\t&lt;article class=&apos;task-kpi zcs-card&apos;&gt;&lt;div class=&apos;task-kpi-top&apos;&gt;&lt;span class=&apos;task-kpi-label&apos;&gt;Total tasks&lt;/span&gt;&lt;i class=&apos;task-kpi-icon zc-li-outline files-folder&apos; aria-hidden=&apos;true&apos;&gt;&lt;/i&gt;&lt;/div&gt;&lt;strong class=&apos;task-kpi-value&apos;&gt;&lt;%=input.total_tasks%&gt;&lt;/strong&gt;&lt;/article&gt;\n\t\t&lt;article class=&apos;task-kpi zcs-card&apos;&gt;&lt;div class=&apos;task-kpi-top&apos;&gt;&lt;span class=&apos;task-kpi-label&apos;&gt;Not started&lt;/span&gt;&lt;i class=&apos;task-kpi-icon zc-li-outline arrows-4-restore&apos; aria-hidden=&apos;true&apos;&gt;&lt;/i&gt;&lt;/div&gt;&lt;strong class=&apos;task-kpi-value&apos;&gt;&lt;%=input.not_started_tasks%&gt;&lt;/strong&gt;&lt;/article&gt;\n\t\t&lt;article class=&apos;task-kpi zcs-card&apos;&gt;&lt;div class=&apos;task-kpi-top&apos;&gt;&lt;span class=&apos;task-kpi-label&apos;&gt;In progress&lt;/span&gt;&lt;i class=&apos;task-kpi-icon zc-li-outline loader-dots-06&apos; aria-hidden=&apos;true&apos;&gt;&lt;/i&gt;&lt;/div&gt;&lt;strong class=&apos;task-kpi-value&apos;&gt;&lt;%=input.in_progress_tasks%&gt;&lt;/strong&gt;&lt;/article&gt;\n\t\t&lt;article class=&apos;task-kpi zcs-card&apos;&gt;&lt;div class=&apos;task-kpi-top&apos;&gt;&lt;span class=&apos;task-kpi-label&apos;&gt;Completed&lt;/span&gt;&lt;i class=&apos;task-kpi-icon zc-li-outline ui-1-check-circle-08&apos; aria-hidden=&apos;true&apos;&gt;&lt;/i&gt;&lt;/div&gt;&lt;strong class=&apos;task-kpi-value&apos;&gt;&lt;%=input.completed_tasks%&gt;&lt;/strong&gt;&lt;/article&gt;\n\t\t&lt;article class=&apos;task-kpi task-kpi-overdue zcs-card&apos;&gt;&lt;div class=&apos;task-kpi-top&apos;&gt;&lt;span class=&apos;task-kpi-label&apos;&gt;Overdue&lt;/span&gt;&lt;i class=&apos;task-kpi-icon zc-li-outline ui-2-time&apos; aria-hidden=&apos;true&apos;&gt;&lt;/i&gt;&lt;/div&gt;&lt;strong class=&apos;task-kpi-value&apos;&gt;&lt;%=input.overdue_tasks%&gt;&lt;/strong&gt;&lt;/article&gt;\n\t&lt;/section&gt;\n\t&lt;nav class=&apos;zcs-horizontal-tabpanel&apos; aria-label=&apos;Task views&apos;&gt;\n\t\t&lt;ul class=&apos;zcs-horizontal-tabhead zcs-flex zcs-gap-12 zcs-px-10 zcs-m-0 zcs-box-border&apos;&gt;\n\t\t\t&lt;li class=&apos;zcs-horizontal-tabitem&apos;&gt;&lt;a class=&apos;zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body zcs-color-tertiary&apos; href=&apos;#Report:All_Tasks&apos;&gt;&lt;i class=&apos;zc-li-outline design-bullet-list-67&apos; aria-hidden=&apos;true&apos;&gt;&lt;/i&gt;&lt;span class=&apos;zcs-font-15&apos;&gt;All Tasks&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;\n\t\t\t&lt;li class=&apos;zcs-horizontal-tabitem&apos;&gt;&lt;a class=&apos;zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body zcs-color-tertiary&apos; href=&apos;#Report:Task_Board&apos;&gt;&lt;i class=&apos;zc-li-outline design-layout-11&apos; aria-hidden=&apos;true&apos;&gt;&lt;/i&gt;&lt;span class=&apos;zcs-font-15&apos;&gt;Task Board&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;\n\t\t\t&lt;li class=&apos;zcs-horizontal-tabitem&apos;&gt;&lt;a class=&apos;zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body zcs-color-tertiary&apos; href=&apos;#Report:Task_Calendar&apos;&gt;&lt;i class=&apos;zc-li-outline ui-1-calendar-60&apos; aria-hidden=&apos;true&apos;&gt;&lt;/i&gt;&lt;span class=&apos;zcs-font-15&apos;&gt;Task Calendar&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;\n\t\t&lt;/ul&gt;\n\t\t&lt;div class=&apos;task-view-copy&apos;&gt;Use the list for details, the board for status flow, or the calendar for due-date planning.&lt;/div&gt;\n\t&lt;/nav&gt;\n&lt;/main&gt;\n\t\t\t\t\t\t&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t</layout>\n</zml>"
+					script
+					{
+						total_tasks = Tasks.count();
+						not_started_tasks = Tasks[Status == "Not Started"].count();
+						in_progress_tasks = Tasks[Status == "In Progress"].count();
+						completed_tasks = Tasks[Status == "Completed"].count();
+						overdue_tasks = Tasks[Due_Date < zoho.currentdate && Status != "Completed"].count();
+					}
+		}
+	}
+
+	web
+	{
+	forms
+	{
+	    form Tasks
+	    {
+	        label placement = left
+	    }
+	}
+	reports
+	{
+		report All_Tasks
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Task_Title
+		                    Status
+		                    Priority
+		                    Due_Date
+		                    Completed
+		                    Description
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                title = "Task Details"
+		                fields
+		                (
+		                    Task_Title
+		                    Description
+		                    Status
+		                    Priority
+		                    Due_Date
+		                    Completed
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Task_Board
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Task_Title
+		                    Status
+		                    Priority
+		                    Due_Date
+		                    Description
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                title = "Task Details"
+		                fields
+		                (
+		                    Task_Title
+		                    Description
+		                    Status
+		                    Priority
+		                    Due_Date
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Task_Calendar
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Task_Title
+		                    Status
+		                    Priority
+		                    Due_Date
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                title = "Scheduled Task"
+		                fields
+		                (
+		                    Task_Title
+		                    Status
+		                    Priority
+		                    Due_Date
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	}
+	menu
+	{
+	    unused
+	    {
+	        form Tasks
+	        {
+	            icon = "files-check"
+	        }
+	        report All_Tasks
+	        {
+	            icon = "files-single-content-03"
+	        }
+	        report Task_Board
+	        {
+	            icon = "business-board-27"
+	        }
+	        report Task_Calendar
+	        {
+	            icon = "business-agenda"
+	        }
+	    }
+	    space Personal_Productivity
+	    {
+	        displayname = "Personal Productivity"
+	        icon = "business-goal-65"
+	        section Task_Workspace
+	        {
+	            displayname = "Tasks"
+	            icon = "files-check"
+	            page Task_Hub
+	            {
+	                icon = "business-chart"
+	            }
+	        }
+	        section SharedAnalytics_Section
+	        {
+	            type = shared_user_report_section
+	            displayname = "Reports"
+	            icon = "business-chart-bar-33"
+	        }
+	    }
+	    preference
+	    {
+	        icon
+	        {
+	            style = outline
+	            show = {space, section, component}
+	        }
+	    }
+	}
+	customize
+	{
+	    layout
+	    {
+	        theme = "theme_2"
+	        variant = "variant_2"
+	    }
+	    font = "lato"
+	    color options
+	    {
+	        name = "Task Blue"
+	        brand color = "#1565C0"
+	        type = "custom"
+	        dark mode color = "#26A69A"
+	    }
+	    logo
+	    {
+	        preference = "app_icon"
+	        placement = "left"
+	    }
+	}
+	}
+}

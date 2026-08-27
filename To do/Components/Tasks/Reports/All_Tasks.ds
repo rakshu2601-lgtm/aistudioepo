@@ -1,0 +1,39 @@
+default list All_Tasks
+{
+    displayName = "All Tasks"
+    show all rows from Tasks
+    (
+        Task_Title
+        Status
+        Priority
+        Due_Date
+        Completed
+        Description
+    )
+    filters
+    (
+        Status
+        Priority
+        Due_Date
+    )
+    sort by
+    (
+        Due_Date ascending
+        Priority descending
+    )
+    conditional formatting
+    (
+        "Completed Tasks"
+        {
+            condition = (Status == "Completed")
+            fields = [Task_Title, Status, Due_Date]
+            format = "background-color:#E8F5E9;color:#2E7D32;text-decoration:line-through"
+        }
+        "High Priority"
+        {
+            condition = (Priority == "High" && Status != "Completed")
+            fields = [Task_Title, Priority, Due_Date]
+            format = "background-color:#FFEBEE;color:#C62828;font-weight:bold"
+        }
+    )
+}
