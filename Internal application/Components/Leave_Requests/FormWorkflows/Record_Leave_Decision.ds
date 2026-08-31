@@ -1,0 +1,28 @@
+Record_Leave_Decision as "Record Leave Decision"
+{
+    type = form
+    form = Leave_Requests
+    record event = on edit
+
+    on update of Approval_Status
+    {
+        actions ( Approval_Status == "Approved" || Approval_Status == "Rejected" )
+        {
+            custom deluge script
+            (
+                input.Decision_Date = zoho.currentdate;
+                insert into Audit_Log
+                [
+                    Module_Name = "Leave Requests"
+                    Record_ID = input.Request_Number.toString()
+                    Action = "Leave request " + input.Approval_Status
+                    Changed_By = zoho.loginuserid
+                    Changed_At = zoho.currenttime
+                    Before_Value = "Pending"
+                    After_Value = input.Approval_Status
+                    Notes = input.Manager_Comments
+                ];
+            )
+        }
+    }
+}

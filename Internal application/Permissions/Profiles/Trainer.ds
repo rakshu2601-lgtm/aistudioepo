@@ -1,0 +1,223 @@
+"Trainer"
+{
+    name = "Trainer"
+    type = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false }
+    description = "Assigned training operations, personal work, leave requests, discounts, and invoices."
+
+    ModulePermissions
+    {
+        Team_Members
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Team_Members={"View"}
+                Active_Trainers={"View"}
+                Active_Mentors={"View"}
+            }
+        }
+        Products
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Products={"View"}
+                Active_Products={"View"}
+            }
+        }
+        Events
+        {
+            enabled = Create,View,Edit,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                Unified_Event_Summary={"View"}
+                Event_Calendar={"View"}
+                Event_Lifecycle_Board={"View"}
+                My_Assigned_Events={"View"}
+                Upcoming_Events={"View"}
+                Incomplete_Event_Activities={"View"}
+                Certification_Tickets={"View"}
+            }
+            FieldPermissions
+            {
+                Event_ID{visibility:true,readonly:true}
+                Event_Title{visibility:true,readonly:false}
+                Event_Type{visibility:true,readonly:false}
+                Product{visibility:true,readonly:false}
+                Region{visibility:true,readonly:false}
+                Start_Date_Time{visibility:true,readonly:false}
+                End_Date_Time{visibility:true,readonly:false}
+                Lifecycle_Stage{visibility:true,readonly:true}
+                Event_Status{visibility:true,readonly:false}
+                Primary_Trainer{visibility:true,readonly:false}
+                Additional_Trainers{visibility:true,readonly:false}
+                QA_Trainer{visibility:true,readonly:false}
+                Topic{visibility:true,readonly:false}
+                Agenda{visibility:true,readonly:false}
+                Trainer_Split{visibility:true,readonly:false}
+                General_Document_URL{visibility:true,readonly:false}
+                Presentation_URL{visibility:true,readonly:false}
+                Dry_Run_URL{visibility:true,readonly:false}
+                Survey_URL{visibility:true,readonly:false}
+                Readiness_Status{visibility:true,readonly:false}
+                Missing_Activity_Notes{visibility:true,readonly:false}
+                Pre_Registrations{visibility:true,readonly:false}
+                Pre_Revenue{visibility:true,readonly:false}
+                Live_Registrations{visibility:true,readonly:false}
+                Live_Attendees{visibility:true,readonly:false}
+                Recording_Status{visibility:true,readonly:false}
+                Social_Media_URL{visibility:true,readonly:false}
+                Connect_Post_URL{visibility:true,readonly:false}
+                Email_Invite_URL{visibility:true,readonly:false}
+                Cliq_Message_URL{visibility:true,readonly:false}
+                Recording_URL{visibility:true,readonly:false}
+                Description_URL{visibility:true,readonly:false}
+                Final_Registrations{visibility:true,readonly:false}
+                Final_Attendees{visibility:true,readonly:false}
+                Final_Revenue{visibility:true,readonly:false}
+                Insights_URL{visibility:true,readonly:false}
+                Debrief_Recording_URL{visibility:true,readonly:false}
+                MOM_Notes{visibility:true,readonly:false}
+                Upload_Destination{visibility:true,readonly:false}
+                Upload_Status{visibility:true,readonly:false}
+                Ticket_ID{visibility:true,readonly:false}
+                Ticket_Status{visibility:true,readonly:false}
+                Ticket_Owner{visibility:true,readonly:false}
+                Ticket_Closure_Notes{visibility:true,readonly:false}
+            }
+        }
+        Event_Performance
+        {
+            enabled = Create,View,Edit,Delete,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Event_Performance_Details={"View"}
+                Source_Performance={"View"}
+                Country_Performance={"View"}
+            }
+        }
+        Tasks
+        {
+            enabled = Create,View,Edit,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                All_Tasks={"View"}
+                Task_Board={"View"}
+                My_Assigned_Tasks={"View"}
+                Tasks_Requiring_Attention={"View"}
+                Trainer_Tasks={"View"}
+            }
+            FieldPermissions
+            {
+                Task_ID{visibility:true,readonly:true}
+                Task_Title{visibility:true,readonly:false}
+                Description{visibility:true,readonly:false}
+                Assignee_Type{visibility:true,readonly:false}
+                Assigned_To{visibility:true,readonly:false}
+                Assigned_By{visibility:true,readonly:true}
+                Priority{visibility:true,readonly:false}
+                Due_Date{visibility:true,readonly:false}
+                Status{visibility:true,readonly:false}
+                Issue_Blocker{visibility:true,readonly:false}
+                Completion_Date{visibility:true,readonly:true}
+            }
+        }
+        Leave_Requests
+        {
+            enabled = Create,View,Edit,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                My_Leave_Requests={"View"}
+                Approved_Leave_WFH={"View"}
+            }
+            FieldPermissions
+            {
+                Request_Number{visibility:true,readonly:true}
+                Team_Member{visibility:true,readonly:true}
+                Request_Type{visibility:true,readonly:false}
+                Start_Date{visibility:true,readonly:false}
+                End_Date{visibility:true,readonly:false}
+                Reason{visibility:true,readonly:false}
+                Reporting_Manager{visibility:true,readonly:true}
+                Approval_Status{visibility:true,readonly:true}
+                Manager_Comments{visibility:true,readonly:true}
+                Decision_Date{visibility:true,readonly:true}
+            }
+        }
+        Discounts
+        {
+            enabled = Create,View,Edit,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                All_Discounts={"View"}
+                Pending_Discount_Approvals={"View"}
+                Approved_Discounts={"View"}
+            }
+            FieldPermissions
+            {
+                Discount_ID{visibility:true,readonly:true}
+                Event{visibility:true,readonly:false}
+                Product{visibility:true,readonly:true}
+                Requested_By{visibility:true,readonly:true}
+                Discount_Type{visibility:true,readonly:false}
+                Discount_Count{visibility:true,readonly:false}
+                Gross_Revenue{visibility:true,readonly:false}
+                Discount_Percentage{visibility:true,readonly:false}
+                Discount_Amount{visibility:true,readonly:true}
+                Discounted_Revenue{visibility:true,readonly:true}
+                Approval_Status{visibility:true,readonly:true}
+                Approved_By{visibility:true,readonly:true}
+                Approval_Date{visibility:true,readonly:true}
+                Approval_Comments{visibility:true,readonly:true}
+            }
+        }
+        Invoices
+        {
+            enabled = Create,View,Edit,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                All_Invoices={"View"}
+                Outstanding_Invoices={"View"}
+                Overdue_Invoices={"View"}
+                Paid_Invoices={"View"}
+            }
+            FieldPermissions
+            {
+                Invoice_Number{visibility:true,readonly:true}
+                Event{visibility:true,readonly:false}
+                Product{visibility:true,readonly:true}
+                Trainer{visibility:true,readonly:true}
+                Customer_Name{visibility:true,readonly:false}
+                Invoice_Date{visibility:true,readonly:false}
+                Due_Date{visibility:true,readonly:false}
+                Revenue_Amount{visibility:true,readonly:false}
+                Approved_Discount{visibility:true,readonly:true}
+                Discount_Amount{visibility:true,readonly:true}
+                Invoice_Total{visibility:true,readonly:true}
+                Source_Currency{visibility:true,readonly:false}
+                Conversion_Rate_To_USD{visibility:true,readonly:true}
+                Invoice_Total_USD{visibility:true,readonly:true}
+                Exchange_Rate_Status{visibility:true,readonly:true}
+                Exchange_Rate_As_Of{visibility:true,readonly:true}
+                Invoice_Status{visibility:true,readonly:true}
+                Payment_Link{visibility:true,readonly:true}
+                Paid_Date{visibility:true,readonly:true}
+                Notes{visibility:true,readonly:false}
+            }
+        }
+        Operations_Dashboard { enabled = tab }
+        Metrics_Dashboard { enabled = tab }
+        Trainer_Dashboard { enabled = tab }
+        Leave_Task_Dashboard { enabled = tab }
+        Finance_Dashboard { enabled = tab }
+    }
+}

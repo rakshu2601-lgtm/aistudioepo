@@ -1,0 +1,38 @@
+Load_Leave_Request_Edit as "Load Leave Request for Edit"
+{
+    type = form
+    form = Leave_Requests
+    record event = on edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                is_training_manager = thisapp.permissions.isUserInProfile("Training_Manager");
+                is_reporting_manager = input.Reporting_Manager.Email == zoho.loginuserid;
+                disable Team_Member;
+                disable Reporting_Manager;
+                if(is_training_manager || is_reporting_manager)
+                {
+                    show Approval_Status;
+                    show Manager_Comments;
+                    show Decision_Date;
+                    enable Approval_Status;
+                    enable Manager_Comments;
+                    disable Decision_Date;
+                }
+                else
+                {
+                    hide Approval_Status;
+                    hide Manager_Comments;
+                    hide Decision_Date;
+                    disable Approval_Status;
+                    disable Manager_Comments;
+                    disable Decision_Date;
+                }
+            )
+        }
+    }
+}

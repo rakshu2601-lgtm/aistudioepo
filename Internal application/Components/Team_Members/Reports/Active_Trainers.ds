@@ -1,0 +1,22 @@
+list Active_Trainers
+{
+    displayName = "Active Trainers"
+    show all rows from Team_Members [Active == true && Member_Type == "Trainer"]
+    (
+        Employee_ID
+        Employee_Name
+        Email
+        Member_Type
+        Reporting_Manager
+        Active
+    )
+    filters
+    (
+        Member_Type
+        Active
+    )
+    sort by
+    (
+        Employee_Name ascending
+    )
+}

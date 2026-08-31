@@ -1,0 +1,22 @@
+list Country_Performance
+{
+    displayName = "Country Performance"
+    show all rows from Event_Performance [Dimension_Type == "Country"]
+    (
+        Event
+        Dimension_Type
+        Dimension_Value
+        Registrations
+        Attendees
+        Notes
+    )
+    filters
+    (
+        Event
+        Dimension_Value
+    )
+    sort by
+    (
+        Dimension_Value ascending
+    )
+}

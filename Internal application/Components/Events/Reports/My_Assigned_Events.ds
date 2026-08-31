@@ -1,0 +1,30 @@
+list My_Assigned_Events
+{
+    displayName = "My Assigned Events"
+    show all rows from Events [Primary_Trainer.Email == zoho.loginuserid || Additional_Trainers.Email == zoho.loginuserid || QA_Trainer.Email == zoho.loginuserid]
+    (
+        Event_ID
+        Event_Title
+        Event_Type
+        Product
+        Region
+        Start_Date_Time
+        End_Date_Time
+        Primary_Trainer
+        Additional_Trainers
+        QA_Trainer
+        Lifecycle_Stage
+        Event_Status
+    )
+    filters
+    (
+        Product
+        Region
+        Lifecycle_Stage
+        Event_Type
+    )
+    sort by
+    (
+        Start_Date_Time ascending
+    )
+}

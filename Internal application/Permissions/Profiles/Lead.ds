@@ -1,0 +1,128 @@
+"Lead"
+{
+    name = "Lead"
+    type = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false }
+    description = "Read-focused event and finance oversight with discount approval authority."
+
+    ModulePermissions
+    {
+        Team_Members
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Team_Members={"View"}
+            }
+        }
+        Products
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Products={"View"}
+                Active_Products={"View"}
+            }
+        }
+        Events
+        {
+            enabled = Viewall,Export,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Unified_Event_Summary={"View"}
+                Event_Calendar={"View"}
+                Event_Lifecycle_Board={"View"}
+                Upcoming_Events={"View"}
+                Incomplete_Event_Activities={"View"}
+                Certification_Tickets={"View"}
+            }
+        }
+        Event_Performance
+        {
+            enabled = Viewall,Export,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Event_Performance_Details={"View"}
+                Source_Performance={"View"}
+                Country_Performance={"View"}
+            }
+        }
+        Tasks
+        {
+            enabled = View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Tasks_Requiring_Attention={"View"}
+            }
+        }
+        Leave_Requests
+        {
+            enabled = View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Approved_Leave_WFH={"View"}
+            }
+        }
+        Discounts
+        {
+            enabled = Viewall,Modifyall,Export,Tab,View,Edit,Search
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                All_Discounts={"View"}
+                Pending_Discount_Approvals={"View"}
+                Approved_Discounts={"View"}
+            }
+            FieldPermissions
+            {
+                Discount_ID{visibility:true,readonly:true}
+                Event{visibility:true,readonly:true}
+                Product{visibility:true,readonly:true}
+                Requested_By{visibility:true,readonly:true}
+                Discount_Type{visibility:true,readonly:true}
+                Discount_Count{visibility:true,readonly:true}
+                Gross_Revenue{visibility:true,readonly:true}
+                Discount_Percentage{visibility:true,readonly:true}
+                Discount_Amount{visibility:true,readonly:true}
+                Discounted_Revenue{visibility:true,readonly:true}
+                Approval_Status{visibility:true,readonly:false}
+                Approved_By{visibility:true,readonly:true}
+                Approval_Date{visibility:true,readonly:true}
+                Approval_Comments{visibility:true,readonly:false}
+            }
+        }
+        Invoices
+        {
+            enabled = Viewall,Export,Tab,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Invoices={"View"}
+                Outstanding_Invoices={"View"}
+                Overdue_Invoices={"View"}
+                Paid_Invoices={"View"}
+            }
+        }
+        Audit_Log
+        {
+            enabled = View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Audit_History={"View"}
+            }
+        }
+        Operations_Dashboard { enabled = tab }
+        Metrics_Dashboard { enabled = tab }
+        Trainer_Dashboard { enabled = tab }
+        Leave_Task_Dashboard { enabled = tab }
+        Finance_Dashboard { enabled = tab }
+        Manager_Dashboard { enabled = tab }
+    }
+}

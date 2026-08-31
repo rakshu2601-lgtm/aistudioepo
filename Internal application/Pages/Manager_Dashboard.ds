@@ -1,0 +1,19 @@
+<page linkname = "Manager_Dashboard" displayname = "Manager Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Manager_Executive' elementName='Manager_Executive'>
+          <![CDATA[htmlpage Manager_Executive()
+            content
+            <%{%>
+              <file name:Manager_Executive.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

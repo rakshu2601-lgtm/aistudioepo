@@ -1,0 +1,26 @@
+Audit_Invoice_Changes as "Audit Invoice Changes"
+{
+    type = form
+    form = Invoices
+    record event = on edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                insert into Audit_Log
+                [
+                    Module_Name = "Invoices"
+                    Record_ID = input.Invoice_Number.toString()
+                    Action = "Invoice financial/status update"
+                    Changed_By = zoho.loginuserid
+                    Changed_At = zoho.currenttime
+                    After_Value = "Revenue: " + input.Revenue_Amount + "; Discount: " + input.Discount_Amount + "; Rate: " + input.Conversion_Rate_To_USD + "; Status: " + input.Invoice_Status
+                    Notes = input.Notes
+                ];
+            )
+        }
+    }
+}

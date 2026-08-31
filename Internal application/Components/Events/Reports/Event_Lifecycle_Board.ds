@@ -1,0 +1,36 @@
+kanban Event_Lifecycle_Board
+{
+    displayName = "Event Lifecycle Board"
+    show all rows from Events
+    (
+        Event_Title
+        Event_Type
+        Product
+        Region
+        Primary_Trainer
+        Start_Date_Time
+        End_Date_Time
+        Lifecycle_Stage
+        Event_Status
+        Readiness_Status
+    )
+    filters
+    (
+        Product
+        Region
+        Primary_Trainer
+        Event_Type
+        Event_Status
+    )
+    sort by
+    (
+        Start_Date_Time ascending
+    )
+    options
+    (
+        display field = Lifecycle_Stage
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

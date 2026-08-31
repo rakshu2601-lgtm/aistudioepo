@@ -1,0 +1,28 @@
+default list All_Leave_Requests
+{
+    displayName = "All Leave Requests"
+    show all rows from Leave_Requests
+    (
+        Request_Number
+        Team_Member
+        Request_Type
+        Start_Date
+        End_Date
+        Reason
+        Reporting_Manager
+        Approval_Status
+        Manager_Comments
+        Decision_Date
+    )
+    filters
+    (
+        Request_Type
+        Start_Date
+        End_Date
+        Approval_Status
+    )
+    sort by
+    (
+        Start_Date descending
+    )
+}

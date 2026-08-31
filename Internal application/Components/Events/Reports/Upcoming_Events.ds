@@ -1,0 +1,38 @@
+list Upcoming_Events
+{
+    displayName = "Upcoming Events"
+    show all rows from Events [Start_Date_Time >= zoho.currenttime && Event_Status != "Cancelled" && Lifecycle_Stage != "Completed"]
+    (
+        Event_ID
+        Event_Title
+        Event_Type
+        Product
+        Region
+        Start_Date_Time
+        End_Date_Time
+        Primary_Trainer
+        Readiness_Status
+        Event_Status
+    )
+    filters
+    (
+        Product
+        Region
+        Primary_Trainer
+        Event_Type
+        Readiness_Status
+    )
+    sort by
+    (
+        Start_Date_Time ascending
+    )
+    conditional formatting
+    (
+        "Not Ready"
+        {
+            condition = (Readiness_Status != "Ready")
+            fields = [Event_Title, Start_Date_Time, Readiness_Status]
+            format = "background-color:#FFF4D6;color:#8A5200;font-weight:bold"
+        }
+    )
+}

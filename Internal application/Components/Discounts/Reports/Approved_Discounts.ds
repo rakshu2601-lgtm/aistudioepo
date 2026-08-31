@@ -1,0 +1,33 @@
+list Approved_Discounts
+{
+    displayName = "Approved Discounts"
+    show all rows from Discounts [Approval_Status == "Approved"]
+    (
+        Discount_ID
+        Event
+        Product
+        Requested_By
+        Discount_Type
+        Discount_Count
+        Gross_Revenue
+        Discount_Percentage
+        Discount_Amount
+        Discounted_Revenue
+        Approval_Status
+        Approved_By
+        Approval_Date
+        Approval_Comments
+    )
+    filters
+    (
+        Event
+        Product
+        Discount_Type
+        Approved_By
+        Approval_Date
+    )
+    sort by
+    (
+        Approval_Date descending
+    )
+}

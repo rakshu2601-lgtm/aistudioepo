@@ -1,0 +1,185 @@
+form Discounts
+{
+    Discount_Details
+    (
+        type = section
+        displayname = "Discount Details"
+        row = 1
+        column = 0
+    )
+    Discount_ID
+    (
+        type = autonumber
+        displayname = "Discount ID"
+        start index = 1001
+        row = 1
+        column = 1
+    )
+    must have Event
+    (
+        type = picklist
+        values = Events.ID
+        displayformat = [Event_Title]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Product
+    (
+        type = picklist
+        values = Products.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Requested_By
+    (
+        type = picklist
+        displayname = "Requested By"
+        values = Team_Members.ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Discount_Type
+    (
+        type = picklist
+        displayname = "Discount Type"
+        values = {"Partner","Customer","Prospect","Other"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Discount_Count
+    (
+        type = number
+        displayname = "Discount Count"
+        initial value = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Gross_Revenue
+    (
+        type = decimal
+        displayname = "Gross Revenue"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Discount_Percentage
+    (
+        type = decimal
+        displayname = "Discount Percentage"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Discount_Amount
+    (
+        type = formula
+        displayname = "Discount Amount"
+        value = Gross_Revenue * Discount_Percentage / 100
+        visibility = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Discounted_Revenue
+    (
+        type = formula
+        displayname = "Discounted Revenue"
+        value = Gross_Revenue - (Gross_Revenue * Discount_Percentage / 100)
+        visibility = true
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    Approval
+    (
+        type = section
+        displayname = "Approval"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Approval_Status
+    (
+        type = picklist
+        displayname = "Approval Status"
+        values = {"Pending","Approved","Rejected"}
+        initial value = "Pending"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Approved_By
+    (
+        type = picklist
+        displayname = "Approved By"
+        values = Team_Members.ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 2
+        column = 2
+        width = medium
+    )
+    Approval_Date
+    (
+        type = date
+        displayname = "Approval Date"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Approval_Comments
+    (
+        type = textarea
+        displayname = "Approval Comments"
+        height = 120px
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit Discount"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Discount"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+
+    blueprint components
+    {
+        stages = {"Pending","Approved","Rejected"}
+    }
+}

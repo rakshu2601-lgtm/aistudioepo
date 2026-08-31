@@ -1,0 +1,36 @@
+Validate_New_Discount as "Validate New Discount"
+{
+    type = form
+    form = Discounts
+    record event = on add
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Discount_Percentage < 0 || input.Discount_Percentage > 100)
+                {
+                    alert "Discount percentage must be between 0 and 100.";
+                    cancel submit;
+                }
+                if(input.Discount_Count <= 0)
+                {
+                    alert "Discount count must be positive.";
+                    cancel submit;
+                }
+                if(input.Gross_Revenue < 0)
+                {
+                    alert "Gross revenue cannot be negative.";
+                    cancel submit;
+                }
+                if(input.Approval_Status == "Rejected" && (input.Approval_Comments == null || input.Approval_Comments.trim() == ""))
+                {
+                    alert "Approval comments are required when rejecting a discount.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

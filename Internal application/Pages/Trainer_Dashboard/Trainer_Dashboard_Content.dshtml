@@ -1,0 +1,106 @@
+<%
+member = Team_Members[Email == zoho.loginuserid];
+viewerName = zoho.loginuser;
+viewerType = "Lead";
+memberId = 0;
+if(member.count() > 0)
+{
+    viewerName = member.Employee_Name;
+    viewerType = member.Member_Type;
+    memberId = member.ID;
+}
+isManager = viewerType == "Training Manager";
+isTrainer = viewerType == "Trainer";
+if(isManager || viewerType == "Lead")
+{
+    eventRows = Events[Event_Status != "Cancelled" && Event_Status != "Closed"] sort by Start_Date_Time asc;
+    taskRows = Tasks[Status != "Completed" && Status != "Cancelled"];
+}
+else
+{
+    eventRows = Events[(Primary_Trainer == memberId || Additional_Trainers == memberId || QA_Trainer == memberId) && Event_Status != "Cancelled" && Event_Status != "Closed"] sort by Start_Date_Time asc;
+    taskRows = Tasks[Assigned_To == memberId && Status != "Completed" && Status != "Cancelled"];
+}
+upcomingCount = 0;
+qaCount = 0;
+overdueCount = 0;
+for each ev in eventRows
+{
+    if(ev.Start_Date_Time >= zoho.currenttime)
+    {
+        upcomingCount = upcomingCount + 1;
+    }
+    if(ev.QA_Trainer != null && (isManager || viewerType == "Lead" || ev.QA_Trainer == memberId))
+    {
+        qaCount = qaCount + 1;
+    }
+    if(ev.End_Date_Time < zoho.currenttime && ev.Lifecycle_Stage != "Completed")
+    {
+        overdueCount = overdueCount + 1;
+    }
+}
+openTaskCount = taskRows.count();
+totalEvents = eventRows.count();
+maxWorkload = if(totalEvents > 0,totalEvents,1);
+%>
+<style>
+/* ZCS global utility sheet, included once for this page */
+:root{--zcs-theme-brand-color:var(--zcs_brand_color);--zcs-primary-text-color:var(--zcs_primary_text_color);--zcs-secondary-text-color:var(--zcs_secondary_text_color);--zcs-teritiary-text-color:var(--zcs_tertiary_text_color);--zcs-white-color:#fff;--zcs-page-bg-color:#f3f3f4;--zcs-thead-color:#f9fafe;--column-gap:0px;font-size:16px;line-height:1.5}.zcs-row,.zcs-flex{display:flex}.zcs-row{flex-wrap:wrap}.zcs-direction-column{flex-direction:column}.zcs-align-items-center{align-items:center}.zcs-align-items-start{align-items:flex-start}.zcs-justify-center{justify-content:center}.zcs-justify-space-between{justify-content:space-between}.zcs-gap-4{gap:.25rem}.zcs-gap-6{gap:.375rem}.zcs-gap-8{gap:.5rem}.zcs-gap-10{gap:.625rem}.zcs-gap-12{gap:.75rem}.zcs-gap-16{gap:1rem}.zcs-gap-20{gap:1.25rem}.zcs-gap-24{gap:1.5rem}.zcs-w-full{width:100%}.zcs-box-border{box-sizing:border-box}.zcs-p-0{padding:0}.zcs-p-16{padding:1rem}.zcs-p-20{padding:1.25rem}.zcs-p-24{padding:1.5rem}.zcs-px-10{padding-left:.625rem;padding-right:.625rem}.zcs-px-16{padding-left:1rem;padding-right:1rem}.zcs-px-24{padding-left:1.5rem;padding-right:1.5rem}.zcs-py-2{padding-top:.125rem;padding-bottom:.125rem}.zcs-py-8{padding-top:.5rem;padding-bottom:.5rem}.zcs-py-16{padding-top:1rem;padding-bottom:1rem}.zcs-m-0{margin:0}.zcs-font-12{font-size:.75rem}.zcs-font-13{font-size:.8125rem}.zcs-font-14{font-size:.875rem}.zcs-font-16{font-size:1rem}.zcs-font-18{font-size:1.125rem}.zcs-font-24{font-size:1.5rem}.zcs-font-30{font-size:1.875rem}.zcs-font-normal{font-weight:400}.zcs-font-medium{font-weight:500}.zcs-font-semibold{font-weight:600}.zcs-font-bold{font-weight:700}.zcs-lh-body{line-height:1.5}.zcs-lh-heading{line-height:1.25}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-secondary{color:var(--zcs-secondary-text-color)}.zcs-color-tertiary{color:var(--zcs-teritiary-text-color)}.zcs-color-theme{color:var(--zcs-theme-brand-color)}.zcs-text-left{text-align:left}.zcs-text-right{text-align:right}.zcs-rounded-sm{border-radius:.25rem}.zcs-rounded-md{border-radius:.375rem}.zcs-rounded-xl{border-radius:.75rem}.zcs-inline-flex{display:inline-flex}.zcs-card{background:var(--zcs-white-color);border:1px solid var(--zcs_tertiary_border_color);border-radius:12px}
+.trainer-dashboard{background:var(--zcs-page-bg-color);padding:20px;min-height:100%;font-family:Arial,sans-serif}.dashboard-header{background:linear-gradient(115deg,var(--zcs_brand_dark_color),var(--zcs_brand_color));color:var(--zcs_brand_foreground_color);border-radius:16px;padding:24px 28px}.dashboard-header h1,.dashboard-header p{color:inherit}.scope-pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);padding:6px 10px;border-radius:999px}.metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.metric-card{min-height:130px}.metric-icon{width:40px;height:40px;border-radius:10px;background:var(--zcs_brand_light_color);color:var(--zcs_brand_color);font-size:20px}.metric-value{font-size:30px;font-weight:700;color:var(--zcs_primary_text_color)}.section-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.55fr);gap:16px}.distribution-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.section-title{padding-bottom:14px;border-bottom:1px solid var(--zcs_tertiary_border_color)}.zcs-progress-bar{height:8px;background:var(--zcs_component_hover_color);border-radius:4px;overflow:hidden}.zcs-progress-bar-indicator{height:100%;border-radius:inherit;background:var(--zcs_brand_color)}.bar-list{list-style:none}.zcs-table-wrapper{border:1px solid var(--zcs_tertiary_border_color);background:var(--zcs-white-color);overflow:auto;border-radius:8px}.zcs-table-wrapper table{border-collapse:collapse;min-width:780px}.zcs-table-wrapper th{background:var(--zcs-thead-color);white-space:nowrap}.zcs-table-wrapper td{border-top:1px solid var(--zcs_tertiary_border_color)}.zcs-table-wrapper tr:hover td{background:#f9fafe}.zcs-badge{width:auto}.zcs-badge-filled{border:1px solid transparent;color:#fff}.zcs-badge-theme{background:var(--zcs_brand_color)}.zcs-badge-blue{background:#2a6ffc}.zcs-badge-orange{background:#f4660c}.zcs-badge-red{background:#fe455d}.zcs-badge-yellow{background:#faae13}.zcs-button{width:auto;min-width:5rem;min-height:36px;text-decoration:none}.zcs-primary-outline-button{border:1px solid var(--zcs_brand_color);background:#fff;color:var(--zcs_brand_color)}.zcs-primary-outline-button:hover{background:var(--zcs_component_hover_color)}.empty-row{padding:28px;text-align:center;color:var(--zcs_tertiary_text_color)}
+@media(max-width:992px){.metric-grid{grid-template-columns:repeat(2,1fr)}.section-grid{grid-template-columns:1fr}.distribution-grid{grid-template-columns:1fr}}@media(max-width:576px){.trainer-dashboard{padding:12px}.metric-grid{grid-template-columns:1fr}.dashboard-header{padding:20px}.dashboard-header>.zcs-flex{align-items:flex-start;flex-direction:column}.header-actions{width:100%;flex-wrap:wrap}.header-actions .zcs-button{flex:1}}
+</style>
+<div class='trainer-dashboard zcs-flex zcs-direction-column zcs-gap-16 zcs-box-border'>
+  <div class='dashboard-header'>
+    <div class='zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-16'>
+      <div>
+        <p class='zcs-font-13 zcs-m-0'>Training delivery workspace</p>
+        <h1 class='zcs-font-24 zcs-font-semibold zcs-m-0'>Trainer Dashboard</h1>
+        <p class='zcs-font-14 zcs-m-0'>Hello <%=viewerName%>. Review assignments, Q&amp;A duties, workload, and delivery follow-ups.</p>
+      </div>
+      <div class='zcs-flex zcs-align-items-center zcs-gap-12 header-actions'>
+        <span class='scope-pill zcs-font-13'><i class='zc-li-outline users-single-05'></i> <%=if(isManager,"All trainers",if(isTrainer,"Personal workload","Read-only overview"))%></span>
+        <a class='zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md zcs-box-border zcs-font-14' href='#Report:My_Assigned_Events'><i class='zc-li-outline ui-1-calendar-60'></i><span>My events</span></a>
+        <a class='zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md zcs-box-border zcs-font-14' href='#Report:My_Assigned_Tasks'><i class='zc-li-outline ui-1-check-circle-08'></i><span>My tasks</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div class='metric-grid'>
+    <div class='zcs-card metric-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-p-20 zcs-box-border'><div class='zcs-flex zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-14 zcs-color-secondary'>Assigned upcoming events</span><span class='metric-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline ui-1-calendar-60'></i></span></div><span class='metric-value'><%=upcomingCount%></span><span class='zcs-font-12 zcs-color-tertiary'>Planned from today onward</span></div>
+    <div class='zcs-card metric-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-p-20 zcs-box-border'><div class='zcs-flex zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-14 zcs-color-secondary'>Q&amp;A assignments</span><span class='metric-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline ui-2-chat-round-content'></i></span></div><span class='metric-value'><%=qaCount%></span><span class='zcs-font-12 zcs-color-tertiary'>Active Q&amp;A delivery duties</span></div>
+    <div class='zcs-card metric-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-p-20 zcs-box-border'><div class='zcs-flex zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-14 zcs-color-secondary'>Overdue updates</span><span class='metric-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline ui-2-time'></i></span></div><span class='metric-value'><%=overdueCount%></span><span class='zcs-font-12 zcs-color-tertiary'>Ended but lifecycle not completed</span></div>
+    <div class='zcs-card metric-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-p-20 zcs-box-border'><div class='zcs-flex zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-14 zcs-color-secondary'>Open tasks</span><span class='metric-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline design-bullet-list-67'></i></span></div><span class='metric-value'><%=openTaskCount%></span><span class='zcs-font-12 zcs-color-tertiary'>Open, in progress, or blocked</span></div>
+  </div>
+
+  <div class='section-grid'>
+    <div class='zcs-card zcs-p-20 zcs-box-border'>
+      <div class='section-title zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-8'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Compact assignment register</h2><p class='zcs-font-13 zcs-color-tertiary zcs-m-0'>Upcoming and active delivery assignments</p></div><a class='zcs-color-theme zcs-font-13' href='#Report:My_Assigned_Events'>Open report</a></div>
+      <div class='zcs-table-wrapper'>
+        <table class='zcs-w-full'>
+          <thead><tr><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Event</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Trainer</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Role</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Product / Region</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Start</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Stage</th></tr></thead>
+          <tbody>
+          <% rowCount = 0; for each ev in eventRows { if(ev.Start_Date_Time >= zoho.currenttime.subDay(30) && rowCount < 8) { roleLabel = "Additional"; roleClass = "zcs-badge-blue"; trainerLabel = ev.Additional_Trainers; if(!isManager && !isTrainer && viewerType == "Lead") { trainerLabel = ev.Primary_Trainer; roleLabel = "Primary"; roleClass = "zcs-badge-theme"; } else if(ev.Primary_Trainer == memberId || isManager) { trainerLabel = ev.Primary_Trainer; roleLabel = "Primary"; roleClass = "zcs-badge-theme"; } if(!isManager && ev.QA_Trainer == memberId) { trainerLabel = ev.QA_Trainer; roleLabel = "Q&A"; roleClass = "zcs-badge-orange"; } rowCount = rowCount + 1; %>
+            <tr><td class='zcs-px-16 zcs-py-8 zcs-font-13 zcs-color-primary'><strong><%=ev.Event_Title%></strong><br><span class='zcs-color-tertiary'><%=ev.Event_Type%></span></td><td class='zcs-px-16 zcs-py-8 zcs-font-13'><%=trainerLabel%></td><td class='zcs-px-16 zcs-py-8'><span class='zcs-badge zcs-badge-filled zcs-inline-flex zcs-rounded-sm zcs-px-10 zcs-py-2 <%=roleClass%>'><span class='zcs-font-12'><%=roleLabel%></span></span></td><td class='zcs-px-16 zcs-py-8 zcs-font-13'><%=ev.Product%><br><span class='zcs-color-tertiary'><%=ev.Region%></span></td><td class='zcs-px-16 zcs-py-8 zcs-font-13'><%=ev.Start_Date_Time%></td><td class='zcs-px-16 zcs-py-8 zcs-font-13'><%=ev.Lifecycle_Stage%></td></tr>
+          <% } } if(rowCount == 0) { %><tr><td colspan='6' class='empty-row'><i class='zc-li-outline ui-1-calendar-60'></i> No current assignments found.</td></tr><% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class='zcs-card zcs-p-20 zcs-box-border'>
+      <div class='section-title'><h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Workload by trainer</h2><p class='zcs-font-13 zcs-color-tertiary zcs-m-0'>Active event allocation</p></div>
+      <ul class='bar-list zcs-flex zcs-direction-column zcs-gap-16 zcs-p-0'>
+      <% trainerShown = 0; for each tr in Team_Members[Active == true && Member_Type == "Trainer"] { trainerLoad = Events[(Primary_Trainer == tr.ID || Additional_Trainers == tr.ID || QA_Trainer == tr.ID) && Event_Status != "Cancelled" && Event_Status != "Closed"].count(); if(isManager || viewerType == "Lead" || tr.ID == memberId) { trainerShown = trainerShown + 1; trainerPct = if(maxWorkload > 0,(trainerLoad * 100 / maxWorkload),0); if(trainerPct > 100) { trainerPct = 100; } %>
+        <li class='zcs-progress-bar-wrapper zcs-flex zcs-direction-column zcs-gap-6'><div class='zcs-flex zcs-justify-space-between zcs-font-13'><span class='zcs-color-primary'><%=tr.Employee_Name%></span><span class='zcs-color-tertiary'><%=trainerLoad%> events</span></div><div class='zcs-progress-bar'><div class='zcs-progress-bar-indicator' style='width:<%=trainerPct%>%;'></div></div></li>
+      <% } } if(trainerShown == 0) { %><li class='empty-row'>No trainer workload found.</li><% } %>
+      </ul>
+    </div>
+  </div>
+
+  <div class='distribution-grid'>
+    <div class='zcs-card zcs-p-20 zcs-box-border'><div class='section-title'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Workload by product</h2></div><ul class='bar-list zcs-flex zcs-direction-column zcs-gap-12 zcs-p-0'><% for each pr in Products[Active == true] { productLoad = 0; for each ev in eventRows { if(ev.Product == pr.ID) { productLoad = productLoad + 1; } } if(productLoad > 0) { pct = productLoad * 100 / maxWorkload; %><li class='zcs-progress-bar-wrapper zcs-flex zcs-direction-column zcs-gap-6'><div class='zcs-flex zcs-justify-space-between zcs-font-13'><span><%=pr.Product_Name%></span><span><%=productLoad%></span></div><div class='zcs-progress-bar'><div class='zcs-progress-bar-indicator' style='width:<%=pct%>%;'></div></div></li><% } } %></ul></div>
+    <div class='zcs-card zcs-p-20 zcs-box-border'><div class='section-title'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Workload by region</h2></div><ul class='bar-list zcs-flex zcs-direction-column zcs-gap-12 zcs-p-0'><% regionNames = {"Americas","EMEA","APAC","India","Global","Other"}; for each regionName in regionNames { regionLoad = 0; for each ev in eventRows { if(ev.Region == regionName) { regionLoad = regionLoad + 1; } } if(regionLoad > 0) { pct = regionLoad * 100 / maxWorkload; %><li class='zcs-progress-bar-wrapper zcs-flex zcs-direction-column zcs-gap-6'><div class='zcs-flex zcs-justify-space-between zcs-font-13'><span><%=regionName%></span><span><%=regionLoad%></span></div><div class='zcs-progress-bar'><div class='zcs-progress-bar-indicator' style='width:<%=pct%>%;'></div></div></li><% } } %></ul></div>
+    <div class='zcs-card zcs-p-20 zcs-box-border'><div class='section-title'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Workload by event type</h2></div><ul class='bar-list zcs-flex zcs-direction-column zcs-gap-12 zcs-p-0'><% typeNames = {"Webinar","Online Training","Customized Training","In-Person Training","Certification"}; for each typeName in typeNames { typeLoad = 0; for each ev in eventRows { if(ev.Event_Type == typeName) { typeLoad = typeLoad + 1; } } if(typeLoad > 0) { pct = typeLoad * 100 / maxWorkload; %><li class='zcs-progress-bar-wrapper zcs-flex zcs-direction-column zcs-gap-6'><div class='zcs-flex zcs-justify-space-between zcs-font-13'><span><%=typeName%></span><span><%=typeLoad%></span></div><div class='zcs-progress-bar'><div class='zcs-progress-bar-indicator' style='width:<%=pct%>%;'></div></div></li><% } } %></ul></div>
+    <div class='zcs-card zcs-p-20 zcs-box-border'><div class='section-title'><h2 class='zcs-font-18 zcs-font-semibold zcs-m-0'>Pending delivery updates</h2></div><ul class='bar-list zcs-flex zcs-direction-column zcs-gap-12 zcs-p-0'><% updateShown = 0; for each ev in eventRows { if(ev.End_Date_Time < zoho.currenttime && ev.Lifecycle_Stage != "Completed" && updateShown < 5) { updateShown = updateShown + 1; %><li class='zcs-flex zcs-align-items-start zcs-justify-space-between zcs-gap-8'><span class='zcs-font-13'><strong><%=ev.Event_Title%></strong><br><span class='zcs-color-tertiary'><%=ev.Primary_Trainer%></span></span><span class='zcs-badge zcs-badge-filled zcs-badge-red zcs-inline-flex zcs-rounded-sm zcs-px-10 zcs-py-2'><span class='zcs-font-12'>Overdue</span></span></li><% } } if(updateShown == 0) { %><li class='empty-row'><i class='zc-li-outline ui-1-check-circle-08'></i> No overdue delivery updates.</li><% } %></ul></div>
+  </div>
+</div>

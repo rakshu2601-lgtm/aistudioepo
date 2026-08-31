@@ -1,0 +1,44 @@
+Validate_Leave_Request_Edit as "Validate Leave Request Edit"
+{
+    type = form
+    form = Leave_Requests
+    record event = on edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                is_training_manager = thisapp.permissions.isUserInProfile("Training_Manager");
+                is_requester = input.Team_Member.Email == zoho.loginuserid;
+                is_reporting_manager = input.Reporting_Manager.Email == zoho.loginuserid;
+                if(input.End_Date < input.Start_Date)
+                {
+                    alert "End Date must be on or after Start Date.";
+                    cancel submit;
+                }
+                if(!is_training_manager && !is_requester && !is_reporting_manager)
+                {
+                    alert "Only the requester, reporting manager, or Training Manager may update this request.";
+                    cancel submit;
+                }
+                if(is_requester && !is_training_manager && !is_reporting_manager && (old.Approval_Status != input.Approval_Status || old.Manager_Comments != input.Manager_Comments || old.Decision_Date != input.Decision_Date))
+                {
+                    alert "Requesters cannot change approval decision fields.";
+                    cancel submit;
+                }
+                if(is_reporting_manager && !is_training_manager && !is_requester && (old.Team_Member != input.Team_Member || old.Request_Type != input.Request_Type || old.Start_Date != input.Start_Date || old.End_Date != input.End_Date || old.Reason != input.Reason))
+                {
+                    alert "Reporting managers may change only approval decision fields.";
+                    cancel submit;
+                }
+                if(input.Approval_Status == "Rejected" && input.Manager_Comments == null)
+                {
+                    alert "Manager Comments are required when rejecting a request.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,73 @@
+<%
+member = Team_Members[Email == zoho.loginuserid];
+memberId = 0;
+memberName = zoho.loginuser;
+memberType = "Viewer";
+if(member.count() > 0)
+{
+  memberId = member.ID;
+  memberName = member.Employee_Name;
+  memberType = member.Member_Type;
+}
+isManager = memberType == "Training Manager";
+isLead = memberType == "Lead";
+scopeLabel = "Personal workload";
+if(isManager)
+{
+  scopeLabel = "Team-wide management view";
+}
+else if(isLead)
+{
+  scopeLabel = "Read-only operational summary";
+}
+if(isManager || isLead)
+{
+  pendingLeave = Leave_Requests[Approval_Status == "Pending"].count();
+  currentApproved = Leave_Requests[Approval_Status == "Approved" && Start_Date <= zoho.currentdate && End_Date >= zoho.currentdate].count();
+  wfhToday = Leave_Requests[Approval_Status == "Approved" && Request_Type == "WFH" && Start_Date <= zoho.currentdate && End_Date >= zoho.currentdate].count();
+  upcomingAbsences = Leave_Requests[Approval_Status == "Approved" && Request_Type != "WFH" && Start_Date > zoho.currentdate && Start_Date <= zoho.currentdate.addDay(30)].count();
+  openTasks = Tasks[Status == "Open" || Status == "In Progress"].count();
+  blockedTasks = Tasks[Status == "Blocked"].count();
+  overdueTasks = Tasks[Due_Date < zoho.currentdate && Status != "Completed" && Status != "Cancelled"].count();
+  criticalTasks = Tasks[Priority == "Critical" && Status != "Completed" && Status != "Cancelled"].count();
+}
+else
+{
+  pendingLeave = Leave_Requests[Team_Member == memberId && Approval_Status == "Pending"].count();
+  currentApproved = Leave_Requests[Team_Member == memberId && Approval_Status == "Approved" && Start_Date <= zoho.currentdate && End_Date >= zoho.currentdate].count();
+  wfhToday = Leave_Requests[Team_Member == memberId && Approval_Status == "Approved" && Request_Type == "WFH" && Start_Date <= zoho.currentdate && End_Date >= zoho.currentdate].count();
+  upcomingAbsences = Leave_Requests[Team_Member == memberId && Approval_Status == "Approved" && Request_Type != "WFH" && Start_Date > zoho.currentdate && Start_Date <= zoho.currentdate.addDay(30)].count();
+  openTasks = Tasks[Assigned_To == memberId && (Status == "Open" || Status == "In Progress")].count();
+  blockedTasks = Tasks[Assigned_To == memberId && Status == "Blocked"].count();
+  overdueTasks = Tasks[Assigned_To == memberId && Due_Date < zoho.currentdate && Status != "Completed" && Status != "Cancelled"].count();
+  criticalTasks = Tasks[Assigned_To == memberId && Priority == "Critical" && Status != "Completed" && Status != "Cancelled"].count();
+}
+%>
+<style>
+/* ZCS global utility sheet, included once for this page */
+:root{--zcs-theme-brand-color:var(--zcs_brand_color);--zcs-light-bg-color:var(--zcs_brand_light_color);--zcs-primary-text-color:var(--zcs_primary_text_color);--zcs-secondary-text-color:var(--zcs_secondary_text_color);--zcs-teritiary-text-color:var(--zcs_tertiary_text_color);--zcs-white-color:#fff;--zcs-page-bg-color:#f3f3f4;line-height:1.5}.zcs-flex{display:flex}.zcs-row{display:flex;flex-wrap:wrap}.zcs-direction-column{flex-direction:column}.zcs-align-items-center{align-items:center}.zcs-justify-space-between{justify-content:space-between}.zcs-justify-center{justify-content:center}.zcs-gap-8{gap:.5rem}.zcs-gap-12{gap:.75rem}.zcs-gap-16{gap:1rem}.zcs-p-20{padding:1.25rem}.zcs-p-24{padding:1.5rem}.zcs-px-16{padding-left:1rem;padding-right:1rem}.zcs-py-8{padding-top:.5rem;padding-bottom:.5rem}.zcs-m-0{margin:0}.zcs-w-full{width:100%}.zcs-box-border{box-sizing:border-box}.zcs-font-12{font-size:.75rem}.zcs-font-14{font-size:.875rem}.zcs-font-18{font-size:1.125rem}.zcs-font-24{font-size:1.5rem}.zcs-font-30{font-size:1.875rem}.zcs-font-medium{font-weight:500}.zcs-font-semibold{font-weight:600}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-secondary{color:var(--zcs-secondary-text-color)}.zcs-color-tertiary{color:var(--zcs-teritiary-text-color)}.zcs-rounded-md{border-radius:.375rem}.zcs-rounded-xl{border-radius:.75rem}.zcs-card{background:var(--zcs-white-color);border:1px solid var(--zcs_tertiary_border_color);border-radius:12px}.zcs-button{width:auto;min-height:36px;text-decoration:none}.zcs-primary-outline-button{border:1px solid var(--zcs_brand_color);background:var(--zcs-white-color);color:var(--zcs_brand_color)}.zcs-primary-outline-button:hover{background:var(--zcs_component_hover_color)}
+.lt-shell{background:var(--zcs-page-bg-color);padding:20px;box-sizing:border-box;font-family:inherit}.lt-header{background:linear-gradient(120deg,var(--zcs_brand_color),var(--zcs_brand_dark_color));color:var(--zcs_brand_foreground_color);border-radius:16px;padding:24px}.lt-header h1,.lt-header p{margin:0;color:inherit}.lt-actions{display:flex;gap:8px;flex-wrap:wrap}.lt-actions .zcs-button{background:#fff}.lt-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:16px}.lt-section-label{grid-column:1/-1;margin:8px 0 -4px;color:var(--zcs_primary_text_color);font-size:14px;font-weight:600}.lt-kpi{padding:18px;min-height:118px;box-sizing:border-box;position:relative;overflow:hidden}.lt-kpi i{font-size:22px;color:var(--zcs_brand_color)}.lt-kpi .value{font-size:30px;font-weight:600;color:var(--zcs_primary_text_color);margin-top:10px}.lt-kpi .label{font-size:13px;color:var(--zcs_secondary_text_color)}.lt-kpi.alert i,.lt-kpi.alert .value{color:#d14343}.lt-kpi.warn i,.lt-kpi.warn .value{color:#b8770d}.lt-view-tag{display:inline-flex;margin-top:10px;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.18);font-size:12px}@media(max-width:900px){.lt-grid{grid-template-columns:repeat(2,1fr)}.lt-header{align-items:flex-start;flex-direction:column}}@media(max-width:520px){.lt-grid{grid-template-columns:1fr}.lt-shell{padding:12px}}
+</style>
+<div class="lt-shell">
+  <div class="lt-header zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-16">
+    <div><h1 class="zcs-font-24 zcs-font-semibold">Leave, WFH and task health</h1><p class="zcs-font-14">Hello <%=memberName%>. Scheduling coverage and workload risks in one place.</p><span class="lt-view-tag"><i class="zc-li-outline users-single-01"></i>&nbsp;<%=scopeLabel%></span></div>
+    <div class="lt-actions">
+      <% if(isManager) { %><a class="zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md" href="#Report:Pending_Leave_Approvals"><i class="zc-li-outline ui-1-check-circle-08"></i><span>Approvals</span></a><% } %>
+      <a class="zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md" href="#Report:Approved_Leave_WFH"><i class="zc-li-outline ui-1-calendar-60"></i><span>Schedule</span></a>
+      <a class="zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md" href="#Report:Task_Board"><i class="zc-li-outline design-layout-11"></i><span>Task board</span></a>
+      <a class="zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md" href="#Report:Tasks_Requiring_Attention"><i class="zc-li-outline ui-2-alert-circle"></i><span>Attention</span></a>
+    </div>
+  </div>
+  <div class="lt-grid">
+    <div class="lt-section-label">Leave and WFH</div>
+    <div class="lt-kpi zcs-card warn"><i class="zc-li-outline ui-2-time"></i><div class="value"><%=pendingLeave%></div><div class="label">Pending requests</div></div>
+    <div class="lt-kpi zcs-card"><i class="zc-li-outline ui-1-check-circle-08"></i><div class="value"><%=currentApproved%></div><div class="label">Approved and current</div></div>
+    <div class="lt-kpi zcs-card"><i class="zc-li-outline location-pin"></i><div class="value"><%=wfhToday%></div><div class="label">WFH today</div></div>
+    <div class="lt-kpi zcs-card"><i class="zc-li-outline ui-1-calendar-60"></i><div class="value"><%=upcomingAbsences%></div><div class="label">Upcoming absences, 30 days</div></div>
+    <div class="lt-section-label">Task health</div>
+    <div class="lt-kpi zcs-card"><i class="zc-li-outline ui-1-list"></i><div class="value"><%=openTasks%></div><div class="label">Open or in progress</div></div>
+    <div class="lt-kpi zcs-card alert"><i class="zc-li-outline ui-2-alert-circle"></i><div class="value"><%=blockedTasks%></div><div class="label">Blocked tasks</div></div>
+    <div class="lt-kpi zcs-card alert"><i class="zc-li-outline ui-2-time"></i><div class="value"><%=overdueTasks%></div><div class="label">Overdue tasks</div></div>
+    <div class="lt-kpi zcs-card warn"><i class="zc-li-outline ui-2-notification-69"></i><div class="value"><%=criticalTasks%></div><div class="label">Critical active tasks</div></div>
+  </div>
+</div>

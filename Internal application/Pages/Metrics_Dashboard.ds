@@ -1,0 +1,19 @@
+<page linkname = "Metrics_Dashboard" displayname = "Metrics Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Metrics_Analytics' elementName='Metrics_Analytics'>
+          <![CDATA[htmlpage Metrics_Analytics()
+            content
+            <%{%>
+              <file name:Metrics_Analytics.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

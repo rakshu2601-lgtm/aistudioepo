@@ -1,0 +1,30 @@
+list Pending_Discount_Approvals
+{
+    displayName = "Pending Discount Approvals"
+    show all rows from Discounts [Approval_Status == "Pending"]
+    (
+        Discount_ID
+        Event
+        Product
+        Requested_By
+        Discount_Type
+        Discount_Count
+        Gross_Revenue
+        Discount_Percentage
+        Discount_Amount
+        Discounted_Revenue
+        Approval_Status
+        Approval_Comments
+    )
+    filters
+    (
+        Event
+        Product
+        Discount_Type
+        Requested_By
+    )
+    sort by
+    (
+        Discount_ID ascending
+    )
+}

@@ -1,0 +1,34 @@
+Refresh_Discount_Event as "Refresh Discount Event"
+{
+    type = form
+    form = Discounts
+    record event = on add or edit
+
+    on user input of Event
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Event != null)
+                {
+                    selected_event = Events[ID == input.Event];
+                    input.Product = selected_event.Product;
+                    if(selected_event.Final_Revenue != null && selected_event.Final_Revenue > 0)
+                    {
+                        input.Gross_Revenue = selected_event.Final_Revenue;
+                    }
+                    else if(selected_event.Pre_Revenue != null)
+                    {
+                        input.Gross_Revenue = selected_event.Pre_Revenue;
+                    }
+                }
+                else
+                {
+                    input.Product = null;
+                    input.Gross_Revenue = null;
+                }
+            )
+        }
+    }
+}

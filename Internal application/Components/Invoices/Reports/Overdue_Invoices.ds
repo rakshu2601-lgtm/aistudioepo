@@ -1,0 +1,30 @@
+list Overdue_Invoices
+{
+    displayName = "Overdue Invoices"
+    show all rows from Invoices [Invoice_Status == "Invoice Overdue"]
+    (
+        Invoice_Number
+        Event
+        Product
+        Trainer
+        Customer_Name
+        Due_Date
+        Invoice_Total_USD
+        Source_Currency
+        Exchange_Rate_Status
+        Invoice_Status
+    )
+    filters
+    (
+        Product
+        Trainer
+        Due_Date
+        Source_Currency
+        Exchange_Rate_Status
+        Invoice_Status
+    )
+    sort by
+    (
+        Due_Date ascending
+    )
+}

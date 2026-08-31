@@ -1,0 +1,42 @@
+Validate_Discount_Edit as "Validate Discount Edit"
+{
+    type = form
+    form = Discounts
+    record event = on edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                is_lead = thisapp.permissions.isUserInProfile("Lead");
+                if(input.Discount_Percentage < 0 || input.Discount_Percentage > 100)
+                {
+                    alert "Discount percentage must be between 0 and 100.";
+                    cancel submit;
+                }
+                if(input.Discount_Count <= 0)
+                {
+                    alert "Discount count must be positive.";
+                    cancel submit;
+                }
+                if(input.Gross_Revenue < 0)
+                {
+                    alert "Gross revenue cannot be negative.";
+                    cancel submit;
+                }
+                if(input.Approval_Status == "Rejected" && (input.Approval_Comments == null || input.Approval_Comments.trim() == ""))
+                {
+                    alert "Approval comments are required when rejecting a discount.";
+                    cancel submit;
+                }
+                if(old.Approval_Status != input.Approval_Status && !is_lead)
+                {
+                    alert "Only a Lead may approve or reject a discount.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

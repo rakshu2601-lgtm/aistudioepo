@@ -1,0 +1,22 @@
+list Active_Mentors
+{
+    displayName = "Active Mentors"
+    show all rows from Team_Members [Active == true && Member_Type == "Mentor"]
+    (
+        Employee_ID
+        Employee_Name
+        Email
+        Member_Type
+        Reporting_Manager
+        Active
+    )
+    filters
+    (
+        Member_Type
+        Active
+    )
+    sort by
+    (
+        Employee_Name ascending
+    )
+}

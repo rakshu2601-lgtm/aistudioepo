@@ -1,0 +1,51 @@
+default list Unified_Event_Summary
+{
+    displayName = "Unified Event Summary"
+    show all rows from Events
+    (
+        Event_ID
+        Event_Title
+        Event_Type
+        Product
+        Region
+        Start_Date_Time
+        End_Date_Time
+        Primary_Trainer
+        Lifecycle_Stage
+        Event_Status
+        Readiness_Status
+    )
+    filters
+    (
+        Product
+        Region
+        Primary_Trainer
+        Lifecycle_Stage
+        Event_Type
+    )
+    sort by
+    (
+        Start_Date_Time ascending
+    )
+    conditional formatting
+    (
+        "Overdue Incomplete"
+        {
+            condition = (End_Date_Time < zoho.currenttime && Lifecycle_Stage != "Completed" && Event_Status != "Cancelled")
+            fields = [Event_Title, End_Date_Time, Lifecycle_Stage, Event_Status]
+            format = "background-color:#FFE0E0;color:#A00000;font-weight:bold"
+        }
+        "Cancelled"
+        {
+            condition = (Event_Status == "Cancelled")
+            fields = [Event_Title, Event_Status]
+            format = "background-color:#F0F0F0;color:#666666;text-decoration:line-through"
+        }
+        "Completed"
+        {
+            condition = (Lifecycle_Stage == "Completed")
+            fields = [Event_Title, Lifecycle_Stage, Event_Status]
+            format = "background-color:#E2F7E8;color:#146C2E"
+        }
+    )
+}

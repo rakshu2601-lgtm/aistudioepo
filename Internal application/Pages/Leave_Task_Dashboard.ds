@@ -1,0 +1,31 @@
+<page linkname = "Leave_Task_Dashboard" displayname = "Leave & Task Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Leave_Task_Summary' elementName='Leave_Task_Summary'>
+          <![CDATA[htmlpage Leave_Task_Summary()
+            content
+            <%{%>
+              <file name:Summary.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+    <row>
+      <column width='100%'>
+        <dsp id='Leave_Task_Detail' elementName='Leave_Task_Detail'>
+          <![CDATA[htmlpage Leave_Task_Detail()
+            content
+            <%{%>
+              <file name:Detail.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

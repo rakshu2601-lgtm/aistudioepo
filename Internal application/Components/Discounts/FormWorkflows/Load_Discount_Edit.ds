@@ -1,0 +1,32 @@
+Load_Discount_Edit as "Load Discount Edit"
+{
+    type = form
+    form = Discounts
+    record event = on edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                is_lead = thisapp.permissions.isUserInProfile("Lead");
+                is_training_manager = thisapp.permissions.isUserInProfile("Training_Manager");
+                disable Requested_By;
+                disable Approval_Status;
+                disable Approved_By;
+                disable Approval_Date;
+                if(!is_lead && !is_training_manager)
+                {
+                    hide Approval;
+                    disable Approval_Comments;
+                }
+                else
+                {
+                    show Approval;
+                    enable Approval_Comments;
+                }
+            )
+        }
+    }
+}

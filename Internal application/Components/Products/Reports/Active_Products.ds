@@ -1,0 +1,16 @@
+list Active_Products
+{
+    displayName = "Active Products"
+    show all rows from Products [Active == true]
+    (
+        Product_Code
+        Product_Name
+        Product_Owner
+        Active
+        Notes
+    )
+    sort by
+    (
+        Product_Name ascending
+    )
+}

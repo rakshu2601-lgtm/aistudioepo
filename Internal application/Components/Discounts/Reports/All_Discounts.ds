@@ -1,0 +1,32 @@
+default list All_Discounts
+{
+    displayName = "All Discounts"
+    show all rows from Discounts
+    (
+        Discount_ID
+        Event
+        Product
+        Requested_By
+        Discount_Type
+        Discount_Count
+        Gross_Revenue
+        Discount_Percentage
+        Discount_Amount
+        Discounted_Revenue
+        Approval_Status
+        Approved_By
+        Approval_Date
+        Approval_Comments
+    )
+    filters
+    (
+        Event
+        Product
+        Discount_Type
+        Approval_Status
+    )
+    sort by
+    (
+        Discount_ID descending
+    )
+}

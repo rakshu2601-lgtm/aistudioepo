@@ -1,0 +1,21 @@
+Initialize_Task as "Initialize Task"
+{
+    type = form
+    form = Tasks
+    record event = on add
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_member = Team_Members[Email == zoho.loginuserid && Active == true];
+                if(current_member.ID != null)
+                {
+                    input.Assigned_By = current_member.ID;
+                }
+            )
+        }
+    }
+}

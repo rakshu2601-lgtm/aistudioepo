@@ -1,0 +1,27 @@
+Audit_Critical_Task_Status as "Audit Critical Task Status"
+{
+    type = form
+    form = Tasks[Priority == "Critical"]
+    record event = on edit
+
+    on update of Status
+    {
+        actions
+        {
+            custom deluge script
+            (
+                insert into Audit_Log
+                [
+                    Module_Name = "Tasks"
+                    Record_ID = input.Task_ID.toString()
+                    Action = "Critical task status changed"
+                    Changed_By = zoho.loginuserid
+                    Changed_At = zoho.currenttime
+                    Before_Value = "Previous status"
+                    After_Value = input.Status
+                    Notes = input.Issue_Blocker
+                ];
+            )
+        }
+    }
+}

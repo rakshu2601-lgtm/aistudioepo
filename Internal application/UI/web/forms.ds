@@ -1,0 +1,12 @@
+forms
+{
+    form Team_Members { label placement = top }
+    form Leave_Requests { label placement = top }
+    form Products { label placement = top }
+    form Events { label placement = top }
+    form Event_Performance { label placement = top }
+    form Tasks { label placement = top }
+    form Discounts { label placement = top }
+    form Invoices { label placement = top }
+    form Audit_Log { label placement = top }
+}

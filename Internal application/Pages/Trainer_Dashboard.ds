@@ -1,0 +1,19 @@
+<page linkname = "Trainer_Dashboard" displayname = "Trainer Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Trainer_Dashboard_Content' elementName='Trainer_Dashboard_Content'>
+          <![CDATA[htmlpage Trainer_Dashboard_Content()
+            content
+            <%{%>
+              <file name:Trainer_Dashboard_Content.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

@@ -1,0 +1,93 @@
+"Mentor"
+{
+    name = "Mentor"
+    type = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false }
+    description = "Personal tasks and leave requests with read-only master and limited event context."
+
+    ModulePermissions
+    {
+        Team_Members
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Team_Members={"View"}
+                Active_Trainers={"View"}
+                Active_Mentors={"View"}
+            }
+        }
+        Products
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Products={"View"}
+                Active_Products={"View"}
+            }
+        }
+        Events
+        {
+            enabled = View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                My_Assigned_Events={"View"}
+                Upcoming_Events={"View"}
+                Event_Calendar={"View"}
+            }
+        }
+        Tasks
+        {
+            enabled = Create,View,Edit,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                My_Assigned_Tasks={"View"}
+                Task_Board={"View"}
+                Mentor_Tasks={"View"}
+                Tasks_Requiring_Attention={"View"}
+            }
+            FieldPermissions
+            {
+                Task_ID{visibility:true,readonly:true}
+                Task_Title{visibility:true,readonly:false}
+                Description{visibility:true,readonly:false}
+                Assignee_Type{visibility:true,readonly:false}
+                Assigned_To{visibility:true,readonly:false}
+                Assigned_By{visibility:true,readonly:true}
+                Priority{visibility:true,readonly:false}
+                Due_Date{visibility:true,readonly:false}
+                Status{visibility:true,readonly:false}
+                Issue_Blocker{visibility:true,readonly:false}
+                Completion_Date{visibility:true,readonly:true}
+            }
+        }
+        Leave_Requests
+        {
+            enabled = Create,View,Edit,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                My_Leave_Requests={"View"}
+                Approved_Leave_WFH={"View"}
+            }
+            FieldPermissions
+            {
+                Request_Number{visibility:true,readonly:true}
+                Team_Member{visibility:true,readonly:true}
+                Request_Type{visibility:true,readonly:false}
+                Start_Date{visibility:true,readonly:false}
+                End_Date{visibility:true,readonly:false}
+                Reason{visibility:true,readonly:false}
+                Reporting_Manager{visibility:true,readonly:true}
+                Approval_Status{visibility:true,readonly:true}
+                Manager_Comments{visibility:true,readonly:true}
+                Decision_Date{visibility:true,readonly:true}
+            }
+        }
+        Leave_Task_Dashboard { enabled = tab }
+    }
+}

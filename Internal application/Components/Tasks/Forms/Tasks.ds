@@ -1,0 +1,151 @@
+form Tasks
+{
+    displayname = "Tasks"
+
+    Task_Details
+    (
+        type = section
+        displayname = "Task Details"
+        row = 1
+        column = 0
+    )
+    Task_ID
+    (
+        type = autonumber
+        displayname = "Task ID"
+        start index = 1001
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Task_Title
+    (
+        type = text
+        displayname = "Task Title"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Description
+    (
+        type = textarea
+        displayname = "Description"
+        height = 120px
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Assignee_Type
+    (
+        type = picklist
+        displayname = "Assignee Type"
+        values = {"Trainer","Mentor"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Assigned_To
+    (
+        type = picklist
+        displayname = "Assigned To"
+        values = Team_Members[Active == true && (Member_Type == "Trainer" || Member_Type == "Mentor")].ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        sortorder = ascending
+        row = 1
+        column = 1
+        width = medium
+    )
+    Assigned_By
+    (
+        type = picklist
+        displayname = "Assigned By"
+        values = Team_Members.ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        sortorder = ascending
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Priority
+    (
+        type = picklist
+        displayname = "Priority"
+        values = {"Low","Medium","High","Critical"}
+        initial value = "Medium"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Due_Date
+    (
+        type = date
+        displayname = "Due Date"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"Open","In Progress","Blocked","Completed","Cancelled"}
+        initial value = "Open"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Issue_Blocker
+    (
+        type = textarea
+        displayname = "Issue / Blocker"
+        height = 120px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Completion_Date
+    (
+        type = date
+        displayname = "Completion Date"
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Task"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Task"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+
+    blueprint components
+    {
+        stages = {"Open","In Progress","Blocked","Completed","Cancelled"}
+    }
+}

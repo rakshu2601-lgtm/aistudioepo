@@ -1,0 +1,68 @@
+Leave_Approval as "Leave Approval"
+{
+    type = blueprint
+    form = Leave_Requests
+
+    start
+    {
+        start stage = "Pending"
+    }
+
+    stages
+    {
+        "Pending"
+        {
+        }
+        "Approved"
+        {
+        }
+        "Rejected"
+        {
+        }
+    }
+
+    transitions
+    {
+        Approve as "Approve"
+        {
+            type = normal
+            from stage = "Pending"
+            to stage = "Approved"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Training_Manager"}
+                )
+                tooltip message = "Approve this leave or WFH request"
+            }
+
+
+            after
+            {
+            }
+        }
+
+        Reject as "Reject"
+        {
+            type = normal
+            from stage = "Pending"
+            to stage = "Rejected"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Training_Manager"}
+                )
+                tooltip message = "Add Manager Comments before rejecting"
+            }
+
+
+            after
+            {
+            }
+        }
+    }
+}

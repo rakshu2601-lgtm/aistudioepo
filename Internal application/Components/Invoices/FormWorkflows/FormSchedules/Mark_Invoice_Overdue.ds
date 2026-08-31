@@ -1,0 +1,31 @@
+Mark_Invoice_Overdue as "Mark Invoice Overdue"
+{
+    type = schedule
+    form = Invoices[Invoice_Status != "Invoice Paid" && Invoice_Status != "Cancelled"]
+    start = after 1 days from Due_Date at "00:05:00"
+    time zone = "UTC"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                if(input.Due_Date < zoho.currentdate && input.Invoice_Status != "Invoice Paid" && input.Invoice_Status != "Cancelled")
+                {
+                    input.Invoice_Status = "Invoice Overdue";
+                    insert into Audit_Log
+                    [
+                        Module_Name = "Invoices"
+                        Record_ID = input.Invoice_Number.toString()
+                        Action = "Invoice marked overdue"
+                        Changed_By = zoho.loginuserid
+                        Changed_At = zoho.currenttime
+                        After_Value = "Invoice Overdue"
+                        Notes = "Automatically marked overdue after Due Date"
+                    ];
+                }
+            )
+        }
+    }
+}

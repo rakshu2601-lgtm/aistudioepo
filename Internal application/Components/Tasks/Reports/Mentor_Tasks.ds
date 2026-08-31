@@ -1,0 +1,24 @@
+list Mentor_Tasks
+{
+    displayName = "Mentor Tasks"
+    show all rows from Tasks [Assignee_Type == "Mentor"]
+    (
+        Task_ID
+        Task_Title
+        Assigned_To
+        Priority
+        Due_Date
+        Status
+    )
+    filters
+    (
+        Assigned_To
+        Priority
+        Due_Date
+        Status
+    )
+    sort by
+    (
+        Due_Date ascending
+    )
+}

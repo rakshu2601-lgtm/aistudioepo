@@ -1,0 +1,27 @@
+Validate_Event_Performance as "Validate Event Performance"
+{
+    type = form
+    form = Event_Performance
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Registrations < 0 || input.Attendees < 0)
+                {
+                    alert "Registrations and attendees cannot be negative.";
+                    cancel submit;
+                }
+                selected_event = Events[ID == input.Event];
+                if(selected_event.ID == null || selected_event.Event_Type != "Webinar")
+                {
+                    alert "Event performance can only be recorded for a Webinar event.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

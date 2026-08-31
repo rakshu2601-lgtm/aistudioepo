@@ -1,0 +1,24 @@
+list My_Assigned_Tasks
+{
+    displayName = "My Assigned Tasks"
+    show all rows from Tasks [Assigned_To.Email == zoho.loginuserid]
+    (
+        Task_ID
+        Task_Title
+        Assignee_Type
+        Assigned_To
+        Priority
+        Due_Date
+        Status
+    )
+    filters
+    (
+        Priority
+        Due_Date
+        Status
+    )
+    sort by
+    (
+        Due_Date ascending
+    )
+}

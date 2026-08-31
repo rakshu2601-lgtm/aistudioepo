@@ -1,0 +1,34 @@
+Initialize_Leave_Request as "Initialize Leave Request"
+{
+    type = form
+    form = Leave_Requests
+    record event = on add
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_member = Team_Members[Email == zoho.loginuserid];
+                is_training_manager = thisapp.permissions.isUserInProfile("Training_Manager");
+                if(current_member.ID != null)
+                {
+                    input.Team_Member = current_member.ID;
+                    input.Reporting_Manager = current_member.Reporting_Manager;
+                }
+                disable Team_Member;
+                disable Reporting_Manager;
+                if(!is_training_manager)
+                {
+                    hide Approval_Status;
+                    hide Manager_Comments;
+                    hide Decision_Date;
+                    disable Approval_Status;
+                    disable Manager_Comments;
+                    disable Decision_Date;
+                }
+            )
+        }
+    }
+}

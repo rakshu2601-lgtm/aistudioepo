@@ -1,0 +1,45 @@
+Initialize_Discount as "Initialize Discount"
+{
+    type = form
+    form = Discounts
+    record event = on add
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_member = Team_Members[Email == zoho.loginuserid];
+                is_lead = thisapp.permissions.isUserInProfile("Lead");
+                is_training_manager = thisapp.permissions.isUserInProfile("Training_Manager");
+                if(current_member.ID != null)
+                {
+                    input.Requested_By = current_member.ID;
+                }
+                disable Requested_By;
+                disable Approval_Status;
+                disable Approved_By;
+                disable Approval_Date;
+                if(input.Event != null)
+                {
+                    selected_event = Events[ID == input.Event];
+                    input.Product = selected_event.Product;
+                    if(selected_event.Final_Revenue != null && selected_event.Final_Revenue > 0)
+                    {
+                        input.Gross_Revenue = selected_event.Final_Revenue;
+                    }
+                    else if(selected_event.Pre_Revenue != null)
+                    {
+                        input.Gross_Revenue = selected_event.Pre_Revenue;
+                    }
+                }
+                if(!is_lead && !is_training_manager)
+                {
+                    hide Approval;
+                    disable Approval_Comments;
+                }
+            )
+        }
+    }
+}

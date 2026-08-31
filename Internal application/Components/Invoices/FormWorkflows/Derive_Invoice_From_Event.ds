@@ -1,0 +1,38 @@
+Derive_Invoice_From_Event as "Derive Invoice From Event"
+{
+    type = form
+    form = Invoices
+    record event = on add or edit
+
+    on user input of Event
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Product = null;
+                input.Trainer = null;
+                input.Revenue_Amount = null;
+                input.Approved_Discount = null;
+                input.Discount_Amount = 0;
+                clear Approved_Discount;
+                if(input.Event != null)
+                {
+                    selected_event = Events[ID == input.Event];
+                    input.Product = selected_event.Product;
+                    input.Trainer = selected_event.Primary_Trainer;
+                    if(selected_event.Final_Revenue != null && selected_event.Final_Revenue > 0)
+                    {
+                        input.Revenue_Amount = selected_event.Final_Revenue;
+                    }
+                    else if(selected_event.Pre_Revenue != null)
+                    {
+                        input.Revenue_Amount = selected_event.Pre_Revenue;
+                    }
+                    eligible_discounts = Discounts[Approval_Status == "Approved" && Event == input.Event];
+                    Approved_Discount:ui.add(eligible_discounts.ID.getall());
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,21 @@
+Route_Leave_Request as "Route Leave Request"
+{
+    type = form
+    form = Leave_Requests
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                member = Team_Members[ID == input.Team_Member];
+                if(member.ID != null && input.Reporting_Manager != member.Reporting_Manager)
+                {
+                    input.Reporting_Manager = member.Reporting_Manager;
+                }
+            )
+        }
+    }
+}

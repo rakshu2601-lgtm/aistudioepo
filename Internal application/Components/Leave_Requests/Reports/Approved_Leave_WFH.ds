@@ -1,0 +1,35 @@
+calendar Approved_Leave_WFH
+{
+    displayName = "Approved Leave & WFH"
+    show all rows from Leave_Requests [Approval_Status == "Approved"]
+    (
+        Request_Number
+        Team_Member
+        Request_Type
+        Start_Date
+        End_Date
+        Reporting_Manager
+        Approval_Status
+    )
+    filters
+    (
+        Request_Type
+        Start_Date
+        End_Date
+        Approval_Status
+    )
+    options
+    (
+        display type = month
+        week start day = monday
+        display field = Team_Member
+        start date = Start_Date
+        end date = End_Date
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+}

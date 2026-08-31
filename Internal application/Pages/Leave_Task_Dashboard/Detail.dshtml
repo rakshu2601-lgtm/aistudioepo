@@ -1,0 +1,72 @@
+<%
+member = Team_Members[Email == zoho.loginuserid];
+memberId = 0;
+memberType = "Viewer";
+if(member.count() > 0)
+{
+  memberId = member.ID;
+  memberType = member.Member_Type;
+}
+isManager = memberType == "Training Manager";
+isLead = memberType == "Lead";
+if(isManager || isLead)
+{
+  approvals = Leave_Requests[Approval_Status == "Pending"] sort by Start_Date asc range from 1 to 6;
+  schedule = Leave_Requests[Approval_Status == "Approved" && End_Date >= zoho.currentdate] sort by Start_Date asc range from 1 to 7;
+  attention = Tasks[(Status == "Blocked" || Priority == "Critical" || Due_Date < zoho.currentdate) && Status != "Completed" && Status != "Cancelled"] sort by Due_Date asc range from 1 to 7;
+  taskOpen = Tasks[Status == "Open"].count();
+  taskProgress = Tasks[Status == "In Progress"].count();
+  taskBlocked = Tasks[Status == "Blocked"].count();
+  taskDone = Tasks[Status == "Completed"].count();
+  trainerTasks = Tasks[Assignee_Type == "Trainer" && Status != "Completed" && Status != "Cancelled"].count();
+  mentorTasks = Tasks[Assignee_Type == "Mentor" && Status != "Completed" && Status != "Cancelled"].count();
+}
+else
+{
+  approvals = Leave_Requests[Team_Member == memberId && Approval_Status == "Pending"] sort by Start_Date asc range from 1 to 6;
+  schedule = Leave_Requests[Team_Member == memberId && Approval_Status == "Approved" && End_Date >= zoho.currentdate] sort by Start_Date asc range from 1 to 7;
+  attention = Tasks[Assigned_To == memberId && (Status == "Blocked" || Priority == "Critical" || Due_Date < zoho.currentdate) && Status != "Completed" && Status != "Cancelled"] sort by Due_Date asc range from 1 to 7;
+  taskOpen = Tasks[Assigned_To == memberId && Status == "Open"].count();
+  taskProgress = Tasks[Assigned_To == memberId && Status == "In Progress"].count();
+  taskBlocked = Tasks[Assigned_To == memberId && Status == "Blocked"].count();
+  taskDone = Tasks[Assigned_To == memberId && Status == "Completed"].count();
+  trainerTasks = Tasks[Assigned_To == memberId && Assignee_Type == "Trainer" && Status != "Completed" && Status != "Cancelled"].count();
+  mentorTasks = Tasks[Assigned_To == memberId && Assignee_Type == "Mentor" && Status != "Completed" && Status != "Cancelled"].count();
+}
+taskTotal = taskOpen + taskProgress + taskBlocked + taskDone;
+if(taskTotal == 0) { taskTotal = 1; }
+openPct = taskOpen * 100 / taskTotal;
+progressPct = taskProgress * 100 / taskTotal;
+blockedPct = taskBlocked * 100 / taskTotal;
+donePct = taskDone * 100 / taskTotal;
+assigneeMax = trainerTasks;
+if(mentorTasks > assigneeMax) { assigneeMax = mentorTasks; }
+if(assigneeMax == 0) { assigneeMax = 1; }
+trainerPct = trainerTasks * 100 / assigneeMax;
+mentorPct = mentorTasks * 100 / assigneeMax;
+%>
+<style>
+.lt-detail{background:var(--zcs-page-bg-color);padding:0 20px 24px;box-sizing:border-box}.lt-two{display:grid;grid-template-columns:1.25fr .75fr;gap:16px;margin-top:16px}.lt-card{padding:20px}.lt-title{margin:0 0 14px;font-size:17px;font-weight:600;color:var(--zcs_primary_text_color);display:flex;align-items:center;justify-content:space-between}.lt-title a{font-size:12px;color:var(--zcs_brand_color);text-decoration:none}.zcs-table-wrapper{border:1px solid var(--zcs_tertiary_border_color);background:var(--zcs-white-color);overflow:auto;border-radius:8px}.zcs-table-wrapper table{width:100%;border-collapse:collapse}.zcs-table-wrapper th{background:#f9fafe;white-space:nowrap;color:var(--zcs_primary_text_color);font-weight:500}.zcs-table-wrapper th,.zcs-table-wrapper td{padding:10px 12px;text-align:left;font-size:13px;border-top:1px solid var(--zcs_tertiary_border_color)}.zcs-table-wrapper thead th{border-top:0}.zcs-table-wrapper tbody tr:hover td{background:#f9fafe}.lt-pill{display:inline-block;padding:3px 8px;border-radius:12px;background:var(--zcs_brand_light_color);color:var(--zcs_brand_dark_color);font-size:11px}.lt-pill.red{background:#fe455d1a;color:#c73549}.lt-list{list-style:none;padding:0;margin:0}.lt-list li{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--zcs_tertiary_border_color)}.lt-list li:last-child{border:0}.lt-list i{font-size:18px;color:var(--zcs_brand_color);margin-top:2px}.lt-list strong,.lt-list span{display:block;color:var(--zcs_primary_text_color);font-size:13px}.lt-list small{color:var(--zcs_secondary_text_color)}.lt-charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.lt-donut-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap}.lt-donut{width:150px;height:150px;border-radius:50%;background:conic-gradient(#36a2eb 0 <%=openPct%>%,#fece56 <%=openPct%>% <%=openPct + progressPct%>%,#ff6283 <%=openPct + progressPct%>% <%=openPct + progressPct + blockedPct%>%,#28cc97 <%=openPct + progressPct + blockedPct%>% 100%);position:relative}.lt-donut:after{content:'Tasks';position:absolute;inset:32px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:var(--zcs_primary_text_color);font-weight:600}.lt-legend{list-style:none;margin:0;padding:0}.lt-legend li{font-size:13px;color:var(--zcs_primary_text_color);margin:7px 0}.lt-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px}.lt-bars{height:170px;display:flex;align-items:flex-end;justify-content:space-around;border-bottom:1px solid var(--zcs_tertiary_border_color);padding:0 30px}.lt-bar-item{text-align:center;color:var(--zcs_primary_text_color);font-size:12px}.lt-bar{width:42px;background:var(--zcs_brand_color);border-radius:7px 7px 0 0;min-height:4px}.lt-empty{padding:18px;text-align:center;color:var(--zcs_secondary_text_color);font-size:13px}@media(max-width:900px){.lt-two,.lt-charts{grid-template-columns:1fr}}@media(max-width:520px){.lt-detail{padding:0 12px 16px}.lt-card{padding:14px}}
+</style>
+<div class="lt-detail">
+  <div class="lt-two">
+    <section class="lt-card zcs-card"><h2 class="lt-title"><span><i class="zc-li-outline ui-1-check-circle-08"></i> <% if(isManager) { %>Approval queue<% } else { %>Pending requests<% } %></span><a href="#Report:Pending_Leave_Approvals">View report</a></h2>
+      <div class="zcs-table-wrapper"><table><thead><tr><th>Member</th><th>Type</th><th>Dates</th><th>Status</th></tr></thead><tbody>
+      <% for each req in approvals { %><tr><td><%=req.Team_Member%></td><td><%=req.Request_Type%></td><td><%=req.Start_Date%> to <%=req.End_Date%></td><td><span class="lt-pill">Pending</span></td></tr><% } %>
+      <% if(approvals.count() == 0) { %><tr><td colspan="4" class="lt-empty">No pending requests in this view.</td></tr><% } %>
+      </tbody></table></div>
+    </section>
+    <section class="lt-card zcs-card"><h2 class="lt-title"><span><i class="zc-li-outline ui-1-calendar-60"></i> WFH and leave schedule</span><a href="#Report:Approved_Leave_WFH">Calendar</a></h2><ul class="lt-list">
+      <% for each req in schedule { %><li><i class="zc-li-outline <% if(req.Request_Type == "WFH") { %>location-pin<% } else { %>ui-1-calendar-60<% } %>"></i><div><strong><%=req.Team_Member%> <span class="lt-pill"><%=req.Request_Type%></span></strong><small><%=req.Start_Date%> to <%=req.End_Date%></small></div></li><% } %>
+      <% if(schedule.count() == 0) { %><li class="lt-empty">No current or upcoming approved schedule entries.</li><% } %>
+    </ul></section>
+  </div>
+  <div class="lt-charts">
+    <section class="lt-card zcs-card"><h2 class="lt-title">Task status distribution</h2><div class="lt-donut-wrap"><div class="lt-donut"></div><ul class="lt-legend"><li><span class="lt-dot" style="background:#36a2eb"></span>Open: <%=taskOpen%></li><li><span class="lt-dot" style="background:#fece56"></span>In progress: <%=taskProgress%></li><li><span class="lt-dot" style="background:#ff6283"></span>Blocked: <%=taskBlocked%></li><li><span class="lt-dot" style="background:#28cc97"></span>Completed: <%=taskDone%></li></ul></div></section>
+    <section class="lt-card zcs-card"><h2 class="lt-title">Active tasks by assignee type</h2><div class="lt-bars"><div class="lt-bar-item"><div class="lt-bar" style="height:<%=trainerPct%>px"></div><strong><%=trainerTasks%></strong><div>Trainer</div></div><div class="lt-bar-item"><div class="lt-bar" style="height:<%=mentorPct%>px"></div><strong><%=mentorTasks%></strong><div>Mentor</div></div></div></section>
+  </div>
+  <section class="lt-card zcs-card" style="margin-top:16px"><h2 class="lt-title"><span><i class="zc-li-outline ui-2-alert-circle"></i> Issues requiring attention</span><a href="#Report:Tasks_Requiring_Attention">Open full list</a></h2><div class="zcs-table-wrapper"><table><thead><tr><th>Task</th><th>Assignee</th><th>Status</th><th>Priority</th><th>Due date</th><th>Issue or blocker</th></tr></thead><tbody>
+    <% for each task in attention { %><tr><td><%=task.Task_Title%></td><td><%=task.Assigned_To%></td><td><span class="lt-pill <% if(task.Status == "Blocked") { %>red<% } %>"><%=task.Status%></span></td><td><%=task.Priority%></td><td><%=task.Due_Date%></td><td><%=task.Issue_Blocker%></td></tr><% } %>
+    <% if(attention.count() == 0) { %><tr><td colspan="6" class="lt-empty">No blocked, overdue, or critical tasks in this view.</td></tr><% } %>
+  </tbody></table></div></section>
+</div>

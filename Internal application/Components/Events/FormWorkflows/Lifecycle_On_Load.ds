@@ -1,0 +1,149 @@
+Lifecycle_On_Load as "Lifecycle On Load"
+{
+    type = form
+    form = Events
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Lifecycle_Stage;
+                if(input.Lifecycle_Stage == "Pre-Event")
+                {
+                    disable Pre_Registrations;
+                    disable Pre_Revenue;
+                    disable Live_Registrations;
+                    disable Live_Attendees;
+                    disable Recording_Status;
+                    disable Recording_URL;
+                    disable Description_URL;
+                    disable Final_Registrations;
+                    disable Final_Attendees;
+                    disable Final_Revenue;
+                    disable Insights_URL;
+                    disable Debrief_Recording_URL;
+                    disable MOM_Notes;
+                    disable Upload_Destination;
+                    disable Upload_Status;
+                    enable Event_Title;
+                    enable Event_Type;
+                    enable Product;
+                    enable Region;
+                    enable Start_Date_Time;
+                    enable End_Date_Time;
+                    enable Primary_Trainer;
+                    enable Additional_Trainers;
+                    enable QA_Trainer;
+                    enable Topic;
+                    enable Agenda;
+                    enable Trainer_Split;
+                    enable General_Document_URL;
+                    enable Presentation_URL;
+                    enable Dry_Run_URL;
+                    enable Survey_URL;
+                    enable Readiness_Status;
+                    enable Missing_Activity_Notes;
+                }
+                else if(input.Lifecycle_Stage == "During Event")
+                {
+                    disable Event_Title;
+                    disable Event_Type;
+                    disable Product;
+                    disable Region;
+                    disable Start_Date_Time;
+                    disable Topic;
+                    disable Agenda;
+                    disable Recording_URL;
+                    disable Description_URL;
+                    disable Final_Registrations;
+                    disable Final_Attendees;
+                    disable Final_Revenue;
+                    disable Insights_URL;
+                    disable Debrief_Recording_URL;
+                    disable MOM_Notes;
+                    disable Upload_Destination;
+                    disable Upload_Status;
+                    enable End_Date_Time;
+                    enable Pre_Registrations;
+                    enable Pre_Revenue;
+                    enable Live_Registrations;
+                    enable Live_Attendees;
+                    enable Recording_Status;
+                }
+                else if(input.Lifecycle_Stage == "Post-Event")
+                {
+                    disable Event_Title;
+                    disable Event_Type;
+                    disable Product;
+                    disable Region;
+                    disable Start_Date_Time;
+                    disable End_Date_Time;
+                    disable Topic;
+                    disable Agenda;
+                    disable Pre_Registrations;
+                    disable Pre_Revenue;
+                    disable Live_Registrations;
+                    disable Live_Attendees;
+                    enable Recording_URL;
+                    enable Description_URL;
+                    enable Final_Registrations;
+                    enable Final_Attendees;
+                    enable Final_Revenue;
+                    enable Insights_URL;
+                    enable Debrief_Recording_URL;
+                    enable MOM_Notes;
+                    enable Upload_Destination;
+                    enable Upload_Status;
+                }
+                else if(input.Lifecycle_Stage == "Completed")
+                {
+                    disable Event_Title;
+                    disable Event_Type;
+                    disable Product;
+                    disable Region;
+                    disable Start_Date_Time;
+                    disable End_Date_Time;
+                    disable Event_Status;
+                    disable Primary_Trainer;
+                    disable Additional_Trainers;
+                    disable QA_Trainer;
+                    disable Topic;
+                    disable Agenda;
+                    disable Trainer_Split;
+                    disable General_Document_URL;
+                    disable Presentation_URL;
+                    disable Dry_Run_URL;
+                    disable Survey_URL;
+                    disable Readiness_Status;
+                    disable Missing_Activity_Notes;
+                    disable Pre_Registrations;
+                    disable Pre_Revenue;
+                    disable Live_Registrations;
+                    disable Live_Attendees;
+                    disable Recording_Status;
+                    disable Social_Media_URL;
+                    disable Connect_Post_URL;
+                    disable Email_Invite_URL;
+                    disable Cliq_Message_URL;
+                    disable Recording_URL;
+                    disable Description_URL;
+                    disable Final_Registrations;
+                    disable Final_Attendees;
+                    disable Final_Revenue;
+                    disable Insights_URL;
+                    disable Debrief_Recording_URL;
+                    disable MOM_Notes;
+                    disable Upload_Destination;
+                    disable Upload_Status;
+                    disable Ticket_ID;
+                    disable Ticket_Status;
+                    disable Ticket_Owner;
+                    disable Ticket_Closure_Notes;
+                }
+            )
+        }
+    }
+}

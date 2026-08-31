@@ -1,0 +1,240 @@
+form Invoices
+{
+    Invoice_Details
+    (
+        type = section
+        displayname = "Invoice Details"
+        row = 1
+        column = 0
+    )
+    Invoice_Number
+    (
+        type = autonumber
+        displayname = "Invoice Number"
+        start index = 1001
+        row = 1
+        column = 1
+    )
+    must have Event
+    (
+        type = picklist
+        values = Events.ID
+        displayformat = [Event_Title]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Product
+    (
+        type = picklist
+        values = Products.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Trainer
+    (
+        type = picklist
+        values = Team_Members.ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Customer_Name
+    (
+        type = text
+        displayname = "Customer Name"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Invoice_Date
+    (
+        type = date
+        displayname = "Invoice Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Due_Date
+    (
+        type = date
+        displayname = "Due Date"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Financials
+    (
+        type = section
+        displayname = "Financials"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Revenue_Amount
+    (
+        type = decimal
+        displayname = "Revenue Amount"
+        decimalplace = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+    Approved_Discount
+    (
+        type = picklist
+        displayname = "Approved Discount"
+        values = Discounts[Approval_Status == "Approved"].ID
+        displayformat = [Discount_ID]
+        searchable = true
+        row = 2
+        column = 2
+        width = medium
+    )
+    Discount_Amount
+    (
+        type = decimal
+        displayname = "Discount Amount"
+        decimalplace = 2
+        initial value = 0
+        row = 2
+        column = 1
+        width = medium
+    )
+    Invoice_Total
+    (
+        type = formula
+        displayname = "Invoice Total"
+        value = Revenue_Amount - Discount_Amount
+        visibility = true
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Source_Currency
+    (
+        type = picklist
+        displayname = "Source Currency"
+        values = {"USD","EUR","GBP","INR","AED","AUD","CAD","SGD","JPY","Other"}
+        initial value = "USD"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Conversion_Rate_To_USD
+    (
+        type = decimal
+        displayname = "Conversion Rate To USD"
+        decimalplace = 6
+        initial value = 1
+        row = 2
+        column = 2
+        width = medium
+    )
+    Invoice_Total_USD
+    (
+        type = formula
+        displayname = "Invoice Total USD"
+        value = (Revenue_Amount - Discount_Amount) * Conversion_Rate_To_USD
+        visibility = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Exchange_Rate_Status
+    (
+        type = picklist
+        displayname = "Exchange Rate Status"
+        values = {"Pending API Rate","Rate Applied","Manual Override","Failed"}
+        initial value = "Pending API Rate"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Exchange_Rate_As_Of
+    (
+        type = datetime
+        displayname = "Exchange Rate As Of"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Payment
+    (
+        type = section
+        displayname = "Payment"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Invoice_Status
+    (
+        type = picklist
+        displayname = "Invoice Status"
+        values = {"Invoice Generated","Payment Link Sent","Invoice Paid","Invoice Overdue","Cancelled"}
+        initial value = "Invoice Generated"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Payment_Link
+    (
+        type = url
+        displayname = "Payment Link"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Paid_Date
+    (
+        type = date
+        displayname = "Paid Date"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Notes
+    (
+        type = textarea
+        height = 100px
+        row = 3
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Create Invoice"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Invoice"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

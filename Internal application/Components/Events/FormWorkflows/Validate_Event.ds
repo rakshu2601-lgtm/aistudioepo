@@ -1,0 +1,51 @@
+Validate_Event as "Validate Event"
+{
+    type = form
+    form = Events
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.End_Date_Time <= input.Start_Date_Time)
+                {
+                    alert(End_Date_Time,"End date and time must be after start date and time.");
+                    cancel submit;
+                }
+                if(input.Pre_Registrations < 0 || input.Pre_Revenue < 0 || input.Live_Registrations < 0 || input.Live_Attendees < 0 || input.Final_Registrations < 0 || input.Final_Attendees < 0 || input.Final_Revenue < 0)
+                {
+                    alert "Counts and revenue values cannot be negative.";
+                    cancel submit;
+                }
+                if(input.Event_Status == "Ready" && input.Event_Type == "Webinar" && (input.Social_Media_URL == null || input.Connect_Post_URL == null || input.Email_Invite_URL == null || input.Cliq_Message_URL == null))
+                {
+                    alert "All webinar promotional URLs are required before the event can be Ready.";
+                    cancel submit;
+                }
+                if(input.Event_Status == "Ready" && (input.Event_Type == "Online Training" || input.Event_Type == "Customized Training" || input.Event_Type == "In-Person Training") && (input.Trainer_Split == null || input.Presentation_URL == null || input.Dry_Run_URL == null || input.Survey_URL == null))
+                {
+                    alert "Trainer split, presentation, dry-run, and survey are required before training can be Ready.";
+                    cancel submit;
+                }
+                if(input.Event_Status == "Ready" && input.Event_Type == "Certification" && (input.Ticket_ID == null || input.Ticket_Owner == null))
+                {
+                    alert "Ticket ID and owner are required before certification can be Ready.";
+                    cancel submit;
+                }
+                if(input.Lifecycle_Stage == "Completed" && input.Event_Type != "Certification" && (input.Final_Registrations == null || input.Final_Attendees == null || input.Final_Revenue == null || input.Recording_Status != "Uploaded" || input.Upload_Status != "Uploaded"))
+                {
+                    alert "Final statistics and recording/upload completion are required before completion.";
+                    cancel submit;
+                }
+                if(input.Lifecycle_Stage == "Completed" && input.Event_Type == "Certification" && input.Ticket_Status != "Closed")
+                {
+                    alert "The certification ticket must be Closed before completion.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

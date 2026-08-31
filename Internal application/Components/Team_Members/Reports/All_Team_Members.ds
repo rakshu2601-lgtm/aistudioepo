@@ -1,0 +1,23 @@
+default list All_Team_Members
+{
+    displayName = "All Team Members"
+    show all rows from Team_Members
+    (
+        Employee_ID
+        Employee_Name
+        Email
+        Member_Type
+        Reporting_Manager
+        Active
+    )
+    filters
+    (
+        Member_Type
+        Active
+        "Active Members" : (Active == true)
+    )
+    sort by
+    (
+        Employee_Name ascending
+    )
+}

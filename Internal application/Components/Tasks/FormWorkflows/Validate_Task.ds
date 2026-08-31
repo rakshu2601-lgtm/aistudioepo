@@ -1,0 +1,27 @@
+Validate_Task as "Validate Task"
+{
+    type = form
+    form = Tasks
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Status == "Blocked" && (input.Issue_Blocker == null || input.Issue_Blocker.trim() == ""))
+                {
+                    alert "Issue / Blocker is required when the task is Blocked.";
+                    cancel submit;
+                }
+                assignee = Team_Members[ID == input.Assigned_To];
+                if(assignee.ID == null || assignee.Active != true || assignee.Member_Type != input.Assignee_Type)
+                {
+                    alert "Assigned To must be an active team member matching the selected Assignee Type.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

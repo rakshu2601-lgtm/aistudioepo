@@ -1,0 +1,20 @@
+default list All_Products
+{
+    displayName = "All Products"
+    show all rows from Products
+    (
+        Product_Code
+        Product_Name
+        Product_Owner
+        Active
+        Notes
+    )
+    filters
+    (
+        Active
+    )
+    sort by
+    (
+        Product_Name ascending
+    )
+}

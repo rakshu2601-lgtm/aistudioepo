@@ -1,0 +1,20 @@
+Filter_Task_Assignee as "Filter Task Assignee"
+{
+    type = form
+    form = Tasks
+    record event = on add or edit
+
+    on user input of Assignee_Type
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Assigned_To = null;
+                clear Assigned_To;
+                matching_members = Team_Members[Active == true && Member_Type == input.Assignee_Type];
+                Assigned_To:ui.add(matching_members.ID.getall());
+            )
+        }
+    }
+}

@@ -1,0 +1,26 @@
+Audit_Invoice_Creation as "Audit Invoice Creation"
+{
+    type = form
+    form = Invoices
+    record event = on add
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                insert into Audit_Log
+                [
+                    Module_Name = "Invoices"
+                    Record_ID = input.Invoice_Number.toString()
+                    Action = "Invoice generated"
+                    Changed_By = zoho.loginuserid
+                    Changed_At = zoho.currenttime
+                    After_Value = "Status: " + input.Invoice_Status + "; Total USD: " + input.Invoice_Total_USD
+                    Notes = "Invoice created for " + input.Customer_Name
+                ];
+            )
+        }
+    }
+}

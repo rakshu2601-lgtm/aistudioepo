@@ -1,0 +1,32 @@
+default list Event_Performance_Details
+{
+    displayName = "Event Performance Details"
+    show all rows from Event_Performance
+    (
+        Event
+        Dimension_Type
+        Dimension_Value
+        Registrations
+        Attendees
+        Notes
+    )
+    filters
+    (
+        Event
+        Dimension_Type
+        Dimension_Value
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Event ascending
+        Dimension_Type ascending
+    )
+    sort by
+    (
+        Dimension_Value ascending
+    )
+}

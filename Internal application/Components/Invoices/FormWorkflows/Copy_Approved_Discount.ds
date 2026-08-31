@@ -1,0 +1,30 @@
+Copy_Approved_Discount as "Copy Approved Discount"
+{
+    type = form
+    form = Invoices
+    record event = on add or edit
+
+    on user input of Approved_Discount
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Discount_Amount = 0;
+                if(input.Approved_Discount != null)
+                {
+                    selected_discount = Discounts[ID == input.Approved_Discount && Approval_Status == "Approved" && Event == input.Event];
+                    if(selected_discount.ID != null)
+                    {
+                        input.Discount_Amount = selected_discount.Discount_Amount;
+                    }
+                    else
+                    {
+                        input.Approved_Discount = null;
+                        alert "Select an approved discount for this invoice's event.";
+                    }
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,32 @@
+Validate_New_Leave_Request as "Validate New Leave Request"
+{
+    type = form
+    form = Leave_Requests
+    record event = on add
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                is_training_manager = thisapp.permissions.isUserInProfile("Training_Manager");
+                if(input.End_Date < input.Start_Date)
+                {
+                    alert "End Date must be on or after Start Date.";
+                    cancel submit;
+                }
+                if(!is_training_manager && input.Team_Member.Email != zoho.loginuserid)
+                {
+                    alert "You may submit a request only for yourself.";
+                    cancel submit;
+                }
+                if(!is_training_manager && input.Approval_Status != "Pending")
+                {
+                    alert "New requests must start in Pending status.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

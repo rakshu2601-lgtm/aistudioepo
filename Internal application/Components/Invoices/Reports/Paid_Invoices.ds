@@ -1,0 +1,32 @@
+list Paid_Invoices
+{
+    displayName = "Paid Invoices"
+    show all rows from Invoices [Invoice_Status == "Invoice Paid"]
+    (
+        Invoice_Number
+        Event
+        Product
+        Trainer
+        Customer_Name
+        Invoice_Date
+        Paid_Date
+        Invoice_Total_USD
+        Source_Currency
+        Exchange_Rate_Status
+        Invoice_Status
+    )
+    filters
+    (
+        Product
+        Trainer
+        Invoice_Date
+        Paid_Date
+        Source_Currency
+        Exchange_Rate_Status
+        Invoice_Status
+    )
+    sort by
+    (
+        Paid_Date descending
+    )
+}

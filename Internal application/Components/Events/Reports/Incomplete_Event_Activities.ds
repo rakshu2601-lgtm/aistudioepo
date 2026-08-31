@@ -1,0 +1,49 @@
+list Incomplete_Event_Activities
+{
+    displayName = "Incomplete Event Activities"
+    show all rows from Events [Event_Status != "Cancelled" && Lifecycle_Stage != "Completed" && (Readiness_Status != "Ready" || General_Document_URL is null || Presentation_URL is null || (Event_Type == "Webinar" && (Social_Media_URL is null || Connect_Post_URL is null || Email_Invite_URL is null || Cliq_Message_URL is null)) || (Lifecycle_Stage == "Post-Event" && (Recording_URL is null || Upload_Status != "Uploaded")) || (Event_Type == "Certification" && Ticket_Status != "Closed"))]
+    (
+        Event_ID
+        Event_Title
+        Event_Type
+        Product
+        Primary_Trainer
+        End_Date_Time
+        Lifecycle_Stage
+        Event_Status
+        Readiness_Status
+        General_Document_URL
+        Presentation_URL
+        Recording_URL
+        Upload_Status
+        Ticket_Status
+        Missing_Activity_Notes
+    )
+    filters
+    (
+        Event_Type
+        Product
+        Primary_Trainer
+        Lifecycle_Stage
+        Readiness_Status
+    )
+    sort by
+    (
+        End_Date_Time ascending
+    )
+    conditional formatting
+    (
+        "Overdue Incomplete"
+        {
+            condition = (End_Date_Time < zoho.currenttime)
+            fields = [Event_Title, End_Date_Time, Lifecycle_Stage, Readiness_Status, Upload_Status, Ticket_Status]
+            format = "background-color:#FFE0E0;color:#A00000;font-weight:bold"
+        }
+        "Incomplete"
+        {
+            condition = (End_Date_Time >= zoho.currenttime)
+            fields = [Event_Title, Readiness_Status, Upload_Status, Ticket_Status]
+            format = "background-color:#FFF4D6;color:#8A5200"
+        }
+    )
+}

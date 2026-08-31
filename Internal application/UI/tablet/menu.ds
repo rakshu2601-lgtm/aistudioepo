@@ -1,0 +1,77 @@
+menu
+{
+    unused
+    {
+        form Events { icon = "business-agenda" }
+        form Event_Performance { icon = "business-chart-bar-33" }
+        form Team_Members { icon = "users-multiple-19" }
+        form Leave_Requests { icon = "files-user" }
+        form Tasks { icon = "design-todo" }
+        form Discounts { icon = "business-money-time" }
+        form Invoices { icon = "files-check" }
+        form Products { icon = "business-briefcase-24" }
+        form Audit_Log { icon = "files-exclamation" }
+        report Event_Lifecycle_Board { icon = "business-hierarchy-53" }
+        report Upcoming_Events { icon = "business-agenda" }
+        report Incomplete_Event_Activities { icon = "loader-dots-06" }
+        report Certification_Tickets { icon = "files-check" }
+        report Event_Performance_Details { icon = "business-chart-bar-33" }
+        report Source_Performance { icon = "business-chart-pie-36" }
+        report Country_Performance { icon = "business-chart-bar-33" }
+        report All_Team_Members { icon = "users-multiple-19" }
+        report Active_Trainers { icon = "users-single-body" }
+        report Active_Mentors { icon = "users-single-body" }
+        report Pending_Leave_Approvals { icon = "loader-dots-06" }
+        report All_Leave_Requests { icon = "files-user" }
+        report Tasks_Requiring_Attention { icon = "files-exclamation" }
+        report Trainer_Tasks { icon = "design-todo" }
+        report Mentor_Tasks { icon = "design-todo" }
+        report All_Tasks { icon = "design-todo" }
+        report Approved_Discounts { icon = "files-check" }
+        report All_Discounts { icon = "business-money-time" }
+        report Paid_Invoices { icon = "files-check" }
+        report All_Invoices { icon = "files-user" }
+        report All_Products { icon = "business-briefcase-24" }
+        report Active_Products { icon = "business-chart-bar-33" }
+        report Audit_History { icon = "files-exclamation" }
+    }
+
+    space Tablet_Operations
+    {
+        displayname = "Operations"
+        icon = "business-chart-bar-33"
+        section Dashboards
+        {
+            displayname = "Dashboards"
+            icon = "business-chart-pie-36"
+            page Operations_Dashboard { icon = "business-chart-bar-33" }
+            page Metrics_Dashboard { icon = "business-chart-pie-36" }
+            page Trainer_Dashboard { icon = "users-single-body" }
+            page Leave_Task_Dashboard { icon = "design-todo" }
+            page Finance_Dashboard { icon = "business-money-time" }
+            page Manager_Dashboard { icon = "business-briefcase-24" }
+        }
+        section Operational_Reports
+        {
+            displayname = "Assigned Work & Requests"
+            icon = "design-todo"
+            report Unified_Event_Summary { icon = "business-chart-bar-33" }
+            report Event_Calendar { icon = "business-agenda" }
+            report My_Assigned_Events { icon = "users-single-body" }
+            report My_Leave_Requests { icon = "files-user" }
+            report Approved_Leave_WFH { icon = "files-check" }
+            report My_Assigned_Tasks { icon = "design-todo" }
+            report Task_Board { icon = "business-hierarchy-53" }
+            report Pending_Discount_Approvals { icon = "loader-dots-06" }
+            report Outstanding_Invoices { icon = "business-money-time" }
+            report Overdue_Invoices { icon = "files-exclamation" }
+        }
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+    preference { icon { style = outline show = {space,section,component} } }
+}

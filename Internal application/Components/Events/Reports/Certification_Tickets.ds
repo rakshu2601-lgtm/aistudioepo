@@ -1,0 +1,48 @@
+list Certification_Tickets
+{
+    displayName = "Certification Tickets"
+    show all rows from Events [Event_Type == "Certification"]
+    (
+        Event_ID
+        Event_Title
+        Product
+        Region
+        Start_Date_Time
+        End_Date_Time
+        Primary_Trainer
+        Lifecycle_Stage
+        Event_Status
+        Ticket_ID
+        Ticket_Status
+        Ticket_Owner
+        Ticket_Closure_Notes
+    )
+    filters
+    (
+        Product
+        Region
+        Primary_Trainer
+        Lifecycle_Stage
+        Ticket_Status
+        Ticket_Owner
+    )
+    sort by
+    (
+        Start_Date_Time ascending
+    )
+    conditional formatting
+    (
+        "Open Past Event"
+        {
+            condition = (End_Date_Time < zoho.currenttime && Ticket_Status != "Closed")
+            fields = [Event_Title, Ticket_ID, Ticket_Status, Ticket_Owner]
+            format = "background-color:#FFE0E0;color:#A00000;font-weight:bold"
+        }
+        "Closed"
+        {
+            condition = (Ticket_Status == "Closed")
+            fields = [Event_Title, Ticket_ID, Ticket_Status]
+            format = "background-color:#E2F7E8;color:#146C2E"
+        }
+    )
+}

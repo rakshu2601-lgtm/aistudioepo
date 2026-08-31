@@ -1,0 +1,114 @@
+Discount_Approval as "Discount Approval"
+{
+    type = blueprint
+    form = Discounts
+
+    start
+    {
+        start stage = "Pending"
+    }
+
+    stages
+    {
+        "Pending"
+        {
+        }
+        "Approved"
+        {
+        }
+        "Rejected"
+        {
+        }
+    }
+
+    transitions
+    {
+        Approve as "Approve"
+        {
+            type = normal
+            from stage = "Pending"
+            to stage = "Approved"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Lead"}
+                )
+                tooltip message = "Approve this discount"
+            }
+
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        current_member = Team_Members[Email == zoho.loginuserid];
+                        if(current_member.ID != null)
+                        {
+                            input.Approved_By = current_member.ID;
+                        }
+                        input.Approval_Date = zoho.currentdate;
+                        insert into Audit_Log
+                        [
+                            Module_Name = "Discounts"
+                            Record_ID = input.Discount_ID.toString()
+                            Action = "Discount Approved"
+                            Changed_By = zoho.loginuserid
+                            Changed_At = zoho.currenttime
+                            Before_Value = "Pending"
+                            After_Value = "Approved"
+                            Notes = input.Approval_Comments
+                        ];
+                    )
+                }
+            }
+        }
+
+        Reject as "Reject"
+        {
+            type = normal
+            from stage = "Pending"
+            to stage = "Rejected"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Lead"}
+                )
+                tooltip message = "Reject this discount with comments"
+            }
+
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        current_member = Team_Members[Email == zoho.loginuserid];
+                        if(current_member.ID != null)
+                        {
+                            input.Approved_By = current_member.ID;
+                        }
+                        input.Approval_Date = zoho.currentdate;
+                        insert into Audit_Log
+                        [
+                            Module_Name = "Discounts"
+                            Record_ID = input.Discount_ID.toString()
+                            Action = "Discount Rejected"
+                            Changed_By = zoho.loginuserid
+                            Changed_At = zoho.currenttime
+                            Before_Value = "Pending"
+                            After_Value = "Rejected"
+                            Notes = input.Approval_Comments
+                        ];
+                    )
+                }
+            }
+        }
+    }
+}

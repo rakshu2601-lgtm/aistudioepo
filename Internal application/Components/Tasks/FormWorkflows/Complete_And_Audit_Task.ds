@@ -1,0 +1,20 @@
+Set_Task_Completion_Date as "Set Task Completion Date"
+{
+    type = form
+    form = Tasks
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Status == "Completed" && input.Completion_Date == null)
+                {
+                    input.Completion_Date = zoho.currentdate;
+                }
+            )
+        }
+    }
+}

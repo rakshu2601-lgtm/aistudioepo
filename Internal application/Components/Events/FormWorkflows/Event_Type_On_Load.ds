@@ -1,0 +1,50 @@
+Event_Type_On_Load as "Event Type On Load"
+{
+    type = form
+    form = Events
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                hide Webinar_Promotion;
+                hide Certification;
+                show Additional_Trainers;
+                show QA_Trainer;
+                show Trainer_Split;
+                show Survey_URL;
+                show Pre_Revenue;
+                show Final_Revenue;
+                show Upload_Destination;
+                if(input.Event_Type == "Webinar")
+                {
+                    show Webinar_Promotion;
+                    show QA_Trainer;
+                    show Upload_Destination;
+                    hide Additional_Trainers;
+                    hide Trainer_Split;
+                    hide Survey_URL;
+                    hide Pre_Revenue;
+                    hide Final_Revenue;
+                }
+                else if(input.Event_Type == "Certification")
+                {
+                    show Certification;
+                    hide Webinar_Promotion;
+                    hide Additional_Trainers;
+                    hide QA_Trainer;
+                    hide Trainer_Split;
+                    hide Survey_URL;
+                    hide Pre_Revenue;
+                    hide Final_Revenue;
+                    hide Recording_Status;
+                    hide Upload_Destination;
+                    hide Upload_Status;
+                }
+            )
+        }
+    }
+}

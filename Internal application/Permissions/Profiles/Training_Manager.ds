@@ -1,0 +1,122 @@
+"Training_Manager"
+{
+    name = "Training_Manager"
+    type = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+    description = "Full operational and master administration with protected financial and audit deletion."
+
+    ModulePermissions
+    {
+        Team_Members
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Team_Members={"View","Edit","Delete"}
+                Active_Trainers={"View","Edit","Delete"}
+                Active_Mentors={"View","Edit","Delete"}
+            }
+        }
+        Products
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Products={"View","Edit","Delete"}
+                Active_Products={"View","Edit","Delete"}
+            }
+        }
+        Events
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Unified_Event_Summary={"View","Edit","Delete"}
+                Event_Calendar={"View","Edit","Delete"}
+                Event_Lifecycle_Board={"View","Edit","Delete"}
+                My_Assigned_Events={"View","Edit","Delete"}
+                Upcoming_Events={"View","Edit","Delete"}
+                Incomplete_Event_Activities={"View","Edit","Delete"}
+                Certification_Tickets={"View","Edit","Delete"}
+            }
+        }
+        Event_Performance
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Event_Performance_Details={"View","Edit","Delete"}
+                Source_Performance={"View","Edit","Delete"}
+                Country_Performance={"View","Edit","Delete"}
+            }
+        }
+        Tasks
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Tasks={"View","Edit","Delete"}
+                Task_Board={"View","Edit","Delete"}
+                My_Assigned_Tasks={"View","Edit","Delete"}
+                Tasks_Requiring_Attention={"View","Edit","Delete"}
+                Mentor_Tasks={"View","Edit","Delete"}
+                Trainer_Tasks={"View","Edit","Delete"}
+            }
+        }
+        Leave_Requests
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Leave_Requests={"View","Edit","Delete"}
+                Pending_Leave_Approvals={"View","Edit","Delete"}
+                Approved_Leave_WFH={"View","Edit","Delete"}
+                My_Leave_Requests={"View","Edit","Delete"}
+            }
+        }
+        Discounts
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Discounts={"View","Edit"}
+                Pending_Discount_Approvals={"View","Edit"}
+                Approved_Discounts={"View","Edit"}
+            }
+        }
+        Invoices
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Invoices={"View","Edit"}
+                Outstanding_Invoices={"View","Edit"}
+                Overdue_Invoices={"View","Edit"}
+                Paid_Invoices={"View","Edit"}
+            }
+        }
+        Audit_Log
+        {
+            enabled = Viewall,Export,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Audit_History={"View"}
+            }
+        }
+        Operations_Dashboard { enabled = tab }
+        Metrics_Dashboard { enabled = tab }
+        Trainer_Dashboard { enabled = tab }
+        Leave_Task_Dashboard { enabled = tab }
+        Finance_Dashboard { enabled = tab }
+        Manager_Dashboard { enabled = tab }
+    }
+}

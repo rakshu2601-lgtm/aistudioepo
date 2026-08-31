@@ -1,0 +1,37 @@
+default list All_Invoices
+{
+    displayName = "All Invoices"
+    show all rows from Invoices
+    (
+        Invoice_Number
+        Event
+        Product
+        Trainer
+        Customer_Name
+        Invoice_Date
+        Due_Date
+        Revenue_Amount
+        Discount_Amount
+        Invoice_Total
+        Source_Currency
+        Conversion_Rate_To_USD
+        Invoice_Total_USD
+        Exchange_Rate_Status
+        Invoice_Status
+        Paid_Date
+    )
+    filters
+    (
+        Product
+        Trainer
+        Source_Currency
+        Exchange_Rate_Status
+        Invoice_Status
+        Invoice_Date
+        Due_Date
+    )
+    sort by
+    (
+        Invoice_Date descending
+    )
+}

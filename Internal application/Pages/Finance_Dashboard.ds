@@ -1,0 +1,19 @@
+<page linkname = "Finance_Dashboard" displayname = "Finance Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Finance_Overview' elementName='Finance_Overview'>
+          <![CDATA[htmlpage Finance_Overview()
+            content
+            <%{%>
+              <file name:Finance_Overview.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

@@ -1,0 +1,111 @@
+Event_Lifecycle as "Event Lifecycle"
+{
+    type = blueprint
+    form = Events
+
+    start
+    {
+        start stage = "Pre-Event"
+    }
+    stages
+    {
+        "Pre-Event" { }
+        "During Event" { }
+        "Post-Event" { }
+        "Completed" { }
+    }
+    transitions
+    {
+        Start_Event as "Start Event"
+        {
+            type = normal
+            from stage = "Pre-Event"
+            to stage = "During Event"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Trainer","Training_Manager"}
+                )
+                transition criteria = ( Event_Status == "Ready" )
+            }
+            after { }
+        }
+        Move_To_Closure as "Move to Closure"
+        {
+            type = normal
+            from stage = "During Event"
+            to stage = "Post-Event"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Trainer","Training_Manager"}
+                )
+            }
+            after { }
+        }
+        Complete_Event as "Complete Event"
+        {
+            type = normal
+            from stage = "Post-Event"
+            to stage = "Completed"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Trainer","Training_Manager"}
+                )
+                confirmation before execution
+                (
+                    message = "Confirm that all closure activities are complete."
+                    confirm button text = "Complete"
+                    cancel button text = "Cancel"
+                )
+            }
+            after { }
+        }
+        Rollback_To_Pre_Event as "Rollback to Pre-Event"
+        {
+            type = normal
+            from stage = "During Event"
+            to stage = "Pre-Event"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Training_Manager"}
+                )
+            }
+            after { }
+        }
+        Rollback_To_During_Event as "Rollback to During Event"
+        {
+            type = normal
+            from stage = "Post-Event"
+            to stage = "During Event"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Training_Manager"}
+                )
+            }
+            after { }
+        }
+        Reopen_Post_Event as "Reopen Post-Event"
+        {
+            type = normal
+            from stage = "Completed"
+            to stage = "Post-Event"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Training_Manager"}
+                )
+            }
+            after { }
+        }
+    }
+}

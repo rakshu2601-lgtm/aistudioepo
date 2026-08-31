@@ -1,0 +1,83 @@
+form Products
+{
+    Product_Details
+    (
+        type = section
+        displayname = "Product Details"
+        row = 1
+        column = 0
+    )
+    must have unique Product_Code
+    (
+        type = text
+        displayname = "Product Code"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have unique Product_Name
+    (
+        type = text
+        displayname = "Product Name"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product_Owner
+    (
+        type = picklist
+        displayname = "Product Owner"
+        values = Team_Members.ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        initial value = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Notes
+    (
+        type = textarea
+        height = 120px
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

@@ -1,0 +1,50 @@
+Validate_Invoice as "Validate Invoice"
+{
+    type = form
+    form = Invoices
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Due_Date < input.Invoice_Date)
+                {
+                    alert(Due_Date,"Due Date must be on or after Invoice Date.");
+                    cancel submit;
+                }
+                if(input.Revenue_Amount < 0 || input.Discount_Amount < 0)
+                {
+                    alert "Revenue and discount amounts cannot be negative.";
+                    cancel submit;
+                }
+                if(input.Discount_Amount > input.Revenue_Amount)
+                {
+                    alert(Discount_Amount,"Discount Amount cannot exceed Revenue Amount.");
+                    cancel submit;
+                }
+                if(input.Conversion_Rate_To_USD == null || input.Conversion_Rate_To_USD <= 0)
+                {
+                    alert(Conversion_Rate_To_USD,"Conversion Rate To USD must be greater than zero.");
+                    cancel submit;
+                }
+                if(input.Invoice_Status == "Invoice Paid" && input.Paid_Date == null)
+                {
+                    alert(Paid_Date,"Paid Date is required when the invoice is paid.");
+                    cancel submit;
+                }
+                if(input.Approved_Discount != null)
+                {
+                    selected_discount = Discounts[ID == input.Approved_Discount];
+                    if(selected_discount.Approval_Status != "Approved" || selected_discount.Event != input.Event)
+                    {
+                        alert(Approved_Discount,"The discount must be approved and belong to the selected Event.");
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

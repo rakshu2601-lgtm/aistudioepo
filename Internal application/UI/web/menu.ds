@@ -1,0 +1,135 @@
+menu
+{
+    space Overview
+    {
+        displayname = "Overview"
+        icon = "business-chart-bar-33"
+        section Dashboards
+        {
+            displayname = "Dashboards"
+            icon = "business-chart-pie-36"
+            page Operations_Dashboard { icon = "business-chart-bar-33" }
+            page Metrics_Dashboard { icon = "business-chart-pie-36" }
+            page Trainer_Dashboard { icon = "users-multiple-11" }
+            page Leave_Task_Dashboard { icon = "design-todo" }
+            page Manager_Dashboard { icon = "business-briefcase-24" }
+        }
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+    space Events
+    {
+        displayname = "Events"
+        icon = "business-agenda"
+        section Event_Operations
+        {
+            displayname = "Event Operations"
+            icon = "business-agenda"
+            form Events { icon = "business-agenda" }
+            report Unified_Event_Summary { icon = "business-chart-bar-33" }
+            report Event_Calendar { icon = "business-agenda" }
+            report Event_Lifecycle_Board { icon = "business-hierarchy-54" }
+            report My_Assigned_Events { icon = "users-single-body" }
+            report Upcoming_Events { icon = "business-progress" }
+            report Incomplete_Event_Activities { icon = "files-exclamation" }
+            report Certification_Tickets { icon = "education-paper-diploma" }
+        }
+        section Performance
+        {
+            displayname = "Performance"
+            icon = "business-chart-pie-36"
+            form Event_Performance { icon = "business-chart-pie-36" }
+            report Event_Performance_Details { icon = "business-chart-bar-33" }
+            report Source_Performance { icon = "business-chart-growth" }
+            report Country_Performance { icon = "business-globe" }
+        }
+    }
+    space Team
+    {
+        displayname = "Team"
+        icon = "users-multiple-11"
+        section People
+        {
+            displayname = "People & Requests"
+            icon = "users-multiple-11"
+            form Team_Members { icon = "users-single-body" }
+            report All_Team_Members { icon = "users-multiple-19" }
+            report Active_Trainers { icon = "users-single-01" }
+            report Active_Mentors { icon = "users-network" }
+            form Leave_Requests { icon = "business-agenda" }
+            report My_Leave_Requests { icon = "files-user" }
+            report Pending_Leave_Approvals { icon = "loader-dots-06" }
+            report Approved_Leave_WFH { icon = "files-check" }
+            report All_Leave_Requests { icon = "files-paper" }
+        }
+    }
+    space Tasks
+    {
+        displayname = "Tasks"
+        icon = "design-todo"
+        form Tasks { icon = "design-todo" }
+        report My_Assigned_Tasks { icon = "files-user" }
+        report Task_Board { icon = "business-hierarchy-53" }
+        report Tasks_Requiring_Attention { icon = "files-exclamation" }
+        report Trainer_Tasks { icon = "users-single-01" }
+        report Mentor_Tasks { icon = "users-network" }
+        report All_Tasks { icon = "design-bullet-list-67" }
+    }
+    space Finance
+    {
+        displayname = "Finance"
+        icon = "business-briefcase-24"
+        section Finance_Dashboards
+        {
+            displayname = "Dashboard"
+            icon = "business-chart-growth"
+            page Finance_Dashboard { icon = "business-money-time" }
+        }
+        section Discounts
+        {
+            displayname = "Discounts"
+            icon = "shopping-discount"
+            form Discounts { icon = "shopping-discount" }
+            report Pending_Discount_Approvals { icon = "loader-dots-06" }
+            report Approved_Discounts { icon = "business-award-48" }
+            report All_Discounts { icon = "shopping-tag" }
+        }
+        section Invoicing
+        {
+            displayname = "Invoices"
+            icon = "shopping-receipt"
+            form Invoices { icon = "shopping-receipt" }
+            report Outstanding_Invoices { icon = "business-money-time" }
+            report Overdue_Invoices { icon = "files-exclamation" }
+            report Paid_Invoices { icon = "files-money" }
+            report All_Invoices { icon = "shopping-receipt-list-43" }
+        }
+    }
+    space Administration
+    {
+        displayname = "Administration"
+        icon = "design-app"
+        section Masters
+        {
+            displayname = "Master Data"
+            icon = "objects-puzzle-09"
+            form Products { icon = "shopping-box" }
+            report All_Products { icon = "files-paper" }
+            report Active_Products { icon = "files-check" }
+            form Audit_Log { icon = "files-locked" }
+            report Audit_History { icon = "files-time" }
+        }
+    }
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space,section,component}
+        }
+    }
+}

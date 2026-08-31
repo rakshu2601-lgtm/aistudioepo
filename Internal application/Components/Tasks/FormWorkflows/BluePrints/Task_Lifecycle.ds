@@ -1,0 +1,93 @@
+Task_Lifecycle as "Task Lifecycle"
+{
+    type = blueprint
+    form = Tasks
+
+    start
+    {
+        start stage = "Open"
+    }
+
+    stages
+    {
+        "Open" { }
+        "In Progress" { }
+        "Blocked" { }
+        "Completed" { }
+        "Cancelled" { }
+    }
+
+    transitions
+    {
+        Start_Work as "Start Work"
+        {
+            type = normal
+            from stage = "Open"
+            to stage = "In Progress"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Trainer","Mentor","Training_Manager"}
+                )
+            }
+            after { }
+        }
+        Block_Task as "Block Task"
+        {
+            type = normal
+            from stage = "In Progress"
+            to stage = "Blocked"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Trainer","Mentor","Training_Manager"}
+                )
+            }
+            after { }
+        }
+        Complete_Task as "Complete Task"
+        {
+            type = normal
+            from stage = "In Progress"
+            to stage = "Completed"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Trainer","Mentor","Training_Manager"}
+                )
+            }
+            after { }
+        }
+        Resume_Task as "Resume Task"
+        {
+            type = normal
+            from stage = "Blocked"
+            to stage = "In Progress"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Trainer","Mentor","Training_Manager"}
+                )
+            }
+            after { }
+        }
+        Complete_Blocked_Task as "Complete Blocked Task"
+        {
+            type = normal
+            from stage = "Blocked"
+            to stage = "Completed"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Trainer","Mentor","Training_Manager"}
+                )
+            }
+            after { }
+        }
+    }
+}

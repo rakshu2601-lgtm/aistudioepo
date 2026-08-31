@@ -1,0 +1,25 @@
+list Tasks_Requiring_Attention
+{
+    displayName = "Tasks Requiring Attention"
+    show all rows from Tasks [(Due_Date < zoho.currentdate && Status != "Completed" && Status != "Cancelled") || Status == "Blocked" || Priority == "Critical"]
+    (
+        Task_ID
+        Task_Title
+        Assigned_To
+        Priority
+        Due_Date
+        Status
+        Issue_Blocker
+    )
+    filters
+    (
+        Assigned_To
+        Priority
+        Due_Date
+        Status
+    )
+    sort by
+    (
+        Due_Date ascending
+    )
+}
