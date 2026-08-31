@@ -1,0 +1,26 @@
+list Active_Tier_Benefits
+{
+    displayName = "Active Tier Benefits"
+    show all rows from Loyalty_Tiers [Active == true]
+    (
+        Tier_Name
+        Applies_To
+        Minimum_Quarterly_Spend
+        Maximum_Quarterly_Spend
+        Points_Multiplier
+        Credit_Rebate_Percent
+        Display_Order
+        Active
+    )
+    filters
+    (
+        Tier_Name
+        Applies_To
+        Active
+    )
+    sort by
+    (
+        Display_Order ascending
+        Minimum_Quarterly_Spend ascending
+    )
+}

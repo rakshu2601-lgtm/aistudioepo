@@ -1,0 +1,37 @@
+Pickup_Run_Sheet_Items_On_Load as "Secure Pickup Stop"
+{
+    type = form
+    form = Pickup_Run_Sheet_Items
+    record event = on add or edit
+    description = "Locks assignment and derived fields while allowing only the assigned agent to capture pickup evidence"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Stop_Status, Arrived_At, Revised_Charge, Completed_At;
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(input.ID != null)
+                {
+                    run_record = Pickup_Run_Sheets[ID == input.Pickup_Run_Sheet];
+                    assigned_agent = Operations_Users[ID == run_record.Assigned_Agent];
+                    disable Pickup_Run_Sheet, Shipment, Stop_Sequence;
+                    if(current_profile == "Field_Agent" && assigned_agent.Work_Email == zoho.loginuserid && (run_record.Status == "Released" || run_record.Status == "In Progress"))
+                    {
+                        enable Physical_Weight_Kg, Customer_Approved_Revised_Charge, Pickup_OTP, Pickup_Signature, Failure_Reason, Agent_Latitude, Agent_Longitude;
+                    }
+                    else
+                    {
+                        disable Physical_Weight_Kg, Customer_Approved_Revised_Charge, Pickup_OTP, Pickup_Signature, Failure_Reason, Agent_Latitude, Agent_Longitude;
+                    }
+                    if(input.Stop_Status == "Picked Up" || input.Stop_Status == "Failed" || input.Stop_Status == "Cancelled")
+                    {
+                        disable Physical_Weight_Kg, Customer_Approved_Revised_Charge, Pickup_OTP, Pickup_Signature, Failure_Reason, Agent_Latitude, Agent_Longitude;
+                    }
+                }
+            )
+        }
+    }
+}

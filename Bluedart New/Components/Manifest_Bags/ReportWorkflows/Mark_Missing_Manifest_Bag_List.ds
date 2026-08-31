@@ -1,0 +1,73 @@
+Mark_Missing_Manifest_Bag_List as "Mark Missing - Manifest Bag List"
+{
+    type = functions
+    form = Manifest_Bags
+    execution type = for each record
+    description = "Records a missing expected bag with mandatory evidence and quarantines the manifest"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                manifest_record = Manifests[ID == input.Manifest];
+                bag_record = Logistics_Bags[ID == input.Bag];
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == manifest_record.Destination_Hub;
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the destination hub can report a missing bag.";
+                }
+                else if((manifest_record.Manifest_Status != "Arrived" && manifest_record.Manifest_Status != "Exception") || input.Load_Status != "Loaded")
+                {
+                    info "Only an unresolved loaded bag on an arrived manifest can be marked missing.";
+                }
+                else if(input.Exception_Photo == null || ifnull(input.Exception_Notes,"").trim() == "")
+                {
+                    info "Edit this checklist row and attach an exception photo and notes before marking the bag missing.";
+                }
+                else
+                {
+                    input.Load_Status = "Missing";
+                    input.Seal_Verified = false;
+                    bag_record.Bag_Status = "Exception";
+                    manifest_record.Manifest_Status = "Exception";
+                    exception_id = insert into Shipment_Exceptions
+                    [
+                        Bag = input.Bag
+                        Manifest = input.Manifest
+                        Exception_Type = "Missing"
+                        Severity = "Critical"
+                        Reporting_Hub = manifest_record.Destination_Hub
+                        Reported_By_Email = zoho.loginuserid
+                        Reported_At = zoho.currenttime
+                        Evidence_Photo = input.Exception_Photo
+                        Notes = input.Exception_Notes
+                        Exception_Status = "Open"
+                    ];
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Mark Manifest Bag Missing"
+                        Module_Name = "Manifest Bags"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=Loaded"
+                        After_Data = "Status=Missing; Manifest=Exception; Exception=" + exception_id
+                        Source = "Report Action"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

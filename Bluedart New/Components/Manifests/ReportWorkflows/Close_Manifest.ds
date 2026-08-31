@@ -1,0 +1,94 @@
+Close_Manifest as "Close Manifest"
+{
+    type = functions
+    form = Manifests
+    execution type = for each record
+    description = "Freezes a bounded loaded-bag set and validates trip capacity before dispatch"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == input.Origin_Hub;
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the origin hub can close this manifest.";
+                }
+                else if(input.Manifest_Status != "Draft")
+                {
+                    info "Only a draft manifest can be closed.";
+                }
+                else
+                {
+                    bag_count = 0;
+                    shipment_count = 0;
+                    total_weight = 0.0;
+                    invalid_bags = 0;
+                    for each manifest_bag in Manifest_Bags[Manifest == input.ID]
+                    {
+                        bag_count = bag_count + 1;
+                        bag_record = Logistics_Bags[ID == manifest_bag.Bag];
+                        if(manifest_bag.Load_Status != "Loaded" || bag_record.Bag_Status != "Sealed" || bag_record.Origin_Hub != input.Origin_Hub || bag_record.Destination_Hub != input.Destination_Hub)
+                        {
+                            invalid_bags = invalid_bags + 1;
+                        }
+                        expected_bag_type = if(input.Manifest_Type == "Linehaul","Master",input.Manifest_Type);
+                        if(bag_record.Bag_Type != expected_bag_type)
+                        {
+                            invalid_bags = invalid_bags + 1;
+                        }
+                        shipment_count = shipment_count + ifnull(bag_record.Total_Shipments,0);
+                        total_weight = total_weight + ifnull(bag_record.Total_Weight_Kg,0);
+                    }
+                    vehicle_record = Vehicles[ID == input.Vehicle && Active == true && Owning_Hub == input.Origin_Hub];
+                    if(bag_count == 0)
+                    {
+                        info "Load at least one sealed bag before closing the manifest.";
+                    }
+                    else if(bag_count > 100 || shipment_count > 1000)
+                    {
+                        info "This trip exceeds the safe processing batch of 100 bags or 1,000 shipments. Split it into additional manifests.";
+                    }
+                    else if(invalid_bags > 0)
+                    {
+                        info "Every manifest bag must be loaded, sealed, route-compatible, and match the manifest type.";
+                    }
+                    else if(vehicle_record.count(ID) == 0 || vehicle_record.Status != "Available" || total_weight > vehicle_record.Capacity_Kg)
+                    {
+                        info "The selected vehicle is unavailable or lacks capacity for the loaded bags.";
+                    }
+                    else
+                    {
+                        input.Total_Bags = bag_count;
+                        input.Total_Shipments = shipment_count;
+                        input.Total_Weight_Kg = total_weight;
+                        input.Manifest_Status = "Closed";
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuserid
+                            Actor_Profile = current_profile
+                            Action_Name = "Close Manifest"
+                            Module_Name = "Manifests"
+                            Record_ID = input.ID.toString()
+                            Before_Data = "Status=Draft"
+                            After_Data = "Status=Closed; Bags=" + bag_count + "; Shipments=" + shipment_count + "; Weight=" + total_weight
+                            Source = "Report Action"
+                            Severity = "Critical"
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

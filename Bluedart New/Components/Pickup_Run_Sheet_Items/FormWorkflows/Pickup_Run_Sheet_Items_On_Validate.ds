@@ -1,0 +1,123 @@
+Pickup_Run_Sheet_Items_On_Validate as "Validate Pickup Stop"
+{
+    type = form
+    form = Pickup_Run_Sheet_Items
+    record event = on add or edit
+    description = "Validates assignment uniqueness, hub ownership, agent access, physical rerating, and protected stop state"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                run_record = Pickup_Run_Sheets[ID == input.Pickup_Run_Sheet];
+                shipment_record = Shipment_Requests[ID == input.Shipment];
+                if(run_record.count(ID) == 0 || shipment_record.count(ID) == 0)
+                {
+                    alert "Select a valid pickup run and shipment.";
+                    cancel submit;
+                }
+                if(input.Stop_Sequence <= 0)
+                {
+                    alert "Stop sequence must be greater than zero.";
+                    cancel submit;
+                }
+                duplicate_sequence = Pickup_Run_Sheet_Items[Pickup_Run_Sheet == input.Pickup_Run_Sheet && Stop_Sequence == input.Stop_Sequence && ID != input.ID].count(ID);
+                if(duplicate_sequence > 0)
+                {
+                    alert "This stop sequence is already used in the pickup run.";
+                    cancel submit;
+                }
+                duplicate_active = Pickup_Run_Sheet_Items[Shipment == input.Shipment && ID != input.ID && Stop_Status != "Picked Up" && Stop_Status != "Failed" && Stop_Status != "Cancelled"].count(ID);
+                if(duplicate_active > 0)
+                {
+                    alert "This shipment is already assigned to an active pickup run.";
+                    cancel submit;
+                }
+                if(run_record.Hub != shipment_record.Collection_Center)
+                {
+                    alert "The shipment collection center must match the pickup run hub.";
+                    cancel submit;
+                }
+                if(input.ID == null)
+                {
+                    if(current_profile != "Logistics_Administrator" && current_profile != "Operations_Manager" && current_profile != "Hub_Supervisor")
+                    {
+                        alert "Only authorised operations planners can add pickup stops.";
+                        cancel submit;
+                    }
+                    if(run_record.Status != "Draft" || shipment_record.Shipment_Status != "Booked")
+                    {
+                        alert "Pickup stops can be added only to draft runs for booked shipments.";
+                        cancel submit;
+                    }
+                    input.Stop_Status = "Assigned";
+                    input.Arrived_At = null;
+                    input.Completed_At = null;
+                }
+                else
+                {
+                    previous_record = Pickup_Run_Sheet_Items[ID == input.ID];
+                    assigned_agent = Operations_Users[ID == run_record.Assigned_Agent];
+                    if(current_profile == "Field_Agent" && assigned_agent.Work_Email != zoho.loginuserid)
+                    {
+                        alert "You cannot update another agent's pickup stop.";
+                        cancel submit;
+                    }
+                    if(current_profile != "Field_Agent" && current_profile != "Logistics_Administrator" && current_profile != "Operations_Manager" && current_profile != "Hub_Supervisor")
+                    {
+                        alert "You are not authorised to update pickup stops.";
+                        cancel submit;
+                    }
+                    if(previous_record.Stop_Status == "Picked Up" || previous_record.Stop_Status == "Failed" || previous_record.Stop_Status == "Cancelled")
+                    {
+                        alert "Terminal pickup stops are locked.";
+                        cancel submit;
+                    }
+                    if(input.Pickup_Run_Sheet != previous_record.Pickup_Run_Sheet || input.Shipment != previous_record.Shipment || input.Stop_Sequence != previous_record.Stop_Sequence || input.Stop_Status != previous_record.Stop_Status || input.Arrived_At != previous_record.Arrived_At || input.Completed_At != previous_record.Completed_At)
+                    {
+                        alert "Assignment, status, and milestone timestamps are managed by pickup actions.";
+                        cancel submit;
+                    }
+                }
+                if(input.Agent_Latitude != null && (input.Agent_Latitude < -90 || input.Agent_Latitude > 90))
+                {
+                    alert "Agent latitude must be between -90 and 90.";
+                    cancel submit;
+                }
+                if(input.Agent_Longitude != null && (input.Agent_Longitude < -180 || input.Agent_Longitude > 180))
+                {
+                    alert "Agent longitude must be between -180 and 180.";
+                    cancel submit;
+                }
+                if(input.Physical_Weight_Kg != null)
+                {
+                    if(input.Physical_Weight_Kg <= 0)
+                    {
+                        alert "Physical weight must be greater than zero.";
+                        cancel submit;
+                    }
+                    quote = thisapp.Calculate_Shipment_Quote(shipment_record.Customer,shipment_record.Pickup_Pincode,shipment_record.Delivery_Pincode,shipment_record.Transport_Mode,shipment_record.Length_Cm,shipment_record.Width_Cm,shipment_record.Height_Cm,input.Physical_Weight_Kg,shipment_record.Payment_Type,shipment_record.Loyalty_Points_Redeemed);
+                    if(quote.get("valid") != true)
+                    {
+                        alert quote.get("message");
+                        cancel submit;
+                    }
+                    input.Revised_Charge = quote.get("total_payable");
+                    if((input.Revised_Charge - shipment_record.Total_Payable).abs() > 0.01 && input.Customer_Approved_Revised_Charge != true)
+                    {
+                        alert "Customer approval is required before saving a changed pickup charge.";
+                        cancel submit;
+                    }
+                }
+                else
+                {
+                    input.Revised_Charge = 0;
+                    input.Customer_Approved_Revised_Charge = false;
+                }
+            )
+        }
+    }
+}

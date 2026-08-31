@@ -1,0 +1,88 @@
+Receive_Manifest as "Receive Manifest"
+{
+    type = functions
+    form = Manifests
+    execution type = for each record
+    description = "Records destination arrival, verifies expected bag custody, and opens bag-level reconciliation"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == input.Destination_Hub;
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the destination hub can receive this manifest.";
+                }
+                else if(input.Manifest_Status != "In Transit" || ifnull(input.Vehicle_Seal_Code,"").trim() == "")
+                {
+                    info "Only an in-transit manifest with a recorded vehicle seal can be received.";
+                }
+                else
+                {
+                    expected_bags = Manifest_Bags[Manifest == input.ID && Load_Status == "Loaded"].count(ID);
+                    dispatched_bags = 0;
+                    bag_exceptions = 0;
+                    for each manifest_bag in Manifest_Bags[Manifest == input.ID && Load_Status == "Loaded"]
+                    {
+                        bag_record = Logistics_Bags[ID == manifest_bag.Bag];
+                        if(bag_record.Bag_Status == "Dispatched")
+                        {
+                            bag_record.Bag_Status = "Received";
+                            bag_record.Received_At = zoho.currenttime;
+                            dispatched_bags = dispatched_bags + 1;
+                        }
+                        else
+                        {
+                            bag_exceptions = bag_exceptions + 1;
+                        }
+                        for each bag_item in Bag_Shipments[Bag == bag_record.ID && Scan_Status == "Loaded"]
+                        {
+                            shipment_record = Shipment_Requests[ID == bag_item.Shipment];
+                            tracking_id = insert into Shipment_Tracking_Events
+                            [
+                                Shipment = shipment_record.ID
+                                Event_Time = zoho.currenttime
+                                Event_Status = "Information"
+                                Hub = input.Destination_Hub
+                                Manifest = input.ID
+                                Bag = bag_record.ID
+                                Event_Description = "Manifest arrived under recorded vehicle seal; bag and item reconciliation is pending."
+                                Source = "Manifest"
+                                Customer_Visible = false
+                                Created_By_Email = zoho.loginuserid
+                            ];
+                        }
+                    }
+                    input.Actual_Arrival_Time = zoho.currenttime;
+                    input.Manifest_Status = if(bag_exceptions > 0 || dispatched_bags != expected_bags,"Exception","Arrived");
+                    vehicle_record = Vehicles[ID == input.Vehicle];
+                    vehicle_record.Status = "Available";
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Receive Manifest"
+                        Module_Name = "Manifests"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=In Transit; Vehicle Seal=" + input.Vehicle_Seal_Code
+                        After_Data = "Status=" + input.Manifest_Status + "; Received Bags=" + dispatched_bags + "; Expected Bags=" + expected_bags + "; Reconciliation=Pending"
+                        Source = "Report Action"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

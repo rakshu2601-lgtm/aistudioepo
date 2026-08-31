@@ -1,0 +1,75 @@
+Remove_Bag_Shipment as "Remove Shipment from Bag"
+{
+    type = functions
+    form = Bag_Shipments
+    execution type = for each record
+    description = "Removes an AWB from an open bag while preserving scan evidence and recalculating totals"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                bag_record = Logistics_Bags[ID == input.Bag];
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == bag_record.Origin_Hub;
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the origin hub can remove this AWB.";
+                }
+                else if(bag_record.Bag_Status != "Open" || input.Scan_Status != "Loaded")
+                {
+                    info "An AWB can be removed only while its bag is open and the scan is loaded.";
+                }
+                else
+                {
+                    input.Scan_Status = "Removed";
+                    input.Exception_Notes = "Removed from the open bag by " + zoho.loginuserid + " on " + zoho.currenttime;
+                    shipment_count = 0;
+                    total_weight = 0.0;
+                    for each remaining_item in Bag_Shipments[Bag == input.Bag && Scan_Status == "Loaded" && ID != input.ID]
+                    {
+                        shipment_count = shipment_count + 1;
+                        shipment_record = Shipment_Requests[ID == remaining_item.Shipment];
+                        total_weight = total_weight + ifnull(shipment_record.Billable_Weight_Kg,0);
+                    }
+                    bag_record.Total_Shipments = shipment_count;
+                    bag_record.Total_Weight_Kg = total_weight;
+                    tracking_id = insert into Shipment_Tracking_Events
+                    [
+                        Shipment = input.Shipment
+                        Event_Time = zoho.currenttime
+                        Event_Status = "Information"
+                        Hub = bag_record.Origin_Hub
+                        Bag = input.Bag
+                        Event_Description = "Shipment was removed from an open bag before sealing."
+                        Source = "Bag"
+                        Customer_Visible = false
+                        Created_By_Email = zoho.loginuserid
+                    ];
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Remove Shipment from Bag"
+                        Module_Name = "Bag Shipments"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=Loaded"
+                        After_Data = "Status=Removed; BagShipments=" + shipment_count + "; BagWeight=" + total_weight
+                        Source = "Report Action"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

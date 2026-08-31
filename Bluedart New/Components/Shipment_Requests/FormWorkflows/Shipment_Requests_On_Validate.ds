@@ -1,0 +1,141 @@
+Shipment_Requests_On_Validate as "Validate Shipment Booking"
+{
+    type = form
+    form = Shipment_Requests
+    record event = on add or edit
+    description = "Validates ownership, serviceability, package values, rating, redemption, payment, KYC, and credit rules"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                is_portal = thisapp.portal.isUserInProfile("Customer_Portal");
+                if(is_portal == true)
+                {
+                    input.Booking_Source = "Customer Portal";
+                }
+                else if(thisapp.permissions.loginUserProfile() == "Field_Agent")
+                {
+                    input.Booking_Source = "Field Agent";
+                }
+                else
+                {
+                    input.Booking_Source = "Employee";
+                }
+                customer_record = Customers[ID == input.Customer];
+                if(customer_record.count(ID) == 0)
+                {
+                    alert "Select a valid customer.";
+                    cancel submit;
+                }
+                if(is_portal == true && customer_record.Portal_Login_Email != zoho.loginuserid && customer_record.Email_ID != zoho.loginuserid)
+                {
+                    alert "You cannot book or update a shipment for another customer.";
+                    cancel submit;
+                }
+                if(customer_record.Active != true || customer_record.Onboarding_Status != "Active")
+                {
+                    alert "Shipment booking is available only for active, fully onboarded customers.";
+                    cancel submit;
+                }
+                if(ifnull(input.Pickup_Pincode,"").matches("[0-9]{6}") == false || ifnull(input.Delivery_Pincode,"").matches("[0-9]{6}") == false)
+                {
+                    alert "Pickup and delivery pincodes must contain exactly six digits.";
+                    cancel submit;
+                }
+                if(ifnull(input.Package_Count,0) <= 0 || ifnull(input.Declared_Value,0) <= 0 || ifnull(input.Length_Cm,0) <= 0 || ifnull(input.Width_Cm,0) <= 0 || ifnull(input.Height_Cm,0) <= 0 || ifnull(input.Actual_Weight_Kg,0) <= 0)
+                {
+                    alert "Package count, declared value, dimensions, and actual weight must be greater than zero.";
+                    cancel submit;
+                }
+                pickup_map = Hub_Pincode_Mapping[Pincode == input.Pickup_Pincode && Active == true && Serviceability != "Non-Serviceable"];
+                delivery_map = Hub_Pincode_Mapping[Pincode == input.Delivery_Pincode && Active == true && Serviceability != "Non-Serviceable"];
+                if(pickup_map.count(ID) == 0 || delivery_map.count(ID) == 0)
+                {
+                    alert "One or both pincodes are not currently serviceable.";
+                    cancel submit;
+                }
+                quote = thisapp.Calculate_Shipment_Quote(customer_record.ID,input.Pickup_Pincode,input.Delivery_Pincode,input.Transport_Mode,input.Length_Cm,input.Width_Cm,input.Height_Cm,input.Actual_Weight_Kg,input.Payment_Type,ifnull(input.Loyalty_Points_Redeemed,0));
+                if(quote.get("valid") != true)
+                {
+                    alert quote.get("message");
+                    cancel submit;
+                }
+                input.Volumetric_Weight_Kg = quote.get("volumetric_weight");
+                input.Billable_Weight_Kg = quote.get("billable_weight");
+                input.Rated_Distance_Km = quote.get("rated_distance");
+                input.Applied_Rate_Card = quote.get("rate_card_id");
+                input.Applied_Rate_Slab = quote.get("rate_slab_id");
+                input.Base_Rate = quote.get("base_rate");
+                input.Fuel_Surcharge = quote.get("fuel_surcharge");
+                input.COD_Handling_Fee = quote.get("cod_fee");
+                input.GST_Amount = quote.get("gst_amount");
+                input.Gross_Amount = quote.get("gross_amount");
+                input.Loyalty_Redemption_Amount = quote.get("redemption_amount");
+                input.Total_Payable = quote.get("total_payable");
+                if(ifnull(input.Loyalty_Points_Redeemed,0) < 0 || input.Loyalty_Points_Redeemed > ifnull(customer_record.Current_Loyalty_Points,0))
+                {
+                    alert "Redeemed points cannot be negative or exceed the customer's current points balance.";
+                    cancel submit;
+                }
+                if(ifnull(input.Loyalty_Redemption_Amount,0) > ifnull(input.Gross_Amount,0))
+                {
+                    alert "Loyalty redemption cannot exceed the shipment gross amount.";
+                    cancel submit;
+                }
+                if(input.Payment_Type == "COD")
+                {
+                    if(ifnull(input.COD_Amount,0) <= 0)
+                    {
+                        alert "Enter the positive amount to collect for a COD shipment.";
+                        cancel submit;
+                    }
+                    input.Payment_Status = "Not Required";
+                    input.Credit_Check_Status = "Not Applicable";
+                }
+                else if(input.Payment_Type == "Credit")
+                {
+                    input.Payment_Status = "Not Required";
+                    if(customer_record.Customer_Type == "Retail" || customer_record.Payment_Terms == "Prepaid")
+                    {
+                        alert "Credit shipment booking is not available for this customer.";
+                        cancel submit;
+                    }
+                    if(customer_record.Onboarding_Status == "KYC Expired" || (customer_record.KYC_Expiry_Date != null && customer_record.KYC_Expiry_Date < zoho.currentdate))
+                    {
+                        input.Credit_Check_Status = "KYC Blocked";
+                        alert "Credit booking is blocked because KYC has expired.";
+                        cancel submit;
+                    }
+                    projected_outstanding = ifnull(customer_record.Outstanding_Balance,0) + ifnull(input.Total_Payable,0);
+                    if(projected_outstanding > ifnull(customer_record.Approved_Credit_Limit,0))
+                    {
+                        input.Credit_Check_Status = "Hold";
+                        input.Shipment_Status = "Credit Hold";
+                    }
+                    else
+                    {
+                        input.Credit_Check_Status = "Passed";
+                    }
+                }
+                else
+                {
+                    input.COD_Amount = 0;
+                    input.Payment_Status = "Pending";
+                    input.Credit_Check_Status = "Not Applicable";
+                }
+                if(is_portal == true && input.ID != null)
+                {
+                    stored_record = Shipment_Requests[ID == input.ID];
+                    if(input.Payment_Status != stored_record.Payment_Status || input.Credit_Check_Status != stored_record.Credit_Check_Status || input.Collection_Center != stored_record.Collection_Center || input.Origin_Sorting_Hub != stored_record.Origin_Sorting_Hub || input.Destination_Sorting_Hub != stored_record.Destination_Sorting_Hub || input.Destination_Hub != stored_record.Destination_Hub || input.Current_Hub != stored_record.Current_Hub || input.Shipment_Status != stored_record.Shipment_Status || input.Booked_On != stored_record.Booked_On || input.NDR_Attempt_Count != stored_record.NDR_Attempt_Count || input.Loyalty_Awarded != stored_record.Loyalty_Awarded)
+                    {
+                        alert "Calculated routing, payment, and shipment lifecycle fields cannot be changed from the customer portal.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

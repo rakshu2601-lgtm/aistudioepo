@@ -1,0 +1,51 @@
+Hubs_On_Validate as "Validate Hub Master"
+{
+    type = form
+    form = Hubs
+    record event = on add or edit
+    description = "Validates hub hierarchy, capacity, and operating hours"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(ifnull(input.Daily_Capacity,0) <= 0)
+                {
+                    alert "Daily capacity must be greater than zero.";
+                    cancel submit;
+                }
+                if(input.Operating_Start_Time >= input.Operating_End_Time)
+                {
+                    alert "Operating end time must be later than the start time.";
+                    cancel submit;
+                }
+                if(input.Cut_Off_Time < input.Operating_Start_Time || input.Cut_Off_Time > input.Operating_End_Time)
+                {
+                    alert "Cut-off time must fall within the hub operating hours.";
+                    cancel submit;
+                }
+                if(input.Parent_Sorting_Hub != null && input.Parent_Sorting_Hub == input.ID)
+                {
+                    alert "A hub cannot be its own parent sorting hub.";
+                    cancel submit;
+                }
+                if(input.Hub_Type == "Collection Center" && input.Parent_Sorting_Hub == null)
+                {
+                    alert "A collection center must have a parent sorting hub.";
+                    cancel submit;
+                }
+                if(input.Parent_Sorting_Hub != null)
+                {
+                    parent_hub = Hubs[ID == input.Parent_Sorting_Hub];
+                    if(parent_hub.count() == 0 || parent_hub.Hub_Type != "Sorting Hub" || parent_hub.Active != true)
+                    {
+                        alert "The parent must be an active sorting hub.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

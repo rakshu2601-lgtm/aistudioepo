@@ -1,0 +1,29 @@
+Delivery_Run_Sheet_Items_On_Delete as "Protect Delivery Stop Deletion"
+{
+    type = form
+    form = Delivery_Run_Sheet_Items
+    record event = on delete
+    description = "Allows deletion only while the parent delivery run is still a draft"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                run_record = Delivery_Run_Sheets[ID == input.Delivery_Run_Sheet];
+                if(current_profile != "Logistics_Administrator" && current_profile != "Operations_Manager" && current_profile != "Hub_Supervisor")
+                {
+                    alert "Only authorised operations planners can remove delivery stops.";
+                    cancel delete;
+                }
+                if(run_record.count(ID) == 0 || run_record.DRS_Status != "Draft")
+                {
+                    alert "Delivery stops can be removed only from draft runs.";
+                    cancel delete;
+                }
+            )
+        }
+    }
+}

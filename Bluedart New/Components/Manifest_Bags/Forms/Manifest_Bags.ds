@@ -1,0 +1,153 @@
+form Manifest_Bags
+{
+    title
+    {
+        displayname = "Manifest Bags"
+        on add = "Add Expected Bag"
+        on edit = "Prepare Bag Reconciliation"
+    }
+    success message = "Manifest bag saved successfully"
+    Manifest_Bag_Assignment
+    (
+        type = section
+        displayname = "Manifest Bag Assignment"
+        row = 1
+        column = 0
+    )
+    must have Manifest
+    (
+        type = picklist
+        displayname = "Manifest"
+        values = Manifests.ID
+        displayformat = [Manifest_Number]
+        searchable = true
+        sortorder = ascending
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Bag
+    (
+        type = picklist
+        displayname = "Bag"
+        values = Logistics_Bags.ID
+        displayformat = [Bag_Number]
+        searchable = true
+        sortorder = ascending
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Manifest_Type
+    (
+        type = picklist
+        displayname = "Manifest Type"
+        values = {"Feeder","Linehaul","Delivery Feeder","Return"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Load_Status
+    (
+        type = picklist
+        displayname = "Load Status"
+        values = {"Expected","Loaded","Received","Missing","Damaged","Short"}
+        initial value = "Expected"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Custody_Timestamps
+    (
+        type = section
+        displayname = "Custody Timestamps"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Loaded_At
+    (
+        type = datetime
+        displayname = "Loaded At"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Received_At
+    (
+        type = datetime
+        displayname = "Received At"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Seal_Verified
+    (
+        type = checkbox
+        displayname = "Seal Verified"
+        initial value = false
+        row = 2
+        column = 1
+        width = medium
+    )
+    Reconciliation_Evidence
+    (
+        type = section
+        displayname = "Reconciliation Evidence"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Exception_Photo
+    (
+        type = image
+        displayname = "Exception Photo"
+        source = file,camera
+        compression = true
+        camera = primary
+        switch camera = true
+        show gallery = true
+        preview duration = 0
+        row = 3
+        column = 1
+        width = medium
+    )
+    Exception_Notes
+    (
+        type = textarea
+        displayname = "Exception Notes"
+        height = 100px
+        row = 3
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Add Expected Bag"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Save Reconciliation Evidence"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

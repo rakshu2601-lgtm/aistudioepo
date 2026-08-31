@@ -1,0 +1,121 @@
+Manifest_Bags_On_Validate as "Validate Manifest Bag Checklist"
+{
+    type = form
+    form = Manifest_Bags
+    record event = on add or edit
+    description = "Enforces hub authority, route compatibility, uniqueness, capacity, and controlled evidence editing"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                authorised_profile = current_profile == "Logistics_Administrator" || current_profile == "Operations_Manager" || current_profile == "Hub_Supervisor" || current_profile == "Hub_Operator";
+                if(authorised_profile == false)
+                {
+                    alert "You are not authorised to maintain manifest bag checklists.";
+                    cancel submit;
+                }
+                manifest_record = Manifests[ID == input.Manifest];
+                if(manifest_record.count(ID) == 0)
+                {
+                    alert "Select a valid manifest.";
+                    cancel submit;
+                }
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                if(input.ID == null)
+                {
+                    if(manifest_record.Manifest_Status != "Draft")
+                    {
+                        alert "Expected bags can be added only while the manifest is in Draft status.";
+                        cancel submit;
+                    }
+                    if((current_profile == "Hub_Supervisor" || current_profile == "Hub_Operator") && (logged_user.count(ID) == 0 || effective_hub != manifest_record.Origin_Hub))
+                    {
+                        alert "Hub users can add expected bags only at their effective origin hub.";
+                        cancel submit;
+                    }
+                    bag_record = Logistics_Bags[ID == input.Bag && Bag_Status == "Sealed"];
+                    if(bag_record.count(ID) == 0)
+                    {
+                        alert "Only a sealed bag can be added to a draft manifest.";
+                        cancel submit;
+                    }
+                    expected_bag_type = if(manifest_record.Manifest_Type == "Linehaul","Master",manifest_record.Manifest_Type);
+                    if(bag_record.Bag_Type != expected_bag_type || bag_record.Origin_Hub != manifest_record.Origin_Hub || bag_record.Destination_Hub != manifest_record.Destination_Hub)
+                    {
+                        alert "The bag type, origin, and destination must match the manifest movement leg.";
+                        cancel submit;
+                    }
+                    duplicate_link = Manifest_Bags[Manifest == input.Manifest && Bag == input.Bag];
+                    other_active_link = Manifest_Bags[Bag == input.Bag && (Load_Status == "Expected" || Load_Status == "Loaded")];
+                    if(duplicate_link.count(ID) > 0 || other_active_link.count(ID) > 0)
+                    {
+                        alert "This bag is already linked to this or another active manifest checklist.";
+                        cancel submit;
+                    }
+                    bag_count = 1;
+                    shipment_count = ifnull(bag_record.Total_Shipments,0);
+                    total_weight = ifnull(bag_record.Total_Weight_Kg,0);
+                    for each manifest_bag in Manifest_Bags[Manifest == input.Manifest && (Load_Status == "Expected" || Load_Status == "Loaded")]
+                    {
+                        linked_bag = Logistics_Bags[ID == manifest_bag.Bag];
+                        bag_count = bag_count + 1;
+                        shipment_count = shipment_count + ifnull(linked_bag.Total_Shipments,0);
+                        total_weight = total_weight + ifnull(linked_bag.Total_Weight_Kg,0);
+                    }
+                    vehicle_record = Vehicles[ID == manifest_record.Vehicle && Active == true];
+                    if(bag_count > 100 || shipment_count > 1000)
+                    {
+                        alert "A manifest cannot exceed 100 bags or 1,000 shipments. Split this trip.";
+                        cancel submit;
+                    }
+                    if(vehicle_record.count(ID) == 0 || total_weight > vehicle_record.Capacity_Kg)
+                    {
+                        alert "The selected vehicle does not have capacity for this expected bag set.";
+                        cancel submit;
+                    }
+                    input.Manifest_Type = manifest_record.Manifest_Type;
+                    input.Load_Status = "Expected";
+                    input.Loaded_At = null;
+                    input.Received_At = null;
+                    input.Seal_Verified = false;
+                    input.Exception_Photo = null;
+                    input.Exception_Notes = "";
+                }
+                else
+                {
+                    existing_record = Manifest_Bags[ID == input.ID];
+                    if(existing_record.Manifest != input.Manifest || existing_record.Bag != input.Bag || existing_record.Manifest_Type != input.Manifest_Type || existing_record.Load_Status != input.Load_Status || existing_record.Loaded_At != input.Loaded_At || existing_record.Received_At != input.Received_At)
+                    {
+                        alert "Manifest, bag, movement type, status, and custody timestamps are controlled by operational actions.";
+                        cancel submit;
+                    }
+                    if(manifest_record.Manifest_Status != "Arrived" && manifest_record.Manifest_Status != "Exception")
+                    {
+                        alert "Seal confirmation and exception evidence can be prepared only after manifest arrival.";
+                        cancel submit;
+                    }
+                    if(input.Load_Status != "Loaded")
+                    {
+                        alert "Terminal reconciliation evidence cannot be altered from this form.";
+                        cancel submit;
+                    }
+                    if((current_profile == "Hub_Supervisor" || current_profile == "Hub_Operator") && (logged_user.count(ID) == 0 || effective_hub != manifest_record.Destination_Hub))
+                    {
+                        alert "Hub users can prepare reconciliation evidence only at their effective destination hub.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

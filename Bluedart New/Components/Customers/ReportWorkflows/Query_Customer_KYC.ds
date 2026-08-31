@@ -1,0 +1,66 @@
+Query_Customer_KYC as "Query Customer KYC"
+{
+    type = functions
+    form = Customers
+    execution type = for each record
+    description = "Moves a customer to Action Required after one or more documents receive query remarks"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                if(input.Onboarding_Status != "Pending Verification")
+                {
+                    info "Only customers pending verification can be queried.";
+                }
+                else
+                {
+                    queried_count = Customer_KYC_Documents[Customer == input.ID && Review_Status == "Query"].count();
+                    if(queried_count == 0)
+                    {
+                        info "Query at least one KYC document and provide review remarks before using this action.";
+                    }
+                    else
+                    {
+                        input.Onboarding_Status = "Action Required";
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuserid
+                            Actor_Profile = "POC Process User"
+                            Action_Name = "Query Customer KYC"
+                            Module_Name = "Customers"
+                            Record_ID = input.ID.toString()
+                            Before_Data = "Status=Pending Verification"
+                            After_Data = "Status=Action Required; Queried Documents=" + queried_count
+                            Source = "Report Action"
+                            Severity = "Warning"
+                        ];
+                        communication_id = insert into Communication_Log
+                        [
+                            Customer = input.ID
+                            Recipient = input.Email_ID
+                            Channel = "Email"
+                            Template_Code = "KYC_ACTION_REQUIRED"
+                            Subject = "KYC document correction required"
+                            Message_Summary = "One or more KYC documents require correction; review remarks are available in the portal."
+                            Provider = "Zoho Mail"
+                            Communication_Status = "Sent"
+                            Attempt_Count = 1
+                            Last_Attempt_At = zoho.currenttime
+                        ];
+                        sendmail
+                        [
+                            from: zoho.adminuserid
+                            to: input.Email_ID
+                            subject: "KYC document correction required"
+                            message: "One or more KYC documents need correction. Sign in to the customer portal, review the remarks, and upload a corrected version."
+                        ]
+                    }
+                }
+            )
+        }
+    }
+}

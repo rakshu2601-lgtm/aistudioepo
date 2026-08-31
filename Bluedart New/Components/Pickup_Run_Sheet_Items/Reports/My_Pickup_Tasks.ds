@@ -1,0 +1,54 @@
+list My_Pickup_Tasks
+{
+    displayName = "My Pickup Tasks"
+    show all rows from Pickup_Run_Sheet_Items [Pickup_Run_Sheet.Assigned_Agent == Operations_Users[Work_Email == zoho.loginuserid && Active == true].ID && Pickup_Run_Sheet.Status != "Draft" && Pickup_Run_Sheet.Status != "Cancelled"]
+    (
+        Pickup_Run_Sheet
+        Stop_Sequence
+        Shipment
+        Stop_Status
+        Arrived_At
+        Physical_Weight_Kg
+        Revised_Charge
+        Customer_Approved_Revised_Charge
+        Completed_At
+        Agent_Latitude
+        Agent_Longitude
+        Failure_Reason
+        custom action "Mark Arrived"
+        (
+            workflow = Mark_Arrived_My_Pickup_Tasks
+            show action for each record = true
+            column header = "Mark Arrived"
+            success message = "Pickup arrival evaluated"
+            condition = (Stop_Status == "Assigned")
+        )
+        custom action "Complete Pickup"
+        (
+            workflow = Complete_Pickup_My_Pickup_Tasks
+            show action for each record = true
+            column header = "Complete Pickup"
+            success message = "Pickup completion evaluated"
+            condition = (Stop_Status == "Arrived")
+        )
+        custom action "Fail Pickup"
+        (
+            workflow = Fail_Pickup_My_Pickup_Tasks
+            show action for each record = true
+            column header = "Fail Pickup"
+            success message = "Pickup failure evaluated"
+            condition = (Stop_Status == "Assigned" || Stop_Status == "Arrived")
+        )
+    )
+    filters
+    (
+        Pickup_Run_Sheet
+        Stop_Status
+        Completed_At
+    )
+    sort by
+    (
+        Pickup_Run_Sheet descending
+        Stop_Sequence ascending
+    )
+}

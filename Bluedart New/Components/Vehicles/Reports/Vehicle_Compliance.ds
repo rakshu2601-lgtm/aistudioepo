@@ -1,0 +1,44 @@
+calendar Vehicle_Compliance
+{
+    displayName = "Vehicle Compliance"
+    show all rows from Vehicles [Active == true && Registration_Expiry != null && Insurance_Expiry != null]
+    (
+        Vehicle_Number
+        Vehicle_Type
+        Owning_Hub
+        Registration_Expiry
+        Insurance_Expiry
+        Status
+        Active
+    )
+    filters
+    (
+        Vehicle_Type
+        Owning_Hub
+        Status
+        Active
+    )
+    options
+    (
+        display type = month
+        week start day = monday
+        display field = Vehicle_Number
+        start date = Registration_Expiry
+        end date = Insurance_Expiry
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+    conditional formatting
+    (
+        "Inactive Vehicle"
+        {
+            condition = (Status == "Inactive")
+            fields = [Vehicle_Number, Status]
+            format = "background-color:#F3F4F6;color:#4B5563"
+        }
+    )
+}

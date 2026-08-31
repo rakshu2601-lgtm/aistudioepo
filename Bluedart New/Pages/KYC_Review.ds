@@ -1,0 +1,19 @@
+<page linkname = "KYC_Review" parameters = "int Customer_ID" displayname = "KYC Review"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='KYC_Review_Workspace' elementName='KYC_Review_Workspace'>
+          <![CDATA[htmlpage KYC_Review_Workspace()
+            content
+            <%{%>
+                <file name:KYC_Review_Workspace.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

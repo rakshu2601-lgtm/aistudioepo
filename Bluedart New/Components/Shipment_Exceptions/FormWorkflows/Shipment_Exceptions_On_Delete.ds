@@ -1,0 +1,19 @@
+Shipment_Exceptions_On_Delete as "Protect Shipment Exception Evidence"
+{
+    type = form
+    form = Shipment_Exceptions
+    record event = on delete
+    description = "Prevents deletion of operational exception and claim evidence"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Shipment exception evidence cannot be deleted. Resolve the exception through the controlled report action.";
+                cancel delete;
+            )
+        }
+    }
+}

@@ -1,0 +1,54 @@
+Customer_KYC_Expiry_Enforcement as "Enforce Customer KYC Expiry"
+{
+    type = schedule
+    form = Customers[Customer_Type != "Retail" && Active == true]
+    start = KYC_Expiry_Date at "00:05:00"
+    time zone = "Asia/Kolkata"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                if(input.KYC_Expiry_Date <= zoho.currentdate && input.Onboarding_Status == "Active")
+                {
+                    input.Onboarding_Status = "KYC Expired";
+                    communication_id = insert into Communication_Log
+                    [
+                        Customer = input.ID
+                        Recipient = input.Email_ID
+                        Channel = "Email"
+                        Template_Code = "KYC_EXPIRED"
+                        Subject = "KYC expired - re-verification required"
+                        Message_Summary = "Customer was moved to KYC Expired and must complete re-verification before new shipments."
+                        Provider = "Zoho Mail"
+                        Communication_Status = "Sent"
+                        Attempt_Count = 1
+                        Last_Attempt_At = zoho.currenttime
+                    ];
+                    sendmail
+                    [
+                        from: zoho.adminuserid
+                        to: input.Email_ID
+                        subject: "KYC expired - re-verification required"
+                        message: "Your KYC verification has expired. Complete re-KYC in the customer portal before booking new shipments."
+                    ]
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.adminuserid
+                        Actor_Profile = "System Schedule"
+                        Action_Name = "Expire Customer KYC"
+                        Module_Name = "Customers"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=Active"
+                        After_Data = "Status=KYC Expired"
+                        Source = "Schedule"
+                        Severity = "Warning"
+                    ];
+                }
+            )
+        }
+    }
+}

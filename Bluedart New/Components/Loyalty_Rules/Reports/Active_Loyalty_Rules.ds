@@ -1,0 +1,45 @@
+list Active_Loyalty_Rules
+{
+    displayName = "Active Loyalty Rules"
+    show all rows from Loyalty_Rules [Status == "Active" && Effective_From <= zoho.currentdate && (Effective_To is null || Effective_To >= zoho.currentdate)]
+    (
+        Loyalty_Rule_ID
+        Rule_Name
+        Customer_Type
+        Transport_Mode
+        Minimum_Shipment_Amount
+        Points_Per_INR
+        Maximum_Points_Per_Shipment
+        Points_Expiry_Months
+        Effective_From
+        Effective_To
+        Status
+        custom action "Expire Rule"
+        (
+            workflow = Expire_Active_Loyalty_Rule
+            show action for each record = true
+            column header = "Expire Rule"
+            success message = "Loyalty rule expiry evaluated"
+            confirmation before execution
+            (
+                message for individual record = "Expire this loyalty earning rule?"
+                confirm button text = "Expire"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Customer_Type
+        Transport_Mode
+        Effective_From
+        Effective_To
+        Status
+    )
+    sort by
+    (
+        Customer_Type ascending
+        Transport_Mode ascending
+        Minimum_Shipment_Amount descending
+    )
+}

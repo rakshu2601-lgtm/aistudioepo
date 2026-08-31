@@ -1,0 +1,49 @@
+Customer_KYC_Documents_On_Success as "Recompute Customer KYC Progress"
+{
+    type = form
+    form = Customer_KYC_Documents
+    record event = on add or edit
+    description = "Moves the parent customer to verification when every required checklist item is uploaded and audits the document save"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                customer_record = Customers[ID == input.Customer];
+                required_count = Customer_KYC_Documents[Customer == input.Customer && Required_For_Onboarding == true].count(ID);
+                incomplete_count = Customer_KYC_Documents[Customer == input.Customer && Required_For_Onboarding == true && Review_Status != "Pending Verification" && Review_Status != "Verified"].count(ID);
+                if(required_count > 0 && incomplete_count == 0 && customer_record.Onboarding_Status != "Active")
+                {
+                    customer_record.Onboarding_Status = "Pending Verification";
+                    customer_record.KYC_Submitted_On = zoho.currenttime;
+                    communication_id = insert into Communication_Log
+                    [
+                        Customer = customer_record.ID
+                        Recipient = customer_record.Email_ID
+                        Channel = "Portal Notification"
+                        Template_Code = "KYC_SUBMITTED"
+                        Subject = "KYC submitted for verification"
+                        Message_Summary = "All required KYC checklist items are uploaded and awaiting review."
+                        Provider = "Other"
+                        Communication_Status = "Queued"
+                        Attempt_Count = 0
+                    ];
+                }
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = "KYC Document Management"
+                    Action_Name = "Save KYC Document"
+                    Module_Name = "Customer_KYC_Documents"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Customer=" + input.Customer + "; Document Type=" + input.Document_Type + "; Version=" + input.File_Version + "; Status=" + input.Review_Status
+                    Source = "Form Workflow"
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

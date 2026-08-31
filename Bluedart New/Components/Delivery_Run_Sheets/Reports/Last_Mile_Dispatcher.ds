@@ -1,0 +1,58 @@
+list Last_Mile_Dispatcher
+{
+    displayName = "Last Mile Dispatcher"
+    show all rows from Delivery_Run_Sheets [(Hub == Operations_Users[Work_Email == zoho.loginuserid && Active == true && Deputed_Hub is not null && (Deputation_Start_Date is null || Deputation_Start_Date <= zoho.currentdate) && (Deputation_End_Date is null || Deputation_End_Date >= zoho.currentdate)].Deputed_Hub) || (Hub == Operations_Users[Work_Email == zoho.loginuserid && Active == true && (Deputed_Hub is null || (Deputation_Start_Date is not null && Deputation_Start_Date > zoho.currentdate) || (Deputation_End_Date is not null && Deputation_End_Date < zoho.currentdate))].Home_Hub)]
+    (
+        DRS_Number
+        Run_Date
+        Hub
+        Delivery_Zone
+        Assigned_Agent
+        Vehicle
+        DRS_Status
+        Planned_Stop_Count
+        Delivered_Count
+        Failed_Count
+        Expected_COD_Amount
+        Collected_COD_Amount
+        Released_At
+        Completed_At
+        custom action "Auto-Cluster"
+        (
+            workflow = Auto_Cluster_Delivery_Run
+            show action for each record = true
+            column header = "Auto-Cluster"
+            success message = "Delivery clustering evaluated"
+            condition = (DRS_Status == "Draft")
+        )
+        custom action "Release Run"
+        (
+            workflow = Release_Delivery_Run
+            show action for each record = true
+            column header = "Release Run"
+            success message = "Delivery run release evaluated"
+            condition = (DRS_Status == "Draft")
+        )
+        custom action "Complete Run"
+        (
+            workflow = Complete_Last_Mile_Delivery_Run
+            show action for each record = true
+            column header = "Complete Run"
+            success message = "Delivery run completion evaluated"
+            condition = (DRS_Status == "Released" || DRS_Status == "In Progress")
+        )
+    )
+    filters
+    (
+        Run_Date
+        Delivery_Zone
+        Assigned_Agent
+        Vehicle
+        DRS_Status
+    )
+    sort by
+    (
+        Run_Date ascending
+        DRS_Number ascending
+    )
+}

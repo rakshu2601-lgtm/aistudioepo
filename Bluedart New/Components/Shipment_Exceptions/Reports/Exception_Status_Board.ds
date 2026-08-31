@@ -1,0 +1,37 @@
+kanban Exception_Status_Board
+{
+    displayName = "Exception Status Board"
+    show all rows from Shipment_Exceptions
+    (
+        Exception_Number
+        Shipment
+        Bag
+        Manifest
+        Exception_Type
+        Severity
+        Reporting_Hub
+        Reported_At
+        Assigned_To_Email
+        Resolution
+        Exception_Status
+    )
+    filters
+    (
+        Exception_Type
+        Severity
+        Reporting_Hub
+        Assigned_To_Email
+        Exception_Status
+    )
+    sort by
+    (
+        Reported_At descending
+    )
+    options
+    (
+        display field = Exception_Status
+        othercolumn = "Other"
+        sort order = custom
+        record count = enable
+    )
+}

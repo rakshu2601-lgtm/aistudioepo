@@ -1,0 +1,38 @@
+"Operations_Manager"
+{
+ name = "Operations_Manager"
+ type = Users_Permissions
+ permissions = { Chat:true, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+ description = "Network-wide shipment and logistics operations management"
+ ModulePermissions
+ {
+  Hubs { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { All_Hubs={"View","Edit"} Active_Hub_Map={"View"} Hub_Capacity={"View"} } }
+  Hub_Pincode_Mapping { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { Pincode_Mappings={"View","Edit"} Serviceability_Map={"View"} Non_Serviceable_Pincodes={"View"} } }
+  Operations_Users { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { Operations_User_Directory={"View","Edit"} Hub_Staff={"View"} Active_Field_Agents={"View"} Agent_Location_Map={"View"} } }
+  Vehicles { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { All_Vehicles={"View","Edit"} Available_Vehicles={"View"} Vehicle_Compliance={"View"} } }
+  Transport_Routes { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { All_Transport_Routes={"View","Edit"} Active_Routes={"View"} Route_Capacity={"View"} } }
+  Rate_Cards { enabled = Viewall,Tab,View,Search allFieldsVisible = true ReportPermissions { All_Rate_Cards={"View"} Published_Rate_Cards={"View"} Expiring_Rate_Cards={"View"} } }
+  Rate_Slabs { enabled = Viewall,Tab,View,Search allFieldsVisible = true ReportPermissions { Rate_Slab_Register={"View"} Active_Slabs={"View"} } }
+  Customers { enabled = Viewall,Tab,View,Search allFieldsVisible = false ReportPermissions { All_Customers={"View"} Active_Customers={"View"} } FieldPermissions { Full_Name{visibility:true,readonly:true} Mobile_Number{visibility:true,readonly:true} Email_ID{visibility:true,readonly:true} Primary_Address{visibility:true,readonly:true} Customer_Type{visibility:true,readonly:true} Company_Name{visibility:true,readonly:true} Onboarding_Status{visibility:true,readonly:true} Default_Collection_Center{visibility:true,readonly:true} Approved_Credit_Limit{visibility:false} Requested_Credit_Limit{visibility:false} Assigned_Rate_Card{visibility:false} GSTIN{visibility:false} PAN_Number{visibility:false} }
+  }
+  Shipment_Requests { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = false ReportPermissions { All_Shipments={"View","Edit","Delete"} Shipment_Status_Board={"View","Edit"} Unassigned_Orders={"View","Edit"} Pickup_Queue={"View","Edit"} Delivery_Queue={"View","Edit"} Active_Shipments={"View"} } FieldPermissions { Applied_Rate_Card{visibility:false} Applied_Rate_Slab{visibility:false} Base_Rate{visibility:false} Fuel_Surcharge{visibility:false} COD_Handling_Fee{visibility:false} GST_Amount{visibility:false} Gross_Amount{visibility:false} Loyalty_Redemption_Amount{visibility:false} Total_Payable{visibility:false} }
+  }
+  Shipment_Tracking_Events { enabled = Create,Viewall,Export,Tab,View,Search allFieldsVisible = true ReportPermissions { Tracking_Event_Log={"View"} Shipment_Timeline={"View"} } }
+  Pickup_Run_Sheets { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Pickup_Run_Register={"View","Edit","Delete"} Today_Pickup_Planner={"View","Edit"} Pickup_Run_Calendar={"View"} } }
+  Pickup_Run_Sheet_Items { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Pickup_Run_Items={"View","Edit","Delete"} Failed_Pickups={"View","Edit"} } }
+  Logistics_Bags { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Logistics_Bags={"View","Edit","Delete"} Open_Bags={"View","Edit"} In_Transit_Bags={"View","Edit"} Bag_Status_Board={"View","Edit"} } }
+  Bag_Shipments { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Bag_Contents={"View","Edit","Delete"} Bag_Reconciliation={"View","Edit"} } }
+  Manifests { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Manifests={"View","Edit","Delete"} Feeder_Manifests={"View","Edit"} Linehaul_Manifests={"View","Edit"} In_Transit_Manifests={"View","Edit"} Manifest_Status_Board={"View","Edit"} Manifest_Arrival_Calendar={"View"} } }
+  Manifest_Bags { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Manifest_Bag_List={"View","Edit","Delete"} Expected_Master_Bags={"View","Edit"} Manifest_Reconciliation={"View","Edit"} } }
+  Shipment_Exceptions { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Shipment_Exception_Queue={"View","Edit","Delete"} Exception_Status_Board={"View","Edit"} Critical_Exceptions={"View","Edit"} } }
+  Delivery_Run_Sheets { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Delivery_Run_Register={"View","Edit","Delete"} Last_Mile_Dispatcher={"View","Edit"} Delivery_Run_Calendar={"View"} } }
+  Delivery_Run_Sheet_Items { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Delivery_Run_Items={"View","Edit","Delete"} Failed_Deliveries={"View","Edit"} Delivered_Shipments={"View"} } }
+  NDR_Instructions { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Search allFieldsVisible = false ReportPermissions { NDR_Instruction_Action_Queue={"View","Edit"} NDR_RTO_Pending={"View","Edit"} } FieldPermissions { Secure_Token{visibility:false} } }
+  COD_Remittances { enabled = Viewall,Tab,View,Search allFieldsVisible = true ReportPermissions { COD_Remittance_Register={"View"} COD_Pending_Remittance={"View"} COD_Payout_Due={"View"} } }
+  Communication_Log { enabled = Viewall,Export,Tab,View,Search allFieldsVisible = true ReportPermissions { Communication_Log_Report={"View"} Failed_Communications={"View"} } }
+  Payment_Transactions { enabled = Viewall,Tab,View,Search allFieldsVisible = false ReportPermissions { Payment_Transaction_Register={"View"} Failed_Payments={"View"} } FieldPermissions { Gateway_Response_Summary{visibility:false} Gateway_Order_ID{visibility:false} Gateway_Payment_ID{visibility:false} } }
+  Shipment_Tracking { enabled = tab }
+  Hub_Dashboard { enabled = tab }
+  Admin_Dashboard { enabled = tab }
+ }
+}

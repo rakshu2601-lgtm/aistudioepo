@@ -1,0 +1,75 @@
+COD_Remittances_On_Validate as "Validate COD Remittance"
+{
+    type = form
+    form = COD_Remittances
+    record event = on add or edit
+    description = "Protects run-level cash reconciliation and permits corrections only by authorised users"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.ID == null)
+                {
+                    alert "COD remittances are created automatically when a delivery run is completed.";
+                    cancel submit;
+                }
+                else
+                {
+                    existing_record = COD_Remittances[ID == input.ID];
+                    current_profile = thisapp.permissions.loginUserProfile();
+                    current_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                    assigned_agent = Operations_Users[ID == input.Agent];
+                    effective_hub = if(current_user.count(ID) > 0 && current_user.Deputed_Hub != null && (current_user.Deputation_Start_Date == null || current_user.Deputation_Start_Date <= input.Remittance_Date) && (current_user.Deputation_End_Date == null || current_user.Deputation_End_Date >= input.Remittance_Date),current_user.Deputed_Hub,current_user.Home_Hub);
+                    authorised = current_profile == "Logistics_Administrator" || current_profile == "Operations_Manager" || current_profile == "Finance_Officer" || (current_profile == "Hub_Supervisor" && current_user.count(ID) > 0 && effective_hub == input.Hub) || (current_profile == "Field_Agent" && assigned_agent.count(ID) > 0 && assigned_agent.Work_Email == zoho.loginuserid);
+                    run_record = Delivery_Run_Sheets[ID == input.Delivery_Run_Sheet];
+                    calculated_expected = 0.0;
+                    for each delivered_item in Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.Delivery_Run_Sheet && Delivery_Status == "Delivered"]
+                    {
+                        shipment_record = Shipment_Requests[ID == delivered_item.Shipment];
+                        if(shipment_record.count(ID) > 0 && shipment_record.Payment_Type == "COD")
+                        {
+                            calculated_expected = calculated_expected + ifnull(shipment_record.COD_Amount,0);
+                        }
+                    }
+                    fixed_fields_changed = existing_record.Delivery_Run_Sheet != input.Delivery_Run_Sheet || existing_record.Agent != input.Agent || existing_record.Hub != input.Hub || existing_record.Remittance_Date != input.Remittance_Date || existing_record.Expected_Amount != input.Expected_Amount || existing_record.Cashier_Email != input.Cashier_Email || existing_record.Confirmed_At != input.Confirmed_At || existing_record.Customer_Payout_Due_Date != input.Customer_Payout_Due_Date;
+                    if(authorised == false)
+                    {
+                        alert "You are not authorised to update this COD remittance.";
+                        cancel submit;
+                    }
+                    else if(existing_record.Remittance_Status == "Confirmed")
+                    {
+                        alert "A confirmed COD remittance is immutable.";
+                        cancel submit;
+                    }
+                    else if(fixed_fields_changed == true || run_record.count(ID) == 0 || run_record.DRS_Status != "Completed" || run_record.Assigned_Agent != input.Agent || run_record.Hub != input.Hub)
+                    {
+                        alert "Delivery-run, agent, hub, expected amount, and cashier-controlled fields cannot be changed.";
+                        cancel submit;
+                    }
+                    else if((calculated_expected - input.Expected_Amount).abs() > 0.01)
+                    {
+                        alert "Expected COD no longer matches delivered run items. Contact Finance before submitting cash.";
+                        cancel submit;
+                    }
+                    else if(ifnull(input.Submitted_Amount,0) < 0 || ifnull(input.Submitted_Amount,0) > calculated_expected)
+                    {
+                        alert "Submitted cash must be between zero and the expected COD amount.";
+                        cancel submit;
+                    }
+                    else
+                    {
+                        input.Shortfall_Amount = calculated_expected - ifnull(input.Submitted_Amount,0);
+                        input.Remittance_Status = "Pending";
+                        input.Cashier_Email = null;
+                        input.Confirmed_At = null;
+                        input.Customer_Payout_Due_Date = null;
+                    }
+                }
+            )
+        }
+    }
+}

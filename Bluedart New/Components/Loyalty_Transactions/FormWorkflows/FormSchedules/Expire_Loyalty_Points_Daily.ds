@@ -1,0 +1,73 @@
+Expire_Loyalty_Points_Daily as "Expire Loyalty Points Daily"
+{
+    type = schedule
+    start = "2025-01-01 01:00:00"
+    frequency = daily
+    time zone = "Asia/Kolkata"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                config_record = App_Configuration[Active == true] range from 0 to 0;
+                point_value = if(config_record.count(ID) > 0,config_record.Loyalty_Redemption_Value_Per_Point,1);
+                for each earning_record in Loyalty_Transactions[Points_Status == "Available" && Expiry_Date < zoho.currentdate && Points > 0] range from 0 to 199
+                {
+                    customer_record = Customers[ID == earning_record.Customer];
+                    expiring_points = earning_record.Points;
+                    unexpired_positive_points = Loyalty_Transactions[Customer == earning_record.Customer && Points_Status == "Available" && Expiry_Date >= zoho.currentdate && Points > 0].sum(Points);
+                    if(unexpired_positive_points == null)
+                    {
+                        unexpired_positive_points = 0;
+                    }
+                    maximum_expirable = ifnull(customer_record.Current_Loyalty_Points,0) - unexpired_positive_points;
+                    if(maximum_expirable < 0)
+                    {
+                        maximum_expirable = 0;
+                    }
+                    if(expiring_points > maximum_expirable)
+                    {
+                        expiring_points = maximum_expirable;
+                    }
+                    earning_record.Points_Status = "Expired";
+                    expiry_reference = "Expiry of loyalty transaction " + earning_record.Loyalty_Transaction_ID;
+                    existing_expiry = Loyalty_Transactions[Reference == expiry_reference];
+                    if(expiring_points > 0 && existing_expiry.count(ID) == 0)
+                    {
+                        expiry_id = insert into Loyalty_Transactions
+                        [
+                            Customer = earning_record.Customer
+                            Shipment = earning_record.Shipment
+                            Transaction_Type = "Expire"
+                            Points = 0 - expiring_points
+                            Amount_Equivalent = (expiring_points * point_value).round(2)
+                            Transaction_Date = zoho.currenttime
+                            Points_Status = "Expired"
+                            Applied_Tier = earning_record.Applied_Tier
+                            Reference = expiry_reference
+                            Notes = "Scheduled expiry of available loyalty points"
+                            Posted_By_Email = zoho.adminuserid
+                            Customer_Login_Email = earning_record.Customer_Login_Email
+                        ];
+                        customer_record.Current_Loyalty_Points = ifnull(customer_record.Current_Loyalty_Points,0) - expiring_points;
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.adminuserid
+                            Actor_Profile = "Scheduled Workflow"
+                            Action_Name = "Expire Loyalty Points"
+                            Module_Name = "Loyalty Transactions"
+                            Record_ID = expiry_id.toString()
+                            Before_Data = "Available points=" + (ifnull(customer_record.Current_Loyalty_Points,0) + expiring_points)
+                            After_Data = "Expired points=" + expiring_points + "; Available points=" + customer_record.Current_Loyalty_Points
+                            Source = "Schedule"
+                            Severity = "Warning"
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

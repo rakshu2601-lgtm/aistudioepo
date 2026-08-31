@@ -1,0 +1,117 @@
+Account_Ledger_On_Validate as "Validate Account Ledger Entry"
+{
+    type = form
+    form = Account_Ledger
+    record event = on add or edit
+    description = "Validates ledger signs, references, ownership, ageing, and immutable posting fields"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                is_portal = thisapp.portal.isUserInProfile("Customer_Portal");
+                if(is_portal == true)
+                {
+                    alert "Customer portal users cannot post or edit ledger entries.";
+                    cancel submit;
+                }
+                else
+                {
+                    customer_record = Customers[ID == input.Customer];
+                    if(customer_record.count(ID) == 0)
+                    {
+                        alert "Select a valid customer.";
+                        cancel submit;
+                    }
+                    else
+                    {
+                        if(input.Transaction_Type == "Adjustment")
+                        {
+                            if(ifnull(input.Amount,0) == 0)
+                            {
+                                alert "An adjustment amount must be non-zero.";
+                                cancel submit;
+                            }
+                        }
+                        else if(ifnull(input.Amount,0) <= 0)
+                        {
+                            alert "Debit, credit, payment, settlement, rebate, and refund amounts must be positive.";
+                            cancel submit;
+                        }
+                        if((input.Transaction_Type == "Debit" || input.Transaction_Type == "COD Settlement") && input.Due_Date == null)
+                        {
+                            alert "A due date is required for debits and COD settlements.";
+                            cancel submit;
+                        }
+                        if(input.Shipment != null)
+                        {
+                            shipment_record = Shipment_Requests[ID == input.Shipment];
+                            if(shipment_record.count(ID) == 0 || shipment_record.Customer != customer_record.ID)
+                            {
+                                alert "The selected shipment does not belong to this customer.";
+                                cancel submit;
+                            }
+                        }
+                        if(input.Invoice != null)
+                        {
+                            invoice_record = Invoices[ID == input.Invoice];
+                            if(invoice_record.count(ID) == 0 || invoice_record.Customer != customer_record.ID || (input.Shipment != null && invoice_record.Shipment != input.Shipment))
+                            {
+                                alert "The selected invoice does not match the customer and shipment.";
+                                cancel submit;
+                            }
+                        }
+                        if(ifnull(input.Payment_Reference,"").trim() != "" && Account_Ledger[Payment_Reference == input.Payment_Reference && ID != input.ID].count(ID) > 0)
+                        {
+                            alert "This payment reference already exists in the ledger.";
+                            cancel submit;
+                        }
+                        if(input.ID != null)
+                        {
+                            stored_record = Account_Ledger[ID == input.ID];
+                            if(input.Customer != stored_record.Customer || input.Shipment != stored_record.Shipment || input.Invoice != stored_record.Invoice || input.Transaction_Type != stored_record.Transaction_Type || input.Amount != stored_record.Amount || input.Transaction_Date != stored_record.Transaction_Date || input.Due_Date != stored_record.Due_Date || input.Payment_Reference != stored_record.Payment_Reference || input.Posted_By_Email != stored_record.Posted_By_Email || input.Customer_Login_Email != stored_record.Customer_Login_Email)
+                            {
+                                alert "Posted ledger values are immutable. Only status and notes may be updated through authorised reconciliation.";
+                                cancel submit;
+                            }
+                        }
+                        else
+                        {
+                            input.Transaction_Date = zoho.currenttime;
+                            input.Posted_By_Email = zoho.loginuserid;
+                            input.Customer_Login_Email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID);
+                        }
+                        input.Ageing_Bucket = "Not Applicable";
+                        if(input.Ledger_Status != "Settled" && input.Due_Date != null)
+                        {
+                            overdue_days = input.Due_Date.daysBetween(zoho.currentdate);
+                            if(overdue_days <= 0)
+                            {
+                                input.Ageing_Bucket = "Current";
+                            }
+                            else if(overdue_days <= 30)
+                            {
+                                input.Ageing_Bucket = "1-30 Days";
+                            }
+                            else if(overdue_days <= 60)
+                            {
+                                input.Ageing_Bucket = "31-60 Days";
+                            }
+                            else if(overdue_days <= 90)
+                            {
+                                input.Ageing_Bucket = "61-90 Days";
+                            }
+                            else
+                            {
+                                input.Ageing_Bucket = "90+ Days";
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

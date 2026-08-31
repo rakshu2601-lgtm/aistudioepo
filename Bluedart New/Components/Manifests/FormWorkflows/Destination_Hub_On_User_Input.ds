@@ -1,0 +1,22 @@
+Destination_Hub_On_User_Input as "Filter Manifest Routes"
+{
+    type = form
+    form = Manifests
+    record event = on add or edit
+    description = "Filters active linehaul routes for the selected hub pair"
+
+    on user input of Destination_Hub
+    {
+        actions
+        {
+            custom deluge script
+            (
+                clear Route;
+                if(input.Manifest_Type == "Linehaul" && input.Origin_Hub != null && input.Destination_Hub != null)
+                {
+                    Route:ui.add(Transport_Routes[Origin_Sorting_Hub == input.Origin_Hub && Destination_Sorting_Hub == input.Destination_Hub && Active == true].ID.getall());
+                }
+            )
+        }
+    }
+}

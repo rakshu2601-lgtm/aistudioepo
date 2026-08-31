@@ -1,0 +1,113 @@
+Bag_Shipments_On_Validate as "Validate Bag Shipment Scan"
+{
+    type = form
+    form = Bag_Shipments
+    record event = on add or edit
+    description = "Validates hub custody, movement-leg compatibility, and duplicate bag membership"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                authorised = current_profile == "Logistics_Administrator" || current_profile == "Operations_Manager" || current_profile == "Hub_Supervisor" || current_profile == "Hub_Operator";
+                if(authorised == false)
+                {
+                    alert "You are not authorised to scan shipments into logistics bags.";
+                    cancel submit;
+                }
+                if(input.ID != null)
+                {
+                    existing_record = Bag_Shipments[ID == input.ID];
+                    bag_record = Logistics_Bags[ID == existing_record.Bag];
+                    notes_only_change = existing_record.Bag == input.Bag && existing_record.Shipment == input.Shipment && existing_record.Scan_Status == input.Scan_Status && existing_record.Scanned_At == input.Scanned_At && existing_record.Scanned_By_Email == input.Scanned_By_Email && existing_record.Received_At == input.Received_At;
+                    if(existing_record.Scan_Status != "Loaded" || (bag_record.Bag_Status != "Received" && bag_record.Bag_Status != "Exception") || notes_only_change == false)
+                    {
+                        alert "After loading, only exception notes may be prepared for an AWB awaiting reconciliation in a received or quarantined bag.";
+                        cancel submit;
+                    }
+                    if(current_profile == "Hub_Supervisor" || current_profile == "Hub_Operator")
+                    {
+                        logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                        deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                        effective_hub = logged_user.Home_Hub;
+                        if(deputation_active == true)
+                        {
+                            effective_hub = logged_user.Deputed_Hub;
+                        }
+                        if(logged_user.count(ID) == 0 || effective_hub != bag_record.Destination_Hub)
+                        {
+                            alert "Hub users can prepare reconciliation notes only at their effective destination hub.";
+                            cancel submit;
+                        }
+                    }
+                }
+                else
+                {
+                    bag_record = Logistics_Bags[ID == input.Bag && Bag_Status == "Open"];
+                    shipment_record = Shipment_Requests[ID == input.Shipment];
+                    if(bag_record.count(ID) == 0 || shipment_record.count(ID) == 0)
+                    {
+                        alert "Select an open bag and a valid shipment.";
+                        cancel submit;
+                    }
+                    if(current_profile == "Hub_Supervisor" || current_profile == "Hub_Operator")
+                    {
+                        logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                        deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                        effective_hub = logged_user.Home_Hub;
+                        if(deputation_active == true)
+                        {
+                            effective_hub = logged_user.Deputed_Hub;
+                        }
+                        if(logged_user.count(ID) == 0 || effective_hub != bag_record.Origin_Hub)
+                        {
+                            alert "Hub users can load bags only at their effective hub.";
+                            cancel submit;
+                        }
+                    }
+                    if(shipment_record.Current_Hub != bag_record.Origin_Hub)
+                    {
+                        alert "The shipment is not currently in custody at the bag origin hub.";
+                        cancel submit;
+                    }
+                    compatible = false;
+                    if(bag_record.Bag_Type == "Feeder")
+                    {
+                        compatible = shipment_record.Collection_Center == bag_record.Origin_Hub && shipment_record.Origin_Sorting_Hub == bag_record.Destination_Hub && (shipment_record.Shipment_Status == "Picked Up" || shipment_record.Shipment_Status == "Inbound at Branch Station");
+                    }
+                    else if(bag_record.Bag_Type == "Master")
+                    {
+                        compatible = shipment_record.Origin_Sorting_Hub == bag_record.Origin_Hub && shipment_record.Destination_Sorting_Hub == bag_record.Destination_Hub && shipment_record.Shipment_Status == "Sorted at Origin Hub";
+                    }
+                    else if(bag_record.Bag_Type == "Delivery Feeder")
+                    {
+                        compatible = shipment_record.Destination_Sorting_Hub == bag_record.Origin_Hub && shipment_record.Destination_Hub == bag_record.Destination_Hub && shipment_record.Shipment_Status == "Arrived at Destination Hub";
+                    }
+                    else
+                    {
+                        compatible = shipment_record.Shipment_Status == "Return to Origin";
+                    }
+                    if(compatible == false)
+                    {
+                        alert "The shipment route or lifecycle status is incompatible with this bag movement.";
+                        cancel submit;
+                    }
+                    active_membership = Bag_Shipments[Shipment == input.Shipment && Scan_Status == "Loaded"];
+                    if(active_membership.count(ID) > 0)
+                    {
+                        alert "This shipment is already loaded in another active bag.";
+                        cancel submit;
+                    }
+                    input.Scan_Status = "Loaded";
+                    input.Scanned_At = zoho.currenttime;
+                    input.Scanned_By_Email = zoho.loginuserid;
+                    input.Received_At = null;
+                    input.Exception_Notes = "";
+                }
+            )
+        }
+    }
+}

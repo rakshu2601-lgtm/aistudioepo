@@ -1,0 +1,65 @@
+Reconcile_Failed_Payment as "Reconcile Failed Payment"
+{
+    type = schedule
+    form = Payment_Transactions[Payment_Status == "Failed"]
+    start = after 1 minutes from Completed_At
+    time zone = "Asia/Kolkata"
+    description = "Completes idempotent customer communication and audit processing after a native payment failure event"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                customer_record = Customers[ID == input.Customer];
+                shipment_record = Shipment_Requests[ID == input.Shipment];
+                if(customer_record.count(ID) > 0)
+                {
+                    recipient_email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID);
+                    failure_summary = "Payment transaction " + input.ID + " failed for INR " + input.Amount + "; order " + input.Gateway_Order_ID + ".";
+                    if(Communication_Log[Customer == customer_record.ID && Template_Code == "PAYMENT_FAILED" && Message_Summary == failure_summary].count(ID) == 0)
+                    {
+                        communication_id = insert into Communication_Log
+                        [
+                            Customer = customer_record.ID
+                            Shipment = input.Shipment
+                            Recipient = recipient_email
+                            Channel = "Email"
+                            Template_Code = "PAYMENT_FAILED"
+                            Subject = "Payment could not be confirmed"
+                            Message_Summary = failure_summary
+                            Provider = "Zoho Mail"
+                            Communication_Status = "Sent"
+                            Attempt_Count = 1
+                            Last_Attempt_At = zoho.currenttime
+                        ];
+                        sendmail
+                        [
+                            from: zoho.adminuserid
+                            to: recipient_email
+                            subject: "Payment could not be confirmed"
+                            message: "Your payment of INR " + input.Amount + " could not be confirmed. No paid status or ledger payment was posted. You may retry from the invoice."
+                        ]
+                    }
+                }
+                if(Audit_Log[Module_Name == "Payment Transactions" && Record_ID == input.ID.toString() && Action_Name == "Record Payment Failure"].count(ID) == 0)
+                {
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.adminuserid
+                        Actor_Profile = "Payment Gateway"
+                        Action_Name = "Record Payment Failure"
+                        Module_Name = "Payment Transactions"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=Initiated; Order=" + input.Gateway_Order_ID
+                        After_Data = "Status=Failed; Ledger posting=None"
+                        Source = "Payment"
+                        Severity = "Warning"
+                    ];
+                }
+            )
+        }
+    }
+}

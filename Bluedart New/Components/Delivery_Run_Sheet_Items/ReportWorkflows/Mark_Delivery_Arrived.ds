@@ -1,0 +1,80 @@
+Mark_Delivery_Arrived as "Mark Arrived - My Delivery Tasks"
+{
+    type = functions
+    form = Delivery_Run_Sheet_Items
+    execution type = for each record
+    description = "Stamps last-mile arrival and agent location without changing the out-for-delivery state"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                run_record = Delivery_Run_Sheets[ID == input.Delivery_Run_Sheet];
+                assigned_agent = Operations_Users[ID == run_record.Assigned_Agent];
+                authorised = assigned_agent.count(ID) > 0 && assigned_agent.Work_Email == zoho.loginuserid || Operations_Users[Work_Email == zoho.loginuserid && Active == true].count(ID) > 0;
+                if(authorised == false)
+                {
+                    info "Only the assigned agent or an active operations user can mark arrival.";
+                }
+                else if(input.Delivery_Status != "Out For Delivery" || (run_record.DRS_Status != "Released" && run_record.DRS_Status != "In Progress"))
+                {
+                    info "Only an out-for-delivery stop on an active run can be marked arrived.";
+                }
+                else if(input.Arrived_At != null)
+                {
+                    info "Arrival has already been recorded for this stop.";
+                }
+                else
+                {
+                    if(input.Agent_Latitude == null)
+                    {
+                        input.Agent_Latitude = assigned_agent.Current_Latitude;
+                    }
+                    if(input.Agent_Longitude == null)
+                    {
+                        input.Agent_Longitude = assigned_agent.Current_Longitude;
+                    }
+                    if(input.Agent_Latitude == null || input.Agent_Longitude == null)
+                    {
+                        info "Agent location is required before marking arrival.";
+                    }
+                    else
+                    {
+                        input.Arrived_At = zoho.currenttime;
+                        run_record.DRS_Status = "In Progress";
+                        tracking_id = insert into Shipment_Tracking_Events
+                        [
+                            Shipment = input.Shipment
+                            Event_Time = zoho.currenttime
+                            Event_Status = "Information"
+                            Hub = run_record.Hub
+                            Agent = assigned_agent.ID
+                            Latitude = input.Agent_Latitude
+                            Longitude = input.Agent_Longitude
+                            Event_Description = "Delivery agent arrived at the recipient location."
+                            Source = "Delivery"
+                            Customer_Visible = true
+                            Created_By_Email = zoho.loginuserid
+                        ];
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuserid
+                            Actor_Profile = current_profile
+                            Action_Name = "Mark Delivery Arrived"
+                            Module_Name = "Delivery Run Sheet Items"
+                            Record_ID = input.ID.toString()
+                            Before_Data = "Arrival not recorded"
+                            After_Data = "Arrived At=" + input.Arrived_At + "; Latitude=" + input.Agent_Latitude + "; Longitude=" + input.Agent_Longitude
+                            Source = "Report Action"
+                            Severity = "Info"
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

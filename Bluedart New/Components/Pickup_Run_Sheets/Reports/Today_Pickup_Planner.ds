@@ -1,0 +1,43 @@
+list Today_Pickup_Planner
+{
+    displayName = "Today's Pickup Planner"
+    show all rows from Pickup_Run_Sheets [Run_Date == zoho.currentdate && ((Hub == Operations_Users[Work_Email == zoho.loginuserid && Active == true && Deputed_Hub is not null && (Deputation_Start_Date is null || Deputation_Start_Date <= zoho.currentdate) && (Deputation_End_Date is null || Deputation_End_Date >= zoho.currentdate)].Deputed_Hub) || (Hub == Operations_Users[Work_Email == zoho.loginuserid && Active == true && (Deputed_Hub is null || (Deputation_Start_Date is not null && Deputation_Start_Date > zoho.currentdate) || (Deputation_End_Date is not null && Deputation_End_Date < zoho.currentdate))].Home_Hub))]
+    (
+        PRS_Number
+        Run_Date
+        Hub
+        Assigned_Agent
+        Beat_Name
+        Vehicle
+        Status
+        Planned_Stop_Count
+        Completed_Stop_Count
+        Total_Planned_Weight_Kg
+        custom action "Release Run"
+        (
+            workflow = Release_Pickup_Run
+            show action for each record = true
+            column header = "Release Run"
+            success message = "Pickup run release evaluated"
+            condition = (Status == "Draft")
+        )
+        custom action "Complete Run"
+        (
+            workflow = Complete_Run_Today_Pickup_Planner
+            show action for each record = true
+            column header = "Complete Run"
+            success message = "Pickup run completion evaluated"
+            condition = (Status == "Released" || Status == "In Progress")
+        )
+    )
+    filters
+    (
+        Assigned_Agent
+        Vehicle
+        Status
+    )
+    sort by
+    (
+        PRS_Number ascending
+    )
+}

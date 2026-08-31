@@ -1,0 +1,64 @@
+Report_Bag_Seal_Exception as "Seal Exception - All Logistics Bags"
+{
+    type = functions
+    form = Logistics_Bags
+    execution type = for each record
+    description = "Quarantines a bag with a seal issue and opens an internal shipment exception"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == input.Destination_Hub;
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the destination hub can report a seal exception.";
+                }
+                else if(input.Bag_Status != "Dispatched" && input.Bag_Status != "Received")
+                {
+                    info "Seal exceptions can be reported only for dispatched or received bags.";
+                }
+                else
+                {
+                    prior_status = input.Bag_Status;
+                    exception_notes = ifnull(input.Notes,"Seal mismatch or tampering observed during destination custody verification.");
+                    input.Bag_Status = "Exception";
+                    exception_id = insert into Shipment_Exceptions
+                    [
+                        Bag = input.ID
+                        Exception_Type = "Seal Mismatch"
+                        Severity = "High"
+                        Reporting_Hub = input.Destination_Hub
+                        Reported_By_Email = zoho.loginuserid
+                        Reported_At = zoho.currenttime
+                        Notes = exception_notes
+                        Exception_Status = "Open"
+                    ];
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Report Bag Seal Exception"
+                        Module_Name = "Logistics Bags"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=" + prior_status + "; Seal=" + input.Seal_Code
+                        After_Data = "Status=Exception; Exception=" + exception_id
+                        Source = "Report Action"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

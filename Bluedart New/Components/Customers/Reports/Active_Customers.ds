@@ -1,0 +1,41 @@
+list Active_Customers
+{
+    displayName = "Active Customers"
+    show all rows from Customers [Onboarding_Status == "Active" && Active == true]
+    (
+        Customer_ID
+        Customer_Type
+        Full_Name
+        Company_Name
+        Email_ID
+        Mobile_Number
+        Default_Collection_Center
+        Assigned_Rate_Card
+        Payment_Terms
+        Approved_Credit_Limit
+        Current_Loyalty_Tier
+        Current_Loyalty_Points
+        Outstanding_Balance
+        Portal_Access_Status
+    )
+    filters
+    (
+        Customer_Type
+        Default_Collection_Center
+        Payment_Terms
+        Current_Loyalty_Tier
+        Portal_Access_Status
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Customer_Type ascending
+    )
+    sort by
+    (
+        Customer_ID descending
+    )
+}

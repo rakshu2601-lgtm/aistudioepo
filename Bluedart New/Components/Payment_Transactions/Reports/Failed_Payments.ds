@@ -1,0 +1,42 @@
+list Failed_Payments
+{
+    displayName = "Failed Payments"
+    show all rows from Payment_Transactions [Payment_Status == "Failed"]
+    (
+        Payment_Transaction_ID
+        Customer
+        Shipment
+        Invoice
+        Gateway
+        Gateway_Order_ID
+        Amount
+        Payment_Method
+        Payment_Status
+        Initiated_At
+        Completed_At
+        Failure_Reason
+        Customer_Login_Email
+    )
+    filters
+    (
+        Customer
+        Gateway
+        Payment_Method
+        Initiated_At
+        Completed_At
+    )
+    sort by
+    (
+        Completed_At descending
+        Payment_Transaction_ID descending
+    )
+    conditional formatting
+    (
+        "Payment Failure"
+        {
+            condition = (Payment_Status == "Failed")
+            fields = [Payment_Transaction_ID, Customer, Amount, Payment_Status, Failure_Reason]
+            format = "background-color:#FEE2E2;color:#991B1B;font-weight:bold"
+        }
+    )
+}

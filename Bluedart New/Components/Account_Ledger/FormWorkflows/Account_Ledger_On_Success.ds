@@ -1,0 +1,76 @@
+Account_Ledger_On_Success as "Post Account Ledger Entry"
+{
+    type = form
+    form = Account_Ledger
+    record event = on add or edit
+    description = "Recomputes customer exposure, releases eligible credit holds after payment, and audits adjustments"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                customer_record = Customers[ID == input.Customer];
+                prior_outstanding = ifnull(customer_record.Outstanding_Balance,0);
+                recalculated_outstanding = thisapp.Recalculate_Customer_Outstanding(input.Customer);
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(input.Transaction_Type == "Adjustment")
+                {
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Post Account Adjustment"
+                        Module_Name = "Account Ledger"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Customer outstanding=" + prior_outstanding
+                        After_Data = "Adjustment=" + input.Amount + "; Customer outstanding=" + recalculated_outstanding + "; Reference=" + input.Payment_Reference
+                        Source = "Finance Correction"
+                        Severity = "Critical"
+                    ];
+                }
+                if(input.Transaction_Type == "Payment" && input.Ledger_Status == "Settled" && customer_record.Onboarding_Status == "Active" && (customer_record.KYC_Expiry_Date == null || customer_record.KYC_Expiry_Date >= zoho.currentdate))
+                {
+                    projected_exposure = recalculated_outstanding;
+                    held_shipments = Shipment_Requests[Customer == input.Customer && Shipment_Status == "Credit Hold" && Credit_Check_Status == "Hold"] sort by Booked_On range from 0 to 199;
+                    for each held_shipment in held_shipments
+                    {
+                        proposed_exposure = projected_exposure + ifnull(held_shipment.Total_Payable,0);
+                        if(proposed_exposure <= ifnull(customer_record.Approved_Credit_Limit,0))
+                        {
+                            held_shipment.Credit_Check_Status = "Passed";
+                            held_shipment.Shipment_Status = if(held_shipment.Collection_Center == null,"Booked - Hub Assignment Pending","Booked");
+                            projected_exposure = proposed_exposure;
+                            tracking_id = insert into Shipment_Tracking_Events
+                            [
+                                Shipment = held_shipment.ID
+                                Event_Time = zoho.currenttime
+                                Event_Status = held_shipment.Shipment_Status
+                                Hub = held_shipment.Current_Hub
+                                Event_Description = "Credit hold released after verified payment reduced account exposure."
+                                Source = "Account Ledger"
+                                Customer_Visible = true
+                                Created_By_Email = zoho.loginuserid
+                            ];
+                            audit_id = insert into Audit_Log
+                            [
+                                Event_Time = zoho.currenttime
+                                Actor_Email = zoho.loginuserid
+                                Actor_Profile = current_profile
+                                Action_Name = "Release Credit Hold"
+                                Module_Name = "Shipment Requests"
+                                Record_ID = held_shipment.ID.toString()
+                                Before_Data = "Status=Credit Hold"
+                                After_Data = "Status=" + held_shipment.Shipment_Status + "; Projected exposure=" + projected_exposure
+                                Source = "Payment Reconciliation"
+                                Severity = "Warning"
+                            ];
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

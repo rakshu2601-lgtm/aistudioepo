@@ -1,0 +1,19 @@
+list Action_Required_Customers
+{
+    displayName = "Action Required Customers"
+    show all rows from Customers [Onboarding_Status == "Action Required" && Active == true]
+    (
+        Customer_ID
+        Customer_Type
+        Company_Name
+        Full_Name
+        Email_ID
+        KYC_Submitted_On
+        Onboarding_Status
+        Portal_Access_Status
+    )
+    sort by
+    (
+        Customer_ID descending
+    )
+}

@@ -1,0 +1,20 @@
+Submitted_Amount_On_User_Input as "Calculate COD Shortfall"
+{
+    type = form
+    form = COD_Remittances
+    record event = on edit
+    description = "Recalculates the cash shortfall while an authorised user records submitted cash"
+
+    on user input of Submitted_Amount
+    {
+        actions
+        {
+            custom deluge script
+            (
+                expected_amount = ifnull(input.Expected_Amount,0);
+                submitted_amount = ifnull(input.Submitted_Amount,0);
+                input.Shortfall_Amount = if(expected_amount > submitted_amount,expected_amount - submitted_amount,0);
+            )
+        }
+    }
+}

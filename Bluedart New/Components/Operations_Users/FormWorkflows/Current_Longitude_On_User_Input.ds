@@ -1,0 +1,21 @@
+Current_Longitude_On_User_Input as "Stamp Longitude Update"
+{
+    type = form
+    form = Operations_Users
+    record event = on add or edit
+    description = "Stamps the time when an agent updates longitude"
+
+    on user input of Current_Longitude
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Application_Role == "Field Agent" && input.Work_Email != null && input.Work_Email.toLowerCase() == zoho.loginuserid.toLowerCase())
+                {
+                    input.Last_Location_At = zoho.currenttime;
+                }
+            )
+        }
+    }
+}

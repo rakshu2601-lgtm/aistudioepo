@@ -1,0 +1,34 @@
+list Linehaul_Manifests
+{
+    displayName = "Linehaul Manifests"
+    show all rows from Manifests [Manifest_Type == "Linehaul"]
+    (
+        Manifest_Number
+        Origin_Hub
+        Destination_Hub
+        Route
+        Vehicle
+        Driver
+        Departure_Time
+        Expected_Arrival_Time
+        Actual_Arrival_Time
+        Manifest_Status
+        Total_Bags
+        Total_Shipments
+        Total_Weight_Kg
+    )
+    filters
+    (
+        Origin_Hub
+        Destination_Hub
+        Route
+        Vehicle
+        Driver
+        Manifest_Status
+        Departure_Time
+    )
+    sort by
+    (
+        Departure_Time descending
+    )
+}

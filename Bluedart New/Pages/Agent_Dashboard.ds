@@ -1,0 +1,19 @@
+<page linkname = "Agent_Dashboard" displayname = "Agent Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Agent_Day_View' elementName='Agent_Day_View'>
+          <![CDATA[htmlpage Agent_Day_View()
+            content
+            <%{%>
+              <file name:Agent_Day_View.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

@@ -1,0 +1,66 @@
+Shipment_Tracking_Events_On_Validate as "Validate Tracking Event"
+{
+    type = form
+    form = Shipment_Tracking_Events
+    record event = on add or edit
+    description = "Stamps event authorship, validates portal ownership, protects edits, and validates coordinates"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                is_portal = thisapp.portal.isUserInProfile("Customer_Portal");
+                shipment_record = Shipment_Requests[ID == input.Shipment];
+                if(shipment_record.count(ID) == 0)
+                {
+                    alert "Select a valid shipment.";
+                    cancel submit;
+                }
+                if(input.Latitude != null && (input.Latitude < -90 || input.Latitude > 90))
+                {
+                    alert "Latitude must be between -90 and 90.";
+                    cancel submit;
+                }
+                if(input.Longitude != null && (input.Longitude < -180 || input.Longitude > 180))
+                {
+                    alert "Longitude must be between -180 and 180.";
+                    cancel submit;
+                }
+                if(input.ID != null)
+                {
+                    if(is_portal == true || thisapp.permissions.loginUserProfile() != "Logistics_Administrator")
+                    {
+                        alert "Shipment tracking events are immutable. Only a logistics administrator can correct an event.";
+                        cancel submit;
+                    }
+                    stored_event = Shipment_Tracking_Events[ID == input.ID];
+                    input.Created_By_Email = stored_event.Created_By_Email;
+                }
+                else
+                {
+                    input.Created_By_Email = zoho.loginuserid;
+                    if(is_portal == true)
+                    {
+                        customer_record = Customers[ID == shipment_record.Customer];
+                        if(customer_record.count(ID) == 0 || (customer_record.Portal_Login_Email != zoho.loginuserid && customer_record.Email_ID != zoho.loginuserid))
+                        {
+                            alert "You cannot add a tracking event for another customer's shipment.";
+                            cancel submit;
+                        }
+                        input.Event_Status = "Information";
+                        input.Source = "System";
+                        input.Customer_Visible = true;
+                        input.Hub = null;
+                        input.Manifest = null;
+                        input.Bag = null;
+                        input.Agent = null;
+                        input.Latitude = null;
+                        input.Longitude = null;
+                    }
+                }
+            )
+        }
+    }
+}

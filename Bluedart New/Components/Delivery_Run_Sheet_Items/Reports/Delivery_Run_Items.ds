@@ -1,0 +1,57 @@
+default list Delivery_Run_Items
+{
+    displayName = "Delivery Run Items"
+    show all rows from Delivery_Run_Sheet_Items
+    (
+        Delivery_Run_Sheet
+        Shipment
+        Stop_Sequence
+        Delivery_Status
+        Arrived_At
+        Completed_At
+        Proof_Type
+        Recipient_Name
+        COD_Collected
+        NDR_Reason
+        Attempt_Number
+        Agent_Latitude
+        Agent_Longitude
+        EPOD_URL
+        custom action "Mark Arrived"
+        (
+            workflow = Mark_Arrived_Delivery_Run_Items
+            show action for each record = true
+            column header = "Mark Arrived"
+            condition = (Delivery_Status == "Out For Delivery" && Arrived_At is null)
+        )
+        custom action "Deliver Shipment"
+        (
+            workflow = Deliver_Shipment_Delivery_Run_Items
+            show action for each record = true
+            column header = "Deliver Shipment"
+            condition = (Delivery_Status == "Out For Delivery")
+        )
+        custom action "Failed Delivery"
+        (
+            workflow = Fail_Delivery_Delivery_Run_Items
+            show action for each record = true
+            column header = "Failed Delivery"
+            condition = (Delivery_Status == "Out For Delivery")
+        )
+    )
+    filters
+    (
+        Delivery_Run_Sheet
+        Shipment
+        Delivery_Status
+        Proof_Type
+        NDR_Reason
+        Attempt_Number
+        Completed_At
+    )
+    sort by
+    (
+        Delivery_Run_Sheet descending
+        Stop_Sequence ascending
+    )
+}

@@ -1,0 +1,5 @@
+report Open_Bags
+{
+    quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Bag_Number Bag_Type Origin_Hub Destination_Hub Total_Shipments Total_Weight_Kg "Close & Seal" ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+    detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Bag_Number Bag_Type Origin_Hub Destination_Hub Total_Shipments Total_Weight_Kg Created_At Notes "Close & Seal" ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

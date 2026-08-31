@@ -1,0 +1,249 @@
+form Invoices
+{
+    title
+    {
+        displayname = "Invoices"
+        on add = "Create Invoice"
+        on edit = "Update Invoice"
+    }
+    success message = "Invoice saved successfully"
+    Invoice_Identity
+    (
+        type = section
+        displayname = "Invoice Identity"
+        row = 1
+        column = 0
+    )
+    Invoice_Number
+    (
+        type = autonumber
+        displayname = "Invoice Number"
+        start index = 100001
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Shipment
+    (
+        type = picklist
+        displayname = "Shipment"
+        values = Shipment_Requests.ID
+        displayformat = [AWB_Number]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Customer
+    (
+        type = picklist
+        displayname = "Customer"
+        values = Customers.ID
+        displayformat = [Customer_ID]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Invoice_Date
+    (
+        type = date
+        displayname = "Invoice Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Invoice_Status
+    (
+        type = picklist
+        displayname = "Invoice Status"
+        values = {"Draft","Issued","Part Paid","Paid","Overdue","Void"}
+        initial value = "Draft"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Charge_Details
+    (
+        type = section
+        displayname = "Charge Details"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Freight_Subtotal
+    (
+        type = INR
+        displayname = "Freight Subtotal"
+        format = commadotindian
+        decimalplace = 2
+        maxchar = 16
+        initial value = 0
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Fuel_Surcharge
+    (
+        type = INR
+        displayname = "Fuel Surcharge"
+        format = commadotindian
+        decimalplace = 2
+        maxchar = 16
+        initial value = 0
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have COD_Fee
+    (
+        type = INR
+        displayname = "COD Fee"
+        format = commadotindian
+        decimalplace = 2
+        maxchar = 16
+        initial value = 0
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have GST_Amount
+    (
+        type = INR
+        displayname = "GST Amount"
+        format = commadotindian
+        decimalplace = 2
+        maxchar = 16
+        initial value = 0
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Loyalty_Discount
+    (
+        type = INR
+        displayname = "Loyalty Discount"
+        format = commadotindian
+        decimalplace = 2
+        maxchar = 16
+        initial value = 0
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Credit_Rebate
+    (
+        type = INR
+        displayname = "Credit Rebate"
+        format = commadotindian
+        decimalplace = 2
+        maxchar = 16
+        initial value = 0
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Invoice_Total
+    (
+        type = INR
+        displayname = "Invoice Total"
+        format = commadotindian
+        decimalplace = 2
+        maxchar = 16
+        initial value = 0
+        row = 2
+        column = 1
+        width = medium
+    )
+    Payment_and_Due_Date
+    (
+        type = section
+        displayname = "Payment and Due Date"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Payment_Terms
+    (
+        type = picklist
+        displayname = "Payment Terms"
+        values = {"Prepaid","Net 15","Net 30"}
+        initial value = "Prepaid"
+        row = 3
+        column = 1
+        width = medium
+    )
+    must have Due_Date
+    (
+        type = date
+        displayname = "Due Date"
+        initial value = "${zoho.currentdate}"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Integration_Details
+    (
+        type = section
+        displayname = "Document and Integration"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    Zoho_Books_Invoice_ID
+    (
+        type = text
+        displayname = "Zoho Books Invoice ID"
+        row = 4
+        column = 1
+        width = medium
+    )
+    Invoice_WorkDrive_File_ID
+    (
+        type = text
+        displayname = "Invoice WorkDrive File ID"
+        row = 4
+        column = 2
+        width = medium
+    )
+    Invoice_Download_URL
+    (
+        type = url
+        displayname = "Invoice Download URL"
+        target = new window
+        enable = linkname, title
+        row = 4
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Invoice"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Invoice"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

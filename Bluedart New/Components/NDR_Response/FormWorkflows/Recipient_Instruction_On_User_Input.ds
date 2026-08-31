@@ -1,0 +1,45 @@
+Recipient_Instruction_On_User_Input as "Show NDR Response Fields"
+{
+    type = form
+    form = NDR_Response
+    record event = on add
+    description = "Shows only the response field required by the selected recipient instruction"
+
+    on user input of Recipient_Instruction
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Recipient_Instruction == "Reschedule Delivery")
+                {
+                    show Reschedule_Date;
+                    hide Updated_Delivery_Address;
+                    input.Updated_Delivery_Address.address_line_1 = "";
+                    input.Updated_Delivery_Address.address_line_2 = "";
+                    input.Updated_Delivery_Address.district_city = "";
+                    input.Updated_Delivery_Address.state_province = "";
+                    input.Updated_Delivery_Address.postal_Code = "";
+                    input.Updated_Delivery_Address.country = "";
+                }
+                else if(input.Recipient_Instruction == "Update Delivery Address")
+                {
+                    hide Reschedule_Date;
+                    show Updated_Delivery_Address;
+                    input.Reschedule_Date = null;
+                }
+                else
+                {
+                    hide Reschedule_Date, Updated_Delivery_Address;
+                    input.Reschedule_Date = null;
+                    input.Updated_Delivery_Address.address_line_1 = "";
+                    input.Updated_Delivery_Address.address_line_2 = "";
+                    input.Updated_Delivery_Address.district_city = "";
+                    input.Updated_Delivery_Address.state_province = "";
+                    input.Updated_Delivery_Address.postal_Code = "";
+                    input.Updated_Delivery_Address.country = "";
+                }
+            )
+        }
+    }
+}

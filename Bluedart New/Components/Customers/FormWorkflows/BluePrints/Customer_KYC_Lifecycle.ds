@@ -1,0 +1,253 @@
+Customer_KYC_Lifecycle as "Customer KYC Lifecycle"
+{
+    type = blueprint
+    form = Customers[Customer_Type != "Retail"]
+
+    start
+    {
+        start stage = "KYC Pending"
+    }
+
+    stages
+    {
+        "KYC Pending" { }
+        "Pending Verification" { }
+        "Action Required" { }
+        "Active" { }
+        "KYC Expired" { }
+    }
+
+    transitions
+    {
+        Submit_KYC as "Submit KYC"
+        {
+            type = normal
+            from stage = "KYC Pending"
+            to stage = "Pending Verification"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Customer_Portal"}
+                )
+                transition criteria = ( KYC_Submitted_On is not null )
+                confirmation before execution
+                (
+                    message = "Submit all uploaded KYC documents for verification?"
+                    confirm button text = "Submit KYC"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        input.KYC_Submitted_On = zoho.currenttime;
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuserid
+                            Actor_Profile = "Customer_Portal"
+                            Action_Name = "Submit KYC"
+                            Module_Name = "Customers"
+                            Record_ID = input.ID.toString()
+                            After_Data = "Status=Pending Verification"
+                            Source = "Form Workflow"
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+        Resubmit_KYC as "Resubmit KYC"
+        {
+            type = normal
+            from stage = "Action Required"
+            to stage = "Pending Verification"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Customer_Portal"}
+                )
+                transition criteria = ( KYC_Submitted_On is not null )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        input.KYC_Submitted_On = zoho.currenttime;
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuserid
+                            Actor_Profile = "Customer_Portal"
+                            Action_Name = "Resubmit KYC"
+                            Module_Name = "Customers"
+                            Record_ID = input.ID.toString()
+                            After_Data = "Status=Pending Verification"
+                            Source = "Form Workflow"
+                            Severity = "Info"
+                        ];
+                    )
+                }
+            }
+        }
+        Query_KYC as "Query KYC"
+        {
+            type = normal
+            from stage = "Pending Verification"
+            to stage = "Action Required"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"KYC_Reviewer","Logistics_Administrator"}
+                )
+                tooltip message = "Query at least one document before moving the customer to Action Required"
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        queried_count = Customer_KYC_Documents[Customer == input.ID && Review_Status == "Query"].count();
+                        if(queried_count == 0)
+                        {
+                            input.Onboarding_Status = "Pending Verification";
+                            info "Query at least one KYC document with review remarks first.";
+                        }
+                        else
+                        {
+                            communication_id = insert into Communication_Log
+                            [
+                                Customer = input.ID
+                                Recipient = input.Email_ID
+                                Channel = "Portal Notification"
+                                Template_Code = "KYC_ACTION_REQUIRED"
+                                Subject = "KYC correction required"
+                                Message_Summary = "One or more KYC documents require correction. Review the document remarks and re-upload."
+                                Provider = "Other"
+                                Communication_Status = "Queued"
+                                Attempt_Count = 0
+                            ];
+                        }
+                    )
+                }
+            }
+        }
+        Approve_KYC as "Approve KYC"
+        {
+            type = normal
+            from stage = "Pending Verification"
+            to stage = "Active"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"KYC_Reviewer","Logistics_Administrator"}
+                )
+                confirmation before execution
+                (
+                    message = "Approve KYC and activate this business customer?"
+                    confirm button text = "Approve"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        unverified_count = Customer_KYC_Documents[Customer == input.ID && Required_For_Onboarding == true && Review_Status != "Verified"].count();
+                        if(unverified_count > 0)
+                        {
+                            input.Onboarding_Status = "Pending Verification";
+                            info "Approval is blocked until every required KYC document is verified.";
+                        }
+                        else
+                        {
+                            input.KYC_Verified_Date = zoho.currentdate;
+                            input.KYC_Expiry_Date = zoho.currentdate.addYear(1);
+                            input.Approved_Credit_Limit = input.Requested_Credit_Limit;
+                            input.Portal_Access_Status = "Active";
+                            audit_id = insert into Audit_Log
+                            [
+                                Event_Time = zoho.currenttime
+                                Actor_Email = zoho.loginuserid
+                                Actor_Profile = thisapp.permissions.loginUserProfile()
+                                Action_Name = "Approve Customer KYC"
+                                Module_Name = "Customers"
+                                Record_ID = input.ID.toString()
+                                After_Data = "Status=Active; KYC Expiry=" + input.KYC_Expiry_Date + "; Approved Credit=" + input.Approved_Credit_Limit
+                                Source = "Form Workflow"
+                                Severity = "Warning"
+                            ];
+                        }
+                    )
+                }
+            }
+        }
+        Request_Re_KYC as "Request Re-KYC"
+        {
+            type = common
+            from stage = "Active"
+            to stage = "KYC Pending"
+            common stages = {"KYC Expired"}
+            before
+            {
+                transition owner
+                (
+                    permissions = {"KYC_Reviewer","Logistics_Administrator"}
+                )
+                confirmation before execution
+                (
+                    message = "Request a fresh KYC cycle for this customer?"
+                    confirm button text = "Request Re-KYC"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        input.KYC_Submitted_On = null;
+                        communication_id = insert into Communication_Log
+                        [
+                            Customer = input.ID
+                            Recipient = input.Email_ID
+                            Channel = "Portal Notification"
+                            Template_Code = "REKYC_REQUESTED"
+                            Subject = "Re-KYC required"
+                            Message_Summary = "A new KYC verification cycle has been requested."
+                            Provider = "Other"
+                            Communication_Status = "Queued"
+                            Attempt_Count = 0
+                        ];
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuserid
+                            Actor_Profile = thisapp.permissions.loginUserProfile()
+                            Action_Name = "Request Re-KYC"
+                            Module_Name = "Customers"
+                            Record_ID = input.ID.toString()
+                            Before_Data = "Status=Active or KYC Expired"
+                            After_Data = "Status=KYC Pending"
+                            Source = "Form Workflow"
+                            Severity = "Warning"
+                        ];
+                    )
+                }
+            }
+        }
+    }
+}

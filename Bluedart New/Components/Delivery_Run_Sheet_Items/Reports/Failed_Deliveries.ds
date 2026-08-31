@@ -1,0 +1,30 @@
+list Failed_Deliveries
+{
+    displayName = "Failed Deliveries"
+    show all rows from Delivery_Run_Sheet_Items [Delivery_Status == "Failed" || Delivery_Status == "RTO"]
+    (
+        Delivery_Run_Sheet
+        Shipment
+        Stop_Sequence
+        Delivery_Status
+        Completed_At
+        NDR_Reason
+        NDR_Notes
+        Attempt_Number
+        Agent_Latitude
+        Agent_Longitude
+    )
+    filters
+    (
+        Delivery_Run_Sheet
+        Shipment
+        Delivery_Status
+        NDR_Reason
+        Attempt_Number
+        Completed_At
+    )
+    sort by
+    (
+        Completed_At descending
+    )
+}

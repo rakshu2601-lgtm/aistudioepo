@@ -1,0 +1,82 @@
+Reassign_Alternate_Hub as "Reassign Alternate Hub"
+{
+    type = functions
+    form = Shipment_Requests
+    execution type = for each record
+    description = "Assigns the configured overflow collection center while preserving the destination route"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(input.Shipment_Status != "Booked - Hub Assignment Pending")
+                {
+                    info "This shipment is no longer awaiting hub assignment.";
+                }
+                else
+                {
+                    pickup_map = Hub_Pincode_Mapping[Pincode == input.Pickup_Pincode && Active == true && Serviceability != "Non-Serviceable"];
+                    delivery_map = Hub_Pincode_Mapping[Pincode == input.Delivery_Pincode && Active == true && Serviceability != "Non-Serviceable"];
+                    if(pickup_map.count(ID) == 0 || delivery_map.count(ID) == 0 || pickup_map.Secondary_Overflow_Hub == null)
+                    {
+                        info "No active overflow-hub mapping is configured for this shipment.";
+                    }
+                    else
+                    {
+                        alternate_hub = Hubs[ID == pickup_map.Secondary_Overflow_Hub && Active == true];
+                        destination_hub = Hubs[ID == delivery_map.Primary_Collection_Center && Active == true];
+                        if(alternate_hub.count(ID) == 0 || destination_hub.count(ID) == 0)
+                        {
+                            info "The overflow collection or destination hub is inactive.";
+                        }
+                        else
+                        {
+                            todays_load = Shipment_Requests[Collection_Center == alternate_hub.ID && Booked_On >= zoho.currentdate && Shipment_Status != "Cancelled"].count(ID);
+                            after_cutoff = zoho.currenttime.getHour() > alternate_hub.Cut_Off_Time.getHour() || (zoho.currenttime.getHour() == alternate_hub.Cut_Off_Time.getHour() && zoho.currenttime.getMinutes() > alternate_hub.Cut_Off_Time.getMinutes());
+                            if(todays_load >= alternate_hub.Daily_Capacity || after_cutoff == true)
+                            {
+                                info "The configured overflow hub is also at capacity or past cutoff.";
+                            }
+                            else
+                            {
+                                input.Collection_Center = alternate_hub.ID;
+                                input.Origin_Sorting_Hub = alternate_hub.Parent_Sorting_Hub;
+                                input.Destination_Hub = destination_hub.ID;
+                                input.Destination_Sorting_Hub = destination_hub.Parent_Sorting_Hub;
+                                input.Current_Hub = alternate_hub.ID;
+                                input.Shipment_Status = "Booked";
+                                tracking_id = insert into Shipment_Tracking_Events
+                                [
+                                    Shipment = input.ID
+                                    Event_Time = zoho.currenttime
+                                    Event_Status = "Booked"
+                                    Hub = alternate_hub.ID
+                                    Event_Description = "Shipment assigned to the configured overflow collection center."
+                                    Source = "System"
+                                    Customer_Visible = true
+                                    Created_By_Email = zoho.loginuserid
+                                ];
+                                audit_id = insert into Audit_Log
+                                [
+                                    Event_Time = zoho.currenttime
+                                    Actor_Email = zoho.loginuserid
+                                    Actor_Profile = current_profile
+                                    Action_Name = "Reassign Alternate Hub"
+                                    Module_Name = "Shipment Requests"
+                                    Record_ID = input.ID.toString()
+                                    Before_Data = "Status=Booked - Hub Assignment Pending"
+                                    After_Data = "Status=Booked; Overflow Collection Center=" + alternate_hub.Hub_Name + "; Destination Hub=" + destination_hub.Hub_Name
+                                    Source = "Report Action"
+                                    Severity = "Warning"
+                                ];
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

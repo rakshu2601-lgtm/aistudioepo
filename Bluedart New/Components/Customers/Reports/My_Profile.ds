@@ -1,0 +1,24 @@
+list My_Profile
+{
+    displayName = "My Profile"
+    show all rows from Customers [Portal_Login_Email == zoho.loginuserid || Email_ID == zoho.loginuserid]
+    (
+        Customer_ID
+        Customer_Type
+        Full_Name
+        Company_Name
+        Mobile_Number
+        Email_ID
+        Primary_Address
+        Payment_Terms
+        Approved_Credit_Limit
+        Onboarding_Status
+        KYC_Expiry_Date
+        Portal_Access_Status
+        Current_Loyalty_Tier
+        Current_Loyalty_Points
+        Lifetime_Loyalty_Points
+        Quarterly_Eligible_Spend
+        Outstanding_Balance
+    )
+}

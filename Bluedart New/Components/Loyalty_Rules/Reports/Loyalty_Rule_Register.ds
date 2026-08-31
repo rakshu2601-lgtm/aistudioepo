@@ -1,0 +1,59 @@
+default list Loyalty_Rule_Register
+{
+    displayName = "Loyalty Rules"
+    show all rows from Loyalty_Rules
+    (
+        Loyalty_Rule_ID
+        Rule_Name
+        Customer_Type
+        Transport_Mode
+        Minimum_Shipment_Amount
+        Points_Per_INR
+        Maximum_Points_Per_Shipment
+        Points_Expiry_Months
+        Effective_From
+        Effective_To
+        Status
+        custom action "Activate Rule"
+        (
+            workflow = Activate_Loyalty_Rule
+            show action for each record = true
+            column header = "Activate Rule"
+            success message = "Loyalty rule activation evaluated"
+            condition = (Status == "Draft")
+            confirmation before execution
+            (
+                message for individual record = "Activate this loyalty earning rule?"
+                confirm button text = "Activate"
+                cancel button text = "Cancel"
+            )
+        )
+        custom action "Expire Rule"
+        (
+            workflow = Expire_Loyalty_Rule
+            show action for each record = true
+            column header = "Expire Rule"
+            success message = "Loyalty rule expiry evaluated"
+            condition = (Status == "Active")
+            confirmation before execution
+            (
+                message for individual record = "Expire this loyalty earning rule?"
+                confirm button text = "Expire"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Customer_Type
+        Transport_Mode
+        Effective_From
+        Effective_To
+        Status
+    )
+    sort by
+    (
+        Effective_From descending
+        Loyalty_Rule_ID ascending
+    )
+}

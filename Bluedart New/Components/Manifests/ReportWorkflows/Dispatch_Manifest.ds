@@ -1,0 +1,122 @@
+Dispatch_Manifest as "Dispatch Manifest"
+{
+    type = functions
+    form = Manifests
+    execution type = for each record
+    description = "Dispatches a closed bounded manifest and records bag and shipment custody milestones"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == input.Origin_Hub;
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the origin hub can dispatch this manifest.";
+                }
+                else if(input.Manifest_Status != "Closed" || ifnull(input.Vehicle_Seal_Code,"").trim() == "" || input.Departure_Time == null || input.Expected_Arrival_Time == null)
+                {
+                    info "A closed manifest requires departure, expected arrival, and a vehicle seal before dispatch.";
+                }
+                else if(input.Total_Bags > 100 || input.Total_Shipments > 1000)
+                {
+                    info "The manifest exceeds the safe dispatch batch and must be split.";
+                }
+                else
+                {
+                    vehicle_record = Vehicles[ID == input.Vehicle && Active == true && Status == "Available"];
+                    if(vehicle_record.count(ID) == 0)
+                    {
+                        info "The assigned vehicle is no longer available.";
+                    }
+                    else
+                    {
+                        milestone = "In Transit";
+                        if(input.Manifest_Type == "Feeder")
+                        {
+                            milestone = "Bagged & Dispatched to Origin Hub";
+                        }
+                        else if(input.Manifest_Type == "Return")
+                        {
+                            milestone = "Return to Origin";
+                        }
+                        validated_bags = 0;
+                        validated_shipments = 0;
+                        invalid_bags = 0;
+                        for each manifest_bag in Manifest_Bags[Manifest == input.ID && Load_Status == "Loaded"]
+                        {
+                            bag_record = Logistics_Bags[ID == manifest_bag.Bag];
+                            if(bag_record.Bag_Status != "Sealed" || bag_record.Origin_Hub != input.Origin_Hub || bag_record.Destination_Hub != input.Destination_Hub)
+                            {
+                                invalid_bags = invalid_bags + 1;
+                            }
+                            validated_bags = validated_bags + 1;
+                            validated_shipments = validated_shipments + Bag_Shipments[Bag == bag_record.ID && Scan_Status == "Loaded"].count(ID);
+                        }
+                        if(invalid_bags > 0 || validated_bags != input.Total_Bags || validated_shipments != input.Total_Shipments)
+                        {
+                            info "Dispatch stopped because sealed bag or shipment custody no longer matches the closed manifest. Reopen the investigation before retrying.";
+                        }
+                        else
+                        {
+                            processed_bags = 0;
+                            processed_shipments = 0;
+                            for each manifest_bag in Manifest_Bags[Manifest == input.ID && Load_Status == "Loaded"]
+                            {
+                                bag_record = Logistics_Bags[ID == manifest_bag.Bag];
+                                bag_record.Bag_Status = "Dispatched";
+                                bag_record.Dispatched_At = zoho.currenttime;
+                                processed_bags = processed_bags + 1;
+                                for each bag_item in Bag_Shipments[Bag == bag_record.ID && Scan_Status == "Loaded"]
+                                {
+                                    shipment_record = Shipment_Requests[ID == bag_item.Shipment];
+                                    shipment_record.Shipment_Status = milestone;
+                                    shipment_record.Current_Hub = input.Origin_Hub;
+                                    tracking_id = insert into Shipment_Tracking_Events
+                                    [
+                                        Shipment = shipment_record.ID
+                                        Event_Time = zoho.currenttime
+                                        Event_Status = milestone
+                                        Hub = input.Origin_Hub
+                                        Manifest = input.ID
+                                        Bag = bag_record.ID
+                                        Event_Description = input.Manifest_Type + " manifest dispatched under vehicle seal " + input.Vehicle_Seal_Code + "."
+                                        Source = "Manifest"
+                                        Customer_Visible = true
+                                        Created_By_Email = zoho.loginuserid
+                                    ];
+                                    processed_shipments = processed_shipments + 1;
+                                }
+                            }
+                            input.Manifest_Status = "In Transit";
+                            vehicle_record.Status = "Assigned";
+                            audit_id = insert into Audit_Log
+                            [
+                                Event_Time = zoho.currenttime
+                                Actor_Email = zoho.loginuserid
+                                Actor_Profile = current_profile
+                                Action_Name = "Dispatch Manifest"
+                                Module_Name = "Manifests"
+                                Record_ID = input.ID.toString()
+                                Before_Data = "Status=Closed; Seal=" + input.Vehicle_Seal_Code
+                                After_Data = "Status=In Transit; Bags=" + processed_bags + "; Shipments=" + processed_shipments + "; Milestone=" + milestone
+                                Source = "Report Action"
+                                Severity = "Critical"
+                            ];
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,29 @@
+KYC_Document_Types_On_Success as "Audit KYC Document Type"
+{
+    type = form
+    form = KYC_Document_Types
+    record event = on add or edit
+    description = "Audits KYC checklist preset changes"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = "KYC Administration"
+                    Action_Name = "Save KYC Document Type"
+                    Module_Name = "KYC Document Types"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Code=" + input.Document_Code + "; Applies To=" + input.Applies_To + "; Mandatory=" + input.Mandatory_By_Default + "; Conditional=" + input.Conditional_On_Credit_Threshold + "; Active=" + input.Active
+                    Source = "Form Workflow"
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

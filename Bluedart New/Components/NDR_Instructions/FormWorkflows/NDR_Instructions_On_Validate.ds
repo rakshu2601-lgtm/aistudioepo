@@ -1,0 +1,35 @@
+NDR_Instructions_On_Validate as "Validate NDR Instruction"
+{
+    type = form
+    form = NDR_Instructions
+    record event = on add or edit
+    description = "Prevents direct creation and protects secure NDR records from unauthorised edits"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                existing_instruction = NDR_Instructions[ID == input.ID];
+                authorised = current_profile == "Logistics_Administrator" || current_profile == "Operations_Manager" || current_profile == "Hub_Supervisor";
+                if(input.ID == null)
+                {
+                    alert "NDR records are created only by the failed-delivery workflow.";
+                    cancel submit;
+                }
+                else if(authorised == false)
+                {
+                    alert "You are not authorised to edit this NDR instruction.";
+                    cancel submit;
+                }
+                else if(existing_instruction.Customer != input.Customer || existing_instruction.Customer_Login_Email != input.Customer_Login_Email || existing_instruction.Shipment != input.Shipment || existing_instruction.Delivery_Run_Item != input.Delivery_Run_Item || existing_instruction.Secure_Token != input.Secure_Token || existing_instruction.Failure_Reason != input.Failure_Reason || existing_instruction.Submitted_At != input.Submitted_At || existing_instruction.Recipient_Instruction != input.Recipient_Instruction || existing_instruction.Reschedule_Date != input.Reschedule_Date || existing_instruction.Updated_Delivery_Address != input.Updated_Delivery_Address || existing_instruction.NDR_Status != input.NDR_Status)
+                {
+                    alert "Use the secure response form and controlled report actions to change NDR lifecycle data.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,36 @@
+list Hub_Staff
+{
+    displayName = "Hub Staff"
+    show all rows from Operations_Users [Active == true && Home_Hub != null]
+    (
+        Employee_ID
+        Employee_Name
+        Work_Email
+        Mobile_Number
+        Application_Role
+        Home_Hub
+        Deputed_Hub
+        Deputation_Start_Date
+        Deputation_End_Date
+        Active
+    )
+    filters
+    (
+        Home_Hub
+        Deputed_Hub
+        Application_Role
+        Active
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Home_Hub ascending
+    )
+    sort by
+    (
+        Employee_Name ascending
+    )
+}

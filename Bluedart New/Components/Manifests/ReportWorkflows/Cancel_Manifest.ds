@@ -1,0 +1,52 @@
+Cancel_Manifest as "Cancel Manifest"
+{
+    type = functions
+    form = Manifests
+    execution type = for each record
+    description = "Cancels only an unused draft manifest with no loaded custody records"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == input.Origin_Hub;
+                loaded_bags = Manifest_Bags[Manifest == input.ID && Load_Status == "Loaded"].count(ID);
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the origin hub can cancel this manifest.";
+                }
+                else if(input.Manifest_Status != "Draft" || loaded_bags > 0)
+                {
+                    info "Only an unused draft with no loaded bags can be cancelled.";
+                }
+                else
+                {
+                    input.Manifest_Status = "Cancelled";
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Cancel Manifest"
+                        Module_Name = "Manifests"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=Draft"
+                        After_Data = "Status=Cancelled"
+                        Source = "Report Action"
+                        Severity = "High"
+                    ];
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,48 @@
+Customer_KYC_Documents_On_Load as "Secure KYC Document Form"
+{
+    type = form
+    form = Customer_KYC_Documents
+    record event = on add or edit
+    description = "Locks system and review fields, enforces portal ownership, and unlocks only pending or queried uploads"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Customer, Document_Type, Required_For_Onboarding, File_Version, Review_Status, Uploaded_On, Reviewed_By_Email, Reviewed_On, Locked_After_Verification;
+                is_portal = thisapp.portal.isUserInProfile("Customer_Portal");
+                if(is_portal == true)
+                {
+                    disable Review_Remarks;
+                    customer_record = Customers[ID == input.Customer];
+                    owner_match = customer_record.Email_ID == zoho.loginuserid || customer_record.Portal_Login_Email == zoho.loginuserid;
+                    if(owner_match == false)
+                    {
+                        disable Document_Number, Expiry_Date, Uploaded_File;
+                        alert "You are not authorised to access this KYC document.";
+                        openUrl("#Page:Customer_Dashboard","same window");
+                    }
+                    else if(input.Review_Status == "Pending Upload" || input.Review_Status == "Query")
+                    {
+                        enable Document_Number, Expiry_Date, Uploaded_File;
+                    }
+                    else
+                    {
+                        disable Document_Number, Expiry_Date, Uploaded_File;
+                    }
+                }
+                else
+                {
+                    disable Document_Number, Expiry_Date, Uploaded_File;
+                    enable Review_Remarks;
+                }
+                if(input.Review_Status == "Verified" || input.Locked_After_Verification == true)
+                {
+                    disable Document_Number, Expiry_Date, Uploaded_File, Review_Remarks;
+                }
+            )
+        }
+    }
+}

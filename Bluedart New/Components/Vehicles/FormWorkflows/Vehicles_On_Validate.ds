@@ -1,0 +1,51 @@
+Vehicles_On_Validate as "Validate Vehicle"
+{
+    type = form
+    form = Vehicles
+    record event = on add or edit
+    description = "Validates capacity, driver assignment, hub compatibility, and compliance dates"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(ifnull(input.Capacity_Kg,0) <= 0)
+                {
+                    alert "Vehicle capacity must be greater than zero.";
+                    cancel submit;
+                }
+                if(input.Assigned_Driver != null)
+                {
+                    driver_record = Operations_Users[ID == input.Assigned_Driver];
+                    if(driver_record.Application_Role != "Field Agent" || driver_record.Active != true)
+                    {
+                        alert "Assigned Driver must be an active field agent.";
+                        cancel submit;
+                    }
+                    effective_hub = driver_record.Home_Hub;
+                    if(driver_record.Deputed_Hub != null && driver_record.Deputation_Start_Date != null && driver_record.Deputation_End_Date != null && zoho.currentdate >= driver_record.Deputation_Start_Date && zoho.currentdate <= driver_record.Deputation_End_Date)
+                    {
+                        effective_hub = driver_record.Deputed_Hub;
+                    }
+                    if(effective_hub != input.Owning_Hub)
+                    {
+                        alert "The assigned driver's home or active deputed hub must match the vehicle's owning hub.";
+                        cancel submit;
+                    }
+                }
+                if(input.Active == true && input.Registration_Expiry != null && input.Registration_Expiry < zoho.currentdate)
+                {
+                    alert "An active vehicle cannot have an expired registration.";
+                    cancel submit;
+                }
+                if(input.Active == true && input.Insurance_Expiry != null && input.Insurance_Expiry < zoho.currentdate)
+                {
+                    alert "An active vehicle cannot have expired insurance.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,32 @@
+Payment_Transactions_On_Success as "Record Payment Initiation"
+{
+    type = form
+    form = Payment_Transactions
+    record event = on add
+    description = "Audits payment initiation without treating browser navigation as payment success"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(Audit_Log[Module_Name == "Payment Transactions" && Record_ID == input.ID.toString() && Action_Name == "Initiate Payment"].count(ID) == 0)
+                {
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = thisapp.permissions.loginUserProfile()
+                        Action_Name = "Initiate Payment"
+                        Module_Name = "Payment Transactions"
+                        Record_ID = input.ID.toString()
+                        After_Data = "Status=Initiated; Gateway=" + input.Gateway + "; Order=" + input.Gateway_Order_ID + "; Amount=" + input.Amount
+                        Source = "Payment"
+                        Severity = "Info"
+                    ];
+                }
+            )
+        }
+    }
+}

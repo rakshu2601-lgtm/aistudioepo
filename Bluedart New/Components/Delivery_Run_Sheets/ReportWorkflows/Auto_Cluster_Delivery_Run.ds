@@ -1,0 +1,88 @@
+Auto_Cluster_Delivery_Run as "Auto Cluster Delivery Run"
+{
+    type = functions
+    form = Delivery_Run_Sheets
+    execution type = for each record
+    description = "Adds eligible delivery-hub shipments to a draft run using configured service zone and pincode grouping"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(input.DRS_Status != "Draft")
+                {
+                    info "Only draft delivery runs can be clustered.";
+                }
+                else
+                {
+                    logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                    deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= input.Run_Date) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= input.Run_Date);
+                    effective_hub = if(deputation_active == true,logged_user.Deputed_Hub,logged_user.Home_Hub);
+                    if(logged_user.count(ID) == 0 || effective_hub != input.Hub)
+                    {
+                        info "Only an active operations user at the run's effective hub can cluster it.";
+                    }
+                    else
+                    {
+                        added_count = 0;
+                        skipped_count = 0;
+                        next_sequence = Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.ID].count(ID) + 1;
+                        candidate_shipments = Shipment_Requests[Current_Hub == input.Hub && Destination_Hub == input.Hub && Shipment_Status == "At Delivery Hub"];
+                        for each shipment_record in candidate_shipments
+                        {
+                            zone_mapping = Hub_Pincode_Mapping[Pincode == shipment_record.Delivery_Pincode && Serviceability == "Serviceable" && Active == true && Primary_Collection_Center == input.Hub];
+                            duplicate_assignment = Delivery_Run_Sheet_Items[Shipment == shipment_record.ID && (Delivery_Status == "Assigned" || Delivery_Status == "Out For Delivery")].count(ID);
+                            if(zone_mapping.count(ID) > 0 && zone_mapping.Service_Zone == input.Delivery_Zone && duplicate_assignment == 0)
+                            {
+                                item_id = insert into Delivery_Run_Sheet_Items
+                                [
+                                    Delivery_Run_Sheet = input.ID
+                                    Shipment = shipment_record.ID
+                                    Stop_Sequence = next_sequence
+                                    Delivery_Status = "Assigned"
+                                    COD_Collected = 0
+                                    Attempt_Number = 0
+                                ];
+                                next_sequence = next_sequence + 1;
+                                added_count = added_count + 1;
+                            }
+                            else
+                            {
+                                skipped_count = skipped_count + 1;
+                            }
+                        }
+                        planned_count = 0;
+                        expected_cod = 0.0;
+                        for each run_item in Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.ID]
+                        {
+                            planned_count = planned_count + 1;
+                            item_shipment = Shipment_Requests[ID == run_item.Shipment];
+                            if(item_shipment.Payment_Type == "COD")
+                            {
+                                expected_cod = expected_cod + ifnull(item_shipment.COD_Amount,0);
+                            }
+                        }
+                        input.Planned_Stop_Count = planned_count;
+                        input.Expected_COD_Amount = expected_cod;
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuserid
+                            Actor_Profile = current_profile
+                            Action_Name = "Auto Cluster Delivery Run"
+                            Module_Name = "Delivery Run Sheets"
+                            Record_ID = input.ID.toString()
+                            Before_Data = "Zone=" + input.Delivery_Zone
+                            After_Data = "Added Stops=" + added_count + "; Total Stops=" + planned_count + "; Skipped Candidates=" + skipped_count
+                            Source = "Report Action"
+                            Severity = "Info"
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

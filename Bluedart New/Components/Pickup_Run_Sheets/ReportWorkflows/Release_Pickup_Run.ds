@@ -1,0 +1,125 @@
+Release_Pickup_Run as "Release Run - Today's Pickup Planner"
+{
+    type = functions
+    form = Pickup_Run_Sheets
+    execution type = for each record
+    description = "Validates run resources and capacity before releasing pickup stops to the assigned agent"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                if(input.Status != "Draft")
+                {
+                    info "Only draft pickup runs can be released.";
+                }
+                else if(input.Run_Date < zoho.currentdate)
+                {
+                    info "A pickup run scheduled in the past cannot be released.";
+                }
+                else
+                {
+                    logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                    deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= input.Run_Date) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= input.Run_Date);
+                    effective_hub = if(deputation_active == true,logged_user.Deputed_Hub,logged_user.Home_Hub);
+                    if(logged_user.count(ID) == 0 || effective_hub != input.Hub)
+                    {
+                        info "Only an active operations user at the run's effective hub can release it.";
+                    }
+                    else
+                    {
+                        agent_record = Operations_Users[ID == input.Assigned_Agent && Active == true && Application_Role == "Field Agent" && (Agent_Role == "Pickup" || Agent_Role == "Both")];
+                        agent_deputation_active = agent_record.count(ID) > 0 && agent_record.Deputed_Hub != null && (agent_record.Deputation_Start_Date == null || agent_record.Deputation_Start_Date <= input.Run_Date) && (agent_record.Deputation_End_Date == null || agent_record.Deputation_End_Date >= input.Run_Date);
+                        agent_hub = if(agent_deputation_active == true,agent_record.Deputed_Hub,agent_record.Home_Hub);
+                        if(agent_record.count(ID) == 0 || agent_hub != input.Hub)
+                        {
+                            info "The assigned pickup agent is not effective at this hub on the run date.";
+                        }
+                        else
+                        {
+                            planned_count = 0;
+                            completed_count = 0;
+                            planned_weight = 0.0;
+                            for each run_item in Pickup_Run_Sheet_Items[Pickup_Run_Sheet == input.ID]
+                            {
+                                if(run_item.Stop_Status != "Cancelled")
+                                {
+                                    planned_count = planned_count + 1;
+                                    shipment_record = Shipment_Requests[ID == run_item.Shipment];
+                                    planned_weight = planned_weight + ifnull(shipment_record.Billable_Weight_Kg,0);
+                                    if(run_item.Stop_Status == "Picked Up" || run_item.Stop_Status == "Failed")
+                                    {
+                                        completed_count = completed_count + 1;
+                                    }
+                                }
+                            }
+                            if(planned_count == 0)
+                            {
+                                info "Add at least one active pickup stop before releasing the run.";
+                            }
+                            else
+                            {
+                                other_agent_weight = 0.0;
+                                for each other_run in Pickup_Run_Sheets[Assigned_Agent == input.Assigned_Agent && Run_Date == input.Run_Date && ID != input.ID && Status != "Cancelled"]
+                                {
+                                    other_agent_weight = other_agent_weight + ifnull(other_run.Total_Planned_Weight_Kg,0);
+                                }
+                                agent_overloaded = agent_record.Maximum_Daily_Load_Kg != null && agent_record.Maximum_Daily_Load_Kg > 0 && other_agent_weight + planned_weight > agent_record.Maximum_Daily_Load_Kg;
+                                vehicle_invalid = false;
+                                if(input.Vehicle != null)
+                                {
+                                    vehicle_record = Vehicles[ID == input.Vehicle && Active == true && Owning_Hub == input.Hub && Status == "Available"];
+                                    duplicate_vehicle_run = Pickup_Run_Sheets[Vehicle == input.Vehicle && Run_Date == input.Run_Date && ID != input.ID && Status != "Cancelled"].count(ID);
+                                    vehicle_invalid = vehicle_record.count(ID) == 0 || duplicate_vehicle_run > 0 || planned_weight > vehicle_record.Capacity_Kg;
+                                }
+                                if(agent_overloaded == true)
+                                {
+                                    info "The assigned agent's maximum daily load would be exceeded.";
+                                }
+                                else if(vehicle_invalid == true)
+                                {
+                                    info "The selected vehicle is unavailable, double-booked, or below the required capacity.";
+                                }
+                                else
+                                {
+                                    input.Planned_Stop_Count = planned_count;
+                                    input.Completed_Stop_Count = completed_count;
+                                    input.Total_Planned_Weight_Kg = planned_weight;
+                                    input.Status = "Released";
+                                    input.Released_At = zoho.currenttime;
+                                    if(input.Vehicle != null)
+                                    {
+                                        vehicle_record.Status = "Assigned";
+                                        vehicle_record.Assigned_Driver = input.Assigned_Agent;
+                                    }
+                                    audit_id = insert into Audit_Log
+                                    [
+                                        Event_Time = zoho.currenttime
+                                        Actor_Email = zoho.loginuserid
+                                        Actor_Profile = "POC Process User"
+                                        Action_Name = "Release Pickup Run"
+                                        Module_Name = "Pickup Run Sheets"
+                                        Record_ID = input.ID.toString()
+                                        Before_Data = "Status=Draft"
+                                        After_Data = "Status=Released; Stops=" + planned_count + "; Weight Kg=" + planned_weight + "; Agent=" + input.Assigned_Agent
+                                        Source = "Report Action"
+                                        Severity = "Warning"
+                                    ];
+                                    sendmail
+                                    (
+                                        from : zoho.adminuserid
+                                        to : agent_record.Work_Email
+                                        subject : "Pickup run released: PRS " + input.PRS_Number
+                                        message : "Your pickup run for " + input.Run_Date + " has been released with " + planned_count + " planned stops."
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,38 @@
+timeline Shipment_Timeline
+{
+    displayName = "Shipment Timeline"
+    show all rows from Shipment_Tracking_Events
+    (
+        Shipment
+        Event_Status
+        Event_Time
+        Hub
+        Manifest
+        Bag
+        Agent
+        Source
+        Event_Description
+        Customer_Visible
+    )
+    filters
+    (
+        Shipment
+        Event_Status
+        Hub
+        Manifest
+        Bag
+        Agent
+        Source
+        Customer_Visible
+        Event_Time
+    )
+    sort by
+    (
+        Event_Time ascending
+    )
+    options
+    (
+        display field = Event_Status
+        start date = Event_Time
+    )
+}

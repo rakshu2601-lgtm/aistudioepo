@@ -1,0 +1,37 @@
+Customer_KYC_Expiry_Alert as "Customer KYC Expiry Alert"
+{
+    type = schedule
+    form = Customers[Customer_Type != "Retail" && Active == true && Onboarding_Status == "Active"]
+    start = before 30 days from KYC_Expiry_Date at "09:00:00"
+    time zone = "Asia/Kolkata"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                communication_id = insert into Communication_Log
+                [
+                    Customer = input.ID
+                    Recipient = input.Email_ID
+                    Channel = "Email"
+                    Template_Code = "KYC_EXPIRY_30_DAY"
+                    Subject = "KYC expires in 30 days"
+                    Message_Summary = "KYC expiry alert sent 30 days before the expiry date."
+                    Provider = "Zoho Mail"
+                    Communication_Status = "Sent"
+                    Attempt_Count = 1
+                    Last_Attempt_At = zoho.currenttime
+                ];
+                sendmail
+                [
+                    from: zoho.adminuserid
+                    to: input.Email_ID
+                    subject: "KYC expires in 30 days"
+                    message: "Your KYC verification will expire on " + input.KYC_Expiry_Date + ". Please prepare updated documents for re-verification."
+                ]
+            )
+        }
+    }
+}

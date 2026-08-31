@@ -1,0 +1,23 @@
+"Hub_Operator"
+{
+ name = "Hub_Operator"
+ type = Users_Permissions
+ permissions = { Chat:true, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+ description = "Scanning, bagging, manifest, and queue operations for an assigned hub"
+ ModulePermissions
+ {
+  Hubs { enabled = Viewall,Tab,View,Search allFieldsVisible = false ReportPermissions { All_Hubs={"View"} } FieldPermissions { Hub_ID{visibility:true,readonly:true} Hub_Name{visibility:true,readonly:true} Hub_Type{visibility:true,readonly:true} Hub_Address{visibility:true,readonly:true} Contact_Name{visibility:true,readonly:true} Contact_Phone{visibility:true,readonly:true} Latitude{visibility:false} Longitude{visibility:false} }
+  }
+  Transport_Routes { enabled = Viewall,Tab,View,Search allFieldsVisible = true ReportPermissions { All_Transport_Routes={"View"} Active_Routes={"View"} } }
+  Shipment_Requests { enabled = Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = false ReportPermissions { Unassigned_Orders={"View","Edit"} Pickup_Queue={"View","Edit"} Delivery_Queue={"View","Edit"} } FieldPermissions { AWB_Number{visibility:true,readonly:true} Customer{visibility:true,readonly:true} Sender_Name{visibility:true,readonly:true} Sender_Phone{visibility:true,readonly:true} Pickup_Address{visibility:true,readonly:true} Recipient_Name{visibility:true,readonly:true} Recipient_Phone{visibility:true,readonly:true} Delivery_Address{visibility:true,readonly:true} Package_Count{visibility:true,readonly:true} Actual_Weight_Kg{visibility:true,readonly:true} Payment_Type{visibility:true,readonly:true} COD_Amount{visibility:true,readonly:true} Collection_Center{visibility:true,readonly:true} Current_Hub{visibility:true,readonly:true} Shipment_Status{visibility:true,readonly:false} Declared_Value{visibility:false} Base_Rate{visibility:false} Gross_Amount{visibility:false} Total_Payable{visibility:false} Credit_Check_Status{visibility:false} }
+  }
+  Logistics_Bags { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { All_Logistics_Bags={"View","Edit"} Open_Bags={"View","Edit"} In_Transit_Bags={"View","Edit"} Bag_Status_Board={"View","Edit"} } }
+  Bag_Shipments { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { Bag_Contents={"View","Edit"} Bag_Reconciliation={"View","Edit"} } }
+  Manifests { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { All_Manifests={"View","Edit"} Feeder_Manifests={"View","Edit"} Linehaul_Manifests={"View","Edit"} In_Transit_Manifests={"View","Edit"} Manifest_Status_Board={"View","Edit"} } }
+  Manifest_Bags { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { Manifest_Bag_List={"View","Edit"} Expected_Master_Bags={"View","Edit"} Manifest_Reconciliation={"View","Edit"} } }
+  Shipment_Exceptions { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { Shipment_Exception_Queue={"View","Edit"} Exception_Status_Board={"View"} Critical_Exceptions={"View"} } }
+  Shipment_Tracking_Events { enabled = Viewall,Tab,View,Search allFieldsVisible = true ReportPermissions { Tracking_Event_Log={"View"} Shipment_Timeline={"View"} } }
+  Hub_Dashboard { enabled = tab }
+  Shipment_Tracking { enabled = tab }
+ }
+}

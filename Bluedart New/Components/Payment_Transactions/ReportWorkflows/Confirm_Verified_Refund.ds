@@ -1,0 +1,116 @@
+Confirm_Verified_Refund as "Confirm Verified Refund"
+{
+    type = functions
+    form = Payment_Transactions
+    execution type = for each record
+    description = "Lets authorised finance users record a refund only after verifying completion with the payment provider"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                if(input.Payment_Status != "Success")
+                {
+                    info "Only a successful payment can be confirmed as refunded.";
+                }
+                else
+                {
+                    shipment_record = Shipment_Requests[ID == input.Shipment];
+                    customer_record = Customers[ID == input.Customer];
+                    invoice_record = Invoices[ID == input.Invoice];
+                    if(shipment_record.count(ID) == 0 || customer_record.count(ID) == 0 || invoice_record.count(ID) == 0)
+                    {
+                        info "Refund reconciliation was blocked because the customer, shipment, or invoice reference is missing.";
+                    }
+                    else if(shipment_record.Shipment_Status != "Cancelled" && shipment_record.Shipment_Status != "RTO Completed")
+                    {
+                        info "Refund confirmation is allowed only for a cancelled or completed return-to-origin shipment.";
+                    }
+                    else if(ifnull(input.Gateway_Payment_ID,"").trim() == "")
+                    {
+                        info "The verified payment reference is missing, so this refund cannot be reconciled safely.";
+                    }
+                    else
+                    {
+                        refund_reference = "REFUND-" + input.Gateway_Payment_ID + "-" + input.ID;
+                        existing_refund = Account_Ledger[Payment_Reference == refund_reference && Transaction_Type == "Refund"];
+                        if(existing_refund.count(ID) == 0)
+                        {
+                            refund_ledger_id = insert into Account_Ledger
+                            [
+                                Customer = customer_record.ID
+                                Shipment = shipment_record.ID
+                                Invoice = invoice_record.ID
+                                Transaction_Type = "Refund"
+                                Amount = input.Amount
+                                Transaction_Date = zoho.currenttime
+                                Ledger_Status = "Settled"
+                                Ageing_Bucket = "Not Applicable"
+                                Payment_Reference = refund_reference
+                                Notes = "Provider refund completion manually verified by " + zoho.loginuserid + " against payment reference " + input.Gateway_Payment_ID + "."
+                                Posted_By_Email = zoho.loginuserid
+                                Customer_Login_Email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID)
+                            ];
+                        }
+                        input.Payment_Status = "Refunded";
+                        input.Completed_At = zoho.currenttime;
+                        input.Gateway_Response_Summary = ifnull(input.Gateway_Response_Summary,"") + " | Provider refund manually verified by authorised finance user. Refund reference: " + refund_reference + ".";
+                        input.Failure_Reason = "";
+                        verified_payment_total = ifnull(Account_Ledger[Invoice == invoice_record.ID && Transaction_Type == "Payment"].sum(Amount),0);
+                        verified_refund_total = ifnull(Account_Ledger[Invoice == invoice_record.ID && Transaction_Type == "Refund"].sum(Amount),0);
+                        if(verified_refund_total + 0.01 >= verified_payment_total)
+                        {
+                            shipment_record.Payment_Status = "Refunded";
+                        }
+                        thisapp.Recalculate_Customer_Outstanding(customer_record.ID);
+                        recipient_email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID);
+                        refund_summary = "Refund of INR " + input.Amount + " confirmed for payment " + input.Gateway_Payment_ID + "; reference " + refund_reference + ".";
+                        if(Communication_Log[Customer == customer_record.ID && Template_Code == "PAYMENT_REFUNDED" && Message_Summary == refund_summary].count(ID) == 0)
+                        {
+                            communication_id = insert into Communication_Log
+                            [
+                                Customer = customer_record.ID
+                                Shipment = shipment_record.ID
+                                Recipient = recipient_email
+                                Channel = "Email"
+                                Template_Code = "PAYMENT_REFUNDED"
+                                Subject = "Refund confirmed for AWB " + shipment_record.AWB_Number
+                                Message_Summary = refund_summary
+                                Provider = "Zoho Mail"
+                                Communication_Status = "Sent"
+                                Attempt_Count = 1
+                                Last_Attempt_At = zoho.currenttime
+                            ];
+                            sendmail
+                            [
+                                from: zoho.adminuserid
+                                to: recipient_email
+                                subject: "Refund confirmed for AWB " + shipment_record.AWB_Number
+                                message: "Your refund of INR " + input.Amount + " has been confirmed. Refund reference: " + refund_reference + "."
+                            ]
+                        }
+                        if(Audit_Log[Module_Name == "Payment Transactions" && Record_ID == input.ID.toString() && Action_Name == "Confirm Verified Refund"].count(ID) == 0)
+                        {
+                            audit_id = insert into Audit_Log
+                            [
+                                Event_Time = zoho.currenttime
+                                Actor_Email = zoho.loginuserid
+                                Actor_Profile = current_profile
+                                Action_Name = "Confirm Verified Refund"
+                                Module_Name = "Payment Transactions"
+                                Record_ID = input.ID.toString()
+                                Before_Data = "Payment Status=Success; Provider Payment=" + input.Gateway_Payment_ID
+                                After_Data = "Payment Status=Refunded; Refund Reference=" + refund_reference
+                                Source = "Payment"
+                                Severity = "Critical"
+                            ];
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

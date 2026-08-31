@@ -1,0 +1,35 @@
+default list Operations_User_Directory
+{
+    displayName = "Operations User Directory"
+    show all rows from Operations_Users
+    (
+        Employee_ID
+        Employee_Name
+        Work_Email
+        Mobile_Number
+        Application_Role
+        Home_Hub
+        Agent_Role
+        Deputed_Hub
+        Active
+    )
+    filters
+    (
+        Application_Role
+        Home_Hub
+        Agent_Role
+        Active
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Application_Role ascending
+    )
+    sort by
+    (
+        Employee_Name ascending
+    )
+}

@@ -1,0 +1,112 @@
+Customers_On_Success as "Initialize Customer Lifecycle"
+{
+    type = form
+    form = Customers
+    record event = on add
+    description = "Initializes customer status and KYC requests, provisions portal access, and audits onboarding"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                customer_record = Customers[ID == input.ID];
+                if(customer_record.Portal_Login_Email == null)
+                {
+                    customer_record.Portal_Login_Email = customer_record.Email_ID;
+                }
+                if(customer_record.Customer_Type == "Retail")
+                {
+                    customer_record.Payment_Terms = "Prepaid";
+                    customer_record.Requested_Credit_Limit = 0;
+                    customer_record.Approved_Credit_Limit = 0;
+                    if(customer_record.Mobile_OTP_Verified == true && customer_record.Email_OTP_Verified == true)
+                    {
+                        customer_record.Onboarding_Status = "Active";
+                        if(customer_record.OTP_Verified_At == null)
+                        {
+                            customer_record.OTP_Verified_At = zoho.currenttime;
+                        }
+                        retail_cards = Rate_Cards[Customer_Type == "Retail" && Default_For_Retail == true && Status == "Published"];
+                        if(retail_cards.count() > 0)
+                        {
+                            customer_record.Assigned_Rate_Card = retail_cards.ID;
+                        }
+                    }
+                }
+                else
+                {
+                    if(customer_record.Onboarding_Status == "Registration Pending")
+                    {
+                        customer_record.Onboarding_Status = "KYC Pending";
+                    }
+                    for each document_type in KYC_Document_Types[Active == true && (Applies_To == customer_record.Customer_Type || Applies_To == "Both")]
+                    {
+                        should_request = document_type.Mandatory_By_Default;
+                        if(document_type.Conditional_On_Credit_Threshold == true && customer_record.Requested_Credit_Limit >= document_type.Credit_Threshold)
+                        {
+                            should_request = true;
+                        }
+                        existing_document_count = Customer_KYC_Documents[Customer == customer_record.ID && Document_Type == document_type.ID].count();
+                        if(should_request == true && existing_document_count == 0)
+                        {
+                            kyc_document_id = insert into Customer_KYC_Documents
+                            [
+                                Customer = customer_record.ID
+                                Document_Type = document_type.ID
+                                Required_For_Onboarding = true
+                                File_Version = 1
+                                Review_Status = "Pending Upload"
+                            ];
+                        }
+                    }
+                }
+                if(customer_record.Portal_Access_Status == "Not Invited")
+                {
+                    portal_result = thisapp.portal.assignUserInProfile(customer_record.Email_ID,"Customer_Portal");
+                    if(customer_record.Registration_Source == "Employee")
+                    {
+                        customer_record.Portal_Access_Status = "Invitation Sent";
+                    }
+                    else
+                    {
+                        customer_record.Portal_Access_Status = "Active";
+                    }
+                    communication_id = insert into Communication_Log
+                    [
+                        Customer = customer_record.ID
+                        Recipient = customer_record.Email_ID
+                        Channel = "Email"
+                        Template_Code = "CUSTOMER_PORTAL_INVITATION"
+                        Subject = "Your logistics customer portal access"
+                        Message_Summary = "Portal access was provisioned for customer onboarding and self-service."
+                        Provider = "Zoho Mail"
+                        Communication_Status = "Sent"
+                        Attempt_Count = 1
+                        Last_Attempt_At = zoho.currenttime
+                    ];
+                    sendmail
+                    [
+                        from: zoho.adminuserid
+                        to: customer_record.Email_ID
+                        subject: "Your logistics customer portal access"
+                        message: "Your customer portal profile is ready. Sign in to complete onboarding, upload KYC documents when required, book shipments, and manage loyalty rewards."
+                    ]
+                }
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = "Customer Onboarding"
+                    Action_Name = "Save Customer"
+                    Module_Name = "Customers"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Customer Type=" + customer_record.Customer_Type + "; Status=" + customer_record.Onboarding_Status + "; Portal=" + customer_record.Portal_Access_Status
+                    Source = "Form Workflow"
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

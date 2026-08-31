@@ -1,0 +1,200 @@
+form Logistics_Bags
+{
+    title
+    {
+        displayname = "Logistics Bags"
+        on add = "Create Logistics Bag"
+        on edit = "Edit Logistics Bag"
+    }
+    success message = "Logistics bag saved successfully"
+    Bag_Identity
+    (
+        type = section
+        displayname = "Bag Identity"
+        row = 1
+        column = 0
+    )
+    Bag_Number
+    (
+        type = autonumber
+        displayname = "Bag Number"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Bag_Type
+    (
+        type = picklist
+        displayname = "Bag Type"
+        values = {"Feeder","Master","Delivery Feeder","Return"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Origin_Hub
+    (
+        type = picklist
+        displayname = "Origin Hub"
+        values = Hubs[Active == true].ID
+        displayformat = [Hub_Name]
+        searchable = true
+        sortorder = ascending
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Destination_Hub
+    (
+        type = picklist
+        displayname = "Destination Hub"
+        values = Hubs[Active == true].ID
+        displayformat = [Hub_Name]
+        searchable = true
+        sortorder = ascending
+        row = 1
+        column = 2
+        width = medium
+    )
+    Seal_and_Status
+    (
+        type = section
+        displayname = "Seal and Status"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Seal_Code
+    (
+        type = text
+        displayname = "Seal Code"
+        maxchar = 80
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Bag_Status
+    (
+        type = picklist
+        displayname = "Bag Status"
+        values = {"Open","Sealed","Dispatched","Received","Unsealed","Exception"}
+        initial value = "Open"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Total_Shipments
+    (
+        type = number
+        displayname = "Total Shipments"
+        initial value = 0
+        row = 2
+        column = 1
+        width = medium
+    )
+    Total_Weight_Kg
+    (
+        type = decimal
+        displayname = "Total Weight (Kg)"
+        decimalplace = 3
+        initial value = 0
+        row = 2
+        column = 2
+        width = medium
+    )
+    Custody_Timestamps
+    (
+        type = section
+        displayname = "Custody Timestamps"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Created_At
+    (
+        type = datetime
+        displayname = "Created At"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Sealed_At
+    (
+        type = datetime
+        displayname = "Sealed At"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Dispatched_At
+    (
+        type = datetime
+        displayname = "Dispatched At"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Received_At
+    (
+        type = datetime
+        displayname = "Received At"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Created_By_Email
+    (
+        type = email
+        displayname = "Created By Email"
+        personal data = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Bag_Notes
+    (
+        type = section
+        displayname = "Bag Notes"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    Notes
+    (
+        type = textarea
+        displayname = "Notes"
+        height = 100px
+        row = 4
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Create Bag"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Save Bag"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

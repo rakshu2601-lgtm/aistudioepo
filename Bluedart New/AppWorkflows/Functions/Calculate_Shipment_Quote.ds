@@ -1,0 +1,120 @@
+map Calculate_Shipment_Quote(int customer_id, string pickup_pincode, string delivery_pincode, string transport_mode, float length_cm, float width_cm, float height_cm, float actual_weight_kg, string payment_type, float points_redeemed)
+{
+    quote = Map();
+    quote.put("valid",false);
+    quote.put("message","Complete customer, mode, pincode, dimensions, and weight to calculate the quote.");
+    quote.put("volumetric_weight",0);
+    quote.put("billable_weight",0);
+    quote.put("rated_distance",0);
+    quote.put("rate_card_id",0);
+    quote.put("rate_slab_id",0);
+    quote.put("base_rate",0);
+    quote.put("fuel_surcharge",0);
+    quote.put("cod_fee",0);
+    quote.put("gst_amount",0);
+    quote.put("gross_amount",0);
+    quote.put("redemption_amount",0);
+    quote.put("total_payable",0);
+    if(customer_id != null && ifnull(pickup_pincode,"").matches("[0-9]{6}") && ifnull(delivery_pincode,"").matches("[0-9]{6}") && transport_mode != null && ifnull(length_cm,0) > 0 && ifnull(width_cm,0) > 0 && ifnull(height_cm,0) > 0 && ifnull(actual_weight_kg,0) > 0)
+    {
+        customer_record = Customers[ID == customer_id];
+        pickup_map = Hub_Pincode_Mapping[Pincode == pickup_pincode && Active == true && Serviceability != "Non-Serviceable"];
+        delivery_map = Hub_Pincode_Mapping[Pincode == delivery_pincode && Active == true && Serviceability != "Non-Serviceable"];
+        if(customer_record.count(ID) > 0 && pickup_map.count(ID) > 0 && delivery_map.count(ID) > 0)
+        {
+            rate_card = Rate_Cards[ID == customer_record.Assigned_Rate_Card && Status == "Published" && Effective_From <= zoho.currentdate && (Effective_To is null || Effective_To >= zoho.currentdate) && (Transport_Mode == transport_mode || Transport_Mode == "Both")] sort by Effective_From desc range from 0 to 0;
+            if(rate_card.count(ID) == 0)
+            {
+                rate_card = Rate_Cards[Customer_Type == customer_record.Customer_Type && Status == "Published" && Effective_From <= zoho.currentdate && (Effective_To is null || Effective_To >= zoho.currentdate) && (Transport_Mode == transport_mode || Transport_Mode == "Both")] sort by Effective_From desc range from 0 to 0;
+            }
+            if(rate_card.count(ID) == 0)
+            {
+                rate_card = Rate_Cards[Customer_Type == "All" && Status == "Published" && Effective_From <= zoho.currentdate && (Effective_To is null || Effective_To >= zoho.currentdate) && (Transport_Mode == transport_mode || Transport_Mode == "Both")] sort by Effective_From desc range from 0 to 0;
+            }
+            if(rate_card.count(ID) > 0)
+            {
+                divisor = ifnull(rate_card.Volumetric_Divisor,0);
+                if(divisor <= 0)
+                {
+                    config_record = App_Configuration[Active == true];
+                    divisor = ifnull(config_record.Default_Volumetric_Divisor,5000);
+                }
+                volumetric_weight = (length_cm * width_cm * height_cm / divisor).round(3);
+                billable_weight = actual_weight_kg;
+                if(volumetric_weight > actual_weight_kg)
+                {
+                    billable_weight = volumetric_weight;
+                }
+                origin_hub = Hubs[ID == pickup_map.Primary_Collection_Center];
+                destination_hub = Hubs[ID == delivery_map.Primary_Collection_Center];
+                route_record = Transport_Routes[Origin_Sorting_Hub == origin_hub.Parent_Sorting_Hub && Destination_Sorting_Hub == destination_hub.Parent_Sorting_Hub && Transport_Mode == transport_mode && Active == true] sort by Distance_Km range from 0 to 0;
+                rated_distance = ifnull(pickup_map.Approx_Distance_From_Primary_Km,0) + ifnull(delivery_map.Approx_Distance_From_Primary_Km,0);
+                if(route_record.count(ID) > 0)
+                {
+                    rated_distance = rated_distance + ifnull(route_record.Distance_Km,0);
+                }
+                service_zone = delivery_map.Service_Zone;
+                slab_record = Rate_Slabs[Rate_Card == rate_card.ID && Active == true && Service_Zone == service_zone && Minimum_Weight_Kg <= billable_weight && Maximum_Weight_Kg >= billable_weight && Minimum_Distance_Km <= rated_distance && Maximum_Distance_Km >= rated_distance] sort by Minimum_Weight_Kg, Minimum_Distance_Km range from 0 to 0;
+                if(slab_record.count(ID) == 0)
+                {
+                    slab_record = Rate_Slabs[Rate_Card == rate_card.ID && Active == true && (Service_Zone is null || Service_Zone == "") && Minimum_Weight_Kg <= billable_weight && Maximum_Weight_Kg >= billable_weight && Minimum_Distance_Km <= rated_distance && Maximum_Distance_Km >= rated_distance] sort by Minimum_Weight_Kg, Minimum_Distance_Km range from 0 to 0;
+                }
+                if(slab_record.count(ID) > 0)
+                {
+                    additional_weight = billable_weight - slab_record.Minimum_Weight_Kg;
+                    if(additional_weight < 0)
+                    {
+                        additional_weight = 0;
+                    }
+                    base_rate = (slab_record.Base_Rate + (additional_weight.ceil() * slab_record.Additional_Kg_Rate)).round(2);
+                    discount_amount = (base_rate * ifnull(rate_card.Contract_Discount_Percent,0) / 100).round(2);
+                    discounted_base = base_rate - discount_amount;
+                    fuel_surcharge = (discounted_base * ifnull(rate_card.Fuel_Surcharge_Percent,0) / 100).round(2);
+                    cod_fee = 0;
+                    if(payment_type == "COD")
+                    {
+                        cod_fee = ifnull(rate_card.COD_Handling_Fee,0);
+                    }
+                    taxable_amount = discounted_base + fuel_surcharge + cod_fee;
+                    gst_amount = (taxable_amount * ifnull(rate_card.GST_Percent,0) / 100).round(2);
+                    gross_amount = (taxable_amount + gst_amount).round(2);
+                    config_record = App_Configuration[Active == true];
+                    redemption_value = ifnull(config_record.Loyalty_Redemption_Value_Per_Point,1);
+                    redemption_amount = (ifnull(points_redeemed,0) * redemption_value).round(2);
+                    if(redemption_amount > gross_amount)
+                    {
+                        redemption_amount = gross_amount;
+                    }
+                    total_payable = (gross_amount - redemption_amount).round(2);
+                    quote.put("valid",true);
+                    quote.put("message","Quote calculated successfully.");
+                    quote.put("volumetric_weight",volumetric_weight);
+                    quote.put("billable_weight",billable_weight);
+                    quote.put("rated_distance",rated_distance.round(2));
+                    quote.put("rate_card_id",rate_card.ID);
+                    quote.put("rate_slab_id",slab_record.ID);
+                    quote.put("base_rate",discounted_base.round(2));
+                    quote.put("fuel_surcharge",fuel_surcharge);
+                    quote.put("cod_fee",cod_fee);
+                    quote.put("gst_amount",gst_amount);
+                    quote.put("gross_amount",gross_amount);
+                    quote.put("redemption_amount",redemption_amount);
+                    quote.put("total_payable",total_payable);
+                }
+                else
+                {
+                    quote.put("message","No active rate slab matches the billable weight, service zone, and rated distance.");
+                }
+            }
+            else
+            {
+                quote.put("message","No published rate card supports this customer and transport mode.");
+            }
+        }
+        else
+        {
+            quote.put("message","Customer or pincode serviceability could not be resolved.");
+        }
+    }
+    return quote;
+}

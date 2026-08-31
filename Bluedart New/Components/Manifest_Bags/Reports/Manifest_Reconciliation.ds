@@ -1,0 +1,39 @@
+list Manifest_Reconciliation
+{
+    displayName = "Manifest Reconciliation"
+    show all rows from Manifest_Bags
+    (
+        Manifest
+        Manifest_Type
+        Bag
+        Load_Status
+        Loaded_At
+        Received_At
+        Seal_Verified
+        Exception_Photo
+        Exception_Notes
+    )
+    filters
+    (
+        Manifest
+        Manifest_Type
+        Bag
+        Load_Status
+        Loaded_At
+        Received_At
+        Seal_Verified
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Manifest descending
+        Load_Status ascending
+    )
+    sort by
+    (
+        Received_At descending
+    )
+}

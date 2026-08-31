@@ -1,0 +1,17 @@
+customize
+{
+    layout = twocolumncard
+    font = "lato"
+    style = "3"
+    color options
+    {
+        name = "BlueDart Accessible"
+        brand color = "#0756A3"
+        type = "custom"
+        dark mode color = "#72B7FF"
+    }
+    logo
+    {
+        preference = "app_icon"
+    }
+}

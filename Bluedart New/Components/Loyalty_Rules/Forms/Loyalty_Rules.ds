@@ -1,0 +1,166 @@
+form Loyalty_Rules
+{
+    title
+    {
+        displayname = "Loyalty Rules"
+        on add = "Create Loyalty Rule"
+        on edit = "Edit Loyalty Rule"
+    }
+    success message = "Loyalty rule saved successfully"
+
+    Rule_Definition
+    (
+        type = section
+        displayname = "Rule Definition"
+        row = 1
+        column = 0
+    )
+    must have unique Loyalty_Rule_ID
+    (
+        type = text
+        displayname = "Loyalty Rule ID"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Rule_Name
+    (
+        type = text
+        displayname = "Rule Name"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Customer_Type
+    (
+        type = picklist
+        displayname = "Customer Type"
+        values = {"Retail","Corporate","Wholesale","All"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Transport_Mode
+    (
+        type = picklist
+        displayname = "Transport Mode"
+        values = {"Air","Surface","Any"}
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    Earning_Policy
+    (
+        type = section
+        displayname = "Earning Policy"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Minimum_Shipment_Amount
+    (
+        type = INR
+        displayname = "Minimum Shipment Amount"
+        format = commadotindian
+        initial value = 0
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Points_Per_INR
+    (
+        type = decimal
+        displayname = "Points Per INR"
+        decimalplace = 4
+        maxchar = 12
+        row = 2
+        column = 2
+        width = medium
+    )
+    Maximum_Points_Per_Shipment
+    (
+        type = decimal
+        displayname = "Maximum Points Per Shipment"
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 1
+        width = medium
+    )
+    Points_Expiry_Months
+    (
+        type = number
+        displayname = "Points Expiry Months"
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    Effective_Period
+    (
+        type = section
+        displayname = "Effective Period"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Effective_From
+    (
+        type = date
+        displayname = "Effective From"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Effective_To
+    (
+        type = date
+        displayname = "Effective To"
+        row = 3
+        column = 2
+        width = medium
+    )
+    must have Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"Draft","Active","Expired"}
+        initial value = "Draft"
+        row = 3
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Draft"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Rule"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

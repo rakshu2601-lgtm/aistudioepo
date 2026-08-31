@@ -1,0 +1,80 @@
+Load_Manifest_Bag as "Load Manifest Bag"
+{
+    type = functions
+    form = Manifest_Bags
+    execution type = for each record
+    description = "Confirms a sealed expected bag on a draft manifest and updates trip totals"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                manifest_record = Manifests[ID == input.Manifest];
+                bag_record = Logistics_Bags[ID == input.Bag];
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == manifest_record.Origin_Hub;
+                expected_bag_type = if(manifest_record.Manifest_Type == "Linehaul","Master",manifest_record.Manifest_Type);
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the origin hub can load this bag.";
+                }
+                else if(manifest_record.Manifest_Status != "Draft" || input.Load_Status != "Expected")
+                {
+                    info "Only an expected bag on a draft manifest can be loaded.";
+                }
+                else if(bag_record.Bag_Status != "Sealed" || bag_record.Bag_Type != expected_bag_type || bag_record.Origin_Hub != manifest_record.Origin_Hub || bag_record.Destination_Hub != manifest_record.Destination_Hub)
+                {
+                    info "The bag is no longer sealed or compatible with the manifest route.";
+                }
+                else
+                {
+                    bag_count = 1;
+                    shipment_count = ifnull(bag_record.Total_Shipments,0);
+                    total_weight = ifnull(bag_record.Total_Weight_Kg,0);
+                    for each other_link in Manifest_Bags[Manifest == input.Manifest && Load_Status == "Loaded" && ID != input.ID]
+                    {
+                        other_bag = Logistics_Bags[ID == other_link.Bag];
+                        bag_count = bag_count + 1;
+                        shipment_count = shipment_count + ifnull(other_bag.Total_Shipments,0);
+                        total_weight = total_weight + ifnull(other_bag.Total_Weight_Kg,0);
+                    }
+                    vehicle_record = Vehicles[ID == manifest_record.Vehicle && Active == true];
+                    if(bag_count > 100 || shipment_count > 1000 || vehicle_record.count(ID) == 0 || total_weight > vehicle_record.Capacity_Kg)
+                    {
+                        info "Loading this bag would exceed the manifest processing or vehicle capacity limit.";
+                    }
+                    else
+                    {
+                        input.Load_Status = "Loaded";
+                        input.Loaded_At = zoho.currenttime;
+                        manifest_record.Total_Bags = bag_count;
+                        manifest_record.Total_Shipments = shipment_count;
+                        manifest_record.Total_Weight_Kg = total_weight;
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuserid
+                            Actor_Profile = current_profile
+                            Action_Name = "Load Manifest Bag"
+                            Module_Name = "Manifest Bags"
+                            Record_ID = input.ID.toString()
+                            Before_Data = "Status=Expected"
+                            After_Data = "Status=Loaded; Manifest=" + input.Manifest + "; Bag=" + input.Bag
+                            Source = "Report Action"
+                            Severity = "Critical"
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

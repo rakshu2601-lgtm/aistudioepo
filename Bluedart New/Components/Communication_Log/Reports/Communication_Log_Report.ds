@@ -1,0 +1,52 @@
+default list Communication_Log_Report
+{
+    displayName = "Communication Log"
+    show all rows from Communication_Log
+    (
+        Communication_ID
+        Customer
+        Shipment
+        Recipient
+        Channel
+        Template_Code
+        Subject
+        Message_Summary
+        Provider
+        Provider_Message_ID
+        Communication_Status
+        Attempt_Count
+        Last_Attempt_At
+        Failure_Reason
+    )
+    filters
+    (
+        Customer
+        Shipment
+        Recipient
+        Channel
+        Template_Code
+        Provider
+        Communication_Status
+        Last_Attempt_At
+    )
+    sort by
+    (
+        Last_Attempt_At descending
+        Communication_ID descending
+    )
+    conditional formatting
+    (
+        "Failed Communication"
+        {
+            condition = (Communication_Status == "Failed")
+            fields = [Communication_ID, Recipient, Channel, Template_Code, Communication_Status, Attempt_Count, Failure_Reason]
+            format = "background-color:#FEE2E2;color:#991B1B"
+        }
+        "Delivered Communication"
+        {
+            condition = (Communication_Status == "Delivered")
+            fields = [Communication_ID, Recipient, Channel, Template_Code, Communication_Status]
+            format = "background-color:#DCFCE7;color:#166534"
+        }
+    )
+}

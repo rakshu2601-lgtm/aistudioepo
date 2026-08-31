@@ -1,0 +1,105 @@
+Customer_KYC_Documents_On_Validate as "Validate KYC Document"
+{
+    type = form
+    form = Customer_KYC_Documents
+    record event = on add or edit
+    description = "Validates document ownership, preset requirements, upload format and size, versioning, and verified-record locks"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                customer_record = Customers[ID == input.Customer];
+                document_type = KYC_Document_Types[ID == input.Document_Type];
+                duplicate_count = Customer_KYC_Documents[Customer == input.Customer && Document_Type == input.Document_Type && ID != input.ID].count(ID);
+                if(duplicate_count > 0)
+                {
+                    alert "This customer already has a checklist item for the selected document type.";
+                    cancel submit;
+                }
+                is_portal = thisapp.portal.isUserInProfile("Customer_Portal");
+                if(is_portal == true && customer_record.Email_ID != zoho.loginuserid && customer_record.Portal_Login_Email != zoho.loginuserid)
+                {
+                    alert "You cannot update another customer's KYC document.";
+                    cancel submit;
+                }
+                previous_record = Customer_KYC_Documents[ID == input.ID];
+                if(input.ID != null && previous_record.Review_Status == "Verified")
+                {
+                    alert "Verified documents are locked. An authorised reviewer must request re-KYC before replacement.";
+                    cancel submit;
+                }
+                file_changed = input.ID == null || previous_record.Uploaded_File != input.Uploaded_File;
+                if(is_portal == true && input.ID != null && file_changed == false)
+                {
+                    if(previous_record.Customer != input.Customer || previous_record.Document_Type != input.Document_Type || previous_record.Required_For_Onboarding != input.Required_For_Onboarding || previous_record.File_Version != input.File_Version || previous_record.Review_Status != input.Review_Status || previous_record.Uploaded_On != input.Uploaded_On || previous_record.Reviewed_By_Email != input.Reviewed_By_Email || previous_record.Reviewed_On != input.Reviewed_On || previous_record.Locked_After_Verification != input.Locked_After_Verification || previous_record.Review_Remarks != input.Review_Remarks)
+                    {
+                        alert "Review, version, ownership, and system fields are managed by authorised workflows.";
+                        cancel submit;
+                    }
+                }
+                if(file_changed == true && input.ID != null && previous_record.Review_Status != "Pending Upload" && previous_record.Review_Status != "Query")
+                {
+                    alert "Only documents in Pending Upload or Query status can be uploaded again.";
+                    cancel submit;
+                }
+                if(document_type.Document_Number_Required == true && ifnull(input.Document_Number,"").trim() == "")
+                {
+                    alert "Document number is required for this KYC document type.";
+                    cancel submit;
+                }
+                if(document_type.Expiry_Date_Required == true && input.Expiry_Date == null)
+                {
+                    alert "Expiry date is required for this KYC document type.";
+                    cancel submit;
+                }
+                if(input.Expiry_Date != null && input.Expiry_Date < zoho.currentdate)
+                {
+                    alert "An expired document cannot be submitted for KYC verification.";
+                    cancel submit;
+                }
+                if(input.Uploaded_File != null)
+                {
+                    file_name = input.Uploaded_File.actualname;
+                    extension_position = file_name.lastIndexOf(".");
+                    if(extension_position < 0)
+                    {
+                        alert "The uploaded file must include a PDF, JPG, or JPEG extension.";
+                        cancel submit;
+                    }
+                    file_extension = file_name.subText(extension_position + 1,file_name.length()).toLowerCase();
+                    configured_extensions = "," + document_type.Accepted_File_Types.toLowerCase().replaceAll(" ","") + ",";
+                    if(file_extension != "pdf" && file_extension != "jpg" && file_extension != "jpeg")
+                    {
+                        alert "Only PDF, JPG, and JPEG files are supported.";
+                        cancel submit;
+                    }
+                    if(configured_extensions.contains("," + file_extension + ",") == false)
+                    {
+                        alert "This file extension is not enabled for the selected document type.";
+                        cancel submit;
+                    }
+                }
+                if(file_changed == true && input.Uploaded_File != null)
+                {
+                    if(input.ID != null && previous_record.Uploaded_File != null)
+                    {
+                        input.File_Version = ifnull(previous_record.File_Version,1) + 1;
+                    }
+                    else
+                    {
+                        input.File_Version = 1;
+                    }
+                    input.Uploaded_On = zoho.currenttime;
+                    input.Review_Status = "Pending Verification";
+                    input.Review_Remarks = "";
+                    input.Reviewed_By_Email = null;
+                    input.Reviewed_On = null;
+                    input.Locked_After_Verification = false;
+                }
+            )
+        }
+    }
+}

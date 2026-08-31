@@ -1,0 +1,29 @@
+Communication_Log_On_Success as "Audit Communication Queue"
+{
+    type = form
+    form = Communication_Log
+    record event = on add
+    description = "Records evidence whenever a new communication is queued or logged"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = if(ifnull(zoho.loginuserid,"").trim() != "",zoho.loginuserid,zoho.adminuserid)
+                    Actor_Profile = if(ifnull(zoho.loginuserid,"").trim() != "",thisapp.permissions.loginUserProfile(),"System")
+                    Action_Name = "Record Communication"
+                    Module_Name = "Communication Log"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Channel=" + input.Channel + "; Template=" + input.Template_Code + "; Status=" + input.Communication_Status + "; Provider=" + input.Provider
+                    Source = "Form Workflow"
+                    Severity = if(input.Communication_Status == "Failed","Warning","Info")
+                ];
+            )
+        }
+    }
+}

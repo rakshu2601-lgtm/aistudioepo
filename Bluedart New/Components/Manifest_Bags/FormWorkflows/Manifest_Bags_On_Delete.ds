@@ -1,0 +1,19 @@
+Manifest_Bags_On_Delete as "Protect Manifest Bag Evidence"
+{
+    type = form
+    form = Manifest_Bags
+    record event = on delete
+    description = "Prevents deletion of manifest bag custody and reconciliation evidence"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Manifest bag checklist records cannot be deleted. Cancel the unused draft manifest instead.";
+                cancel delete;
+            )
+        }
+    }
+}

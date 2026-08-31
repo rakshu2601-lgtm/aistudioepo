@@ -1,0 +1,158 @@
+Fail_Delivery_Delivery_Run_Items as "Failed Delivery - Delivery Run Items"
+{
+    type = functions
+    form = Delivery_Run_Sheet_Items
+    execution type = for each record
+    description = "Captures NDR evidence, increments attempts, creates a secure instruction request, notifies the recipient, and applies RTO policy"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                run_record = Delivery_Run_Sheets[ID == input.Delivery_Run_Sheet];
+                assigned_agent = Operations_Users[ID == run_record.Assigned_Agent];
+                authorised = assigned_agent.count(ID) > 0 && assigned_agent.Work_Email == zoho.loginuserid || Operations_Users[Work_Email == zoho.loginuserid && Active == true].count(ID) > 0;
+                shipment_record = Shipment_Requests[ID == input.Shipment];
+                if(authorised == false)
+                {
+                    info "Only the assigned agent or an active operations user can record a failed delivery.";
+                }
+                else if(input.Delivery_Status != "Out For Delivery" || shipment_record.Shipment_Status != "Out For Delivery (OFD)" || (run_record.DRS_Status != "Released" && run_record.DRS_Status != "In Progress"))
+                {
+                    info "Only an out-for-delivery shipment on an active run can be failed.";
+                }
+                else if(input.Arrived_At == null)
+                {
+                    info "Mark arrival before recording a delivery failure.";
+                }
+                else if(input.NDR_Reason == null || ifnull(input.NDR_Notes,"").trim() == "")
+                {
+                    info "Select an NDR reason and enter internal failure notes.";
+                }
+                else if(input.Agent_Latitude == null || input.Agent_Longitude == null)
+                {
+                    info "Agent latitude and longitude are required for a failed delivery.";
+                }
+                else
+                {
+                    customer_record = Customers[ID == shipment_record.Customer];
+                    config_record = App_Configuration[Active == true] range from 0 to 0;
+                    maximum_attempts = if(config_record.count(ID) > 0,config_record.Maximum_NDR_Attempts,3);
+                    next_attempt = ifnull(shipment_record.NDR_Attempt_Count,0) + 1;
+                    rto_required = input.NDR_Reason == "Refused COD" || next_attempt >= maximum_attempts;
+                    input.Attempt_Number = next_attempt;
+                    input.Completed_At = zoho.currenttime;
+                    input.Proof_Type = null;
+                    input.Recipient_OTP = null;
+                    input.Delivery_Photo = null;
+                    input.Recipient_Name = null;
+                    input.COD_Collected = 0;
+                    shipment_record.NDR_Attempt_Count = next_attempt;
+                    if(rto_required == true)
+                    {
+                        input.Delivery_Status = "RTO";
+                        shipment_record.Shipment_Status = "Return to Origin";
+                    }
+                    else
+                    {
+                        input.Delivery_Status = "Failed";
+                        shipment_record.Shipment_Status = "Delivery Failed - NDR";
+                    }
+                    token_source = shipment_record.ID + "|" + input.ID + "|" + zoho.currenttime + "|" + randomNumber(100000,999999);
+                    secure_token = zoho.encryption.md5(token_source);
+                    ndr_status = if(rto_required == true,"RTO","Awaiting Instruction");
+                    ndr_id = insert into NDR_Instructions
+                    [
+                        Customer = customer_record.ID
+                        Customer_Login_Email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID)
+                        Shipment = shipment_record.ID
+                        Delivery_Run_Item = input.ID
+                        Secure_Token = secure_token
+                        Failure_Reason = input.NDR_Reason
+                        Submitted_At = null
+                        NDR_Status = ndr_status
+                        Supervisor_Notes = "Attempt " + next_attempt + " recorded by " + zoho.loginuserid + ". Internal agent notes are retained on the delivery stop."
+                    ];
+                    ndr_link = zoho.appuri + "form-perma/NDR_Response?Secure_Token=" + encodeUrl(secure_token);
+                    event_status = if(rto_required == true,"Return to Origin","Delivery Failed - NDR");
+                    tracking_id = insert into Shipment_Tracking_Events
+                    [
+                        Shipment = shipment_record.ID
+                        Event_Time = zoho.currenttime
+                        Event_Status = event_status
+                        Hub = run_record.Hub
+                        Agent = assigned_agent.ID
+                        Latitude = input.Agent_Latitude
+                        Longitude = input.Agent_Longitude
+                        Event_Description = if(rto_required == true,"Delivery could not be completed and the shipment entered return-to-origin processing.","Delivery could not be completed. Recipient instruction is awaited for the next attempt.")
+                        Source = if(rto_required == true,"RTO","NDR")
+                        Customer_Visible = true
+                        Created_By_Email = zoho.loginuserid
+                    ];
+                    recipient_email = if(ifnull(shipment_record.Recipient_Email,"").trim() != "",shipment_record.Recipient_Email,customer_record.Email_ID);
+                    communication_id = insert into Communication_Log
+                    [
+                        Customer = customer_record.ID
+                        Shipment = shipment_record.ID
+                        Recipient = recipient_email
+                        Channel = "Email"
+                        Template_Code = if(rto_required == true,"SHIPMENT_RTO_INITIATED","SHIPMENT_NDR_ACTION_REQUIRED")
+                        Subject = if(rto_required == true,"Shipment returning to origin: AWB " + shipment_record.AWB_Number,"Delivery action required: AWB " + shipment_record.AWB_Number)
+                        Message_Summary = if(rto_required == true,"Delivery attempts ended under the configured RTO policy.","Recipient was sent a secure NDR instruction link after failed delivery attempt " + next_attempt + ".")
+                        Provider = "Zoho Mail"
+                        Communication_Status = "Sent"
+                        Attempt_Count = 1
+                        Last_Attempt_At = zoho.currenttime
+                    ];
+                    if(rto_required == true)
+                    {
+                        sendmail
+                        [
+                            from: zoho.adminuserid
+                            to: recipient_email
+                            subject: "Shipment returning to origin: AWB " + shipment_record.AWB_Number
+                            message: "Delivery could not be completed after attempt " + next_attempt + ". The shipment is now entering return-to-origin processing."
+                        ]
+                    }
+                    else
+                    {
+                        sendmail
+                        [
+                            from: zoho.adminuserid
+                            to: recipient_email
+                            subject: "Delivery action required: AWB " + shipment_record.AWB_Number
+                            message: "We could not complete delivery attempt " + next_attempt + ". Use this secure link to reschedule, update the address, or request local-office hold: " + ndr_link
+                        ]
+                    }
+                    delivered_count = Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.Delivery_Run_Sheet && ID != input.ID && Delivery_Status == "Delivered"].count(ID);
+                    failed_count = Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.Delivery_Run_Sheet && ID != input.ID && (Delivery_Status == "Failed" || Delivery_Status == "RTO")].count(ID) + 1;
+                    collected_cod = 0.0;
+                    for each delivered_item in Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.Delivery_Run_Sheet && ID != input.ID && Delivery_Status == "Delivered"]
+                    {
+                        collected_cod = collected_cod + ifnull(delivered_item.COD_Collected,0);
+                    }
+                    run_record.Delivered_Count = delivered_count;
+                    run_record.Failed_Count = failed_count;
+                    run_record.Collected_COD_Amount = collected_cod;
+                    run_record.DRS_Status = "In Progress";
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Record Failed Delivery"
+                        Module_Name = "Delivery Run Sheet Items"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Stop=Out For Delivery; Shipment=Out For Delivery (OFD)"
+                        After_Data = "Stop=" + input.Delivery_Status + "; Shipment=" + shipment_record.Shipment_Status + "; NDR Reason=" + input.NDR_Reason + "; Attempt=" + next_attempt + "; NDR ID=" + ndr_id
+                        Source = "Report Action"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

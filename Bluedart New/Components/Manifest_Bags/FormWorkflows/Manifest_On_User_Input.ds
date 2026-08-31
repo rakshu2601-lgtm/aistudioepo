@@ -1,0 +1,26 @@
+Manifest_On_User_Input as "Filter Bags for Manifest"
+{
+    type = form
+    form = Manifest_Bags
+    record event = on add or edit
+    description = "Offers only sealed bags matching the selected draft manifest route and movement type"
+
+    on user input of Manifest
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Bag = null;
+                clear Bag;
+                manifest_record = Manifests[ID == input.Manifest && Manifest_Status == "Draft"];
+                if(manifest_record.count(ID) > 0)
+                {
+                    expected_bag_type = if(manifest_record.Manifest_Type == "Linehaul","Master",manifest_record.Manifest_Type);
+                    eligible_bags = Logistics_Bags[Bag_Status == "Sealed" && Bag_Type == expected_bag_type && Origin_Hub == manifest_record.Origin_Hub && Destination_Hub == manifest_record.Destination_Hub].ID.getall();
+                    Bag:ui.add(eligible_bags);
+                }
+            )
+        }
+    }
+}

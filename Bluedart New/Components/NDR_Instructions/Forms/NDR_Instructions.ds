@@ -1,0 +1,229 @@
+form NDR_Instructions
+{
+    title
+    {
+        displayname = "NDR Instructions"
+        on add = "Create NDR Instruction"
+        on edit = "Respond to Failed Delivery"
+    }
+    captcha = true
+    success message = "Your delivery instruction has been submitted securely."
+
+    NDR_Identity
+    (
+        type = section
+        displayname = "Secure Delivery Exception"
+        row = 1
+        column = 0
+    )
+    NDR_ID
+    (
+        type = autonumber
+        displayname = "NDR ID"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Customer
+    (
+        type = picklist
+        displayname = "Customer"
+        values = Customers.ID
+        displayformat = [Email_ID]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Customer_Login_Email
+    (
+        type = email
+        displayname = "Customer Login Email"
+        personal data = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Shipment
+    (
+        type = picklist
+        displayname = "Shipment"
+        values = Shipment_Requests.ID
+        displayformat = [AWB_Number]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Delivery_Run_Item
+    (
+        type = picklist
+        displayname = "Delivery Run Item"
+        values = Delivery_Run_Sheet_Items.ID
+        displayformat = [Stop_Sequence]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Secure_Token
+    (
+        type = text
+        displayname = "Secure Token"
+        maxchar = 128
+        isencrypted = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Failure_Reason
+    (
+        type = text
+        displayname = "Failure Reason"
+        maxchar = 100
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    Recipient_Response
+    (
+        type = section
+        displayname = "Recipient Instruction"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Recipient_Instruction
+    (
+        type = radiobuttons
+        displayname = "What would you like us to do?"
+        values = {"Reschedule Delivery","Update Delivery Address","Hold at Local Office"}
+        row = 2
+        column = 1
+        width = medium
+    )
+    Reschedule_Date
+    (
+        type = date
+        displayname = "Preferred Reschedule Date"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Updated_Delivery_Address
+    (
+        type = address
+        displayname = "Updated Delivery Address"
+        address_line_1
+        (
+            type = address_line_1
+            displayname = "Address Line 1"
+        )
+        address_line_2
+        (
+            type = address_line_2
+            displayname = "Address Line 2"
+        )
+        district_city
+        (
+            type = district_city
+            displayname = "City"
+        )
+        state_province
+        (
+            type = state_province
+            displayname = "State"
+        )
+        postal_Code
+        (
+            type = postal_Code
+            displayname = "Pincode"
+        )
+        country
+        (
+            type = country
+            displayname = "Country"
+        )
+        latitude
+        (
+            type = latitude
+            displayname = "Latitude"
+        )
+        longitude
+        (
+            type = longitude
+            displayname = "Longitude"
+        )
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    Processing_Status
+    (
+        type = section
+        displayname = "Processing Status"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Submitted_At
+    (
+        type = datetime
+        displayname = "Submitted At"
+        row = 3
+        column = 1
+        width = medium
+    )
+    must have NDR_Status
+    (
+        type = picklist
+        displayname = "NDR Status"
+        values = {"Awaiting Instruction","New","Acknowledged","Added to Next DRS","RTO"}
+        initial value = "Awaiting Instruction"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Supervisor_Notes
+    (
+        type = textarea
+        displayname = "Supervisor Notes"
+        height = 100px
+        row = 3
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit Instruction"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Submit Instruction"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

@@ -1,0 +1,19 @@
+Loyalty_Transactions_On_Delete as "Protect Loyalty Ledger"
+{
+    type = form
+    form = Loyalty_Transactions
+    record event = on delete
+    description = "Prevents deletion of posted loyalty transactions"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Posted loyalty transactions are immutable and cannot be deleted.";
+                cancel delete;
+            )
+        }
+    }
+}

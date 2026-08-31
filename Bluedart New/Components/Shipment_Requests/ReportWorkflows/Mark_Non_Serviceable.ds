@@ -1,0 +1,151 @@
+Mark_Non_Serviceable as "Mark Non-Serviceable"
+{
+    type = functions
+    form = Shipment_Requests
+    execution type = for each record
+    description = "Cancels an unassigned non-serviceable shipment and queues paid bookings for provider-verified refund confirmation"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(input.Shipment_Status != "Booked - Hub Assignment Pending")
+                {
+                    info "Only a shipment awaiting hub assignment can be marked non-serviceable.";
+                }
+                else
+                {
+                    prior_payment_status = input.Payment_Status;
+                    input.Shipment_Status = "Cancelled";
+                    if(input.Payment_Status == "Paid")
+                    {
+                        for each payment_record in Payment_Transactions[Shipment == input.ID && Payment_Status == "Success"]
+                        {
+                            if(Audit_Log[Module_Name == "Payment Transactions" && Record_ID == payment_record.ID.toString() && Action_Name == "Refund Required"].count(ID) == 0)
+                            {
+                                refund_audit_id = insert into Audit_Log
+                                [
+                                    Event_Time = zoho.currenttime
+                                    Actor_Email = zoho.loginuserid
+                                    Actor_Profile = current_profile
+                                    Action_Name = "Refund Required"
+                                    Module_Name = "Payment Transactions"
+                                    Record_ID = payment_record.ID.toString()
+                                    Before_Data = "Payment Status=Success; Shipment Status=Booked - Hub Assignment Pending"
+                                    After_Data = "Payment Status=Success; Shipment Status=Cancelled; Provider refund confirmation required"
+                                    Source = "Report Action"
+                                    Severity = "Critical"
+                                ];
+                            }
+                        }
+                    }
+                    for each invoice_record in Invoices[Shipment == input.ID && Invoice_Status != "Void"]
+                    {
+                        invoice_record.Invoice_Status = "Void";
+                    }
+                    for each ledger_record in Account_Ledger[Shipment == input.ID && Transaction_Type == "Debit"]
+                    {
+                        reversal_reference = "CANCEL-" + input.AWB_Number + "-" + ledger_record.ID;
+                        if(Account_Ledger[Payment_Reference == reversal_reference].count(ID) == 0)
+                        {
+                            reversal_id = insert into Account_Ledger
+                            [
+                                Customer = input.Customer
+                                Shipment = input.ID
+                                Invoice = ledger_record.Invoice
+                                Transaction_Type = "Credit"
+                                Amount = ledger_record.Amount
+                                Transaction_Date = zoho.currenttime
+                                Ledger_Status = "Settled"
+                                Ageing_Bucket = "Not Applicable"
+                                Payment_Reference = reversal_reference
+                                Notes = "Reversing credit posted because the shipment was cancelled as non-serviceable."
+                                Posted_By_Email = zoho.loginuserid
+                                Customer_Login_Email = ledger_record.Customer_Login_Email
+                            ];
+                        }
+                        ledger_record.Ledger_Status = "Settled";
+                        ledger_record.Notes = ifnull(ledger_record.Notes,"") + " | Cancelled as non-serviceable" + if(prior_payment_status == "Paid","; paid status retained until provider refund is confirmed by finance.","; receivable reversed.") + " Reversal: " + reversal_reference + ".";
+                    }
+                    for each non_debit_ledger_record in Account_Ledger[Shipment == input.ID && Transaction_Type != "Debit" && Transaction_Type != "Credit" && Ledger_Status != "Settled"]
+                    {
+                        non_debit_ledger_record.Ledger_Status = "Settled";
+                        non_debit_ledger_record.Notes = ifnull(non_debit_ledger_record.Notes,"") + " | Shipment cancelled as non-serviceable.";
+                    }
+                    thisapp.Recalculate_Customer_Outstanding(input.Customer);
+                    if(ifnull(input.Loyalty_Points_Redeemed,0) > 0)
+                    {
+                        customer_record = Customers[ID == input.Customer];
+                        customer_record.Current_Loyalty_Points = ifnull(customer_record.Current_Loyalty_Points,0) + input.Loyalty_Points_Redeemed;
+                        reversal_id = insert into Loyalty_Transactions
+                        [
+                            Customer = input.Customer
+                            Shipment = input.ID
+                            Transaction_Type = "Reverse"
+                            Points = input.Loyalty_Points_Redeemed
+                            Amount_Equivalent = input.Loyalty_Redemption_Amount
+                            Transaction_Date = zoho.currenttime
+                            Points_Status = "Available"
+                            Applied_Tier = customer_record.Current_Loyalty_Tier
+                            Reference = "Non-serviceable cancellation for AWB " + input.AWB_Number
+                            Notes = "Restored points redeemed at booking"
+                            Posted_By_Email = zoho.loginuserid
+                            Customer_Login_Email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID)
+                        ];
+                    }
+                    tracking_id = insert into Shipment_Tracking_Events
+                    [
+                        Shipment = input.ID
+                        Event_Time = zoho.currenttime
+                        Event_Status = "Cancelled"
+                        Hub = input.Current_Hub
+                        Event_Description = "Shipment cancelled because the route could not be serviced."
+                        Source = "System"
+                        Customer_Visible = true
+                        Created_By_Email = zoho.loginuserid
+                    ];
+                    customer_record = Customers[ID == input.Customer];
+                    recipient_email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID);
+                    communication_summary = if(prior_payment_status == "Paid","Shipment was cancelled as non-serviceable. The paid amount is awaiting provider-confirmed refund processing.","Shipment was cancelled as non-serviceable. Any receivable and loyalty redemption were reversed.");
+                    communication_id = insert into Communication_Log
+                    [
+                        Customer = input.Customer
+                        Shipment = input.ID
+                        Recipient = recipient_email
+                        Channel = "Email"
+                        Template_Code = "SHIPMENT_NON_SERVICEABLE"
+                        Subject = "Shipment cancelled: AWB " + input.AWB_Number
+                        Message_Summary = communication_summary
+                        Provider = "Zoho Mail"
+                        Communication_Status = "Sent"
+                        Attempt_Count = 1
+                        Last_Attempt_At = zoho.currenttime
+                    ];
+                    sendmail
+                    [
+                        from: zoho.adminuserid
+                        to: recipient_email
+                        subject: "Shipment cancelled: AWB " + input.AWB_Number
+                        message: if(prior_payment_status == "Paid","We could not service this route, so the booking was cancelled. Your paid amount will be marked refunded only after our finance team verifies completion with the payment provider.","We could not service this route, so the booking was cancelled. Any redeemed loyalty points and open receivable have been reversed.")
+                    ]
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Mark Shipment Non-Serviceable"
+                        Module_Name = "Shipment Requests"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=Booked - Hub Assignment Pending; Payment Status=" + prior_payment_status
+                        After_Data = "Status=Cancelled; Payment Status=" + input.Payment_Status + if(prior_payment_status == "Paid","; Refund verification required","")
+                        Source = "Report Action"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

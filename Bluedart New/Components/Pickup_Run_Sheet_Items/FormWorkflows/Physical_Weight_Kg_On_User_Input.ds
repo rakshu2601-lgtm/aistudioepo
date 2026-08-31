@@ -1,0 +1,32 @@
+Physical_Weight_Kg_On_User_Input as "Recalculate Pickup Charge"
+{
+    type = form
+    form = Pickup_Run_Sheet_Items
+    record event = on add or edit
+    description = "Calculates the revised shipment payable amount from the physical pickup weight"
+
+    on user input of Physical_Weight_Kg
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Revised_Charge = 0;
+                input.Customer_Approved_Revised_Charge = false;
+                if(input.Shipment != null && ifnull(input.Physical_Weight_Kg,0) > 0)
+                {
+                    shipment_record = Shipment_Requests[ID == input.Shipment];
+                    quote = thisapp.Calculate_Shipment_Quote(shipment_record.Customer,shipment_record.Pickup_Pincode,shipment_record.Delivery_Pincode,shipment_record.Transport_Mode,shipment_record.Length_Cm,shipment_record.Width_Cm,shipment_record.Height_Cm,input.Physical_Weight_Kg,shipment_record.Payment_Type,shipment_record.Loyalty_Points_Redeemed);
+                    if(quote.get("valid") == true)
+                    {
+                        input.Revised_Charge = quote.get("total_payable");
+                    }
+                    else
+                    {
+                        alert quote.get("message");
+                    }
+                }
+            )
+        }
+    }
+}

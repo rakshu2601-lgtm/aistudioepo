@@ -1,0 +1,23 @@
+Payment_Transactions_On_Load as "Protect Payment Transaction"
+{
+    type = form
+    form = Payment_Transactions
+    record event = on add or edit
+    description = "Keeps gateway and reconciliation fields read-only and redirects portal customers to invoice payment actions"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Customer, Shipment, Invoice, Ledger_Entry, Gateway, Gateway_Order_ID, Gateway_Payment_ID, Amount, Payment_Method, Payment_Status, Initiated_At, Completed_At, Gateway_Response_Summary, Failure_Reason, Customer_Login_Email;
+                if(thisapp.portal.isUserInProfile("Customer_Portal") == true && input.ID == null)
+                {
+                    alert "Start payments from the Pay Now action on an eligible invoice.";
+                    openUrl("#Report:Invoice_Statement","same window");
+                }
+            )
+        }
+    }
+}

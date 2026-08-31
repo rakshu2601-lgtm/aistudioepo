@@ -1,0 +1,198 @@
+form Communication_Log
+{
+    title
+    {
+        displayname = "Communication Log"
+        on add = "Queue Communication"
+        on edit = "Review Communication"
+    }
+    success message = "Communication record saved"
+
+    Communication_Identity
+    (
+        type = section
+        displayname = "Communication Identity"
+        row = 1
+        column = 0
+    )
+    Communication_ID
+    (
+        type = autonumber
+        displayname = "Communication ID"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    Customer
+    (
+        type = picklist
+        displayname = "Customer"
+        values = Customers.ID
+        displayformat = [Customer_ID]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Shipment
+    (
+        type = picklist
+        displayname = "Shipment"
+        values = Shipment_Requests.ID
+        displayformat = [AWB_Number]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Recipient
+    (
+        type = text
+        displayname = "Recipient"
+        maxchar = 255
+        personal data = true
+        isencrypted = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Channel
+    (
+        type = picklist
+        displayname = "Channel"
+        values = {"Email","SMS","WhatsApp","Portal Notification"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Template_Code
+    (
+        type = text
+        displayname = "Template Code"
+        maxchar = 100
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    Message_Details
+    (
+        type = section
+        displayname = "Message Details"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Subject
+    (
+        type = text
+        displayname = "Subject"
+        maxchar = 255
+        row = 2
+        column = 1
+        width = medium
+    )
+    Message_Summary
+    (
+        type = textarea
+        displayname = "Message Summary"
+        height = 120px
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Provider
+    (
+        type = picklist
+        displayname = "Provider"
+        values = {"Zoho Mail","ZeptoMail","PhoneBridge","Configured SMS Gateway","Other"}
+        row = 2
+        column = 1
+        width = medium
+    )
+    Provider_Message_ID
+    (
+        type = text
+        displayname = "Provider Message ID"
+        maxchar = 255
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    Delivery_Outcome
+    (
+        type = section
+        displayname = "Delivery Outcome"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Communication_Status
+    (
+        type = picklist
+        displayname = "Communication Status"
+        values = {"Queued","Sent","Delivered","Failed"}
+        initial value = "Queued"
+        row = 3
+        column = 1
+        width = medium
+    )
+    must have Attempt_Count
+    (
+        type = number
+        displayname = "Attempt Count"
+        initial value = 0
+        row = 3
+        column = 2
+        width = medium
+    )
+    Last_Attempt_At
+    (
+        type = datetime
+        displayname = "Last Attempt At"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Failure_Reason
+    (
+        type = textarea
+        displayname = "Failure Reason"
+        height = 100px
+        row = 3
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Queue Communication"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Communication"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

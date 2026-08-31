@@ -1,0 +1,37 @@
+list Agent_Location_Map
+{
+    displayName = "Agent Location Coordinates"
+    show all rows from Operations_Users [Application_Role == "Field Agent" && Active == true && Current_Latitude != null && Current_Longitude != null]
+    (
+        Employee_ID
+        Employee_Name
+        Mobile_Number
+        Home_Hub
+        Deputed_Hub
+        Assigned_Beat
+        Current_Latitude
+        Current_Longitude
+        Last_Location_At
+        Active
+    )
+    filters
+    (
+        Home_Hub
+        Deputed_Hub
+        Assigned_Beat
+        Active
+    )
+    sort by
+    (
+        Last_Location_At descending
+    )
+    conditional formatting
+    (
+        "Location Not Recently Updated"
+        {
+            condition = (Last_Location_At < zoho.currenttime.addHour(-2))
+            fields = [Employee_Name, Last_Location_At]
+            format = "background-color:#FEF3C7;color:#92400E"
+        }
+    )
+}

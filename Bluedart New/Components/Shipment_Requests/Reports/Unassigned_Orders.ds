@@ -1,0 +1,62 @@
+list Unassigned_Orders
+{
+    displayName = "Unassigned Orders"
+    show all rows from Shipment_Requests [Shipment_Status == "Booked - Hub Assignment Pending"]
+    (
+        AWB_Number
+        Booked_On
+        Customer
+        Pickup_Address
+        Pickup_Pincode
+        Delivery_Address
+        Delivery_Pincode
+        Billable_Weight_Kg
+        Total_Payable
+        Collection_Center
+        Destination_Hub
+        Shipment_Status
+        custom action "Assign Collection Center"
+        (
+            workflow = Assign_Collection_Center
+            show action for each record = true
+            column header = "Assign Collection Center"
+            success message = "Collection center assignment evaluated"
+            condition = (Shipment_Status == "Booked - Hub Assignment Pending")
+        )
+        custom action "Reassign Alternate Hub"
+        (
+            workflow = Reassign_Alternate_Hub
+            show action for each record = true
+            column header = "Reassign Alternate Hub"
+            success message = "Alternate hub assignment evaluated"
+            condition = (Shipment_Status == "Booked - Hub Assignment Pending")
+        )
+        custom action "Mark Non-Serviceable"
+        (
+            workflow = Mark_Non_Serviceable
+            show action for each record = true
+            column header = "Mark Non-Serviceable"
+            success message = "Shipment marked non-serviceable"
+            condition = (Shipment_Status == "Booked - Hub Assignment Pending")
+            confirmation before execution
+            (
+                message for individual record = "Cancel this shipment as non-serviceable and start refund handling where applicable?"
+                confirm button text = "Mark Non-Serviceable"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Customer
+        Pickup_Pincode
+        Delivery_Pincode
+        Collection_Center
+        Destination_Hub
+        Shipment_Status
+    )
+    sort by
+    (
+        Booked_On ascending
+    )
+}

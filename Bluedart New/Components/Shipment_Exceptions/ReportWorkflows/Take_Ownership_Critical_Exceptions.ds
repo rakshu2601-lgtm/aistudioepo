@@ -1,0 +1,58 @@
+Take_Ownership_Critical_Exceptions as "Take Ownership - Critical Exceptions"
+{
+    type = functions
+    form = Shipment_Exceptions
+    execution type = for each record
+    description = "Assigns an open exception to the current authorised operations user"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                effective_hub = null;
+                if(logged_user.count(ID) > 0)
+                {
+                    effective_hub = logged_user.Home_Hub;
+                    deputation_active = logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                    if(deputation_active == true)
+                    {
+                        effective_hub = logged_user.Deputed_Hub;
+                    }
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == input.Reporting_Hub;
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the reporting hub can take ownership of this exception.";
+                }
+                else if(input.Exception_Status == "Resolved" || input.Exception_Status == "Claim Raised")
+                {
+                    info "Resolved or claim-raised exceptions cannot be taken into investigation.";
+                }
+                else
+                {
+                    prior_owner = ifnull(input.Assigned_To_Email,"");
+                    prior_status = input.Exception_Status;
+                    input.Assigned_To_Email = zoho.loginuserid;
+                    input.Exception_Status = "Investigating";
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Take Exception Ownership"
+                        Module_Name = "Shipment Exceptions"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=" + prior_status + "; Owner=" + prior_owner
+                        After_Data = "Status=Investigating; Owner=" + zoho.loginuserid
+                        Source = "Report Action"
+                        Severity = "Warning"
+                    ];
+                }
+            )
+        }
+    }
+}

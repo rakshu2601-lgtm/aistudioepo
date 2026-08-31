@@ -1,0 +1,34 @@
+kanban Bag_Status_Board
+{
+    displayName = "Bag Status Board"
+    show all rows from Logistics_Bags
+    (
+        Bag_Number
+        Bag_Type
+        Origin_Hub
+        Destination_Hub
+        Bag_Status
+        Total_Shipments
+        Total_Weight_Kg
+        Created_At
+    )
+    filters
+    (
+        Bag_Type
+        Origin_Hub
+        Destination_Hub
+        Bag_Status
+        Created_At
+    )
+    sort by
+    (
+        Created_At descending
+    )
+    options
+    (
+        display field = Bag_Status
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

@@ -1,0 +1,106 @@
+Initiate_RTO as "Initiate RTO"
+{
+    type = functions
+    form = NDR_Instructions
+    execution type = for each record
+    description = "Applies NDR attempt policy and reverses routing for return-to-origin processing"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                shipment_record = Shipment_Requests[ID == input.Shipment];
+                run_item = Delivery_Run_Sheet_Items[ID == input.Delivery_Run_Item];
+                config_record = App_Configuration[Active == true] range from 0 to 0;
+                maximum_attempts = if(config_record.count(ID) > 0,config_record.Maximum_NDR_Attempts,3);
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                effective_hub = if(logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate),logged_user.Deputed_Hub,logged_user.Home_Hub);
+                authorised = logged_user.count(ID) > 0 && effective_hub == shipment_record.Destination_Hub;
+                latest_failure = Delivery_Run_Sheet_Items[ID == input.Delivery_Run_Item];
+                refusal_or_limit = latest_failure.NDR_Reason == "Refused COD" || ifnull(shipment_record.NDR_Attempt_Count,0) >= maximum_attempts;
+                if(authorised == false)
+                {
+                    info "You are not authorised to initiate RTO for this shipment.";
+                }
+                else if(input.NDR_Status == "Awaiting Instruction" || input.NDR_Status == "RTO" || input.NDR_Status == "Added to Next DRS")
+                {
+                    info "This NDR record is not eligible for manual RTO initiation.";
+                }
+                else if(refusal_or_limit == false)
+                {
+                    info "RTO requires COD refusal or the configured maximum number of delivery attempts.";
+                }
+                else
+                {
+                    previous_ndr_status = input.NDR_Status;
+                    original_collection_center = shipment_record.Collection_Center;
+                    original_origin_sorting_hub = shipment_record.Origin_Sorting_Hub;
+                    original_destination_sorting_hub = shipment_record.Destination_Sorting_Hub;
+                    original_destination_hub = shipment_record.Destination_Hub;
+                    shipment_record.Collection_Center = original_destination_hub;
+                    shipment_record.Origin_Sorting_Hub = original_destination_sorting_hub;
+                    shipment_record.Destination_Sorting_Hub = original_origin_sorting_hub;
+                    shipment_record.Destination_Hub = original_collection_center;
+                    shipment_record.Current_Hub = original_destination_hub;
+                    shipment_record.Shipment_Status = "Return to Origin";
+                    input.NDR_Status = "RTO";
+                    input.Supervisor_Notes = ifnull(input.Supervisor_Notes,"") + "\nRTO initiated by " + zoho.loginuserid + " on " + zoho.currenttime + ".";
+                    if(run_item.count(ID) > 0)
+                    {
+                        run_item.Delivery_Status = "RTO";
+                    }
+                    tracking_id = insert into Shipment_Tracking_Events
+                    [
+                        Shipment = shipment_record.ID
+                        Event_Time = zoho.currenttime
+                        Event_Status = "Return to Origin"
+                        Hub = original_destination_hub
+                        Event_Description = "Return-to-origin routing initiated under NDR attempt/refusal policy."
+                        Source = "RTO"
+                        Customer_Visible = true
+                        Created_By_Email = zoho.loginuserid
+                    ];
+                    customer_record = Customers[ID == shipment_record.Customer];
+                    sender_email = if(ifnull(shipment_record.Sender_Email,"").trim() != "",shipment_record.Sender_Email,customer_record.Email_ID);
+                    sendmail
+                    [
+                        from: zoho.adminuserid
+                        to: sender_email
+                        subject: "Return to origin initiated: AWB " + shipment_record.AWB_Number
+                        message: "The shipment entered return-to-origin processing after delivery attempt policy was met."
+                    ]
+                    communication_id = insert into Communication_Log
+                    [
+                        Customer = customer_record.ID
+                        Shipment = shipment_record.ID
+                        Recipient = sender_email
+                        Channel = "Email"
+                        Template_Code = "SHIPMENT_RTO_INITIATED"
+                        Subject = "Return to origin initiated: AWB " + shipment_record.AWB_Number
+                        Message_Summary = "Sender notified after RTO routing was initiated."
+                        Provider = "Zoho Mail"
+                        Communication_Status = "Sent"
+                        Attempt_Count = 1
+                        Last_Attempt_At = zoho.currenttime
+                    ];
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Initiate RTO"
+                        Module_Name = "NDR Instructions"
+                        Before_Data = "Status=" + previous_ndr_status + "; Destination Hub=" + original_destination_hub
+                        Before_Data = "Status=" + input.NDR_Status + "; Destination Hub=" + original_destination_hub
+                        After_Data = "Status=RTO; Shipment=Return to Origin; Return Destination=" + original_collection_center
+                        Source = "Report Action"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,74 @@
+Operations_Users_On_Validate as "Validate Operations User"
+{
+    type = form
+    form = Operations_Users
+    record event = on add or edit
+    description = "Validates hub scope, agent capacity, deputation dates, and location coordinates"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                hub_scoped_roles = {"Hub Supervisor","Hub Operator","Field Agent"};
+                if(input.Application_Role in hub_scoped_roles && input.Home_Hub == null)
+                {
+                    alert "Home Hub is required for hub-scoped users.";
+                    cancel submit;
+                }
+                if(input.Application_Role == "Field Agent")
+                {
+                    if(input.Agent_Role == null || input.Agent_Role == "Not Applicable")
+                    {
+                        alert "Select Pickup, Delivery, or Both as the agent role.";
+                        cancel submit;
+                    }
+                    if(ifnull(input.Maximum_Daily_Load_Kg,0) <= 0)
+                    {
+                        alert "Maximum daily load must be greater than zero for field agents.";
+                        cancel submit;
+                    }
+                }
+                else if(input.Agent_Role != "Not Applicable")
+                {
+                    alert "Agent Role must be Not Applicable for non-agent users.";
+                    cancel submit;
+                }
+                has_deputed_hub = input.Deputed_Hub != null;
+                has_deputation_start = input.Deputation_Start_Date != null;
+                has_deputation_end = input.Deputation_End_Date != null;
+                if((has_deputed_hub || has_deputation_start || has_deputation_end) && !(has_deputed_hub && has_deputation_start && has_deputation_end))
+                {
+                    alert "Deputed Hub, Deputation Start Date, and Deputation End Date must be provided together.";
+                    cancel submit;
+                }
+                if(has_deputed_hub)
+                {
+                    if(input.Deputed_Hub == input.Home_Hub)
+                    {
+                        alert "Deputed Hub must differ from Home Hub.";
+                        cancel submit;
+                    }
+                    if(input.Deputation_End_Date < input.Deputation_Start_Date)
+                    {
+                        alert "Deputation End Date cannot be before the start date.";
+                        cancel submit;
+                    }
+                }
+                has_latitude = input.Current_Latitude != null;
+                has_longitude = input.Current_Longitude != null;
+                if(has_latitude != has_longitude)
+                {
+                    alert "Latitude and longitude must be provided together.";
+                    cancel submit;
+                }
+                if(has_latitude && (input.Current_Latitude < -90 || input.Current_Latitude > 90 || input.Current_Longitude < -180 || input.Current_Longitude > 180))
+                {
+                    alert "Enter valid latitude and longitude coordinates.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,12 @@
+forms
+{
+    form Shipment_Requests { label placement = left }
+    form Pickup_Run_Sheets { label placement = left }
+    form Logistics_Bags { label placement = left }
+    form Bag_Shipments { label placement = left }
+    form Manifests { label placement = left }
+    form Manifest_Bags { label placement = left }
+    form Shipment_Exceptions { label placement = left }
+    form Delivery_Run_Sheets { label placement = left }
+    form COD_Remittances { label placement = left }
+}

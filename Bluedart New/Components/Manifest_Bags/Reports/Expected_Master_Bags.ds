@@ -1,0 +1,60 @@
+list Expected_Master_Bags
+{
+    displayName = "Expected Master Bags"
+    show all rows from Manifest_Bags [Manifest_Type == "Linehaul" && (Load_Status == "Expected" || Load_Status == "Loaded")]
+    (
+        Manifest
+        Manifest_Type
+        Bag
+        Load_Status
+        Loaded_At
+        Received_At
+        Seal_Verified
+        Exception_Photo
+        Exception_Notes
+        custom action "Receive Bag"
+        (
+            workflow = Receive_Manifest_Bag
+            show action for each record = true
+            column header = "Receive Bag"
+            success message = "Bag receipt evaluated"
+            condition = (Load_Status == "Loaded")
+        )
+        custom action "Mark Missing"
+        (
+            workflow = Mark_Manifest_Bag_Missing
+            show action for each record = true
+            column header = "Mark Missing"
+            success message = "Missing-bag reconciliation evaluated"
+            condition = (Load_Status == "Loaded")
+        )
+        custom action "Mark Damaged"
+        (
+            workflow = Mark_Manifest_Bag_Damaged
+            show action for each record = true
+            column header = "Mark Damaged"
+            success message = "Damaged-bag reconciliation evaluated"
+            condition = (Load_Status == "Loaded")
+        )
+        custom action "Mark Short"
+        (
+            workflow = Mark_Manifest_Bag_Short
+            show action for each record = true
+            column header = "Mark Short"
+            success message = "Short-bag reconciliation evaluated"
+            condition = (Load_Status == "Loaded")
+        )
+    )
+    filters
+    (
+        Manifest
+        Manifest_Type
+        Bag
+        Load_Status
+        Seal_Verified
+    )
+    sort by
+    (
+        Loaded_At ascending
+    )
+}

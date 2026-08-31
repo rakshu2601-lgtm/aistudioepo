@@ -1,0 +1,41 @@
+list Credit_Utilization
+{
+    displayName = "Credit Utilization"
+    show all rows from Account_Ledger [(Transaction_Type == "Debit" || (Transaction_Type == "Adjustment" && Amount > 0)) && (Ledger_Status == "Open" || Ledger_Status == "Partially Settled" || Ledger_Status == "Overdue")]
+    (
+        Customer
+        Invoice
+        Shipment
+        Transaction_Type
+        Amount
+        (
+            display = total
+        )
+        Transaction_Date
+        Due_Date
+        Ledger_Status
+        Ageing_Bucket
+    )
+    filters
+    (
+        Customer
+        Transaction_Type
+        Due_Date
+        Ledger_Status
+        Ageing_Bucket
+    )
+    sort by
+    (
+        Amount descending
+        Due_Date ascending
+    )
+    conditional formatting
+    (
+        "High Risk Credit"
+        {
+            condition = (Ledger_Status == "Overdue" && (Ageing_Bucket == "61-90 Days" || Ageing_Bucket == "90+ Days"))
+            fields = [Customer, Amount, Due_Date, Ledger_Status, Ageing_Bucket]
+            format = "background-color:#7F1D1D;color:#FFFFFF;font-weight:bold"
+        }
+    )
+}

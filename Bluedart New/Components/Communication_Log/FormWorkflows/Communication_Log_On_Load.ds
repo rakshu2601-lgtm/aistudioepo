@@ -1,0 +1,27 @@
+Communication_Log_On_Load as "Protect Communication Outcome"
+{
+    type = form
+    form = Communication_Log
+    record event = on add or edit
+    description = "Protects provider outcome fields and keeps customer portal users out of the internal queue"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Communication_Status, Attempt_Count, Last_Attempt_At, Provider_Message_ID, Failure_Reason;
+                if(thisapp.permissions.loginUserProfile() == "Customer_Portal")
+                {
+                    alert "Communication delivery records are available only to authorised internal teams.";
+                    openUrl("#Page:Customer_Dashboard","same window");
+                }
+                if(input.ID != null && ifnull(input.Attempt_Count,0) > 0)
+                {
+                    disable Customer, Shipment, Recipient, Channel, Template_Code, Subject, Message_Summary, Provider;
+                }
+            )
+        }
+    }
+}

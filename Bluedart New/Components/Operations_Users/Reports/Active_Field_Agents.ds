@@ -1,0 +1,39 @@
+list Active_Field_Agents
+{
+    displayName = "Active Field Agents"
+    show all rows from Operations_Users [Application_Role == "Field Agent" && Active == true]
+    (
+        Employee_ID
+        Employee_Name
+        Work_Email
+        Mobile_Number
+        Home_Hub
+        Agent_Role
+        Assigned_Beat
+        Assigned_Pincodes
+        Vehicle_Type
+        Maximum_Daily_Load_Kg
+        Deputed_Hub
+        Active
+    )
+    filters
+    (
+        Home_Hub
+        Agent_Role
+        Vehicle_Type
+        Deputed_Hub
+        Active
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Home_Hub ascending
+    )
+    sort by
+    (
+        Employee_Name ascending
+    )
+}

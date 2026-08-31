@@ -1,0 +1,76 @@
+Shipment_Requests_On_Load as "Secure and Configure Shipment Booking"
+{
+    type = form
+    form = Shipment_Requests
+    record event = on add or edit
+    description = "Resolves the portal customer and protects calculated, routing, payment, and lifecycle fields"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Booking_Source, Volumetric_Weight_Kg, Billable_Weight_Kg, Rated_Distance_Km, Applied_Rate_Card, Applied_Rate_Slab, Base_Rate, Fuel_Surcharge, COD_Handling_Fee, GST_Amount, Gross_Amount, Loyalty_Redemption_Amount, Total_Payable, Payment_Status, Credit_Check_Status, Collection_Center, Origin_Sorting_Hub, Destination_Sorting_Hub, Destination_Hub, Current_Hub, Shipment_Status, Booked_On, NDR_Attempt_Count, Loyalty_Awarded, EPOD_WorkDrive_File_ID, EPOD_Download_URL;
+                is_portal = thisapp.portal.isUserInProfile("Customer_Portal");
+                if(input.ID == null && is_portal == false)
+                {
+                    if(thisapp.permissions.loginUserProfile() == "Field_Agent")
+                    {
+                        input.Booking_Source = "Field Agent";
+                    }
+                    else
+                    {
+                        input.Booking_Source = "Employee";
+                    }
+                }
+                if(is_portal == true)
+                {
+                    portal_customer = Customers[(Portal_Login_Email == zoho.loginuserid || Email_ID == zoho.loginuserid) && Active == true];
+                    if(portal_customer.count(ID) == 0)
+                    {
+                        alert "No active customer profile is linked to this portal login.";
+                        disable Booking_Source, Customer, Sender_Name, Sender_Phone, Sender_Email, Pickup_Address, Pickup_Pincode, Recipient_Name, Recipient_Phone, Recipient_Email, Delivery_Address, Delivery_Pincode, Package_Count, Contents_Description, Declared_Value, Transport_Mode, Length_Cm, Width_Cm, Height_Cm, Actual_Weight_Kg, Loyalty_Points_Redeemed, Payment_Type, COD_Amount;
+                        openUrl("#Page:Customer_Dashboard","same window");
+                    }
+                    else
+                    {
+                        if(input.ID == null)
+                        {
+                            input.Booking_Source = "Customer Portal";
+                            input.Customer = portal_customer.ID;
+                            input.Sender_Name = ifnull(portal_customer.Full_Name.first_name,"") + " " + ifnull(portal_customer.Full_Name.last_name,"");
+                            input.Sender_Phone = portal_customer.Mobile_Number;
+                            input.Sender_Email = portal_customer.Email_ID;
+                            input.Pickup_Address = portal_customer.Primary_Address;
+                            input.Pickup_Pincode = portal_customer.Primary_Address.postal_Code;
+                            if(portal_customer.Payment_Terms == "Prepaid")
+                            {
+                                input.Payment_Type = "Prepaid";
+                            }
+                        }
+                        disable Booking_Source, Customer;
+                        if(input.Customer != portal_customer.ID)
+                        {
+                            alert "You are not authorised to access this shipment.";
+                            disable Sender_Name, Sender_Phone, Sender_Email, Pickup_Address, Pickup_Pincode, Recipient_Name, Recipient_Phone, Recipient_Email, Delivery_Address, Delivery_Pincode, Package_Count, Contents_Description, Declared_Value, Transport_Mode, Length_Cm, Width_Cm, Height_Cm, Actual_Weight_Kg, Loyalty_Points_Redeemed, Payment_Type, COD_Amount;
+                            openUrl("#Page:Customer_Dashboard","same window");
+                        }
+                    }
+                }
+                if(input.Payment_Type == "COD")
+                {
+                    show COD_Amount;
+                }
+                else
+                {
+                    hide COD_Amount;
+                }
+                if(input.ID != null && input.Shipment_Status != "Booked" && input.Shipment_Status != "Booked - Hub Assignment Pending" && input.Shipment_Status != "Credit Hold")
+                {
+                    disable Booking_Source, Customer, Sender_Name, Sender_Phone, Sender_Email, Pickup_Address, Pickup_Pincode, Recipient_Name, Recipient_Phone, Recipient_Email, Delivery_Address, Delivery_Pincode, Package_Count, Contents_Description, Declared_Value, Transport_Mode, Length_Cm, Width_Cm, Height_Cm, Actual_Weight_Kg, Loyalty_Points_Redeemed, Payment_Type, COD_Amount;
+                }
+            )
+        }
+    }
+}

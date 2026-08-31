@@ -1,0 +1,30 @@
+Tracking_Event_Correction_Audit as "Audit Tracking Event Correction"
+{
+    type = form
+    form = Shipment_Tracking_Events
+    record event = on edit
+    description = "Audits every authorised administrator correction to immutable shipment history"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = current_profile
+                    Action_Name = "Correct Shipment Tracking Event"
+                    Module_Name = "Shipment Tracking Events"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Shipment=" + input.Shipment + "; Status=" + input.Event_Status + "; Event Time=" + input.Event_Time + "; Source=" + input.Source + "; Customer Visible=" + input.Customer_Visible
+                    Source = "Admin Correction"
+                    Severity = "Critical"
+                ];
+            )
+        }
+    }
+}

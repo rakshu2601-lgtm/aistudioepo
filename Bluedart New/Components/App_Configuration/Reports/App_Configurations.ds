@@ -1,0 +1,35 @@
+default list App_Configurations
+{
+    displayName = "Application Configurations"
+    show all rows from App_Configuration
+    (
+        Configuration_Name
+        High_Credit_KYC_Threshold
+        KYC_Expiry_Alert_Days
+        Maximum_NDR_Attempts
+        COD_Payout_Cycle
+        Points_Expiry_Months
+        Default_Volumetric_Divisor
+        Loyalty_Redemption_Value_Per_Point
+        Notification_Retry_Limit
+        Active
+    )
+    filters
+    (
+        Active
+        COD_Payout_Cycle
+    )
+    sort by
+    (
+        Configuration_Name ascending
+    )
+    conditional formatting
+    (
+        "Inactive Policy"
+        {
+            condition = (Active == false)
+            fields = [Configuration_Name, Active]
+            format = "background-color:#F3F4F6;color:#6B7280"
+        }
+    )
+}

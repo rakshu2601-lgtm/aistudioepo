@@ -1,0 +1,43 @@
+Account_Ledger_On_Load as "Secure Account Ledger Load"
+{
+    type = form
+    form = Account_Ledger
+    record event = on add or edit
+    description = "Protects system fields and limits manual ledger posting to authorised finance users"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Transaction_Date, Ageing_Bucket, Posted_By_Email, Customer_Login_Email;
+                current_profile = thisapp.permissions.loginUserProfile();
+                is_portal = thisapp.portal.isUserInProfile("Customer_Portal");
+                if(is_portal == true)
+                {
+                    disable Customer, Shipment, Invoice, Transaction_Type, Amount, Due_Date, Ledger_Status, Payment_Reference, Notes;
+                    alert "Ledger entries are posted by authorised finance processes.";
+                }
+                else if(input.ID != null)
+                {
+                    disable Customer, Shipment, Invoice, Transaction_Type, Amount, Transaction_Date, Due_Date, Payment_Reference, Posted_By_Email, Customer_Login_Email;
+                    if(current_profile != "Logistics_Administrator" && current_profile != "Finance_Officer")
+                    {
+                        disable Ledger_Status, Notes;
+                    }
+                }
+                else if(current_profile == "Logistics_Administrator" || current_profile == "Finance_Officer")
+                {
+                    input.Transaction_Type = "Adjustment";
+                    input.Ledger_Status = "Open";
+                }
+                else
+                {
+                    disable Customer, Shipment, Invoice, Transaction_Type, Amount, Due_Date, Ledger_Status, Payment_Reference, Notes;
+                    alert "Only Logistics Administrators and Finance Officers can post manual ledger entries.";
+                }
+            )
+        }
+    }
+}

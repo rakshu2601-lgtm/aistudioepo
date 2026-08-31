@@ -1,0 +1,52 @@
+default list All_Shipments
+{
+    displayName = "All Shipments"
+    show all rows from Shipment_Requests
+    (
+        AWB_Number
+        Booked_On
+        Booking_Source
+        Customer
+        Sender_Name
+        Recipient_Name
+        Pickup_Pincode
+        Delivery_Pincode
+        Transport_Mode
+        Billable_Weight_Kg
+        Total_Payable
+        Payment_Type
+        Payment_Status
+        Credit_Check_Status
+        Collection_Center
+        Destination_Hub
+        Current_Hub
+        Shipment_Status
+        Expected_Delivery_Date
+    )
+    filters
+    (
+        Booking_Source
+        Customer
+        Transport_Mode
+        Payment_Type
+        Payment_Status
+        Credit_Check_Status
+        Collection_Center
+        Destination_Hub
+        Current_Hub
+        Shipment_Status
+        Expected_Delivery_Date
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Shipment_Status ascending
+    )
+    sort by
+    (
+        Booked_On descending
+    )
+}

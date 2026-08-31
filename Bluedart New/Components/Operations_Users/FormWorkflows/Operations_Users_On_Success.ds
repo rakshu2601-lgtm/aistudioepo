@@ -1,0 +1,29 @@
+Operations_Users_On_Success as "Audit Operations User"
+{
+    type = form
+    form = Operations_Users
+    record event = on add or edit
+    description = "Audits operations user and hub assignment changes"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = "Operations Administration"
+                    Action_Name = "Save Operations User"
+                    Module_Name = "Operations Users"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Employee ID=" + input.Employee_ID + "; Role=" + input.Application_Role + "; Home Hub ID=" + input.Home_Hub + "; Active=" + input.Active
+                    Source = "Form Workflow"
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

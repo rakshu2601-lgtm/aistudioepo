@@ -1,0 +1,83 @@
+Mark_Bag_Shipment_Missing as "Mark Bag Shipment Missing"
+{
+    type = functions
+    form = Bag_Shipments
+    execution type = for each record
+    description = "Marks an expected AWB missing during destination reconciliation and opens an exception"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                bag_record = Logistics_Bags[ID == input.Bag];
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == bag_record.Destination_Hub;
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the destination hub can reconcile this AWB.";
+                }
+                else if((bag_record.Bag_Status != "Received" && bag_record.Bag_Status != "Exception") || input.Scan_Status != "Loaded")
+                {
+                    info "The bag must be received or quarantined and the AWB must still be awaiting reconciliation.";
+                }
+                else
+                {
+                    notes = ifnull(input.Exception_Notes,"").trim();
+                    if(notes == "")
+                    {
+                        notes = "Expected AWB was not found during destination bag reconciliation. Evidence must be attached during investigation.";
+                    }
+                    input.Scan_Status = "Missing";
+                    input.Exception_Notes = notes;
+                    bag_record.Bag_Status = "Exception";
+                    exception_id = insert into Shipment_Exceptions
+                    [
+                        Shipment = input.Shipment
+                        Bag = input.Bag
+                        Exception_Type = "Missing"
+                        Severity = "High"
+                        Reporting_Hub = bag_record.Destination_Hub
+                        Reported_By_Email = zoho.loginuserid
+                        Reported_At = zoho.currenttime
+                        Notes = notes
+                        Exception_Status = "Open"
+                    ];
+                    tracking_id = insert into Shipment_Tracking_Events
+                    [
+                        Shipment = input.Shipment
+                        Event_Time = zoho.currenttime
+                        Event_Status = "Exception"
+                        Hub = bag_record.Destination_Hub
+                        Bag = input.Bag
+                        Event_Description = "Shipment is under operational review following bag reconciliation."
+                        Source = "Bag"
+                        Customer_Visible = true
+                        Created_By_Email = zoho.loginuserid
+                    ];
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Mark Bag Shipment Missing"
+                        Module_Name = "Bag Shipments"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=Loaded"
+                        After_Data = "Status=Missing; Exception=" + exception_id
+                        Source = "Report Action"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

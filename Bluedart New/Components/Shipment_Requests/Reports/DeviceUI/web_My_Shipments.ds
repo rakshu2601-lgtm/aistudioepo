@@ -1,0 +1,5 @@
+report My_Shipments
+{
+    quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( AWB_Number Recipient_Name Shipment_Status Expected_Delivery_Date Total_Payable Payment_Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+    detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( AWB_Number Booked_On Recipient_Name Delivery_Pincode Transport_Mode Billable_Weight_Kg Gross_Amount Loyalty_Points_Redeemed Loyalty_Redemption_Amount Total_Payable Payment_Type Payment_Status Shipment_Status Expected_Delivery_Date EPOD_Download_URL ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

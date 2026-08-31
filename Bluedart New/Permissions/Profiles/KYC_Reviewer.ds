@@ -1,0 +1,18 @@
+"KYC_Reviewer"
+{
+ name = "KYC_Reviewer"
+ type = Users_Permissions
+ permissions = { Chat:true, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+ description = "Customer KYC document review and onboarding approval"
+ ModulePermissions
+ {
+  Customers { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Search allFieldsVisible = false ReportPermissions { All_Customers={"View","Edit"} Verification_Pending={"View","Edit"} Action_Required_Customers={"View","Edit"} KYC_Expiry_Alert={"View"} Active_Customers={"View"} } FieldPermissions { Full_Name{visibility:true,readonly:false} Mobile_Number{visibility:true,readonly:false} Email_ID{visibility:true,readonly:false} Primary_Address{visibility:true,readonly:false} Customer_Type{visibility:true,readonly:false} Company_Name{visibility:true,readonly:false} GSTIN{visibility:true,readonly:false} PAN_Number{visibility:true,readonly:false} Contact_Person_Name{visibility:true,readonly:false} Contact_Person_Email{visibility:true,readonly:false} Contact_Person_Phone{visibility:true,readonly:false} Requested_Credit_Limit{visibility:true,readonly:false} Approved_Credit_Limit{visibility:true,readonly:false} Payment_Terms{visibility:true,readonly:false} Assigned_Rate_Card{visibility:true,readonly:false} Onboarding_Status{visibility:true,readonly:false} KYC_Submitted_On{visibility:true,readonly:true} KYC_Verified_Date{visibility:true,readonly:false} KYC_Expiry_Date{visibility:true,readonly:false} Current_Loyalty_Points{visibility:false} Lifetime_Loyalty_Points{visibility:false} Outstanding_Balance{visibility:false} }
+  }
+  Customer_KYC_Documents { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { All_KYC_Documents={"View","Edit"} KYC_Review_Queue={"View","Edit"} Queried_KYC_Documents={"View","Edit"} } }
+  KYC_Document_Types { enabled = Viewall,Tab,View,Search allFieldsVisible = true ReportPermissions { KYC_Document_Type_Mapping={"View"} Corporate_KYC_Checklist={"View"} Wholesale_KYC_Checklist={"View"} } }
+  Rate_Cards { enabled = Viewall,Tab,View,Search allFieldsVisible = false ReportPermissions { Published_Rate_Cards={"View"} } FieldPermissions { Rate_Card_ID{visibility:true,readonly:true} Rate_Card_Name{visibility:true,readonly:true} Customer_Type{visibility:true,readonly:true} Effective_From{visibility:true,readonly:true} Effective_To{visibility:true,readonly:true} Status{visibility:true,readonly:true} Fuel_Surcharge_Percent{visibility:false} COD_Handling_Fee{visibility:false} Contract_Discount_Percent{visibility:false} }
+  }
+  KYC_Review { enabled = tab }
+  Admin_Dashboard { enabled = tab }
+ }
+}

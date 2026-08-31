@@ -1,0 +1,43 @@
+list COD_Pending_Remittance
+{
+    displayName = "COD Pending Remittance"
+    show all rows from COD_Remittances [Remittance_Status == "Pending" || Remittance_Status == "Shortfall"]
+    (
+        Remittance_Number
+        Delivery_Run_Sheet
+        Agent
+        Hub
+        Remittance_Date
+        Expected_Amount
+        Submitted_Amount
+        Shortfall_Amount
+        Remittance_Status
+        Confirmed_At
+        Notes
+        custom action "Confirm Remittance"
+        (
+            workflow = Confirm_COD_Pending_Remittance
+            show action for each record = true
+            column header = "Confirm Remittance"
+            success message = "COD remittance confirmation evaluated"
+            confirmation before execution
+            (
+                message for individual record = "Confirm the submitted cash against delivered COD items?"
+                confirm button text = "Confirm Cash"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Agent
+        Hub
+        Remittance_Date
+        Remittance_Status
+    )
+    sort by
+    (
+        Remittance_Date ascending
+        Remittance_Number ascending
+    )
+}

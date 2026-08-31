@@ -1,0 +1,19 @@
+Bag_Shipments_On_Delete as "Protect Bag Shipment Deletion"
+{
+    type = form
+    form = Bag_Shipments
+    record event = on delete
+    description = "Prevents deletion of bag scan and reconciliation evidence"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Bag shipment custody records cannot be deleted. Use Remove Shipment before sealing when applicable.";
+                cancel delete;
+            )
+        }
+    }
+}

@@ -1,0 +1,40 @@
+list Published_Rate_Cards
+{
+    displayName = "Published Rate Cards"
+    show all rows from Rate_Cards [Status == "Published"]
+    (
+        Rate_Card_ID
+        Rate_Card_Name
+        Customer_Type
+        Transport_Mode
+        Fuel_Surcharge_Percent
+        COD_Handling_Fee
+        Volumetric_Divisor
+        GST_Percent
+        Contract_Discount_Percent
+        Effective_From
+        Effective_To
+        Default_For_Retail
+        Status
+    )
+    filters
+    (
+        Customer_Type
+        Transport_Mode
+        Default_For_Retail
+        Effective_From
+        Effective_To
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Transport_Mode ascending
+    )
+    sort by
+    (
+        Effective_From descending
+    )
+}

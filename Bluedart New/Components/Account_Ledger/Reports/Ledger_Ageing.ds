@@ -1,0 +1,56 @@
+list Ledger_Ageing
+{
+    displayName = "Ledger Ageing"
+    show all rows from Account_Ledger [(Transaction_Type == "Debit" || (Transaction_Type == "Adjustment" && Amount > 0)) && Ledger_Status != "Settled"]
+    (
+        Ageing_Bucket
+        Customer
+        Invoice
+        Shipment
+        Transaction_Type
+        Amount
+        (
+            display = total
+        )
+        Due_Date
+        Ledger_Status
+        Transaction_Date
+    )
+    filters
+    (
+        Ageing_Bucket
+        Customer
+        Transaction_Type
+        Due_Date
+        Ledger_Status
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Ageing_Bucket ascending
+        Customer ascending
+    )
+    sort by
+    (
+        Due_Date ascending
+        Amount descending
+    )
+    conditional formatting
+    (
+        "Ninety Plus Days"
+        {
+            condition = (Ageing_Bucket == "90+ Days")
+            fields = [Ageing_Bucket, Customer, Amount, Due_Date, Ledger_Status]
+            format = "background-color:#450A0A;color:#FFFFFF;font-weight:bold"
+        }
+        "Sixty Plus Days"
+        {
+            condition = (Ageing_Bucket == "61-90 Days")
+            fields = [Ageing_Bucket, Customer, Amount, Due_Date]
+            format = "background-color:#FFEDD5;color:#9A3412"
+        }
+    )
+}

@@ -1,0 +1,31 @@
+list Queried_KYC_Documents
+{
+    displayName = "Queried KYC Documents"
+    show all rows from Customer_KYC_Documents [Review_Status == "Query"]
+    (
+        KYC_Document_ID
+        Customer
+        Document_Type
+        Required_For_Onboarding
+        Document_Number
+        Expiry_Date
+        Uploaded_File
+        File_Version
+        Review_Status
+        Review_Remarks
+        Uploaded_On
+        Reviewed_By_Email
+        Reviewed_On
+        Locked_After_Verification
+    )
+    filters
+    (
+        Customer
+        Document_Type
+        Required_For_Onboarding
+    )
+    sort by
+    (
+        Reviewed_On descending
+    )
+}

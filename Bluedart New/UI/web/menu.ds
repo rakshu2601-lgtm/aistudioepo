@@ -1,0 +1,318 @@
+menu
+{
+    unused
+    {
+        report Active_Tier_Benefits {} report Active_Slabs {} report Active_Routes {} report Active_Loyalty_Rules {} report Active_Hub_Map {}
+    }
+    space Customer_Portal_Space
+    {
+        displayname = "Customer Portal"
+        icon = "users-circle-08"
+        section Customer_Dashboard_Section
+        {
+            displayname = "Customer Dashboard"
+            icon = "business-chart-bar-33"
+            page Customer_Dashboard { icon = "users-circle-08" }
+            page Shipment_Tracking { icon = "shopping-delivery-track" }
+        }
+        section Customer_Self_Service
+        {
+            displayname = "Customer Self-Service"
+            icon = "users-single-01"
+            form Customers { icon = "users-single-01" }
+            report My_Profile { icon = "users-badge-13" }
+        }
+        section Customer_KYC_Actions
+        {
+            displayname = "KYC Actions"
+            icon = "business-safe"
+            form Customer_KYC_Documents { icon = "business-notes" }
+            report My_KYC_Checklist { icon = "shopping-list" }
+        }
+        section Customer_Shipment_Delivery
+        {
+            displayname = "Shipment & Delivery"
+            icon = "shopping-delivery-fast"
+            form Shipment_Requests { icon = "shopping-box" }
+            report My_Shipments { icon = "shopping-delivery" }
+            report Customer_NDR_Instructions { icon = "location-route-alert" }
+        }
+        section Customer_Billing_Loyalty
+        {
+            displayname = "Billing & Loyalty"
+            icon = "business-wallet-43"
+            report My_Invoices { icon = "shopping-receipt" }
+            report Overdue_Invoices { icon = "business-money-time" }
+            report My_Account_Statement { icon = "business-books" }
+            report My_Payments { icon = "shopping-credit-card" }
+            report My_Loyalty_History { icon = "shopping-award" }
+            report My_Points_Expiring_Soon { icon = "business-money-time" }
+        }
+    }
+    space KYC_Reviewer_Space
+    {
+        displayname = "KYC Reviewer"
+        icon = "business-safe"
+        section KYC_Dashboard_Section
+        {
+            displayname = "KYC Dashboard"
+            icon = "business-chart-bar-33"
+            page KYC_Review { icon = "business-safe" }
+        }
+        section KYC_Document_Review
+        {
+            displayname = "Document Review"
+            icon = "business-notes"
+            report KYC_Review_Queue { icon = "business-agenda" }
+            report Queried_KYC_Documents { icon = "location-route-alert" }
+            report All_KYC_Documents { icon = "business-books" }
+        }
+        section KYC_Customer_Decisions
+        {
+            displayname = "Customer Decisions"
+            icon = "users-multiple-11"
+            report Verification_Pending { icon = "business-agenda" }
+            report KYC_Expiry_Alert { icon = "business-money-time" }
+            report Action_Required_Customers { icon = "location-route-alert" }
+            report Active_Customers { icon = "users-multiple-11" }
+        }
+    }
+    space Field_Agent_Space
+    {
+        displayname = "Field Agent"
+        icon = "users-single-position"
+        section Agent_Dashboard_Section
+        {
+            displayname = "Agent Dashboard"
+            icon = "business-chart-bar-33"
+            page Agent_Dashboard { icon = "users-single-position" }
+        }
+        section Agent_Pickup_Actions
+        {
+            displayname = "Pickup Actions"
+            icon = "location-appointment"
+            report My_Pickup_Runs { icon = "business-agenda" }
+            report My_Pickup_Tasks { icon = "shopping-box-3d-50" }
+        }
+        section Agent_Delivery_Actions
+        {
+            displayname = "Delivery Actions"
+            icon = "shopping-delivery-fast"
+            report My_Delivery_Runs { icon = "shopping-delivery-time" }
+            report My_Delivery_Tasks { icon = "shopping-delivery" }
+        }
+    }
+    space Hub_Operator_Space
+    {
+        displayname = "Hub Operator"
+        icon = "business-building"
+        section Hub_Dashboard_Section
+        {
+            displayname = "Hub Dashboard"
+            icon = "business-chart-bar-33"
+            page Hub_Dashboard { icon = "business-board-30" }
+        }
+        section Hub_Booking_Assignment
+        {
+            displayname = "Booking Assignment"
+            icon = "shopping-box"
+            report Unassigned_Orders { icon = "business-agenda" }
+            report Pickup_Queue { icon = "location-appointment" }
+            report Delivery_Queue { icon = "shopping-delivery-fast" }
+        }
+        section Hub_Bag_Handling
+        {
+            displayname = "Bag Handling"
+            icon = "shopping-bag-17"
+            form Logistics_Bags { icon = "shopping-bag-add-18" }
+            form Bag_Shipments { icon = "shopping-barcode-scan" }
+            report Open_Bags { icon = "shopping-bag-add-18" }
+            report In_Transit_Bags { icon = "transportation-road" }
+            report Bag_Contents { icon = "shopping-list" }
+        }
+        section Hub_Manifest_Handling
+        {
+            displayname = "Manifest Handling"
+            icon = "transportation-truck-front"
+            form Manifests { icon = "transportation-truck-front" }
+            form Manifest_Bags { icon = "shopping-bag-edit" }
+            report Manifest_Bag_List { icon = "shopping-list" }
+            report Expected_Master_Bags { icon = "business-agenda" }
+        }
+    }
+    space Hub_Supervisor_Space
+    {
+        displayname = "Hub Supervisor"
+        icon = "users-multiple-11"
+        section Hub_Oversight
+        {
+            displayname = "Hub Oversight"
+            icon = "business-board-30"
+            form Operations_Users { icon = "users-badge-13" }
+            form Vehicles { icon = "transportation-car" }
+            report Hub_Staff { icon = "users-multiple-11" }
+            report Active_Field_Agents { icon = "users-single-position" }
+        }
+        section First_Mile_Planning
+        {
+            displayname = "First-Mile Planning"
+            icon = "location-appointment"
+            form Pickup_Run_Sheets { icon = "business-agenda" }
+            form Pickup_Run_Sheet_Items { icon = "shopping-box-3d-50" }
+            report Today_Pickup_Planner { icon = "location-appointment" }
+            report Pickup_Run_Register { icon = "business-books" }
+        }
+        section Last_Mile_Planning
+        {
+            displayname = "Last-Mile Planning"
+            icon = "shopping-delivery-fast"
+            form Delivery_Run_Sheets { icon = "shopping-delivery-time" }
+            form Delivery_Run_Sheet_Items { icon = "shopping-delivery" }
+            report Last_Mile_Dispatcher { icon = "business-agenda" }
+        }
+        section Supervisor_Exceptions_NDR
+        {
+            displayname = "Exceptions & NDR"
+            icon = "location-route-alert"
+            form NDR_Instructions { icon = "location-route-close" }
+            report NDR_Instruction_Action_Queue { icon = "business-agenda" }
+            report Shipment_Exception_Queue { icon = "location-route-alert" }
+        }
+    }
+    space Operations_Manager_Space
+    {
+        displayname = "Operations Manager"
+        icon = "business-strategy"
+        section Operations_Dashboard
+        {
+            displayname = "Operations Dashboard"
+            icon = "business-chart-bar-33"
+            report All_Logistics_Bags { icon = "shopping-bag-17" }
+            report All_Manifests { icon = "transportation-truck-front" }
+            report Critical_Exceptions { icon = "location-route-alert" }
+            report Exception_Status_Board { icon = "business-board-30" }
+        }
+        section Network_Operations
+        {
+            displayname = "Network Operations"
+            icon = "transportation-road"
+            form Shipment_Exceptions { icon = "location-route-alert" }
+            form Shipment_Tracking_Events { icon = "location-map-gps" }
+            report Active_Shipments { icon = "location-map-gps" }
+            report Shipment_Status_Board { icon = "business-board-30" }
+            report Tracking_Event_Log { icon = "business-books" }
+            report Shipment_Timeline { icon = "shopping-delivery-track" }
+        }
+        section Operations_Performance
+        {
+            displayname = "Performance Views"
+            icon = "business-chart-pie-36"
+            report Bag_Status_Board { icon = "business-board-30" }
+            report Manifest_Status_Board { icon = "business-board-30" }
+            report Hub_Capacity { icon = "business-chart-bar-33" }
+            report Agent_Location_Map { icon = "location-map-gps" }
+        }
+    }
+    space Finance_Officer_Space
+    {
+        displayname = "Finance Officer"
+        icon = "business-wallet-43"
+        section Finance_Actions
+        {
+            displayname = "Finance Actions"
+            icon = "business-money-coins"
+            form COD_Remittances { icon = "business-money-coins" }
+            report COD_Pending_Remittance { icon = "business-money-time" }
+            report COD_Remittance_Register { icon = "business-books" }
+        }
+        section Invoice_Actions
+        {
+            displayname = "Invoice Actions"
+            icon = "shopping-receipt"
+            form Invoices { icon = "shopping-receipt" }
+            report Invoice_Statement { icon = "business-books" }
+        }
+        section Payment_Actions
+        {
+            displayname = "Payment Actions"
+            icon = "shopping-credit-card"
+            form Payment_Transactions { icon = "shopping-credit-card" }
+            report Payment_Transaction_Register { icon = "business-books" }
+            report Failed_Payments { icon = "location-route-alert" }
+        }
+        section COD_Ledger
+        {
+            displayname = "COD & Ledger"
+            icon = "business-books"
+            form Account_Ledger { icon = "business-books" }
+            report Outstanding_Accounts { icon = "business-money-time" }
+            report Credit_Utilization { icon = "business-chart-bar-33" }
+            report Ledger_Ageing { icon = "business-chart-pie-36" }
+        }
+    }
+    space Logistics_Administrator_Space
+    {
+        displayname = "Logistics Administrator"
+        icon = "business-hammer"
+        section Admin_Dashboard_Section
+        {
+            displayname = "Admin Dashboard"
+            icon = "business-chart-bar-33"
+            page Admin_Dashboard { icon = "business-chart-pie-36" }
+        }
+        section Admin_Master_Setup
+        {
+            displayname = "Master Setup"
+            icon = "business-strategy"
+            form Hubs { icon = "business-building" }
+            form Hub_Pincode_Mapping { icon = "location-map-pin" }
+            form Transport_Routes { icon = "transportation-road" }
+            form Rate_Cards { icon = "shopping-tag" }
+            form Rate_Slabs { icon = "business-percentage-38" }
+            form KYC_Document_Types { icon = "business-notes" }
+        }
+        section Admin_Configuration
+        {
+            displayname = "Configuration"
+            icon = "business-strategy"
+            form App_Configuration { icon = "business-strategy" }
+            form Loyalty_Rules { icon = "shopping-award" }
+            form Loyalty_Tiers { icon = "business-award-48" }
+            form Loyalty_Transactions { icon = "business-coins" }
+            form NDR_Response { icon = "location-route-open" }
+        }
+        section Admin_Audit_Communications
+        {
+            displayname = "Audit & Communications"
+            icon = "business-connect"
+            form Audit_Log { icon = "business-notes" }
+            form Communication_Log { icon = "business-connect" }
+            report Audit_Log_Report { icon = "business-books" }
+            report Critical_Audit_Events { icon = "location-route-alert" }
+            report Communication_Log_Report { icon = "business-connect" }
+            report Failed_Communications { icon = "location-route-alert" }
+        }
+        section Admin_Other_Reports
+        {
+            displayname = "Administration & Oversight"
+            icon = "business-chart-bar-33"
+            report Account_Ledger_Statement {} report All_Customers {} report All_Hubs {} report All_Rate_Cards {} report All_Shipments {} report All_Transport_Routes {} report All_Vehicles {}
+            report App_Configurations {} report Available_Vehicles {} report Bag_Reconciliation {} report COD_Payout_Due {} report Corporate_KYC_Checklist {} report Customer_Tracking_Events {}
+            report Delivered_Shipments {} report Delivery_Run_Calendar {} report Delivery_Run_Items {} report Delivery_Run_Register {} report Expiring_Rate_Cards {} report Failed_Deliveries {} report Failed_Pickups {}
+            report Feeder_Manifests {} report In_Transit_Manifests {} report Invoice_Due_Calendar {} report KYC_Document_Type_Mapping {} report Linehaul_Manifests {} report Loyalty_Activity_By_Type {}
+            report Loyalty_Rule_Register {} report Loyalty_Tier_Register {} report Loyalty_Transaction_Ledger {} report Manifest_Arrival_Calendar {} report Manifest_Reconciliation {} report NDR_RTO_Pending {}
+            report Non_Serviceable_Pincodes {} report Operations_User_Directory {} report Pickup_Run_Calendar {} report Pickup_Run_Items {} report Pincode_Mappings {} report Points_Expiring_Soon {}
+            report Published_Rate_Cards {} report Rate_Slab_Register {} report Route_Capacity {} report Serviceability_Map {} report Vehicle_Compliance {} report Wholesale_KYC_Checklist {}
+        }
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+    preference
+    {
+        icon { style = outline show = {space,section,component} }
+    }
+}

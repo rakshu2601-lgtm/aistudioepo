@@ -1,0 +1,19 @@
+Manifests_On_Delete as "Block Manifest Deletion"
+{
+    type = form
+    form = Manifests
+    record event = on delete
+    description = "Preserves the manifest custody trail by blocking deletion"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Manifests cannot be deleted. Cancel an unused draft through the controlled action.";
+                cancel delete;
+            )
+        }
+    }
+}

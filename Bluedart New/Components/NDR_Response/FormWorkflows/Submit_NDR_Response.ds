@@ -1,0 +1,98 @@
+Submit_NDR_Response as "Submit Secure NDR Response"
+{
+    type = form
+    form = NDR_Response
+    button = Submit_Response
+    description = "Validates an expiring one-time token and securely records the recipient's delivery instruction"
+
+    on click
+    {
+        actions
+        {
+            on click
+            (
+                token_value = ifnull(input.Secure_Token,"").trim();
+                ndr_record = NDR_Instructions[Secure_Token == token_value];
+                token_valid = token_value != "" && ndr_record.count(ID) > 0 && ndr_record.NDR_Status == "Awaiting Instruction" && ndr_record.Submitted_At == null && ndr_record.Added_Time.addDay(2) >= zoho.currenttime;
+                validation_message = "";
+                if(token_valid == false)
+                {
+                    validation_message = "This secure delivery instruction link is invalid, expired, or already used.";
+                }
+                else if(input.Recipient_Instruction == null)
+                {
+                    validation_message = "Select a delivery instruction.";
+                }
+                else if(input.Recipient_Instruction == "Reschedule Delivery" && (input.Reschedule_Date == null || input.Reschedule_Date <= zoho.currentdate))
+                {
+                    validation_message = "Select a reschedule date after today.";
+                }
+                else if(input.Recipient_Instruction == "Update Delivery Address" && (ifnull(input.Updated_Delivery_Address.address_line_1,"").trim() == "" || ifnull(input.Updated_Delivery_Address.district_city,"").trim() == "" || ifnull(input.Updated_Delivery_Address.state_province,"").trim() == "" || ifnull(input.Updated_Delivery_Address.postal_Code,"").trim() == "" || input.Updated_Delivery_Address.postal_Code.matches("^[1-9][0-9]{5}$") == false || ifnull(input.Updated_Delivery_Address.country,"").trim() == ""))
+                {
+                    validation_message = "Enter a complete Indian delivery address with a valid six-digit pincode.";
+                }
+                if(validation_message != "")
+                {
+                    alert validation_message;
+                }
+                else
+                {
+                    shipment_record = Shipment_Requests[ID == ndr_record.Shipment];
+                    destination_hub = Hubs[ID == shipment_record.Destination_Hub];
+                    customer_record = Customers[ID == shipment_record.Customer];
+                    ndr_record.Recipient_Instruction = input.Recipient_Instruction;
+                    ndr_record.Reschedule_Date = input.Reschedule_Date;
+                    if(input.Recipient_Instruction == "Update Delivery Address")
+                    {
+                        ndr_record.Updated_Delivery_Address.address_line_1 = input.Updated_Delivery_Address.address_line_1;
+                        ndr_record.Updated_Delivery_Address.address_line_2 = input.Updated_Delivery_Address.address_line_2;
+                        ndr_record.Updated_Delivery_Address.district_city = input.Updated_Delivery_Address.district_city;
+                        ndr_record.Updated_Delivery_Address.state_province = input.Updated_Delivery_Address.state_province;
+                        ndr_record.Updated_Delivery_Address.postal_Code = input.Updated_Delivery_Address.postal_Code;
+                        ndr_record.Updated_Delivery_Address.country = input.Updated_Delivery_Address.country;
+                    }
+                    ndr_record.Submitted_At = zoho.currenttime;
+                    ndr_record.NDR_Status = "New";
+                    if(ifnull(destination_hub.Contact_Email,"").trim() != "")
+                    {
+                        sendmail
+                        [
+                            from: zoho.adminuserid
+                            to: destination_hub.Contact_Email
+                            subject: "New NDR instruction for AWB " + shipment_record.AWB_Number
+                            message: "A recipient submitted: " + input.Recipient_Instruction + ". Review the NDR Action Queue before replanning delivery."
+                        ]
+                    }
+                    communication_id = insert into Communication_Log
+                    [
+                        Customer = customer_record.ID
+                        Shipment = shipment_record.ID
+                        Recipient = if(ifnull(destination_hub.Contact_Email,"").trim() != "",destination_hub.Contact_Email,zoho.adminuserid)
+                        Channel = "Email"
+                        Template_Code = "NDR_RESPONSE_RECEIVED"
+                        Subject = "NDR response received for AWB " + shipment_record.AWB_Number
+                        Message_Summary = "Recipient selected " + input.Recipient_Instruction + "."
+                        Provider = "Zoho Mail"
+                        Communication_Status = if(ifnull(destination_hub.Contact_Email,"").trim() != "","Sent","Skipped")
+                        Attempt_Count = if(ifnull(destination_hub.Contact_Email,"").trim() != "",1,0)
+                        Last_Attempt_At = zoho.currenttime
+                    ];
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = if(ifnull(zoho.loginuserid,"").trim() != "",zoho.loginuserid,"Secure Recipient Link")
+                        Actor_Profile = "External Recipient"
+                        Action_Name = "Submit NDR Instruction"
+                        Module_Name = "NDR Instructions"
+                        Record_ID = ndr_record.ID.toString()
+                        Before_Data = "Status=Awaiting Instruction"
+                        After_Data = "Status=New; Instruction=" + input.Recipient_Instruction
+                        Source = "Secure Stateless Form"
+                        Severity = "Critical"
+                    ];
+                    alert "Your delivery instruction has been submitted securely. This one-time link is now closed.";
+                }
+            )
+        }
+    }
+}

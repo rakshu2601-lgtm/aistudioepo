@@ -1,0 +1,191 @@
+form Customer_KYC_Documents
+{
+    title
+    {
+        displayname = "Customer KYC Documents"
+        on add = "Add KYC Document"
+        on edit = "Upload or Review KYC Document"
+    }
+    success message = "KYC document saved successfully"
+    Document_Identity
+    (
+        type = section
+        displayname = "Document Identity"
+        row = 1
+        column = 0
+    )
+    KYC_Document_ID
+    (
+        type = autonumber
+        displayname = "KYC Document ID"
+        start index = 100001
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Customer
+    (
+        type = picklist
+        displayname = "Customer"
+        values = Customers[Customer_Type != "Retail"].ID
+        displayformat = [Company_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Document_Type
+    (
+        type = picklist
+        displayname = "Document Type"
+        values = KYC_Document_Types[Active == true].ID
+        displayformat = [Document_Name]
+        searchable = true
+        sortorder = ascending
+        row = 1
+        column = 1
+        width = medium
+    )
+    Required_For_Onboarding
+    (
+        type = checkbox
+        displayname = "Required for Onboarding"
+        initial value = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Upload_Details
+    (
+        type = section
+        displayname = "Upload Details"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Document_Number
+    (
+        type = text
+        displayname = "Document Number"
+        isencrypted = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Expiry_Date
+    (
+        type = date
+        displayname = "Expiry Date"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Uploaded_File
+    (
+        type = upload file
+        displayname = "Uploaded File"
+        browse = local_drive, google_docs, zoho_docs
+        description [ type = tooltip  message = "Upload one PDF, JPG, or JPEG file within the limit configured for this document type." ]
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have File_Version
+    (
+        type = number
+        displayname = "File Version"
+        initial value = 1
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Review_Status
+    (
+        type = picklist
+        displayname = "Review Status"
+        values = {"Pending Upload","Pending Verification","Verified","Query"}
+        initial value = "Pending Upload"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Uploaded_On
+    (
+        type = datetime
+        displayname = "Uploaded On"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Review_Details
+    (
+        type = section
+        displayname = "Review Details"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Review_Remarks
+    (
+        type = textarea
+        displayname = "Review Remarks"
+        height = 100px
+        row = 3
+        column = 1
+        width = medium
+    )
+    Reviewed_By_Email
+    (
+        type = email
+        displayname = "Reviewed By Email"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Reviewed_On
+    (
+        type = datetime
+        displayname = "Reviewed On"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Locked_After_Verification
+    (
+        type = checkbox
+        displayname = "Locked After Verification"
+        initial value = false
+        row = 3
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save KYC Document"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Save Upload"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

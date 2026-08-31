@@ -1,0 +1,35 @@
+default list Delivery_Run_Register
+{
+    displayName = "Delivery Run Sheets"
+    show all rows from Delivery_Run_Sheets
+    (
+        DRS_Number
+        Run_Date
+        Hub
+        Delivery_Zone
+        Assigned_Agent
+        Vehicle
+        DRS_Status
+        Planned_Stop_Count
+        Delivered_Count
+        Failed_Count
+        Expected_COD_Amount
+        Collected_COD_Amount
+        Released_At
+        Completed_At
+    )
+    filters
+    (
+        Run_Date
+        Hub
+        Delivery_Zone
+        Assigned_Agent
+        Vehicle
+        DRS_Status
+    )
+    sort by
+    (
+        Run_Date descending
+        DRS_Number descending
+    )
+}

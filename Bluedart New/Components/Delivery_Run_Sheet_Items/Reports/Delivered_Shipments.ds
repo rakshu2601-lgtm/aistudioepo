@@ -1,0 +1,32 @@
+list Delivered_Shipments
+{
+    displayName = "Delivered Shipments"
+    show all rows from Delivery_Run_Sheet_Items [Delivery_Status == "Delivered"]
+    (
+        Delivery_Run_Sheet
+        Shipment
+        Stop_Sequence
+        Delivery_Status
+        Completed_At
+        Proof_Type
+        Recipient_Name
+        COD_Collected
+        Attempt_Number
+        Agent_Latitude
+        Agent_Longitude
+        EPOD_WorkDrive_File_ID
+        EPOD_URL
+    )
+    filters
+    (
+        Delivery_Run_Sheet
+        Shipment
+        Completed_At
+        Proof_Type
+        Attempt_Number
+    )
+    sort by
+    (
+        Completed_At descending
+    )
+}

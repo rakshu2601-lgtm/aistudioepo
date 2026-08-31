@@ -1,0 +1,22 @@
+Departure_Time_On_User_Input as "Calculate Manifest Arrival"
+{
+    type = form
+    form = Manifests
+    record event = on add or edit
+    description = "Calculates expected arrival from the selected route transit time"
+
+    on user input of Departure_Time
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Departure_Time != null && input.Route != null)
+                {
+                    route_record = Transport_Routes[ID == input.Route && Active == true];
+                    input.Expected_Arrival_Time = input.Departure_Time.addHour(route_record.Estimated_Transit_Hours.round(0));
+                }
+            )
+        }
+    }
+}

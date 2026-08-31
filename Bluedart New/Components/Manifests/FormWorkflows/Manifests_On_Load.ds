@@ -1,0 +1,44 @@
+Manifests_On_Load as "Prepare Manifest"
+{
+    type = form
+    form = Manifests
+    record event = on add or edit
+    description = "Defaults the effective origin hub, filters trip resources, and locks custody-controlled data"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Manifest_Status, Actual_Arrival_Time, Total_Bags, Total_Shipments, Total_Weight_Kg, Manifest_Barcode, Created_By_Email;
+                current_profile = thisapp.permissions.loginUserProfile();
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                if(input.ID == null && (current_profile == "Hub_Supervisor" || current_profile == "Hub_Operator") && logged_user.count(ID) > 0)
+                {
+                    deputation_active = logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                    input.Origin_Hub = if(deputation_active == true,logged_user.Deputed_Hub,logged_user.Home_Hub);
+                }
+                if(input.ID == null)
+                {
+                    clear Route;
+                    clear Vehicle;
+                    clear Driver;
+                    if(input.Origin_Hub != null)
+                    {
+                        Vehicle:ui.add(Vehicles[Owning_Hub == input.Origin_Hub && Active == true && Status == "Available"].ID.getall());
+                        Driver:ui.add(Operations_Users[Active == true && Application_Role == "Field Agent" && ((Deputed_Hub == input.Origin_Hub && (Deputation_Start_Date == null || Deputation_Start_Date <= zoho.currentdate) && (Deputation_End_Date == null || Deputation_End_Date >= zoho.currentdate)) || (Home_Hub == input.Origin_Hub && (Deputed_Hub == null || (Deputation_Start_Date != null && Deputation_Start_Date > zoho.currentdate) || (Deputation_End_Date != null && Deputation_End_Date < zoho.currentdate))))].ID.getall());
+                    }
+                    if(input.Origin_Hub != null && input.Destination_Hub != null && input.Manifest_Type == "Linehaul")
+                    {
+                        Route:ui.add(Transport_Routes[Origin_Sorting_Hub == input.Origin_Hub && Destination_Sorting_Hub == input.Destination_Hub && Active == true].ID.getall());
+                    }
+                }
+                if(input.ID != null && input.Manifest_Status != "Draft")
+                {
+                    disable Manifest_Type, Origin_Hub, Destination_Hub, Route, Vehicle, Driver, Departure_Time, Expected_Arrival_Time, Vehicle_Seal_Code, Notes;
+                }
+            )
+        }
+    }
+}

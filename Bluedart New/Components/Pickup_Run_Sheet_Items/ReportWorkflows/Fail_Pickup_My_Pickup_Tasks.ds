@@ -1,0 +1,104 @@
+Fail_Pickup_My_Pickup_Tasks as "Fail Pickup - My Pickup Tasks"
+{
+    type = functions
+    form = Pickup_Run_Sheet_Items
+    execution type = for each record
+    description = "Records a failed pickup attempt and returns the booked shipment to pickup planning"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                run_record = Pickup_Run_Sheets[ID == input.Pickup_Run_Sheet];
+                assigned_agent = Operations_Users[ID == run_record.Assigned_Agent];
+                authorised = assigned_agent.Work_Email == zoho.loginuserid || Operations_Users[Work_Email == zoho.loginuserid && Active == true].count(ID) > 0;
+                if(authorised == false)
+                {
+                    info "Only the assigned agent or an active operations user can fail this pickup.";
+                }
+                else if(input.Stop_Status != "Assigned" && input.Stop_Status != "Arrived")
+                {
+                    info "Only an unresolved pickup stop can be marked failed.";
+                }
+                else if(ifnull(input.Failure_Reason,"").trim() == "")
+                {
+                    info "Enter a failure reason before marking the pickup failed.";
+                }
+                else
+                {
+                    prior_status = input.Stop_Status;
+                    shipment_record = Shipment_Requests[ID == input.Shipment];
+                    input.Stop_Status = "Failed";
+                    input.Completed_At = zoho.currenttime;
+                    if(input.Agent_Latitude == null)
+                    {
+                        input.Agent_Latitude = assigned_agent.Current_Latitude;
+                    }
+                    if(input.Agent_Longitude == null)
+                    {
+                        input.Agent_Longitude = assigned_agent.Current_Longitude;
+                    }
+                    if(shipment_record.Shipment_Status == "Booked")
+                    {
+                        shipment_record.Shipment_Status = "Booked";
+                    }
+                    resolved_count = Pickup_Run_Sheet_Items[Pickup_Run_Sheet == input.Pickup_Run_Sheet && ID != input.ID && (Stop_Status == "Picked Up" || Stop_Status == "Failed")].count(ID) + 1;
+                    run_record.Completed_Stop_Count = resolved_count;
+                    run_record.Status = "In Progress";
+                    tracking_id = insert into Shipment_Tracking_Events
+                    [
+                        Shipment = shipment_record.ID
+                        Event_Time = zoho.currenttime
+                        Event_Status = "Exception"
+                        Hub = run_record.Hub
+                        Agent = assigned_agent.ID
+                        Latitude = input.Agent_Latitude
+                        Longitude = input.Agent_Longitude
+                        Event_Description = "Pickup attempt failed: " + input.Failure_Reason
+                        Source = "Pickup Scan"
+                        Customer_Visible = true
+                        Created_By_Email = zoho.loginuserid
+                    ];
+                    customer_record = Customers[ID == shipment_record.Customer];
+                    communication_id = insert into Communication_Log
+                    [
+                        Customer = customer_record.ID
+                        Shipment = shipment_record.ID
+                        Recipient = customer_record.Email_ID
+                        Channel = "Email"
+                        Template_Code = "PICKUP_FAILED"
+                        Subject = "Pickup attempt update: AWB " + shipment_record.AWB_Number
+                        Message_Summary = "Pickup attempt failed and will require replanning. Reason: " + input.Failure_Reason
+                        Provider = "Zoho Mail"
+                        Communication_Status = "Sent"
+                        Attempt_Count = 1
+                        Last_Attempt_At = zoho.currenttime
+                    ];
+                    sendmail
+                    [
+                        from: zoho.adminuserid
+                        to: customer_record.Email_ID
+                        subject: "Pickup attempt update: AWB " + shipment_record.AWB_Number
+                        message: "The pickup attempt was not completed. Reason: " + input.Failure_Reason + ". Our operations team will replan the pickup."
+                    ]
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Fail Pickup"
+                        Module_Name = "Pickup Run Sheet Items"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=" + prior_status
+                        After_Data = "Status=Failed; Reason=" + input.Failure_Reason
+                        Source = "Report Action"
+                        Severity = "Warning"
+                    ];
+                }
+            )
+        }
+    }
+}

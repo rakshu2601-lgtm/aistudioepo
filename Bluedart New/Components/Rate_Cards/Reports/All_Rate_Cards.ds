@@ -1,0 +1,55 @@
+default list All_Rate_Cards
+{
+    displayName = "All Rate Cards"
+    show all rows from Rate_Cards
+    (
+        Rate_Card_ID
+        Rate_Card_Name
+        Customer_Type
+        Transport_Mode
+        Fuel_Surcharge_Percent
+        COD_Handling_Fee
+        Volumetric_Divisor
+        GST_Percent
+        Contract_Discount_Percent
+        Effective_From
+        Effective_To
+        Default_For_Retail
+        Status
+        custom action "Publish Rate Card"
+        (
+            workflow = Publish_Rate_Card
+            show action for each record = true
+            column header = "Publish Rate Card"
+            success message = "Rate card published"
+            condition = (Status == "Draft")
+            confirmation before execution
+            (
+                message for individual record = "Publish this rate card for shipment rating?"
+                confirm button text = "Publish"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Customer_Type
+        Transport_Mode
+        Default_For_Retail
+        Status
+        Effective_From
+        Effective_To
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Customer_Type ascending
+    )
+    sort by
+    (
+        Effective_From descending
+    )
+}

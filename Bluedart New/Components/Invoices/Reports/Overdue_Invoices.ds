@@ -1,0 +1,54 @@
+list Overdue_Invoices
+{
+    displayName = "Overdue Invoices"
+    show all rows from Invoices [Invoice_Status == "Overdue"]
+    (
+        Invoice_Number
+        Shipment
+        Customer
+        Invoice_Date
+        Invoice_Total
+        Payment_Terms
+        Due_Date
+        Invoice_Status
+        Invoice_Download_URL
+        custom action "Pay Now"
+        (
+            workflow = Pay_Overdue_Invoice
+            show action for each record = true
+            column header = "Pay Now"
+        )
+        custom action "Void Invoice"
+        (
+            workflow = Void_Overdue_Invoice
+            show action for each record = true
+            column header = "Void Invoice"
+            success message = "Invoice voided"
+            confirmation before execution
+            (
+                message for individual record = "Void this overdue invoice and close its receivable?"
+                confirm button text = "Void Invoice"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Customer
+        Due_Date
+        Payment_Terms
+    )
+    sort by
+    (
+        Due_Date ascending
+    )
+    conditional formatting
+    (
+        "Overdue Invoice"
+        {
+            condition = (Invoice_Status == "Overdue")
+            fields = [Invoice_Number, Customer, Invoice_Total, Due_Date, Invoice_Status]
+            format = "background-color:#FEE2E2;color:#991B1B;font-weight:bold"
+        }
+    )
+}

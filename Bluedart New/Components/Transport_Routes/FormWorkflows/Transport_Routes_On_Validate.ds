@@ -1,0 +1,48 @@
+Transport_Routes_On_Validate as "Validate Transport Route"
+{
+    type = form
+    form = Transport_Routes
+    record event = on add or edit
+    description = "Validates sorting-hub lanes, capacities, and active lane uniqueness"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Origin_Sorting_Hub == input.Destination_Sorting_Hub)
+                {
+                    alert "Origin and destination sorting hubs must be different.";
+                    cancel submit;
+                }
+                origin_hub = Hubs[ID == input.Origin_Sorting_Hub];
+                destination_hub = Hubs[ID == input.Destination_Sorting_Hub];
+                if(origin_hub.Hub_Type != "Sorting Hub" || origin_hub.Active != true)
+                {
+                    alert "Origin must be an active sorting hub.";
+                    cancel submit;
+                }
+                if(destination_hub.Hub_Type != "Sorting Hub" || destination_hub.Active != true)
+                {
+                    alert "Destination must be an active sorting hub.";
+                    cancel submit;
+                }
+                if(ifnull(input.Distance_Km,0) <= 0 || ifnull(input.Estimated_Transit_Hours,0) <= 0 || ifnull(input.Daily_Capacity_Kg,0) <= 0)
+                {
+                    alert "Distance, transit hours, and daily capacity must all be greater than zero.";
+                    cancel submit;
+                }
+                if(input.Active == true)
+                {
+                    duplicate_lane_count = Transport_Routes[Origin_Sorting_Hub == input.Origin_Sorting_Hub && Destination_Sorting_Hub == input.Destination_Sorting_Hub && Transport_Mode == input.Transport_Mode && Active == true && ID != input.ID].count();
+                    if(duplicate_lane_count > 0)
+                    {
+                        alert "An active route already exists for this origin, destination, and transport mode.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,61 @@
+default list NDR_Instruction_Action_Queue
+{
+    displayName = "NDR Action Queue"
+    show all rows from NDR_Instructions
+    (
+        NDR_ID
+        Customer
+        Shipment
+        Delivery_Run_Item
+        Failure_Reason
+        Recipient_Instruction
+        Reschedule_Date
+        Updated_Delivery_Address
+        Submitted_At
+        NDR_Status
+        Supervisor_Notes
+        custom action "Acknowledge NDR"
+        (
+            workflow = Acknowledge_NDR
+            show action for each record = true
+            column header = "Acknowledge NDR"
+            success message = "NDR instruction acknowledged"
+            condition = (NDR_Status == "New")
+        )
+        custom action "Add to Next DRS"
+        (
+            workflow = Add_To_Next_DRS
+            show action for each record = true
+            column header = "Add to Next DRS"
+            success message = "Shipment added to delivery planning"
+            condition = (NDR_Status == "Acknowledged" && Recipient_Instruction != "Hold at Local Office")
+        )
+        custom action "Initiate RTO"
+        (
+            workflow = Initiate_RTO
+            show action for each record = true
+            column header = "Initiate RTO"
+            success message = "Return-to-origin processing initiated"
+            condition = (NDR_Status != "RTO" && NDR_Status != "Added to Next DRS" && NDR_Status != "Awaiting Instruction")
+            confirmation before execution
+            (
+                message for individual record = "Initiate return-to-origin processing for this shipment?"
+                confirm button text = "Initiate RTO"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Failure_Reason
+        Recipient_Instruction
+        Reschedule_Date
+        NDR_Status
+        "Open NDR" : (NDR_Status == "Awaiting Instruction" || NDR_Status == "New" || NDR_Status == "Acknowledged")
+    )
+    sort by
+    (
+        Submitted_At descending
+        NDR_ID descending
+    )
+}

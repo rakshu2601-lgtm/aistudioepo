@@ -1,0 +1,51 @@
+calendar Invoice_Due_Calendar
+{
+    displayName = "Invoice Due Calendar"
+    show all rows from Invoices [Invoice_Status != "Draft" && Invoice_Status != "Void"]
+    (
+        Invoice_Number
+        Customer
+        Invoice_Total
+        Payment_Terms
+        Due_Date
+        Invoice_Status
+    )
+    filters
+    (
+        Customer
+        Payment_Terms
+        Invoice_Status
+        Due_Date
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Invoice_Status ascending
+    )
+    options
+    (
+        display type = month
+        week start day = monday
+        display field = Invoice_Number
+        start date = Due_Date
+        end date = Due_Date
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+    conditional formatting
+    (
+        "Overdue Invoice"
+        {
+            condition = (Invoice_Status == "Overdue")
+            fields = [Invoice_Number, Customer, Invoice_Total, Due_Date, Invoice_Status]
+            format = "background-color:#FEE2E2;color:#991B1B;font-weight:bold"
+        }
+    )
+}

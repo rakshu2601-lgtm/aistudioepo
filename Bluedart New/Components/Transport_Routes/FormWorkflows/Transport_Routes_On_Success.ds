@@ -1,0 +1,29 @@
+Transport_Routes_On_Success as "Audit Transport Route"
+{
+    type = form
+    form = Transport_Routes
+    record event = on add or edit
+    description = "Audits transport lane and route capacity changes"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = "Operations"
+                    Action_Name = "Save Transport Route"
+                    Module_Name = "Transport Routes"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Route=" + input.Route_ID + "; Mode=" + input.Transport_Mode + "; Origin Hub ID=" + input.Origin_Sorting_Hub + "; Destination Hub ID=" + input.Destination_Sorting_Hub + "; Capacity Kg=" + input.Daily_Capacity_Kg
+                    Source = "Form Workflow"
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

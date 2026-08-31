@@ -1,0 +1,173 @@
+Shipment_Requests_On_Success as "Finalize Shipment Booking"
+{
+    type = form
+    form = Shipment_Requests
+    record event = on add
+    description = "Finalizes hubs, capacity, cutoff, ETA, tracking, billing, payment, redemption, notification, and audit records"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                shipment_record = Shipment_Requests[ID == input.ID];
+                customer_record = Customers[ID == shipment_record.Customer];
+                pickup_map = Hub_Pincode_Mapping[Pincode == shipment_record.Pickup_Pincode && Active == true];
+                delivery_map = Hub_Pincode_Mapping[Pincode == shipment_record.Delivery_Pincode && Active == true];
+                shipment_record.Booked_On = zoho.currenttime;
+                assignable = pickup_map.count(ID) > 0 && delivery_map.count(ID) > 0 && pickup_map.Serviceability != "Non-Serviceable" && delivery_map.Serviceability != "Non-Serviceable";
+                if(assignable == true)
+                {
+                    origin_hub = Hubs[ID == pickup_map.Primary_Collection_Center && Active == true];
+                    destination_hub = Hubs[ID == delivery_map.Primary_Collection_Center && Active == true];
+                    if(origin_hub.count(ID) == 0 || destination_hub.count(ID) == 0)
+                    {
+                        assignable = false;
+                    }
+                    else
+                    {
+                        todays_origin_load = Shipment_Requests[Collection_Center == origin_hub.ID && Booked_On >= zoho.currentdate && Shipment_Status != "Cancelled"].count(ID);
+                        after_cutoff = false;
+                        if(zoho.currenttime.getHour() > origin_hub.Cut_Off_Time.getHour() || (zoho.currenttime.getHour() == origin_hub.Cut_Off_Time.getHour() && zoho.currenttime.getMinutes() > origin_hub.Cut_Off_Time.getMinutes()))
+                        {
+                            after_cutoff = true;
+                        }
+                        if(todays_origin_load >= origin_hub.Daily_Capacity || after_cutoff == true)
+                        {
+                            alternate_hub = Hubs[ID == pickup_map.Secondary_Overflow_Hub && Active == true];
+                            if(alternate_hub.count(ID) > 0)
+                            {
+                                alternate_load = Shipment_Requests[Collection_Center == alternate_hub.ID && Booked_On >= zoho.currentdate && Shipment_Status != "Cancelled"].count(ID);
+                                alternate_after_cutoff = zoho.currenttime.getHour() > alternate_hub.Cut_Off_Time.getHour() || (zoho.currenttime.getHour() == alternate_hub.Cut_Off_Time.getHour() && zoho.currenttime.getMinutes() > alternate_hub.Cut_Off_Time.getMinutes());
+                                if(alternate_load < alternate_hub.Daily_Capacity && alternate_after_cutoff == false)
+                                {
+                                    origin_hub = alternate_hub;
+                                }
+                                else
+                                {
+                                    assignable = false;
+                                }
+                            }
+                            else
+                            {
+                                assignable = false;
+                            }
+                        }
+                        if(assignable == true)
+                        {
+                            shipment_record.Collection_Center = origin_hub.ID;
+                            shipment_record.Origin_Sorting_Hub = origin_hub.Parent_Sorting_Hub;
+                            shipment_record.Destination_Hub = destination_hub.ID;
+                            shipment_record.Destination_Sorting_Hub = destination_hub.Parent_Sorting_Hub;
+                            shipment_record.Current_Hub = origin_hub.ID;
+                            route_record = Transport_Routes[Origin_Sorting_Hub == shipment_record.Origin_Sorting_Hub && Destination_Sorting_Hub == shipment_record.Destination_Sorting_Hub && Transport_Mode == shipment_record.Transport_Mode && Active == true] sort by Estimated_Transit_Hours range from 0 to 0;
+                            transit_days = 1;
+                            if(route_record.count(ID) > 0)
+                            {
+                                transit_days = (route_record.Estimated_Transit_Hours / 24).ceil() + 1;
+                            }
+                            shipment_record.Expected_Delivery_Date = zoho.currentdate.addDay(transit_days);
+                            if(shipment_record.Credit_Check_Status != "Hold")
+                            {
+                                shipment_record.Shipment_Status = "Booked";
+                            }
+                        }
+                    }
+                }
+                if(assignable == false && shipment_record.Credit_Check_Status != "Hold")
+                {
+                    shipment_record.Shipment_Status = "Booked - Hub Assignment Pending";
+                }
+                tracking_id = insert into Shipment_Tracking_Events
+                [
+                    Shipment = shipment_record.ID
+                    Event_Time = zoho.currenttime
+                    Event_Status = shipment_record.Shipment_Status
+                    Hub = shipment_record.Current_Hub
+                    Event_Description = "Shipment booking was confirmed and initial routing was evaluated."
+                    Source = "Booking"
+                    Customer_Visible = true
+                    Created_By_Email = zoho.loginuserid
+                ];
+                due_date = zoho.currentdate;
+                if(customer_record.Payment_Terms == "Net 15")
+                {
+                    due_date = zoho.currentdate.addDay(15);
+                }
+                else if(customer_record.Payment_Terms == "Net 30")
+                {
+                    due_date = zoho.currentdate.addDay(30);
+                }
+                invoice_id = insert into Invoices
+                [
+                    Shipment = shipment_record.ID
+                    Customer = customer_record.ID
+                    Invoice_Date = zoho.currentdate
+                    Freight_Subtotal = shipment_record.Base_Rate
+                    Fuel_Surcharge = shipment_record.Fuel_Surcharge
+                    COD_Fee = shipment_record.COD_Handling_Fee
+                    GST_Amount = shipment_record.GST_Amount
+                    Loyalty_Discount = shipment_record.Loyalty_Redemption_Amount
+                    Credit_Rebate = 0
+                    Invoice_Total = shipment_record.Total_Payable
+                    Payment_Terms = customer_record.Payment_Terms
+                    Due_Date = due_date
+                    Invoice_Status = "Draft"
+                ];
+                if(ifnull(shipment_record.Loyalty_Points_Redeemed,0) > 0)
+                {
+                    loyalty_id = insert into Loyalty_Transactions
+                    [
+                        Customer = customer_record.ID
+                        Shipment = shipment_record.ID
+                        Transaction_Type = "Redeem"
+                        Points = 0 - shipment_record.Loyalty_Points_Redeemed
+                        Amount_Equivalent = shipment_record.Loyalty_Redemption_Amount
+                        Transaction_Date = zoho.currenttime
+                        Points_Status = "Consumed"
+                        Applied_Tier = customer_record.Current_Loyalty_Tier
+                        Reference = "AWB " + shipment_record.AWB_Number
+                        Notes = "Points redeemed against shipment booking"
+                        Posted_By_Email = zoho.loginuserid
+                        Customer_Login_Email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID)
+                    ];
+                    customer_record.Current_Loyalty_Points = ifnull(customer_record.Current_Loyalty_Points,0) - shipment_record.Loyalty_Points_Redeemed;
+                }
+                communication_id = insert into Communication_Log
+                [
+                    Customer = customer_record.ID
+                    Shipment = shipment_record.ID
+                    Recipient = customer_record.Email_ID
+                    Channel = "Email"
+                    Template_Code = "SHIPMENT_BOOKED"
+                    Subject = "Shipment booked: AWB " + shipment_record.AWB_Number
+                    Message_Summary = "Shipment booking confirmed with status " + shipment_record.Shipment_Status + "."
+                    Provider = "Zoho Mail"
+                    Communication_Status = "Sent"
+                    Attempt_Count = 1
+                    Last_Attempt_At = zoho.currenttime
+                ];
+                sendmail
+                [
+                    from: zoho.adminuserid
+                    to: customer_record.Email_ID
+                    subject: "Shipment booked: AWB " + shipment_record.AWB_Number
+                    message: "Your shipment has been booked. Current status: " + shipment_record.Shipment_Status + ". Total payable: INR " + shipment_record.Total_Payable + "."
+                ]
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = "Shipment Booking"
+                    Action_Name = "Book Shipment"
+                    Module_Name = "Shipment Requests"
+                    Record_ID = shipment_record.ID.toString()
+                    After_Data = "AWB=" + shipment_record.AWB_Number + "; Status=" + shipment_record.Shipment_Status + "; Amount=" + shipment_record.Total_Payable + "; Collection Center=" + shipment_record.Collection_Center
+                    Source = "Form Workflow"
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

@@ -1,0 +1,57 @@
+Publish_Rate_Card as "Publish Rate Card"
+{
+    type = functions
+    form = Rate_Cards
+    execution type = for each record
+    description = "Publishes a complete rate card with at least one active slab"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                active_slab_count = Rate_Slabs[Rate_Card == input.ID && Active == true].count();
+                if(active_slab_count == 0)
+                {
+                    info "Add at least one active rate slab before publishing this rate card.";
+                }
+                else
+                {
+                    if(input.Default_For_Retail == true)
+                    {
+                        existing_default_count = Rate_Cards[Default_For_Retail == true && Status == "Published" && ID != input.ID].count();
+                        if(existing_default_count > 0)
+                        {
+                            info "Another published rate card is already the retail default.";
+                        }
+                        else
+                        {
+                            input.Status = "Published";
+                        }
+                    }
+                    else
+                    {
+                        input.Status = "Published";
+                    }
+                    if(input.Status == "Published")
+                    {
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuserid
+                            Actor_Profile = "Pricing Administration"
+                            Action_Name = "Publish Rate Card"
+                            Module_Name = "Rate Cards"
+                            Record_ID = input.ID.toString()
+                            Before_Data = "Status=Draft"
+                            After_Data = "Status=Published; Active Slabs=" + active_slab_count
+                            Source = "Report Action"
+                            Severity = "Warning"
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

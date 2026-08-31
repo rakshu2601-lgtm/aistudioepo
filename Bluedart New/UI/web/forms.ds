@@ -1,0 +1,36 @@
+forms
+{
+    form App_Configuration { label placement = left }
+    form Hubs { label placement = left }
+    form Hub_Pincode_Mapping { label placement = left }
+    form Operations_Users { label placement = left }
+    form Vehicles { label placement = left }
+    form Transport_Routes { label placement = left }
+    form Rate_Cards { label placement = left }
+    form Rate_Slabs { label placement = left }
+    form KYC_Document_Types { label placement = left }
+    form Customers { label placement = left }
+    form Customer_KYC_Documents { label placement = left }
+    form Shipment_Requests { label placement = left }
+    form Shipment_Tracking_Events { label placement = left }
+    form Pickup_Run_Sheets { label placement = left }
+    form Pickup_Run_Sheet_Items { label placement = left }
+    form Logistics_Bags { label placement = left }
+    form Bag_Shipments { label placement = left }
+    form Manifests { label placement = left }
+    form Manifest_Bags { label placement = left }
+    form Shipment_Exceptions { label placement = left }
+    form Delivery_Run_Sheets { label placement = left }
+    form Delivery_Run_Sheet_Items { label placement = left }
+    form NDR_Instructions { label placement = left }
+    form NDR_Response { label placement = left }
+    form COD_Remittances { label placement = left }
+    form Loyalty_Rules { label placement = left }
+    form Loyalty_Tiers { label placement = left }
+    form Loyalty_Transactions { label placement = left }
+    form Invoices { label placement = left }
+    form Account_Ledger { label placement = left }
+    form Payment_Transactions { label placement = left }
+    form Audit_Log { label placement = left }
+    form Communication_Log { label placement = left }
+}

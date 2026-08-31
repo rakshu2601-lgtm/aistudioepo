@@ -1,0 +1,49 @@
+list Verification_Pending
+{
+    displayName = "Verification Pending"
+    show all rows from Customers [Onboarding_Status == "Pending Verification" && Active == true]
+    (
+        Customer_ID
+        Customer_Type
+        Company_Name
+        Full_Name
+        Email_ID
+        Requested_Credit_Limit
+        KYC_Submitted_On
+        Onboarding_Status
+        custom action "View KYC"
+        (
+            workflow = View_Customer_KYC
+            show action for each record = true
+            column header = "KYC Actions"
+        )
+        custom action "Approve"
+        (
+            workflow = Approve_Customer_KYC
+            show action for each record = true
+            column header = "KYC Actions"
+            confirmation before execution
+            (
+                message for individual record = "Approve this customer only after every required document is verified?"
+                confirm button text = "Approve"
+                cancel button text = "Cancel"
+            )
+        )
+        custom action "Query"
+        (
+            workflow = Query_Customer_KYC
+            show action for each record = true
+            column header = "KYC Actions"
+            confirmation before execution
+            (
+                message for individual record = "Move this customer to Action Required based on queried document remarks?"
+                confirm button text = "Move to Action Required"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    sort by
+    (
+        KYC_Submitted_On ascending
+    )
+}

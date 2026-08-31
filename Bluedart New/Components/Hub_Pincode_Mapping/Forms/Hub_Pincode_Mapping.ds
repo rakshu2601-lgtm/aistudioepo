@@ -1,0 +1,131 @@
+form Hub_Pincode_Mapping
+{
+    title
+    {
+        displayname = "Hub Pincode Mapping"
+        on add = "Add Pincode Mapping"
+        on edit = "Edit Pincode Mapping"
+    }
+    success message = "Pincode mapping saved successfully"
+    Service_Area
+    (
+        type = section
+        displayname = "Service Area"
+        row = 1
+        column = 0
+    )
+    must have unique Pincode
+    (
+        type = text
+        displayname = "Pincode"
+        maxchar = 6
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Serviceability
+    (
+        type = picklist
+        displayname = "Serviceability"
+        values = {"Serviceable","Non-Serviceable","ODA"}
+        initial value = "Serviceable"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Service_Zone
+    (
+        type = text
+        displayname = "Service Zone"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Beat_Name
+    (
+        type = text
+        displayname = "Beat Name"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Hub_Assignment
+    (
+        type = section
+        displayname = "Hub Assignment"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Primary_Collection_Center
+    (
+        type = picklist
+        displayname = "Primary Collection Center"
+        values = Hubs[Hub_Type == "Collection Center" && Active == true].ID
+        displayformat = [Hub_Name]
+        searchable = true
+        sortorder = ascending
+        row = 2
+        column = 1
+        width = medium
+    )
+    Secondary_Overflow_Hub
+    (
+        type = picklist
+        displayname = "Secondary Overflow Hub"
+        values = Hubs[Hub_Type == "Collection Center" && Active == true].ID
+        displayformat = [Hub_Name]
+        searchable = true
+        sortorder = ascending
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Approx_Distance_From_Primary_Km
+    (
+        type = decimal
+        displayname = "Approx. Distance from Primary (Km)"
+        decimalplace = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Mapping"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Mapping"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

@@ -1,0 +1,30 @@
+list Hub_Capacity
+{
+    displayName = "Hub Capacity"
+    show all rows from Hubs [Active == true]
+    (
+        Hub_ID
+        Hub_Name
+        Hub_Type
+        Daily_Capacity
+        Operating_Start_Time
+        Operating_End_Time
+        Cut_Off_Time
+    )
+    filters
+    (
+        Hub_Type
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Hub_Type ascending
+    )
+    sort by
+    (
+        Daily_Capacity descending
+    )
+}

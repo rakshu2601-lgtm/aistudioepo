@@ -1,0 +1,21 @@
+Current_Latitude_On_User_Input as "Stamp Latitude Update"
+{
+    type = form
+    form = Operations_Users
+    record event = on add or edit
+    description = "Stamps the time when an agent updates latitude"
+
+    on user input of Current_Latitude
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Application_Role == "Field Agent" && input.Work_Email != null && input.Work_Email.toLowerCase() == zoho.loginuserid.toLowerCase())
+                {
+                    input.Last_Location_At = zoho.currenttime;
+                }
+            )
+        }
+    }
+}

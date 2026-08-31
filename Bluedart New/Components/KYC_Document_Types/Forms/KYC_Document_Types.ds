@@ -1,0 +1,171 @@
+form KYC_Document_Types
+{
+    title
+    {
+        displayname = "KYC Document Types"
+        on add = "Add KYC Document Type"
+        on edit = "Edit KYC Document Type"
+    }
+    success message = "KYC document type saved successfully"
+    Document_Identity
+    (
+        type = section
+        displayname = "Document Identity"
+        row = 1
+        column = 0
+    )
+    must have unique Document_Code
+    (
+        type = text
+        displayname = "Document Code"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Document_Name
+    (
+        type = text
+        displayname = "Document Name"
+        description [ type = tooltip  message = "Preset examples: GST Certificate, Company PAN, Incorporation or Business Registration, Office Address Proof, Cancelled Cheque, Authorised Signatory ID, Corporate Board Authorisation, Wholesale Trade Licence, Audited Financials or ITR." ]
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Applies_To
+    (
+        type = picklist
+        displayname = "Applies To"
+        values = {"Corporate","Wholesale","Both"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    Mandatory_By_Default
+    (
+        type = checkbox
+        displayname = "Mandatory by Default"
+        initial value = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Conditional_Requirement
+    (
+        type = section
+        displayname = "Conditional Requirement"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Conditional_On_Credit_Threshold
+    (
+        type = checkbox
+        displayname = "Conditional on Credit Threshold"
+        initial value = false
+        row = 2
+        column = 1
+        width = medium
+    )
+    Credit_Threshold
+    (
+        type = INR
+        displayname = "Credit Threshold"
+        format = commadotindian
+        decimalplace = 2
+        maxchar = 14
+        row = 2
+        column = 2
+        width = medium
+    )
+    File_Requirements
+    (
+        type = section
+        displayname = "File Requirements"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Document_Number_Required
+    (
+        type = checkbox
+        displayname = "Document Number Required"
+        initial value = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Expiry_Date_Required
+    (
+        type = checkbox
+        displayname = "Expiry Date Required"
+        initial value = false
+        row = 3
+        column = 2
+        width = medium
+    )
+    must have Accepted_File_Types
+    (
+        type = text
+        displayname = "Accepted File Types"
+        initial value = "pdf,jpg,jpeg"
+        description [ type = tooltip  message = "Enter lowercase extensions separated by commas, without dots." ]
+        row = 3
+        column = 1
+        width = medium
+    )
+    must have Maximum_File_Size_MB
+    (
+        type = number
+        displayname = "Maximum File Size (MB)"
+        initial value = 10
+        row = 3
+        column = 2
+        width = medium
+    )
+    must have Display_Order
+    (
+        type = number
+        displayname = "Display Order"
+        row = 3
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Document Type"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Document Type"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

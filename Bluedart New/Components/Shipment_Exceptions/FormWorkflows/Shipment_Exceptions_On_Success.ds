@@ -1,0 +1,49 @@
+Shipment_Exceptions_On_Success as "Notify and Audit New Shipment Exception"
+{
+    type = form
+    form = Shipment_Exceptions
+    record event = on add
+    description = "Audits new exceptions and alerts operations management for high or critical severity"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = thisapp.permissions.loginUserProfile()
+                    Action_Name = "Create Shipment Exception"
+                    Module_Name = "Shipment Exceptions"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Type=" + input.Exception_Type + "; Severity=" + input.Severity + "; Hub=" + input.Reporting_Hub + "; Status=" + input.Exception_Status
+                    Source = "Form Workflow"
+                    Severity = if(input.Severity == "Critical","Critical","Warning")
+                ];
+                if(input.Severity == "High" || input.Severity == "Critical")
+                {
+                    sendmail
+                    (
+                        from : zoho.adminuserid
+                        to : zoho.adminuserid
+                        subject : input.Severity + " logistics exception " + input.Exception_Number
+                        message : "A " + input.Exception_Type + " exception was reported at hub " + input.Reporting_Hub + ". Review the internal Shipment Exception Queue."
+                    )
+                    for each operations_manager in Operations_Users[Active == true && Application_Role == "Operations Manager"]
+                    {
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : operations_manager.Work_Email
+                            subject : input.Severity + " logistics exception " + input.Exception_Number
+                            message : "A " + input.Exception_Type + " exception was reported at hub " + input.Reporting_Hub + ". Review the internal Shipment Exception Queue."
+                        )
+                    }
+                }
+            )
+        }
+    }
+}

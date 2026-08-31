@@ -1,0 +1,38 @@
+list My_Pickup_Runs
+{
+    displayName = "My Pickup Runs"
+    show all rows from Pickup_Run_Sheets [Assigned_Agent.Work_Email == zoho.loginuserid && Status != "Draft"]
+    (
+        PRS_Number
+        Run_Date
+        Hub
+        Assigned_Agent
+        Beat_Name
+        Vehicle
+        Status
+        Planned_Stop_Count
+        Completed_Stop_Count
+        Total_Planned_Weight_Kg
+        Released_At
+        Completed_At
+        custom action "Complete Run"
+        (
+            workflow = Complete_Pickup_Run
+            show action for each record = true
+            column header = "Complete Run"
+            success message = "Pickup run completion evaluated"
+            condition = (Status == "Released" || Status == "In Progress")
+        )
+    )
+    filters
+    (
+        Run_Date
+        Hub
+        Status
+    )
+    sort by
+    (
+        Run_Date descending
+        PRS_Number descending
+    )
+}

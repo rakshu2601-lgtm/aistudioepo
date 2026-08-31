@@ -1,0 +1,57 @@
+default list Shipment_Exception_Queue
+{
+    displayName = "Shipment Exception Queue"
+    show all rows from Shipment_Exceptions [Exception_Status != "Resolved"]
+    (
+        Exception_Number
+        Shipment
+        Bag
+        Manifest
+        Exception_Type
+        Severity
+        Reporting_Hub
+        Reported_By_Email
+        Reported_At
+        Evidence_Photo
+        Notes
+        Exception_Status
+        Assigned_To_Email
+        Resolution
+        custom action "Take Ownership"
+        (
+            workflow = Take_Exception_Ownership
+            show action for each record = true
+            column header = "Take Ownership"
+            success message = "Exception ownership evaluated"
+            condition = (Exception_Status == "Open" || Exception_Status == "Investigating")
+        )
+        custom action "Resolve Exception"
+        (
+            workflow = Resolve_Shipment_Exception
+            show action for each record = true
+            column header = "Resolve Exception"
+            success message = "Exception resolution evaluated"
+            condition = (Exception_Status != "Resolved")
+            confirmation before execution
+            (
+                message for individual record = "Resolve this exception using the saved resolution and evidence?"
+                confirm button text = "Resolve"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Exception_Type
+        Severity
+        Reporting_Hub
+        Exception_Status
+        Assigned_To_Email
+        Reported_At
+    )
+    sort by
+    (
+        Severity descending
+        Reported_At descending
+    )
+}

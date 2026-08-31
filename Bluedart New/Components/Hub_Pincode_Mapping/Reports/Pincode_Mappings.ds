@@ -1,0 +1,48 @@
+default list Pincode_Mappings
+{
+    displayName = "Pincode Mappings"
+    show all rows from Hub_Pincode_Mapping
+    (
+        Pincode
+        Serviceability
+        Service_Zone
+        Beat_Name
+        Primary_Collection_Center
+        Secondary_Overflow_Hub
+        Approx_Distance_From_Primary_Km
+        Active
+        custom action "Reassign Primary Hub"
+        (
+            workflow = Reassign_Primary_Hub
+            show action for each record = true
+            column header = "Reassign Primary Hub"
+            success message = "Primary hub reassigned to the configured overflow hub"
+            condition = (Secondary_Overflow_Hub is not null && Active == true)
+            confirmation before execution
+            (
+                message for individual record = "Swap the primary and overflow hubs for this pincode?"
+                confirm button text = "Reassign"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Serviceability
+        Service_Zone
+        Primary_Collection_Center
+        Active
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Service_Zone ascending
+    )
+    sort by
+    (
+        Pincode ascending
+    )
+}

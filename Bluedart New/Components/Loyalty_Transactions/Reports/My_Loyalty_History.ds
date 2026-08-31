@@ -1,0 +1,31 @@
+list My_Loyalty_History
+{
+    displayName = "My Loyalty History"
+    show all rows from Loyalty_Transactions [Customer_Login_Email == zoho.loginuserid]
+    (
+        Loyalty_Transaction_ID
+        Shipment
+        Transaction_Type
+        Points
+        Amount_Equivalent
+        Transaction_Date
+        Expiry_Date
+        Points_Status
+        Applied_Tier
+        Reference
+        Notes
+    )
+    filters
+    (
+        Transaction_Type
+        Transaction_Date
+        Expiry_Date
+        Points_Status
+        Applied_Tier
+    )
+    sort by
+    (
+        Transaction_Date descending
+        Loyalty_Transaction_ID descending
+    )
+}

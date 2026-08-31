@@ -1,0 +1,42 @@
+NDR_Response_On_Load as "Load Secure NDR Response"
+{
+    type = form
+    form = NDR_Response
+    record event = on add
+    description = "Validates the secure token before exposing recipient response controls"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                hide Reschedule_Date, Updated_Delivery_Address;
+                token_value = ifnull(input.Secure_Token,"").trim();
+                if(token_value == "")
+                {
+                    hide Recipient_Instruction, Reschedule_Date, Updated_Delivery_Address;
+                    disable Recipient_Instruction, Reschedule_Date, Updated_Delivery_Address;
+                    alert "This secure delivery instruction link is incomplete.";
+                }
+                else
+                {
+                    ndr_record = NDR_Instructions[Secure_Token == token_value];
+                    token_valid = ndr_record.count(ID) > 0 && ndr_record.NDR_Status == "Awaiting Instruction" && ndr_record.Submitted_At == null && ndr_record.Added_Time.addDay(2) >= zoho.currenttime;
+                    if(token_valid == false)
+                    {
+                        hide Recipient_Instruction, Reschedule_Date, Updated_Delivery_Address;
+                        disable Recipient_Instruction, Reschedule_Date, Updated_Delivery_Address;
+                        alert "This secure delivery instruction link is invalid, expired, or already used. Contact customer support for assistance.";
+                    }
+                    else
+                    {
+                        disable Secure_Token;
+                        show Recipient_Instruction;
+                        enable Recipient_Instruction;
+                    }
+                }
+            )
+        }
+    }
+}

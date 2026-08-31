@@ -1,0 +1,71 @@
+Approve_Customer_KYC as "Approve"
+{
+    type = functions
+    form = Customers
+    execution type = for each record
+    description = "Activates a business customer only when every required KYC document is verified"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                if(input.Onboarding_Status != "Pending Verification")
+                {
+                    info "Only customers pending verification can be approved.";
+                }
+                else
+                {
+                    required_count = Customer_KYC_Documents[Customer == input.ID && Required_For_Onboarding == true].count();
+                    unverified_count = Customer_KYC_Documents[Customer == input.ID && Required_For_Onboarding == true && Review_Status != "Verified"].count();
+                    if(required_count == 0 || unverified_count > 0)
+                    {
+                        info "Approval is blocked until every required KYC document is uploaded and verified.";
+                    }
+                    else
+                    {
+                        input.Onboarding_Status = "Active";
+                        input.KYC_Verified_Date = zoho.currentdate;
+                        input.KYC_Expiry_Date = zoho.currentdate.addYear(1);
+                        input.Approved_Credit_Limit = input.Requested_Credit_Limit;
+                        input.Portal_Access_Status = "Active";
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuserid
+                            Actor_Profile = "POC Process User"
+                            Action_Name = "Approve Customer KYC"
+                            Module_Name = "Customers"
+                            Record_ID = input.ID.toString()
+                            Before_Data = "Status=Pending Verification"
+                            After_Data = "Status=Active; KYC Expiry=" + input.KYC_Expiry_Date + "; Approved Credit=" + input.Approved_Credit_Limit
+                            Source = "Report Action"
+                            Severity = "Warning"
+                        ];
+                        communication_id = insert into Communication_Log
+                        [
+                            Customer = input.ID
+                            Recipient = input.Email_ID
+                            Channel = "Email"
+                            Template_Code = "KYC_APPROVED"
+                            Subject = "KYC approved and account activated"
+                            Message_Summary = "KYC was approved and the customer account is active."
+                            Provider = "Zoho Mail"
+                            Communication_Status = "Sent"
+                            Attempt_Count = 1
+                            Last_Attempt_At = zoho.currenttime
+                        ];
+                        sendmail
+                        [
+                            from: zoho.adminuserid
+                            to: input.Email_ID
+                            subject: "KYC approved and account activated"
+                            message: "Your KYC documents have been approved. Your logistics account is now active."
+                        ]
+                    }
+                }
+            )
+        }
+    }
+}

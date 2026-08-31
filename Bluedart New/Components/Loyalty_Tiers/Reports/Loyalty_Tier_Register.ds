@@ -1,0 +1,26 @@
+default list Loyalty_Tier_Register
+{
+    displayName = "Loyalty Tiers"
+    show all rows from Loyalty_Tiers
+    (
+        Tier_Name
+        Applies_To
+        Minimum_Quarterly_Spend
+        Maximum_Quarterly_Spend
+        Points_Multiplier
+        Credit_Rebate_Percent
+        Display_Order
+        Active
+    )
+    filters
+    (
+        Tier_Name
+        Applies_To
+        Active
+    )
+    sort by
+    (
+        Display_Order ascending
+        Minimum_Quarterly_Spend ascending
+    )
+}

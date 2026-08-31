@@ -1,0 +1,5 @@
+report NDR_RTO_Pending
+{
+    quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( NDR_ID Shipment Delivery_Run_Item Failure_Reason Submitted_At NDR_Status Supervisor_Notes ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+    detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( NDR_ID Shipment Delivery_Run_Item Failure_Reason Submitted_At NDR_Status Supervisor_Notes ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

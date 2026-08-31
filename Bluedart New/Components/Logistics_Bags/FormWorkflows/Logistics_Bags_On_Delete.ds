@@ -1,0 +1,19 @@
+Logistics_Bags_On_Delete as "Protect Logistics Bag Deletion"
+{
+    type = form
+    form = Logistics_Bags
+    record event = on delete
+    description = "Prevents deletion of logistics custody records"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Logistics bag custody records cannot be deleted.";
+                cancel delete;
+            )
+        }
+    }
+}

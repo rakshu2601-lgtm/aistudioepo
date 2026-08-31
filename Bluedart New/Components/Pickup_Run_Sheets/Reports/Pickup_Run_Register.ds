@@ -1,0 +1,60 @@
+default list Pickup_Run_Register
+{
+    displayName = "Pickup Run Sheets"
+    show all rows from Pickup_Run_Sheets
+    (
+        PRS_Number
+        Run_Date
+        Hub
+        Assigned_Agent
+        Beat_Name
+        Vehicle
+        Status
+        Planned_Stop_Count
+        Completed_Stop_Count
+        Total_Planned_Weight_Kg
+        Released_At
+        Completed_At
+        custom action "Release Run"
+        (
+            workflow = Release_Run_Pickup_Run_Register
+            show action for each record = true
+            column header = "Release Run"
+            success message = "Pickup run release evaluated"
+            condition = (Status == "Draft")
+            confirmation before execution
+            (
+                message for individual record = "Release this pickup run to the assigned agent?"
+                confirm button text = "Release"
+                cancel button text = "Cancel"
+            )
+        )
+        custom action "Complete Run"
+        (
+            workflow = Complete_Run_Pickup_Run_Register
+            show action for each record = true
+            column header = "Complete Run"
+            success message = "Pickup run completion evaluated"
+            condition = (Status == "Released" || Status == "In Progress")
+            confirmation before execution
+            (
+                message for individual record = "Complete this run after all pickup stops are resolved?"
+                confirm button text = "Complete"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Run_Date
+        Hub
+        Assigned_Agent
+        Vehicle
+        Status
+    )
+    sort by
+    (
+        Run_Date descending
+        PRS_Number descending
+    )
+}

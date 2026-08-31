@@ -1,0 +1,50 @@
+Pickup_Run_Sheet_Items_On_Success as "Reconcile Pickup Run Stop Totals"
+{
+    type = form
+    form = Pickup_Run_Sheet_Items
+    record event = on add or edit
+    description = "Refreshes pickup run aggregates and audits pickup stop assignment or evidence updates"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                run_record = Pickup_Run_Sheets[ID == input.Pickup_Run_Sheet];
+                planned_count = 0;
+                completed_count = 0;
+                planned_weight = 0.0;
+                for each run_item in Pickup_Run_Sheet_Items[Pickup_Run_Sheet == input.Pickup_Run_Sheet]
+                {
+                    if(run_item.Stop_Status != "Cancelled")
+                    {
+                        planned_count = planned_count + 1;
+                        shipment_record = Shipment_Requests[ID == run_item.Shipment];
+                        planned_weight = planned_weight + ifnull(shipment_record.Billable_Weight_Kg,0);
+                        if(run_item.Stop_Status == "Picked Up" || run_item.Stop_Status == "Failed")
+                        {
+                            completed_count = completed_count + 1;
+                        }
+                    }
+                }
+                run_record.Planned_Stop_Count = planned_count;
+                run_record.Completed_Stop_Count = completed_count;
+                run_record.Total_Planned_Weight_Kg = planned_weight;
+                current_profile = thisapp.permissions.loginUserProfile();
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = current_profile
+                    Action_Name = "Save Pickup Stop"
+                    Module_Name = "Pickup Run Sheet Items"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Run=" + input.Pickup_Run_Sheet + "; Shipment=" + input.Shipment + "; Stop=" + input.Stop_Sequence + "; Status=" + input.Stop_Status + "; Physical Weight=" + input.Physical_Weight_Kg
+                    Source = "Form Workflow"
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

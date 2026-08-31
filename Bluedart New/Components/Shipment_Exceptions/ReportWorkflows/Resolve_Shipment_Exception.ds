@@ -1,0 +1,94 @@
+Resolve_Shipment_Exception as "Resolve Exception - Exception Queue"
+{
+    type = functions
+    form = Shipment_Exceptions
+    execution type = for each record
+    description = "Resolves an evidenced exception, records ownership, creates safe shipment tracking, and audits the outcome"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                effective_hub = null;
+                if(logged_user.count(ID) > 0)
+                {
+                    effective_hub = logged_user.Home_Hub;
+                    deputation_active = logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                    if(deputation_active == true)
+                    {
+                        effective_hub = logged_user.Deputed_Hub;
+                    }
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == input.Reporting_Hub;
+                resolution_text = ifnull(input.Resolution,"").trim();
+                evidence_required = input.Exception_Type == "Missing" || input.Exception_Type == "Damaged" || input.Exception_Type == "Short" || input.Exception_Type == "Seal Mismatch";
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the reporting hub can resolve this exception.";
+                }
+                else if(input.Exception_Status == "Resolved")
+                {
+                    info "This exception is already resolved.";
+                }
+                else if(resolution_text == "")
+                {
+                    info "Save a clear resolution before resolving the exception.";
+                }
+                else if(evidence_required == true && input.Evidence_Photo == null)
+                {
+                    info "Attach the mandatory evidence photo before resolving this exception.";
+                }
+                else
+                {
+                    prior_status = input.Exception_Status;
+                    prior_owner = ifnull(input.Assigned_To_Email,"");
+                    if(input.Assigned_To_Email == null)
+                    {
+                        input.Assigned_To_Email = zoho.loginuserid;
+                    }
+                    input.Exception_Status = "Resolved";
+                    input.Resolved_By_Email = zoho.loginuserid;
+                    input.Resolved_At = zoho.currenttime;
+                    if(input.Shipment != null)
+                    {
+                        shipment_record = Shipment_Requests[ID == input.Shipment];
+                        if((input.Exception_Type == "Misroute" || shipment_record.Current_Hub == null) && input.Reporting_Hub != null)
+                        {
+                            shipment_record.Current_Hub = input.Reporting_Hub;
+                        }
+                        tracking_id = insert into Shipment_Tracking_Events
+                        [
+                            Shipment = input.Shipment
+                            Event_Time = zoho.currenttime
+                            Event_Status = "Information"
+                            Hub = input.Reporting_Hub
+                            Manifest = input.Manifest
+                            Bag = input.Bag
+                            Event_Description = "Operational review completed. Shipment processing continues according to the latest tracking status."
+                            Source = "System"
+                            Customer_Visible = true
+                            Created_By_Email = zoho.loginuserid
+                        ];
+                    }
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Resolve Shipment Exception"
+                        Module_Name = "Shipment Exceptions"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=" + prior_status + "; Owner=" + prior_owner
+                        After_Data = "Status=Resolved; Resolver=" + zoho.loginuserid + "; Resolution=" + resolution_text
+                        Source = "Report Action"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

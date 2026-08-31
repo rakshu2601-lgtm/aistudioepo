@@ -1,0 +1,29 @@
+Hub_Pincode_Mapping_On_Success as "Audit Pincode Mapping"
+{
+    type = form
+    form = Hub_Pincode_Mapping
+    record event = on add or edit
+    description = "Audits serviceability and hub routing changes"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = "Operations"
+                    Action_Name = "Save Pincode Mapping"
+                    Module_Name = "Hub Pincode Mapping"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Pincode=" + input.Pincode + "; Serviceability=" + input.Serviceability + "; Primary Hub ID=" + input.Primary_Collection_Center
+                    Source = "Form Workflow"
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

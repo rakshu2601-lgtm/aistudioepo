@@ -1,0 +1,41 @@
+calendar Delivery_Run_Calendar
+{
+    displayName = "Delivery Run Calendar"
+    show all rows from Delivery_Run_Sheets
+    (
+        DRS_Number
+        Run_Date
+        Hub
+        Delivery_Zone
+        Assigned_Agent
+        Vehicle
+        DRS_Status
+        Planned_Stop_Count
+        Delivered_Count
+        Failed_Count
+        Expected_COD_Amount
+        Collected_COD_Amount
+    )
+    filters
+    (
+        Hub
+        Delivery_Zone
+        Assigned_Agent
+        Vehicle
+        DRS_Status
+        Run_Date
+    )
+    options
+    (
+        display type = week
+        week start day = monday
+        display field = DRS_Number
+        start date = Run_Date
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+}

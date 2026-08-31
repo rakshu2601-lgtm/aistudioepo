@@ -1,0 +1,38 @@
+default list All_Hubs
+{
+    displayName = "All Hubs"
+    show all rows from Hubs
+    (
+        Hub_ID
+        Hub_Name
+        Hub_Type
+        Hub_Address
+        Parent_Sorting_Hub
+        Operating_Start_Time
+        Operating_End_Time
+        Cut_Off_Time
+        Daily_Capacity
+        Contact_Name
+        Contact_Email
+        Contact_Phone
+        Active
+    )
+    filters
+    (
+        Hub_Type
+        Active
+        Parent_Sorting_Hub
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Hub_Type ascending
+    )
+    sort by
+    (
+        Hub_Name ascending
+    )
+}

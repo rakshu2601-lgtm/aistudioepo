@@ -1,0 +1,178 @@
+form Rate_Cards
+{
+    title
+    {
+        displayname = "Rate Cards"
+        on add = "Add Rate Card"
+        on edit = "Edit Rate Card"
+    }
+    success message = "Rate card saved successfully"
+    Rate_Plan_Identity
+    (
+        type = section
+        displayname = "Rate Plan Identity"
+        row = 1
+        column = 0
+    )
+    must have unique Rate_Card_ID
+    (
+        type = text
+        displayname = "Rate Card ID"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Rate_Card_Name
+    (
+        type = text
+        displayname = "Rate Card Name"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Customer_Type
+    (
+        type = picklist
+        displayname = "Customer Type"
+        values = {"Retail","Corporate","Wholesale","All"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Transport_Mode
+    (
+        type = picklist
+        displayname = "Transport Mode"
+        values = {"Air","Surface","Both"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"Draft","Published","Expired"}
+        initial value = "Draft"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Default_For_Retail
+    (
+        type = checkbox
+        displayname = "Default for Retail"
+        initial value = false
+        row = 1
+        column = 2
+        width = medium
+    )
+    Pricing_Policy
+    (
+        type = section
+        displayname = "Pricing Policy"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Fuel_Surcharge_Percent
+    (
+        type = decimal
+        displayname = "Fuel Surcharge (%)"
+        decimalplace = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have COD_Handling_Fee
+    (
+        type = INR
+        displayname = "COD Handling Fee"
+        format = commadotindian
+        decimalplace = 2
+        maxchar = 12
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Volumetric_Divisor
+    (
+        type = number
+        displayname = "Volumetric Divisor"
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have GST_Percent
+    (
+        type = decimal
+        displayname = "GST (%)"
+        decimalplace = 2
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Contract_Discount_Percent
+    (
+        type = decimal
+        displayname = "Contract Discount (%)"
+        decimalplace = 2
+        initial value = 0
+        row = 2
+        column = 1
+        width = medium
+    )
+    Validity
+    (
+        type = section
+        displayname = "Validity"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Effective_From
+    (
+        type = date
+        displayname = "Effective From"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Effective_To
+    (
+        type = date
+        displayname = "Effective To"
+        row = 3
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Rate Card"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Rate Card"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

@@ -1,0 +1,33 @@
+App_Configuration_On_Validate as "Validate Application Configuration"
+{
+    type = form
+    form = App_Configuration
+    record event = on add or edit
+    description = "Validates positive policy values and ensures exactly one active configuration"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(ifnull(input.High_Credit_KYC_Threshold,0) <= 0 || ifnull(input.KYC_Expiry_Alert_Days,0) <= 0 || ifnull(input.Maximum_NDR_Attempts,0) <= 0 || ifnull(input.Points_Expiry_Months,0) <= 0 || ifnull(input.Default_Volumetric_Divisor,0) <= 0 || ifnull(input.Loyalty_Redemption_Value_Per_Point,0) <= 0 || ifnull(input.Notification_Retry_Limit,0) <= 0)
+                {
+                    alert "All policy thresholds, retry limits, expiry periods, and divisors must be greater than zero.";
+                    cancel submit;
+                }
+                other_active_count = App_Configuration[Active == true && ID != input.ID].count();
+                if(input.Active == true && other_active_count > 0)
+                {
+                    alert "Only one operations policy can be active.";
+                    cancel submit;
+                }
+                if(input.Active == false && other_active_count == 0)
+                {
+                    alert "At least one operations policy must remain active.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,33 @@
+Shipment_Exceptions_On_Load as "Secure Shipment Exception Form"
+{
+    type = form
+    form = Shipment_Exceptions
+    record event = on add or edit
+    description = "Protects immutable reporting metadata and resolved exception evidence"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Reported_By_Email, Reported_At, Resolved_By_Email, Resolved_At;
+                if(input.ID == null)
+                {
+                    disable Exception_Status;
+                    input.Reported_By_Email = zoho.loginuserid;
+                    input.Reported_At = zoho.currenttime;
+                    input.Exception_Status = "Open";
+                }
+                else
+                {
+                    disable Shipment, Bag, Manifest, Exception_Type, Severity, Reporting_Hub;
+                    if(input.Exception_Status == "Resolved")
+                    {
+                        disable Evidence_Photo, Notes, Exception_Status, Assigned_To_Email, Resolution;
+                    }
+                }
+            )
+        }
+    }
+}

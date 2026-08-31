@@ -1,0 +1,5 @@
+report COD_Pending_Remittance
+{
+    quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Remittance_Number Agent Hub Remittance_Date Expected_Amount Submitted_Amount Shortfall_Amount Remittance_Status "Confirm Remittance" ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on tap ( View Record ) on long press ( Edit Delete Duplicate View Record ) on left swipe ( Delete ) on right swipe ( Edit ) ) )
+    detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Remittance_Number Delivery_Run_Sheet Agent Hub Remittance_Date Expected_Amount Submitted_Amount Shortfall_Amount Remittance_Status Confirmed_At Notes "Confirm Remittance" ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

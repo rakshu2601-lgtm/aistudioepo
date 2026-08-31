@@ -1,0 +1,26 @@
+Loyalty_Rules_On_Load as "Secure Loyalty Rule Load"
+{
+    type = form
+    form = Loyalty_Rules
+    record event = on add or edit
+    description = "Keeps lifecycle state action-controlled and locks identifiers after creation"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Status;
+                if(input.ID != null)
+                {
+                    disable Loyalty_Rule_ID;
+                }
+                if(input.Status == "Expired")
+                {
+                    disable Rule_Name, Customer_Type, Transport_Mode, Minimum_Shipment_Amount, Points_Per_INR, Maximum_Points_Per_Shipment, Points_Expiry_Months, Effective_From, Effective_To;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,42 @@
+Operations_Users_On_Load as "Configure Operations User Fields"
+{
+    type = form
+    form = Operations_Users
+    record event = on add or edit
+    description = "Shows role-relevant fields and protects agent location fields"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Application_Role == "Field Agent")
+                {
+                    show Agent_Role, Assigned_Beat, Assigned_Pincodes, Vehicle_Type, Maximum_Daily_Load_Kg, Current_Latitude, Current_Longitude, Last_Location_At;
+                    if(input.Work_Email != null && input.Work_Email.toLowerCase() == zoho.loginuserid.toLowerCase())
+                    {
+                        enable Current_Latitude, Current_Longitude;
+                    }
+                    else
+                    {
+                        disable Current_Latitude, Current_Longitude;
+                    }
+                    disable Last_Location_At;
+                }
+                else
+                {
+                    hide Agent_Role, Assigned_Beat, Assigned_Pincodes, Vehicle_Type, Maximum_Daily_Load_Kg, Current_Latitude, Current_Longitude, Last_Location_At;
+                }
+                if(input.Application_Role in {"Hub Supervisor","Hub Operator","Field Agent"})
+                {
+                    show Home_Hub, Deputed_Hub, Deputation_Start_Date, Deputation_End_Date;
+                }
+                else
+                {
+                    hide Home_Hub, Deputed_Hub, Deputation_Start_Date, Deputation_End_Date;
+                }
+            )
+        }
+    }
+}

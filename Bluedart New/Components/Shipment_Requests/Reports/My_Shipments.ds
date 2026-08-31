@@ -1,0 +1,34 @@
+list My_Shipments
+{
+    displayName = "My Shipments"
+    show all rows from Shipment_Requests [Customer.Portal_Login_Email == zoho.loginuserid || Customer.Email_ID == zoho.loginuserid]
+    (
+        AWB_Number
+        Booked_On
+        Recipient_Name
+        Delivery_Pincode
+        Transport_Mode
+        Billable_Weight_Kg
+        Gross_Amount
+        Loyalty_Points_Redeemed
+        Loyalty_Redemption_Amount
+        Total_Payable
+        Payment_Type
+        Payment_Status
+        Shipment_Status
+        Expected_Delivery_Date
+        EPOD_Download_URL
+    )
+    filters
+    (
+        Transport_Mode
+        Payment_Type
+        Payment_Status
+        Shipment_Status
+        Expected_Delivery_Date
+    )
+    sort by
+    (
+        Booked_On descending
+    )
+}

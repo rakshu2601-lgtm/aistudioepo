@@ -1,0 +1,19 @@
+Loyalty_Tiers_On_Delete as "Protect Loyalty Tier History"
+{
+    type = form
+    form = Loyalty_Tiers
+    record event = on delete
+    description = "Prevents deletion of tier policies referenced by loyalty history"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Loyalty tiers are policy evidence and cannot be deleted. Mark a tier inactive instead.";
+                cancel delete;
+            )
+        }
+    }
+}

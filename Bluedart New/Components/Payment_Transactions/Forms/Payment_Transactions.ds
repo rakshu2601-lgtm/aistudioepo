@@ -1,0 +1,224 @@
+form Payment_Transactions
+{
+    title
+    {
+        displayname = "Payment Transactions"
+        on add = "Initiate Payment Transaction"
+        on edit = "Review Payment Transaction"
+    }
+    success message = "Payment transaction saved successfully"
+
+    Payment_Identity
+    (
+        type = section
+        displayname = "Payment Identity"
+        row = 1
+        column = 0
+    )
+    Payment_Transaction_ID
+    (
+        type = autonumber
+        displayname = "Payment Transaction ID"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Customer
+    (
+        type = picklist
+        displayname = "Customer"
+        values = Customers.ID
+        displayformat = [Customer_ID]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Shipment
+    (
+        type = picklist
+        displayname = "Shipment"
+        values = Shipment_Requests.ID
+        displayformat = [AWB_Number]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Invoice
+    (
+        type = picklist
+        displayname = "Invoice"
+        values = Invoices.ID
+        displayformat = [Invoice_Number]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Ledger_Entry
+    (
+        type = picklist
+        displayname = "Ledger Entry"
+        values = Account_Ledger.ID
+        displayformat = [Ledger_Entry_ID]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    Gateway_References
+    (
+        type = section
+        displayname = "Gateway References"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Gateway
+    (
+        type = picklist
+        displayname = "Gateway"
+        values = {"Zoho Checkout","Razorpay","Other"}
+        initial value = "Zoho Checkout"
+        row = 2
+        column = 1
+        width = medium
+    )
+    unique Gateway_Order_ID
+    (
+        type = text
+        displayname = "Gateway Order ID"
+        maxchar = 100
+        row = 2
+        column = 2
+        width = medium
+    )
+    unique Gateway_Payment_ID
+    (
+        type = text
+        displayname = "Gateway Payment ID"
+        maxchar = 100
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Amount
+    (
+        type = INR
+        displayname = "Amount"
+        format = commadotindian
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Payment_Method
+    (
+        type = picklist
+        displayname = "Payment Method"
+        values = {"UPI","Card","Net Banking","Wallet","Cash","Other"}
+        initial value = "Other"
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Payment_Status
+    (
+        type = picklist
+        displayname = "Payment Status"
+        values = {"Initiated","Success","Failed","Refunded"}
+        initial value = "Initiated"
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    Reconciliation_Details
+    (
+        type = section
+        displayname = "Reconciliation Details"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Initiated_At
+    (
+        type = datetime
+        displayname = "Initiated At"
+        initial value = "${zoho.currenttime}"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Completed_At
+    (
+        type = datetime
+        displayname = "Completed At"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Gateway_Response_Summary
+    (
+        type = textarea
+        displayname = "Gateway Response Summary"
+        height = 100px
+        private = true
+        isencrypted = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Failure_Reason
+    (
+        type = textarea
+        displayname = "Failure Reason"
+        height = 100px
+        row = 3
+        column = 2
+        width = medium
+    )
+    Customer_Login_Email
+    (
+        type = email
+        displayname = "Customer Login Email"
+        personal data = true
+        row = 3
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Initiate Transaction"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Transaction"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

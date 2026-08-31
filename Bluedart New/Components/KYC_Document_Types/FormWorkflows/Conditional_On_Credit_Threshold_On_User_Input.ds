@@ -1,0 +1,27 @@
+Conditional_On_Credit_Threshold_On_User_Input as "Update Credit Threshold Requirement"
+{
+    type = form
+    form = KYC_Document_Types
+    record event = on add or edit
+    description = "Toggles the credit threshold when the conditional requirement changes"
+
+    on user input of Conditional_On_Credit_Threshold
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Conditional_On_Credit_Threshold == true)
+                {
+                    show Credit_Threshold;
+                    enable Credit_Threshold;
+                }
+                else
+                {
+                    input.Credit_Threshold = null;
+                    hide Credit_Threshold;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,84 @@
+Review_Account_Ageing_Daily as "Review Account Ageing Daily"
+{
+    type = schedule
+    start = "2026-01-01 08:00:00"
+    frequency = daily
+    time zone = "Asia/Kolkata"
+    description = "Marks due ledger entries overdue, refreshes ageing buckets, and sends bounded customer reminders"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                due_entries = Account_Ledger[(Transaction_Type == "Debit" || (Transaction_Type == "Adjustment" && Amount > 0)) && (Ledger_Status == "Open" || Ledger_Status == "Partially Settled") && Due_Date < zoho.currentdate] sort by Due_Date range from 0 to 199;
+                for each ledger_record in due_entries
+                {
+                    prior_status = ledger_record.Ledger_Status;
+                    overdue_days = ledger_record.Due_Date.daysBetween(zoho.currentdate);
+                    ledger_record.Ledger_Status = "Overdue";
+                    if(overdue_days <= 30)
+                    {
+                        ledger_record.Ageing_Bucket = "1-30 Days";
+                    }
+                    else if(overdue_days <= 60)
+                    {
+                        ledger_record.Ageing_Bucket = "31-60 Days";
+                    }
+                    else if(overdue_days <= 90)
+                    {
+                        ledger_record.Ageing_Bucket = "61-90 Days";
+                    }
+                    else
+                    {
+                        ledger_record.Ageing_Bucket = "90+ Days";
+                    }
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.adminuserid
+                        Actor_Profile = "System"
+                        Action_Name = "Mark Ledger Overdue"
+                        Module_Name = "Account Ledger"
+                        Record_ID = ledger_record.ID.toString()
+                        Before_Data = "Status=" + prior_status
+                        After_Data = "Status=Overdue; Ageing=" + ledger_record.Ageing_Bucket + "; Due Date=" + ledger_record.Due_Date
+                        Source = "Schedule"
+                        Severity = "Warning"
+                    ];
+                }
+                reminder_entries = Account_Ledger[(Transaction_Type == "Debit" || (Transaction_Type == "Adjustment" && Amount > 0)) && Ledger_Status == "Overdue" && Customer_Login_Email != ""] sort by Due_Date range from 0 to 49;
+                for each reminder_record in reminder_entries
+                {
+                    customer_record = Customers[ID == reminder_record.Customer];
+                    recipient_email = reminder_record.Customer_Login_Email;
+                    if(ifnull(recipient_email,"").trim() != "")
+                    {
+                        sendmail
+                        [
+                            from: zoho.adminuserid
+                            to: recipient_email
+                            subject: "Payment reminder for overdue logistics account entry"
+                            message: "An account entry of INR " + reminder_record.Amount + " has been overdue since " + reminder_record.Due_Date + ". Please review your account statement or contact the finance team."
+                        ]
+                        communication_id = insert into Communication_Log
+                        [
+                            Customer = customer_record.ID
+                            Shipment = reminder_record.Shipment
+                            Recipient = recipient_email
+                            Channel = "Email"
+                            Template_Code = "ACCOUNT_OVERDUE_REMINDER"
+                            Subject = "Payment reminder for overdue logistics account entry"
+                            Message_Summary = "Reminder sent for ledger entry " + reminder_record.Ledger_Entry_ID + " amount INR " + reminder_record.Amount + "."
+                            Provider = "Zoho Mail"
+                            Communication_Status = "Sent"
+                            Attempt_Count = 1
+                            Last_Attempt_At = zoho.currenttime
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

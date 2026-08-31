@@ -1,0 +1,342 @@
+<%
+profileName = thisapp.permissions.loginUserProfile();
+isAdmin = profileName == "Logistics_Administrator" || profileName == "Administrator";
+isOperations = profileName == "Operations_Manager";
+allowed = isAdmin || isOperations;
+if(allowed)
+{
+    todayStart = zoho.currentdate;
+    tomorrowStart = zoho.currentdate.addDay(1);
+    monthStart = zoho.currentdate.subDay(29);
+
+    activeRetail = Customers[Active == true && Onboarding_Status == "Active" && Customer_Type == "Retail"].count(ID);
+    activeCorporate = Customers[Active == true && Onboarding_Status == "Active" && Customer_Type == "Corporate"].count(ID);
+    activeWholesale = Customers[Active == true && Onboarding_Status == "Active" && Customer_Type == "Wholesale"].count(ID);
+    activeCustomers = activeRetail + activeCorporate + activeWholesale;
+    pendingKYC = Customers[Active == true && (Onboarding_Status == "KYC Pending" || Onboarding_Status == "Pending Verification" || Onboarding_Status == "Action Required")].count(ID);
+    todayBookings = Shipment_Requests[Booked_On >= todayStart && Booked_On < tomorrowStart].count(ID);
+    todayRevenue = ifnull(Invoices[Invoice_Date == zoho.currentdate && Invoice_Status != "Void"].sum(Invoice_Total),0);
+    unassignedShipments = Shipment_Requests[Shipment_Status == "Booked - Hub Assignment Pending"].count(ID);
+    inTransitShipments = Shipment_Requests[Shipment_Status == "In Transit"].count(ID);
+    deliveredToday = Shipment_Tracking_Events[Event_Status == "Delivered" && Event_Time >= todayStart && Event_Time < tomorrowStart].count(ID);
+    ndrShipments = Shipment_Requests[Shipment_Status == "Delivery Failed - NDR"].count(ID);
+    rtoShipments = Shipment_Requests[Shipment_Status == "Return to Origin"].count(ID);
+    codPendingAmount = ifnull(COD_Remittances[Remittance_Status == "Pending" || Remittance_Status == "Shortfall"].sum(Expected_Amount),0);
+    codPendingCount = COD_Remittances[Remittance_Status == "Pending" || Remittance_Status == "Shortfall"].count(ID);
+    criticalExceptions = Shipment_Exceptions[Severity == "Critical" && Exception_Status != "Resolved"].count(ID);
+    loyaltyIssued = ifnull(Loyalty_Transactions[Transaction_Type == "Earn" && Transaction_Date >= monthStart].sum(Points),0);
+    loyaltyRedeemedRaw = ifnull(Loyalty_Transactions[Transaction_Type == "Redeem" && Transaction_Date >= monthStart].sum(Points),0);
+    loyaltyRedeemed = if(loyaltyRedeemedRaw < 0,0 - loyaltyRedeemedRaw,loyaltyRedeemedRaw);
+
+    bookedStatus = Shipment_Requests[Shipment_Status == "Booked" || Shipment_Status == "Picked Up" || Shipment_Status == "Inbound at Branch Station" || Shipment_Status == "Sorted at Origin Hub"].count(ID);
+    linehaulStatus = Shipment_Requests[Shipment_Status == "Bagged & Dispatched to Origin Hub" || Shipment_Status == "In Transit" || Shipment_Status == "Arrived at Destination Hub"].count(ID);
+    lastMileStatus = Shipment_Requests[Shipment_Status == "At Delivery Hub" || Shipment_Status == "Out For Delivery (OFD)" || Shipment_Status == "Delivery Failed - NDR"].count(ID);
+    completedStatus = Shipment_Requests[Shipment_Status == "Delivered"].count(ID);
+    statusTotal = bookedStatus + linehaulStatus + lastMileStatus + completedStatus;
+    statusP1 = if(statusTotal > 0,(bookedStatus * 100.0) / statusTotal,0);
+    statusP2 = if(statusTotal > 0,(linehaulStatus * 100.0) / statusTotal,0);
+    statusP3 = if(statusTotal > 0,(lastMileStatus * 100.0) / statusTotal,0);
+    statusP4 = if(statusTotal > 0,(completedStatus * 100.0) / statusTotal,0);
+
+    airCount = Shipment_Requests[Transport_Mode == "Air"].count(ID);
+    surfaceCount = Shipment_Requests[Transport_Mode == "Surface"].count(ID);
+    modeTotal = airCount + surfaceCount;
+    airP = if(modeTotal > 0,(airCount * 100.0) / modeTotal,0);
+    surfaceP = if(modeTotal > 0,(surfaceCount * 100.0) / modeTotal,0);
+
+    customerTotal = activeCustomers;
+    retailP = if(customerTotal > 0,(activeRetail * 100.0) / customerTotal,0);
+    corporateP = if(customerTotal > 0,(activeCorporate * 100.0) / customerTotal,0);
+    wholesaleP = if(customerTotal > 0,(activeWholesale * 100.0) / customerTotal,0);
+
+    tierSilver = Customers[Active == true && Current_Loyalty_Tier == "Silver"].count(ID);
+    tierGold = Customers[Active == true && Current_Loyalty_Tier == "Gold"].count(ID);
+    tierPlatinum = Customers[Active == true && Current_Loyalty_Tier == "Platinum"].count(ID);
+    tierNone = Customers[Active == true && Current_Loyalty_Tier == "None"].count(ID);
+    tierTotal = tierSilver + tierGold + tierPlatinum + tierNone;
+    tierP1 = if(tierTotal > 0,(tierSilver * 100.0) / tierTotal,0);
+    tierP2 = if(tierTotal > 0,(tierGold * 100.0) / tierTotal,0);
+    tierP3 = if(tierTotal > 0,(tierPlatinum * 100.0) / tierTotal,0);
+    tierP4 = if(tierTotal > 0,(tierNone * 100.0) / tierTotal,0);
+
+    deliveredAll = Shipment_Requests[Shipment_Status == "Delivered"].count(ID);
+    failedAll = Shipment_Requests[Shipment_Status == "Delivery Failed - NDR" || Shipment_Status == "Return to Origin"].count(ID);
+    deliveryOutcomeTotal = deliveredAll + failedAll;
+    deliverySuccess = if(deliveryOutcomeTotal > 0,(deliveredAll * 100.0) / deliveryOutcomeTotal,0);
+    ndrRate = if(deliveryOutcomeTotal > 0,(ndrShipments * 100.0) / deliveryOutcomeTotal,0);
+    rtoRate = if(deliveryOutcomeTotal > 0,(rtoShipments * 100.0) / deliveryOutcomeTotal,0);
+
+    revD6Date = zoho.currentdate.subDay(6);
+    revD5Date = zoho.currentdate.subDay(5);
+    revD4Date = zoho.currentdate.subDay(4);
+    revD3Date = zoho.currentdate.subDay(3);
+    revD2Date = zoho.currentdate.subDay(2);
+    revD1Date = zoho.currentdate.subDay(1);
+    revD0Date = zoho.currentdate;
+    revD6 = ifnull(Invoices[Invoice_Date == revD6Date && Invoice_Status != "Void"].sum(Invoice_Total),0);
+    revD5 = ifnull(Invoices[Invoice_Date == revD5Date && Invoice_Status != "Void"].sum(Invoice_Total),0);
+    revD4 = ifnull(Invoices[Invoice_Date == revD4Date && Invoice_Status != "Void"].sum(Invoice_Total),0);
+    revD3 = ifnull(Invoices[Invoice_Date == revD3Date && Invoice_Status != "Void"].sum(Invoice_Total),0);
+    revD2 = ifnull(Invoices[Invoice_Date == revD2Date && Invoice_Status != "Void"].sum(Invoice_Total),0);
+    revD1 = ifnull(Invoices[Invoice_Date == revD1Date && Invoice_Status != "Void"].sum(Invoice_Total),0);
+    revD0 = ifnull(Invoices[Invoice_Date == revD0Date && Invoice_Status != "Void"].sum(Invoice_Total),0);
+    maxRevenue = revD6;
+    if(revD5 > maxRevenue){maxRevenue = revD5;}
+    if(revD4 > maxRevenue){maxRevenue = revD4;}
+    if(revD3 > maxRevenue){maxRevenue = revD3;}
+    if(revD2 > maxRevenue){maxRevenue = revD2;}
+    if(revD1 > maxRevenue){maxRevenue = revD1;}
+    if(revD0 > maxRevenue){maxRevenue = revD0;}
+    revH6 = if(maxRevenue > 0,(revD6 * 100.0) / maxRevenue,0);
+    revH5 = if(maxRevenue > 0,(revD5 * 100.0) / maxRevenue,0);
+    revH4 = if(maxRevenue > 0,(revD4 * 100.0) / maxRevenue,0);
+    revH3 = if(maxRevenue > 0,(revD3 * 100.0) / maxRevenue,0);
+    revH2 = if(maxRevenue > 0,(revD2 * 100.0) / maxRevenue,0);
+    revH1 = if(maxRevenue > 0,(revD1 * 100.0) / maxRevenue,0);
+    revH0 = if(maxRevenue > 0,(revD0 * 100.0) / maxRevenue,0);
+
+    activeHubs = Hubs[Active == true] sort by Daily_Capacity desc;
+    recentManifests = Manifests[ID != 0] sort by Departure_Time desc;
+    verificationQueue = Customers[Active == true && Onboarding_Status == "Pending Verification"] sort by KYC_Submitted_On asc;
+    expiryQueue = Customers[Active == true && Customer_Type != "Retail" && KYC_Expiry_Date != null && KYC_Expiry_Date <= zoho.currentdate.addDay(30)] sort by KYC_Expiry_Date asc;
+    recentCriticalAudits = Audit_Log[Severity == "Critical"] sort by Event_Time desc;
+
+    routeActive = Transport_Routes[Active == true].count(ID);
+    manifestDraft = Manifests[Manifest_Status == "Draft" || Manifest_Status == "Closed"].count(ID);
+    manifestTransit = Manifests[Manifest_Status == "In Transit"].count(ID);
+    manifestExceptions = Manifests[Manifest_Status == "Exception"].count(ID);
+
+    openCredit = ifnull(Account_Ledger[Ledger_Status == "Open" || Ledger_Status == "Partially Settled"].sum(Amount),0);
+    overdueCredit = ifnull(Account_Ledger[Ledger_Status == "Overdue"].sum(Amount),0);
+    ageingCurrent = ifnull(Account_Ledger[Ageing_Bucket == "Current" && Ledger_Status != "Settled"].sum(Amount),0);
+    ageing30 = ifnull(Account_Ledger[Ageing_Bucket == "1-30 Days" && Ledger_Status != "Settled"].sum(Amount),0);
+    ageing60 = ifnull(Account_Ledger[Ageing_Bucket == "31-60 Days" && Ledger_Status != "Settled"].sum(Amount),0);
+    ageing90 = ifnull(Account_Ledger[(Ageing_Bucket == "61-90 Days" || Ageing_Bucket == "90+ Days") && Ledger_Status != "Settled"].sum(Amount),0);
+    ageingTotal = ageingCurrent + ageing30 + ageing60 + ageing90;
+    ageingCurrentP = if(ageingTotal > 0,(ageingCurrent * 100.0) / ageingTotal,0);
+    ageing30P = if(ageingTotal > 0,(ageing30 * 100.0) / ageingTotal,0);
+    ageing60P = if(ageingTotal > 0,(ageing60 * 100.0) / ageingTotal,0);
+    ageing90P = if(ageingTotal > 0,(ageing90 * 100.0) / ageingTotal,0);
+}
+%>
+<style>
+/* ZCS global utility sheet, included once for this page. */
+:root{--zcs-theme-brand-color:var(--zcs_brand_color);--zcs-light-bg-color:var(--zcs_brand_light_color);--zcs-page-bg-color:#f3f3f4;--zcs-primary-text-color:var(--zcs_primary_text_color);--zcs-secondary-text-color:var(--zcs_secondary_text_color);--zcs-teritiary-text-color:var(--zcs_tertiary_text_color);--zcs-white-color:#fff;--zcs-thead-color:#f9fafe;--donut-pi:3.1416;--donut-r:62;--donut-c:389.6}
+.zcs-flex,.zcs-row{display:flex}.zcs-row{flex-wrap:wrap}.zcs-inline-flex{display:inline-flex}.zcs-direction-column{flex-direction:column}.zcs-align-items-center{align-items:center}.zcs-align-items-start{align-items:flex-start}.zcs-align-items-end{align-items:flex-end}.zcs-justify-center{justify-content:center}.zcs-justify-space-between{justify-content:space-between}.zcs-row-wrap{flex-wrap:wrap}.zcs-col-common{flex:1 1 0}.zcs-no-shrink{flex-shrink:0}.zcs-gap-4{gap:.25rem}.zcs-gap-6{gap:.375rem}.zcs-gap-8{gap:.5rem}.zcs-gap-10{gap:.625rem}.zcs-gap-12{gap:.75rem}.zcs-gap-16{gap:1rem}.zcs-gap-20{gap:1.25rem}.zcs-gap-24{gap:1.5rem}.zcs-p-0{padding:0}.zcs-p-8{padding:.5rem}.zcs-p-10{padding:.625rem}.zcs-p-12{padding:.75rem}.zcs-p-16{padding:1rem}.zcs-p-20{padding:1.25rem}.zcs-p-24{padding:1.5rem}.zcs-px-8{padding-left:.5rem;padding-right:.5rem}.zcs-px-10{padding-left:.625rem;padding-right:.625rem}.zcs-px-12{padding-left:.75rem;padding-right:.75rem}.zcs-px-16{padding-left:1rem;padding-right:1rem}.zcs-py-2{padding-top:.125rem;padding-bottom:.125rem}.zcs-py-6{padding-top:.375rem;padding-bottom:.375rem}.zcs-py-8{padding-top:.5rem;padding-bottom:.5rem}.zcs-py-12{padding-top:.75rem;padding-bottom:.75rem}.zcs-m-0{margin:0}.zcs-mt-4{margin-top:.25rem}.zcs-mt-8{margin-top:.5rem}.zcs-mt-12{margin-top:.75rem}.zcs-mb-0{margin-bottom:0}.zcs-mb-8{margin-bottom:.5rem}.zcs-w-full{width:100%}.zcs-h-full{height:100%}.zcs-box-border{box-sizing:border-box}.zcs-relative{position:relative}.zcs-absolute{position:absolute}.zcs-sticky{position:sticky}.zcs-rounded-sm{border-radius:4px}.zcs-rounded-md{border-radius:6px}.zcs-rounded-lg{border-radius:8px}.zcs-rounded-xl{border-radius:12px}.zcs-rounded-half{border-radius:50%}.zcs-font-11{font-size:.6875rem}.zcs-font-12{font-size:.75rem}.zcs-font-13{font-size:.8125rem}.zcs-font-14{font-size:.875rem}.zcs-font-15{font-size:.9375rem}.zcs-font-16{font-size:1rem}.zcs-font-18{font-size:1.125rem}.zcs-font-20{font-size:1.25rem}.zcs-font-22{font-size:1.375rem}.zcs-font-24{font-size:1.5rem}.zcs-font-28{font-size:1.75rem}.zcs-font-normal{font-weight:400}.zcs-font-medium{font-weight:500}.zcs-font-semibold{font-weight:600}.zcs-font-bold{font-weight:700}.zcs-lh-body{line-height:1.5}.zcs-lh-heading{line-height:1.25}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-secondary{color:var(--zcs-secondary-text-color)}.zcs-color-tertiary{color:var(--zcs-teritiary-text-color)}.zcs-color-theme{color:var(--zcs_brand_color)}.zcs-color-green{color:#179e6c}.zcs-color-red{color:#fe455d}.zcs-color-yellow{color:#a06309}.zcs-color-blue{color:#2a6ffc}.zcs-text-left{text-align:left}.zcs-text-right{text-align:right}.zcs-text-center{text-align:center}.zcs-overflow-auto{overflow:auto}.zcs-ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.zcs-list-none{list-style:none}.zcs-cursor-pointer{cursor:pointer}.zcs-card{background:var(--zcs-white-color);border:1px solid var(--zcs_tertiary_border_color);border-radius:12px}.zcs-page-container{background:var(--zcs-page-bg-color)}a{text-decoration:none}
+.admin-dashboard{min-height:100%;padding:18px;font-family:Arial,sans-serif}.admin-header{background:linear-gradient(112deg,var(--zcs_brand_color),var(--zcs_brand_dark_color));color:var(--zcs_brand_foreground_color);border-radius:16px;overflow:hidden}.admin-header .zcs-color-primary,.admin-header .zcs-color-secondary{color:inherit}.header-actions a{border:1px solid var(--zcs_brand_foreground_color);color:var(--zcs_brand_foreground_color);min-height:36px}.header-actions a:hover{background:var(--zcs_brand_foreground_color);color:var(--zcs_brand_color)}.kpi-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}.kpi-card{min-height:120px}.kpi-card:hover{border-color:var(--zcs_brand_color)}.kpi-icon{width:38px;height:38px;background:var(--zcs_component_hover_color);color:var(--zcs_brand_color);font-size:18px}.dashboard-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px}.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-7{grid-column:span 7}.span-6{grid-column:span 6}.span-5{grid-column:span 5}.span-4{grid-column:span 4}.span-3{grid-column:span 3}.section-head{border-bottom:1px solid var(--zcs_tertiary_border_color)}.metric-note{white-space:nowrap}.security-banner{border-left:4px solid #fe455d;background:#fde3e6}.scope-banner{border-left:4px solid #2a6ffc;background:#e8efff}.zcs-badge{width:auto;border:1px solid}.zcs-badge-green{background:#e4fcf3;border-color:#179e6c;color:#179e6c}.zcs-badge-red{background:#fde3e6;border-color:#fe455d;color:#fe455d}.zcs-badge-yellow{background:#fcf4e6;border-color:#faae13;color:#a06309}.zcs-badge-blue{background:#e8efff;border-color:#2a6ffc;color:#2a6ffc}.zcs-badge-theme{background:var(--zcs_component_hover_color);border-color:var(--zcs_brand_color);color:var(--zcs_brand_color)}
+.chart-card{min-height:330px}.zcs-donut-chart-wrapper{min-height:230px}.zcs-donut-chart{width:166px;height:166px}.zcs-donut-chart svg{width:166px;height:166px;transform:rotate(-90deg)}.zcs-donut-chart circle{cx:83;cy:83;r:62;fill:transparent;stroke-width:18}.zcs-donut-chart circle:nth-child(1){stroke:#fece56;stroke-dasharray:calc(var(--a1)*var(--donut-c)/100) var(--donut-c);stroke-dashoffset:0}.zcs-donut-chart circle:nth-child(2){stroke:#36a2eb;stroke-dasharray:calc(var(--a2)*var(--donut-c)/100) var(--donut-c);stroke-dashoffset:calc(-1*var(--a1)*var(--donut-c)/100)}.zcs-donut-chart circle:nth-child(3){stroke:#ff6283;stroke-dasharray:calc(var(--a3)*var(--donut-c)/100) var(--donut-c);stroke-dashoffset:calc(-1*(var(--a1) + var(--a2))*var(--donut-c)/100)}.zcs-donut-chart circle:nth-child(4){stroke:#28cc97;stroke-dasharray:calc(var(--a4)*var(--donut-c)/100) var(--donut-c);stroke-dashoffset:calc(-1*(var(--a1) + var(--a2) + var(--a3))*var(--donut-c)/100)}.zcs-donut-chart-name{width:92px;left:37px;top:64px}.zcs-legend-wrapper li{list-style:none}.legend-dot{width:10px;height:10px}.legend-yellow{background:#fece56}.legend-blue{background:#36a2eb}.legend-red{background:#ff6283}.legend-green{background:#28cc97}
+.zcs-progress-bar{height:8px;background:var(--zcs_component_hover_color)}.zcs-progress-bar-indicator{height:inherit;border-radius:inherit;background:var(--zcs_brand_color)}.performance-list li{list-style:none}.revenue-chart{height:220px;border-bottom:1px solid var(--zcs_tertiary_border_color)}.revenue-bar-wrap{height:100%;min-width:48px}.revenue-bar{width:28px;min-height:3px;background:var(--zcs_brand_color);border-radius:6px 6px 0 0}.hub-chart{height:260px}.hub-bars{height:190px;border-bottom:1px solid var(--zcs_tertiary_border_color);overflow-x:auto}.hub-bar-group{height:100%;min-width:84px}.hub-bar{width:22px;min-height:2px;border-radius:5px 5px 0 0}.hub-bar.load{background:#36a2eb}.hub-bar.capacity{background:#e5e7ef;height:100%}.zcs-table-wrapper{border:1px solid var(--zcs_tertiary_border_color);background:#fff;overflow:auto}.zcs-table-wrapper table{border-collapse:collapse;min-width:620px}.zcs-table-wrapper thead{top:0}.zcs-table-wrapper th{background:var(--zcs-thead-color);box-shadow:0 -1px 0 var(--zcs_tertiary_border_color) inset;white-space:nowrap}.zcs-table-wrapper td{border-top:1px solid var(--zcs_tertiary_border_color)}.zcs-table-wrapper tbody tr:hover td{background:#f9fafe}.queue-scroll{max-height:355px}.zcs-tl-li{list-style:none;padding-left:26px}.zcs-tl-dot{width:12px;height:12px;background:var(--zcs_brand_color);left:0;top:5px}.zcs-tl-li:not(:last-child):before{content:"";position:absolute;left:5px;top:16px;width:1px;height:calc(100% + 12px);background:#e1e1e1}.quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.zcs-quick-action-item{list-style:none}.zcs-quick-action-item:hover{border-color:var(--zcs_brand_color)}.zcs-quick-action-item:hover a{color:var(--zcs_brand_color)}.leader-row:not(:last-child){border-bottom:1px solid var(--zcs_tertiary_border_color)}.empty-state{min-height:100px}
+@media(max-width:1250px){.kpi-grid{grid-template-columns:repeat(4,1fr)}.span-8,.span-7,.span-6,.span-5,.span-4,.span-3{grid-column:span 12}}@media(max-width:820px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.admin-dashboard{padding:10px}.admin-header{align-items:flex-start}.quick-grid{grid-template-columns:repeat(2,1fr)}.chart-card{min-height:auto}.zcs-donut-chart-wrapper{flex-direction:column}}@media(max-width:480px){.kpi-grid,.quick-grid{grid-template-columns:1fr}}
+</style>
+<div class='admin-dashboard zcs-page-container zcs-box-border'>
+<% if(!allowed) { %>
+  <div class='zcs-card security-banner zcs-p-24 zcs-box-border'>
+    <h5 class='zcs-font-18 zcs-font-semibold zcs-color-red zcs-m-0'>Access restricted</h5>
+    <p class='zcs-font-14 zcs-color-primary zcs-mb-0'>The network control tower is limited to Logistics Administrator and Operations Manager profiles.</p>
+  </div>
+<% } else { %>
+  <div class='admin-header zcs-flex zcs-align-items-center zcs-justify-space-between zcs-row-wrap zcs-gap-16 zcs-p-24 zcs-box-border'>
+    <div>
+      <div class='zcs-flex zcs-align-items-center zcs-gap-10'><i class='zc-li-outline business-chart-bar-32 zcs-font-24'></i><h1 class='zcs-font-24 zcs-font-semibold zcs-m-0'>Network control tower</h1></div>
+      <p class='zcs-font-14 zcs-mt-8 zcs-mb-0'>India network overview for <%=zoho.loginuser%> · <%=zoho.currentdate%></p>
+    </div>
+    <div class='header-actions zcs-flex zcs-row-wrap zcs-gap-8'>
+      <a class='zcs-inline-flex zcs-align-items-center zcs-gap-8 zcs-px-12 zcs-py-8 zcs-rounded-md zcs-box-border zcs-font-14' href='#Report:All_Shipments'><i class='zc-li-outline transport-truck-front'></i>All shipments</a>
+      <a class='zcs-inline-flex zcs-align-items-center zcs-gap-8 zcs-px-12 zcs-py-8 zcs-rounded-md zcs-box-border zcs-font-14' href='#Report:Shipment_Exception_Queue'><i class='zc-li-outline ui-3-alert'></i>Exception queue</a>
+    </div>
+  </div>
+
+  <% if(isOperations) { %>
+  <div class='zcs-card scope-banner zcs-flex zcs-align-items-start zcs-gap-10 zcs-p-12 zcs-box-border zcs-mt-12'>
+    <i class='zc-li-outline ui-1-lock-circle-open zcs-color-blue zcs-font-18'></i><p class='zcs-font-13 zcs-color-primary zcs-m-0'>Operational network scope is active. Detailed KYC, credit ageing, and critical audit evidence are shown only to the Logistics Administrator profile.</p>
+  </div>
+  <% } %>
+
+  <div class='kpi-grid zcs-mt-12'>
+    <a href='#Report:All_Customers' class='kpi-card zcs-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-p-16 zcs-box-border'>
+      <div class='zcs-flex zcs-align-items-center zcs-justify-space-between'><span class='kpi-icon zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-lg'><i class='zc-li-outline users-multiple-19'></i></span><span class='zcs-font-12 zcs-color-tertiary'>R <%=activeRetail%> · C <%=activeCorporate%> · W <%=activeWholesale%></span></div><div><strong class='zcs-font-24 zcs-color-primary'><%=activeCustomers%></strong><p class='zcs-font-13 zcs-color-tertiary zcs-m-0'>Active customers by type</p></div>
+    </a>
+    <a href='#Report:Verification_Pending' class='kpi-card zcs-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-p-16 zcs-box-border'>
+      <span class='kpi-icon zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-lg'><i class='zc-li-outline files-2-file-search'></i></span><div><strong class='zcs-font-24 zcs-color-primary'><%=pendingKYC%></strong><p class='zcs-font-13 zcs-color-tertiary zcs-m-0'>Pending KYC</p></div>
+    </a>
+    <a href='#Report:All_Shipments' class='kpi-card zcs-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-p-16 zcs-box-border'>
+      <span class='kpi-icon zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-lg'><i class='zc-li-outline shopping-delivery-fast'></i></span><div><strong class='zcs-font-24 zcs-color-primary'><%=todayBookings%></strong><p class='zcs-font-13 zcs-color-tertiary zcs-m-0'>Today's bookings</p></div>
+    </a>
+    <a href='#Report:Invoice_Statement' class='kpi-card zcs-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-p-16 zcs-box-border'>
+      <span class='kpi-icon zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-lg'><i class='zc-li-outline business-money-coins'></i></span><div><strong class='zcs-font-20 zcs-color-primary'>INR <%=todayRevenue.round(0)%></strong><p class='zcs-font-13 zcs-color-tertiary zcs-m-0'>Today's revenue</p></div>
+    </a>
+    <a href='#Report:Unassigned_Orders' class='kpi-card zcs-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-p-16 zcs-box-border'>
+      <span class='kpi-icon zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-lg'><i class='zc-li-outline location-pin'></i></span><div><strong class='zcs-font-24 zcs-color-primary'><%=unassignedShipments%></strong><p class='zcs-font-13 zcs-color-tertiary zcs-m-0'>Unassigned shipments</p></div>
+    </a>
+    <a href='#Report:All_Shipments' class='kpi-card zcs-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-p-16 zcs-box-border'>
+      <span class='kpi-icon zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-lg'><i class='zc-li-outline arrows-1-refresh-69'></i></span><div><strong class='zcs-font-24 zcs-color-primary'><%=inTransitShipments%></strong><p class='zcs-font-13 zcs-color-tertiary zcs-m-0'>In-transit shipments</p></div>
+    </a>
+    <a href='#Report:Delivered_Shipments' class='kpi-card zcs-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-p-16 zcs-box-border'>
+      <span class='kpi-icon zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-lg'><i class='zc-li-outline ui-1-check-circle-08'></i></span><div><strong class='zcs-font-24 zcs-color-primary'><%=deliveredToday%></strong><p class='zcs-font-13 zcs-color-tertiary zcs-m-0'>Delivered today</p></div>
+    </a>
+    <a href='#Report:NDR_Instruction_Action_Queue' class='kpi-card zcs-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-p-16 zcs-box-border'>
+      <span class='kpi-icon zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-lg'><i class='zc-li-outline arrows-4-restore'></i></span><div><strong class='zcs-font-24 zcs-color-primary'><%=ndrShipments + rtoShipments%></strong><p class='zcs-font-13 zcs-color-tertiary zcs-m-0'>NDR / RTO · <%=ndrShipments%> / <%=rtoShipments%></p></div>
+    </a>
+    <a href='#Report:COD_Pending_Remittance' class='kpi-card zcs-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-p-16 zcs-box-border'>
+      <span class='kpi-icon zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-lg'><i class='zc-li-outline business-cash-register'></i></span><div><strong class='zcs-font-20 zcs-color-primary'>INR <%=codPendingAmount.round(0)%></strong><p class='zcs-font-13 zcs-color-tertiary zcs-m-0'>COD pending · <%=codPendingCount%> remittances</p></div>
+    </a>
+    <a href='#Report:Critical_Exceptions' class='kpi-card zcs-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-p-16 zcs-box-border'>
+      <span class='kpi-icon zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-lg'><i class='zc-li-outline ui-3-alert'></i></span><div><strong class='zcs-font-24 zcs-color-red'><%=criticalExceptions%></strong><p class='zcs-font-13 zcs-color-tertiary zcs-m-0'>Open critical exceptions</p></div>
+    </a>
+    <a href='#Report:Loyalty_Transaction_Ledger' class='kpi-card zcs-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-p-16 zcs-box-border'>
+      <span class='kpi-icon zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-lg'><i class='zc-li-outline ui-2-favourite-31'></i></span><div><strong class='zcs-font-20 zcs-color-primary'><%=loyaltyIssued.round(0)%></strong><p class='zcs-font-13 zcs-color-tertiary zcs-m-0'>Loyalty issued · 30 days</p></div>
+    </a>
+    <a href='#Report:Loyalty_Transaction_Ledger' class='kpi-card zcs-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-p-16 zcs-box-border'>
+      <span class='kpi-icon zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-lg'><i class='zc-li-outline shopping-tag-sale'></i></span><div><strong class='zcs-font-20 zcs-color-primary'><%=loyaltyRedeemed.round(0)%></strong><p class='zcs-font-13 zcs-color-tertiary zcs-m-0'>Loyalty redeemed · 30 days</p></div>
+    </a>
+  </div>
+
+  <div class='dashboard-grid zcs-mt-12'>
+    <section class='span-4 zcs-card chart-card zcs-p-16 zcs-box-border'>
+      <div class='section-head zcs-flex zcs-justify-space-between zcs-gap-8 zcs-py-8'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Shipment status</h2><p class='zcs-font-12 zcs-color-tertiary zcs-m-0'>Current network flow</p></div><a href='#Report:Shipment_Status_Board' class='zcs-font-13 zcs-color-theme'>Open board</a></div>
+      <div class='zcs-donut-chart-wrapper zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-12' style='--a1:<%=statusP1%>;--a2:<%=statusP2%>;--a3:<%=statusP3%>;--a4:<%=statusP4%>'>
+        <div class='zcs-donut-chart zcs-flex zcs-align-items-center zcs-justify-center zcs-relative'><svg class='zcs-rounded-half'><circle></circle><circle></circle><circle></circle><circle></circle></svg><h6 class='zcs-donut-chart-name zcs-font-14 zcs-font-medium zcs-color-primary zcs-m-0 zcs-absolute zcs-text-center'><%=statusTotal%><br>shipments</h6></div>
+        <div class='zcs-legend-wrapper'><ul class='zcs-flex zcs-direction-column zcs-gap-10 zcs-p-0 zcs-m-0'><li class='zcs-flex zcs-align-items-center zcs-gap-8'><span class='legend-dot legend-yellow zcs-rounded-half'></span><span class='zcs-font-13 zcs-color-primary'>Booked <%=bookedStatus%></span></li><li class='zcs-flex zcs-align-items-center zcs-gap-8'><span class='legend-dot legend-blue zcs-rounded-half'></span><span class='zcs-font-13 zcs-color-primary'>Linehaul <%=linehaulStatus%></span></li><li class='zcs-flex zcs-align-items-center zcs-gap-8'><span class='legend-dot legend-red zcs-rounded-half'></span><span class='zcs-font-13 zcs-color-primary'>Last mile <%=lastMileStatus%></span></li><li class='zcs-flex zcs-align-items-center zcs-gap-8'><span class='legend-dot legend-green zcs-rounded-half'></span><span class='zcs-font-13 zcs-color-primary'>Delivered <%=completedStatus%></span></li></ul></div>
+      </div>
+    </section>
+
+    <section class='span-4 zcs-card chart-card zcs-p-16 zcs-box-border'>
+      <div class='section-head zcs-flex zcs-justify-space-between zcs-gap-8 zcs-py-8'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Transport mode</h2><p class='zcs-font-12 zcs-color-tertiary zcs-m-0'>Booking mix</p></div><a href='#Report:All_Shipments' class='zcs-font-13 zcs-color-theme'>View shipments</a></div>
+      <div class='zcs-donut-chart-wrapper zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-12' style='--a1:<%=airP%>;--a2:<%=surfaceP%>;--a3:0;--a4:0'>
+        <div class='zcs-donut-chart zcs-flex zcs-align-items-center zcs-justify-center zcs-relative'><svg class='zcs-rounded-half'><circle></circle><circle></circle><circle></circle><circle></circle></svg><h6 class='zcs-donut-chart-name zcs-font-14 zcs-font-medium zcs-color-primary zcs-m-0 zcs-absolute zcs-text-center'><%=modeTotal%><br>bookings</h6></div>
+        <div class='zcs-legend-wrapper'><ul class='zcs-flex zcs-direction-column zcs-gap-12 zcs-p-0 zcs-m-0'><li class='zcs-flex zcs-align-items-center zcs-gap-8'><span class='legend-dot legend-yellow zcs-rounded-half'></span><span class='zcs-font-13 zcs-color-primary'>Air <%=airCount%></span></li><li class='zcs-flex zcs-align-items-center zcs-gap-8'><span class='legend-dot legend-blue zcs-rounded-half'></span><span class='zcs-font-13 zcs-color-primary'>Surface <%=surfaceCount%></span></li></ul></div>
+      </div>
+    </section>
+
+    <section class='span-4 zcs-card chart-card zcs-p-16 zcs-box-border'>
+      <div class='section-head zcs-flex zcs-justify-space-between zcs-gap-8 zcs-py-8'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Delivery success rate</h2><p class='zcs-font-12 zcs-color-tertiary zcs-m-0'>Delivered against terminal exceptions</p></div><span class='zcs-badge zcs-badge-green zcs-inline-flex zcs-px-10 zcs-py-2 zcs-rounded-sm zcs-font-13'><i class='zc-li-outline ui-1-check-circle-08'></i>&nbsp;<%=deliverySuccess.round(1)%>%</span></div>
+      <ul class='performance-list zcs-flex zcs-direction-column zcs-gap-24 zcs-p-0 zcs-mt-12 zcs-mb-0'>
+        <li class='zcs-flex zcs-direction-column zcs-gap-8'><p class='zcs-flex zcs-justify-space-between zcs-font-14 zcs-color-primary zcs-m-0'><span>Successful delivery</span><span><%=deliverySuccess.round(1)%>%</span></p><div class='zcs-progress-bar zcs-rounded-sm'><div class='zcs-progress-bar-indicator' style='width:<%=deliverySuccess%>%'></div></div></li>
+        <li class='zcs-flex zcs-direction-column zcs-gap-8'><p class='zcs-flex zcs-justify-space-between zcs-font-14 zcs-color-primary zcs-m-0'><span>NDR share</span><span><%=ndrRate.round(1)%>%</span></p><div class='zcs-progress-bar zcs-rounded-sm'><div class='zcs-progress-bar-indicator' style='width:<%=ndrRate%>%;background:#faae13'></div></div></li>
+        <li class='zcs-flex zcs-direction-column zcs-gap-8'><p class='zcs-flex zcs-justify-space-between zcs-font-14 zcs-color-primary zcs-m-0'><span>RTO share</span><span><%=rtoRate.round(1)%>%</span></p><div class='zcs-progress-bar zcs-rounded-sm'><div class='zcs-progress-bar-indicator' style='width:<%=rtoRate%>%;background:#fe455d'></div></div></li>
+      </ul>
+    </section>
+
+    <section class='span-7 zcs-card chart-card zcs-p-16 zcs-box-border'>
+      <div class='section-head zcs-flex zcs-justify-space-between zcs-gap-8 zcs-py-8'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Revenue trend</h2><p class='zcs-font-12 zcs-color-tertiary zcs-m-0'>Issued invoice value · last seven days</p></div><a href='#Report:Invoice_Statement' class='zcs-font-13 zcs-color-theme'>Invoice statement</a></div>
+      <div class='revenue-chart zcs-flex zcs-align-items-end zcs-justify-space-between zcs-gap-12 zcs-px-12 zcs-mt-12'>
+        <div class='revenue-bar-wrap zcs-flex zcs-direction-column zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-11 zcs-color-tertiary'><%=revD6.round(0)%></span><div class='revenue-bar' style='height:<%=revH6%>%'></div><span class='zcs-font-11 zcs-color-primary'><%=revD6Date.toString("dd-MMM")%></span></div>
+        <div class='revenue-bar-wrap zcs-flex zcs-direction-column zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-11 zcs-color-tertiary'><%=revD5.round(0)%></span><div class='revenue-bar' style='height:<%=revH5%>%'></div><span class='zcs-font-11 zcs-color-primary'><%=revD5Date.toString("dd-MMM")%></span></div>
+        <div class='revenue-bar-wrap zcs-flex zcs-direction-column zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-11 zcs-color-tertiary'><%=revD4.round(0)%></span><div class='revenue-bar' style='height:<%=revH4%>%'></div><span class='zcs-font-11 zcs-color-primary'><%=revD4Date.toString("dd-MMM")%></span></div>
+        <div class='revenue-bar-wrap zcs-flex zcs-direction-column zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-11 zcs-color-tertiary'><%=revD3.round(0)%></span><div class='revenue-bar' style='height:<%=revH3%>%'></div><span class='zcs-font-11 zcs-color-primary'><%=revD3Date.toString("dd-MMM")%></span></div>
+        <div class='revenue-bar-wrap zcs-flex zcs-direction-column zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-11 zcs-color-tertiary'><%=revD2.round(0)%></span><div class='revenue-bar' style='height:<%=revH2%>%'></div><span class='zcs-font-11 zcs-color-primary'><%=revD2Date.toString("dd-MMM")%></span></div>
+        <div class='revenue-bar-wrap zcs-flex zcs-direction-column zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-11 zcs-color-tertiary'><%=revD1.round(0)%></span><div class='revenue-bar' style='height:<%=revH1%>%'></div><span class='zcs-font-11 zcs-color-primary'><%=revD1Date.toString("dd-MMM")%></span></div>
+        <div class='revenue-bar-wrap zcs-flex zcs-direction-column zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-11 zcs-color-tertiary'><%=revD0.round(0)%></span><div class='revenue-bar' style='height:<%=revH0%>%'></div><span class='zcs-font-11 zcs-color-primary'>Today</span></div>
+      </div>
+    </section>
+
+    <section class='span-5 zcs-card chart-card zcs-p-16 zcs-box-border'>
+      <div class='section-head zcs-flex zcs-justify-space-between zcs-gap-8 zcs-py-8'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Customer type</h2><p class='zcs-font-12 zcs-color-tertiary zcs-m-0'>Active customer mix</p></div><a href='#Report:All_Customers' class='zcs-font-13 zcs-color-theme'>Customer directory</a></div>
+      <div class='zcs-donut-chart-wrapper zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-12' style='--a1:<%=retailP%>;--a2:<%=corporateP%>;--a3:<%=wholesaleP%>;--a4:0'>
+        <div class='zcs-donut-chart zcs-flex zcs-align-items-center zcs-justify-center zcs-relative'><svg class='zcs-rounded-half'><circle></circle><circle></circle><circle></circle><circle></circle></svg><h6 class='zcs-donut-chart-name zcs-font-14 zcs-font-medium zcs-color-primary zcs-m-0 zcs-absolute zcs-text-center'><%=activeCustomers%><br>active</h6></div>
+        <div class='zcs-legend-wrapper'><ul class='zcs-flex zcs-direction-column zcs-gap-10 zcs-p-0 zcs-m-0'><li class='zcs-flex zcs-align-items-center zcs-gap-8'><span class='legend-dot legend-yellow zcs-rounded-half'></span><span class='zcs-font-13 zcs-color-primary'>Retail <%=activeRetail%></span></li><li class='zcs-flex zcs-align-items-center zcs-gap-8'><span class='legend-dot legend-blue zcs-rounded-half'></span><span class='zcs-font-13 zcs-color-primary'>Corporate <%=activeCorporate%></span></li><li class='zcs-flex zcs-align-items-center zcs-gap-8'><span class='legend-dot legend-red zcs-rounded-half'></span><span class='zcs-font-13 zcs-color-primary'>Wholesale <%=activeWholesale%></span></li></ul></div>
+      </div>
+    </section>
+
+    <section class='span-8 zcs-card chart-card zcs-p-16 zcs-box-border'>
+      <div class='section-head zcs-flex zcs-justify-space-between zcs-gap-8 zcs-py-8'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Hub throughput and capacity</h2><p class='zcs-font-12 zcs-color-tertiary zcs-m-0'>Current shipment load against daily capacity</p></div><a href='#Report:Hub_Capacity' class='zcs-font-13 zcs-color-theme'>Capacity report</a></div>
+      <div class='hub-chart zcs-mt-12'><div class='hub-bars zcs-flex zcs-align-items-end zcs-gap-16 zcs-px-12'>
+      <% hubChartCount = 0; for each hub in activeHubs { if(hubChartCount < 8) { hubChartCount = hubChartCount + 1; hubLoad = Shipment_Requests[Current_Hub == hub.ID && Shipment_Status != "Delivered" && Shipment_Status != "Cancelled"].count(ID); hubCap = ifnull(hub.Daily_Capacity,0); hubUtil = if(hubCap > 0,(hubLoad * 100.0) / hubCap,0); hubDisplayUtil = if(hubUtil > 100,100,hubUtil); %>
+        <div class='hub-bar-group zcs-flex zcs-direction-column zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-11 zcs-color-tertiary'><%=hubUtil.round(0)%>%</span><div class='zcs-flex zcs-align-items-end zcs-gap-4 zcs-col-common'><div class='hub-bar load' style='height:<%=hubDisplayUtil%>%'></div><div class='hub-bar capacity'></div></div><span class='zcs-font-11 zcs-color-primary zcs-text-center'><%=hub.Hub_ID%></span></div>
+      <% } } %>
+      </div><div class='zcs-flex zcs-justify-center zcs-gap-16 zcs-mt-8'><span class='zcs-font-12 zcs-color-tertiary'><i class='zc-li-solid ui-1-circle' style='color:#36a2eb'></i> Current load</span><span class='zcs-font-12 zcs-color-tertiary'><i class='zc-li-solid ui-1-circle' style='color:#e5e7ef'></i> Capacity</span></div></div>
+    </section>
+
+    <section class='span-4 zcs-card chart-card zcs-p-16 zcs-box-border'>
+      <div class='section-head zcs-flex zcs-justify-space-between zcs-gap-8 zcs-py-8'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Loyalty tier mix</h2><p class='zcs-font-12 zcs-color-tertiary zcs-m-0'>Active customer tier distribution</p></div><a href='#Report:Loyalty_Tiers' class='zcs-font-13 zcs-color-theme'>Tier rules</a></div>
+      <div class='zcs-donut-chart-wrapper zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-12' style='--a1:<%=tierP1%>;--a2:<%=tierP2%>;--a3:<%=tierP3%>;--a4:<%=tierP4%>'>
+        <div class='zcs-donut-chart zcs-flex zcs-align-items-center zcs-justify-center zcs-relative'><svg class='zcs-rounded-half'><circle></circle><circle></circle><circle></circle><circle></circle></svg><h6 class='zcs-donut-chart-name zcs-font-14 zcs-font-medium zcs-color-primary zcs-m-0 zcs-absolute zcs-text-center'><%=tierTotal%><br>customers</h6></div>
+        <div class='zcs-legend-wrapper'><ul class='zcs-flex zcs-direction-column zcs-gap-8 zcs-p-0 zcs-m-0'><li class='zcs-flex zcs-align-items-center zcs-gap-8'><span class='legend-dot legend-yellow zcs-rounded-half'></span><span class='zcs-font-13 zcs-color-primary'>Silver <%=tierSilver%></span></li><li class='zcs-flex zcs-align-items-center zcs-gap-8'><span class='legend-dot legend-blue zcs-rounded-half'></span><span class='zcs-font-13 zcs-color-primary'>Gold <%=tierGold%></span></li><li class='zcs-flex zcs-align-items-center zcs-gap-8'><span class='legend-dot legend-red zcs-rounded-half'></span><span class='zcs-font-13 zcs-color-primary'>Platinum <%=tierPlatinum%></span></li><li class='zcs-flex zcs-align-items-center zcs-gap-8'><span class='legend-dot legend-green zcs-rounded-half'></span><span class='zcs-font-13 zcs-color-primary'>None <%=tierNone%></span></li></ul></div>
+      </div>
+    </section>
+
+    <section class='span-7 zcs-card zcs-p-16 zcs-box-border'>
+      <div class='section-head zcs-flex zcs-justify-space-between zcs-gap-8 zcs-py-8'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Route and manifest activity</h2><p class='zcs-font-12 zcs-color-tertiary zcs-m-0'><%=routeActive%> active routes · <%=manifestTransit%> manifests in transit</p></div><a href='#Report:All_Manifests' class='zcs-font-13 zcs-color-theme'>All manifests</a></div>
+      <div class='zcs-flex zcs-row-wrap zcs-gap-8 zcs-mt-12'><span class='zcs-badge zcs-badge-theme zcs-inline-flex zcs-px-10 zcs-py-2 zcs-rounded-sm zcs-font-13'>Draft / closed <%=manifestDraft%></span><span class='zcs-badge zcs-badge-blue zcs-inline-flex zcs-px-10 zcs-py-2 zcs-rounded-sm zcs-font-13'>In transit <%=manifestTransit%></span><span class='zcs-badge zcs-badge-red zcs-inline-flex zcs-px-10 zcs-py-2 zcs-rounded-sm zcs-font-13'>Exception <%=manifestExceptions%></span></div>
+      <div class='zcs-table-wrapper zcs-rounded-sm zcs-box-border zcs-relative zcs-mt-12'><table class='zcs-w-full'><thead class='zcs-sticky'><tr><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13 zcs-font-medium'>Manifest</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13 zcs-font-medium'>Lane</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13 zcs-font-medium'>Departure</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13 zcs-font-medium'>Status</th><th class='zcs-px-16 zcs-py-8 zcs-text-right zcs-font-13 zcs-font-medium'>Shipments</th></tr></thead><tbody>
+      <% manifestCount = 0; for each manifest in recentManifests { if(manifestCount < 6) { manifestCount = manifestCount + 1; manifestBadge = "zcs-badge-theme"; if(manifest.Manifest_Status == "In Transit"){manifestBadge = "zcs-badge-blue";} else if(manifest.Manifest_Status == "Exception"){manifestBadge = "zcs-badge-red";} else if(manifest.Manifest_Status == "Reconciled" || manifest.Manifest_Status == "Arrived"){manifestBadge = "zcs-badge-green";} %>
+        <tr><td class='zcs-px-16 zcs-py-8 zcs-font-13 zcs-color-primary'><%=manifest.Manifest_Number%></td><td class='zcs-px-16 zcs-py-8 zcs-font-13 zcs-color-primary'><%=manifest.Origin_Hub.Hub_ID%> to <%=manifest.Destination_Hub.Hub_ID%></td><td class='zcs-px-16 zcs-py-8 zcs-font-13 zcs-color-tertiary'><%=ifnull(manifest.Departure_Time,"Not set")%></td><td class='zcs-px-16 zcs-py-8'><span class='zcs-badge <%=manifestBadge%> zcs-inline-flex zcs-px-8 zcs-py-2 zcs-rounded-sm zcs-font-12'><%=manifest.Manifest_Status%></span></td><td class='zcs-px-16 zcs-py-8 zcs-text-right zcs-font-13 zcs-color-primary'><%=ifnull(manifest.Total_Shipments,0)%></td></tr>
+      <% } } if(manifestCount == 0) { %><tr><td colspan='5' class='zcs-p-24 zcs-text-center zcs-font-13 zcs-color-tertiary'>No manifest activity is available.</td></tr><% } %>
+      </tbody></table></div>
+    </section>
+
+    <section class='span-5 zcs-card zcs-p-16 zcs-box-border'>
+      <div class='section-head zcs-flex zcs-justify-space-between zcs-gap-8 zcs-py-8'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Hub leaderboard</h2><p class='zcs-font-12 zcs-color-tertiary zcs-m-0'>Lowest utilization leads available capacity</p></div><a href='#Report:All_Hubs' class='zcs-font-13 zcs-color-theme'>Hub directory</a></div>
+      <div class='zcs-flex zcs-direction-column zcs-mt-8'>
+      <% leaderCount = 0; for each leaderHub in activeHubs { if(leaderCount < 6) { leaderCount = leaderCount + 1; leaderLoad = Shipment_Requests[Current_Hub == leaderHub.ID && Shipment_Status != "Delivered" && Shipment_Status != "Cancelled"].count(ID); leaderCap = ifnull(leaderHub.Daily_Capacity,0); leaderUtil = if(leaderCap > 0,(leaderLoad * 100.0) / leaderCap,0); leaderDisplay = if(leaderUtil > 100,100,leaderUtil); %>
+        <div class='leader-row zcs-flex zcs-align-items-center zcs-gap-12 zcs-py-12'><span class='zcs-badge zcs-badge-theme zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-half zcs-font-12' style='width:28px;height:28px'><%=leaderCount%></span><div class='zcs-col-common'><div class='zcs-flex zcs-justify-space-between zcs-gap-8'><span class='zcs-font-13 zcs-font-medium zcs-color-primary'><%=leaderHub.Hub_Name%></span><span class='zcs-font-12 zcs-color-tertiary'><%=leaderLoad%> / <%=leaderCap%></span></div><div class='zcs-progress-bar zcs-rounded-sm zcs-mt-4'><div class='zcs-progress-bar-indicator' style='width:<%=leaderDisplay%>%'></div></div></div><strong class='zcs-font-13 zcs-color-primary'><%=leaderUtil.round(0)%>%</strong></div>
+      <% } } %>
+      </div>
+    </section>
+
+    <% if(isAdmin) { %>
+    <section class='span-6 zcs-card zcs-p-16 zcs-box-border'>
+      <div class='section-head zcs-flex zcs-justify-space-between zcs-gap-8 zcs-py-8'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>KYC verification queue</h2><p class='zcs-font-12 zcs-color-tertiary zcs-m-0'>Submitted customers awaiting review</p></div><a href='#Report:Verification_Pending' class='zcs-font-13 zcs-color-theme'>Open queue</a></div>
+      <div class='zcs-table-wrapper queue-scroll zcs-rounded-sm zcs-box-border zcs-relative zcs-mt-12'><table class='zcs-w-full'><thead class='zcs-sticky'><tr><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Customer</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Type</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Submitted</th><th class='zcs-px-16 zcs-py-8 zcs-text-right zcs-font-13'>Credit request</th></tr></thead><tbody>
+      <% verifyCount = 0; for each customerKyc in verificationQueue { if(verifyCount < 6) { verifyCount = verifyCount + 1; %><tr><td class='zcs-px-16 zcs-py-8 zcs-font-13 zcs-color-primary'><a class='zcs-color-theme' href='#Page:KYC_Review?Customer_ID=<%=customerKyc.ID%>'><%=ifnull(customerKyc.Company_Name,customerKyc.Email_ID)%></a></td><td class='zcs-px-16 zcs-py-8 zcs-font-13 zcs-color-primary'><%=customerKyc.Customer_Type%></td><td class='zcs-px-16 zcs-py-8 zcs-font-13 zcs-color-tertiary'><%=ifnull(customerKyc.KYC_Submitted_On,"Not stamped")%></td><td class='zcs-px-16 zcs-py-8 zcs-text-right zcs-font-13 zcs-color-primary'>INR <%=ifnull(customerKyc.Requested_Credit_Limit,0).round(0)%></td></tr><% } } if(verifyCount == 0) { %><tr><td colspan='4' class='zcs-p-24 zcs-text-center zcs-font-13 zcs-color-tertiary'>No customers are waiting for KYC verification.</td></tr><% } %>
+      </tbody></table></div>
+    </section>
+
+    <section class='span-6 zcs-card zcs-p-16 zcs-box-border'>
+      <div class='section-head zcs-flex zcs-justify-space-between zcs-gap-8 zcs-py-8'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>KYC expiry queue</h2><p class='zcs-font-12 zcs-color-tertiary zcs-m-0'>Expired or expiring in 30 days</p></div><a href='#Report:KYC_Expiry_Alert' class='zcs-font-13 zcs-color-theme'>Expiry report</a></div>
+      <div class='zcs-table-wrapper queue-scroll zcs-rounded-sm zcs-box-border zcs-relative zcs-mt-12'><table class='zcs-w-full'><thead class='zcs-sticky'><tr><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Customer</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Type</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Expiry</th><th class='zcs-px-16 zcs-py-8 zcs-text-left zcs-font-13'>Status</th></tr></thead><tbody>
+      <% expiryCount = 0; for each expiryCustomer in expiryQueue { if(expiryCount < 6) { expiryCount = expiryCount + 1; expiryBadge = if(expiryCustomer.KYC_Expiry_Date < zoho.currentdate,"zcs-badge-red","zcs-badge-yellow"); %><tr><td class='zcs-px-16 zcs-py-8 zcs-font-13 zcs-color-primary'><%=ifnull(expiryCustomer.Company_Name,expiryCustomer.Email_ID)%></td><td class='zcs-px-16 zcs-py-8 zcs-font-13 zcs-color-primary'><%=expiryCustomer.Customer_Type%></td><td class='zcs-px-16 zcs-py-8 zcs-font-13 zcs-color-primary'><%=expiryCustomer.KYC_Expiry_Date%></td><td class='zcs-px-16 zcs-py-8'><span class='zcs-badge <%=expiryBadge%> zcs-inline-flex zcs-px-8 zcs-py-2 zcs-rounded-sm zcs-font-12'><%=if(expiryCustomer.KYC_Expiry_Date < zoho.currentdate,"Expired","Expiring")%></span></td></tr><% } } if(expiryCount == 0) { %><tr><td colspan='4' class='zcs-p-24 zcs-text-center zcs-font-13 zcs-color-tertiary'>No KYC expiries require attention.</td></tr><% } %>
+      </tbody></table></div>
+    </section>
+
+    <section class='span-7 zcs-card zcs-p-16 zcs-box-border'>
+      <div class='section-head zcs-flex zcs-justify-space-between zcs-gap-8 zcs-py-8'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Credit utilization and ageing</h2><p class='zcs-font-12 zcs-color-tertiary zcs-m-0'>Open exposure INR <%=openCredit.round(0)%> · overdue INR <%=overdueCredit.round(0)%></p></div><a href='#Report:Ledger_Ageing' class='zcs-font-13 zcs-color-theme'>Ageing report</a></div>
+      <ul class='performance-list zcs-flex zcs-direction-column zcs-gap-16 zcs-p-0 zcs-mt-12 zcs-mb-0'>
+        <li><p class='zcs-flex zcs-justify-space-between zcs-font-13 zcs-color-primary zcs-m-0'><span>Current</span><span>INR <%=ageingCurrent.round(0)%></span></p><div class='zcs-progress-bar zcs-rounded-sm zcs-mt-4'><div class='zcs-progress-bar-indicator' style='width:<%=ageingCurrentP%>%;background:#179e6c'></div></div></li>
+        <li><p class='zcs-flex zcs-justify-space-between zcs-font-13 zcs-color-primary zcs-m-0'><span>1–30 days</span><span>INR <%=ageing30.round(0)%></span></p><div class='zcs-progress-bar zcs-rounded-sm zcs-mt-4'><div class='zcs-progress-bar-indicator' style='width:<%=ageing30P%>%;background:#36a2eb'></div></div></li>
+        <li><p class='zcs-flex zcs-justify-space-between zcs-font-13 zcs-color-primary zcs-m-0'><span>31–60 days</span><span>INR <%=ageing60.round(0)%></span></p><div class='zcs-progress-bar zcs-rounded-sm zcs-mt-4'><div class='zcs-progress-bar-indicator' style='width:<%=ageing60P%>%;background:#faae13'></div></div></li>
+        <li><p class='zcs-flex zcs-justify-space-between zcs-font-13 zcs-color-primary zcs-m-0'><span>61+ days</span><span>INR <%=ageing90.round(0)%></span></p><div class='zcs-progress-bar zcs-rounded-sm zcs-mt-4'><div class='zcs-progress-bar-indicator' style='width:<%=ageing90P%>%;background:#fe455d'></div></div></li>
+      </ul><div class='zcs-flex zcs-gap-8 zcs-mt-12'><a class='zcs-badge zcs-badge-theme zcs-inline-flex zcs-px-10 zcs-py-6 zcs-rounded-sm zcs-font-13' href='#Report:Credit_Utilization'>Credit utilization</a><a class='zcs-badge zcs-badge-red zcs-inline-flex zcs-px-10 zcs-py-6 zcs-rounded-sm zcs-font-13' href='#Report:Overdue_Invoices'>Overdue invoices</a></div>
+    </section>
+
+    <section class='span-5 zcs-card zcs-p-16 zcs-box-border'>
+      <div class='section-head zcs-flex zcs-justify-space-between zcs-gap-8 zcs-py-8'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Recent critical audit feed</h2><p class='zcs-font-12 zcs-color-tertiary zcs-m-0'>Privileged and custody-sensitive activity</p></div><a href='#Report:Critical_Audit_Events' class='zcs-font-13 zcs-color-theme'>Critical audit</a></div>
+      <div class='zcs-timeline-wrapper queue-scroll zcs-overflow-auto zcs-mt-12'><ul class='zcs-flex zcs-direction-column zcs-gap-20 zcs-p-0 zcs-m-0'>
+      <% auditCount = 0; for each auditEvent in recentCriticalAudits { if(auditCount < 6) { auditCount = auditCount + 1; %><li class='zcs-tl-li zcs-relative'><span class='zcs-tl-dot zcs-rounded-half zcs-absolute'></span><div class='zcs-flex zcs-justify-space-between zcs-gap-8'><strong class='zcs-font-13 zcs-color-primary'><%=auditEvent.Action_Name%></strong><span class='zcs-font-11 zcs-color-tertiary'><%=auditEvent.Event_Time%></span></div><p class='zcs-font-12 zcs-color-tertiary zcs-mt-4 zcs-mb-0'><%=auditEvent.Module_Name%> · <%=auditEvent.Actor_Email%></p></li><% } } if(auditCount == 0) { %><li class='zcs-p-24 zcs-text-center zcs-font-13 zcs-color-tertiary'>No critical audit events are available.</li><% } %>
+      </ul></div>
+    </section>
+    <% } %>
+
+    <section class='span-12 zcs-quick-actions-wrapper zcs-card zcs-p-16 zcs-box-border'>
+      <div class='section-head zcs-flex zcs-justify-space-between zcs-gap-8 zcs-py-8'><div><h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Quick links</h2><p class='zcs-font-12 zcs-color-tertiary zcs-m-0'>Master setup and network exception queues</p></div></div>
+      <h3 class='zcs-font-14 zcs-font-semibold zcs-color-primary zcs-mt-12 zcs-mb-8'>Exception queues</h3>
+      <ul class='quick-grid zcs-p-0 zcs-m-0'>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:Unassigned_Orders'><i class='zc-li-outline location-pin'></i>Unassigned orders</a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:Shipment_Exception_Queue'><i class='zc-li-outline ui-3-alert'></i>Shipment exceptions</a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:Critical_Exceptions'><i class='zc-li-outline ui-2-time'></i>Critical exceptions</a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:NDR_Instruction_Action_Queue'><i class='zc-li-outline arrows-4-restore'></i>NDR action queue</a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:NDR_RTO_Pending'><i class='zc-li-outline arrows-1-tail-left'></i>RTO pending</a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:COD_Pending_Remittance'><i class='zc-li-outline business-cash-register'></i>COD pending</a></li>
+        <% if(isAdmin) { %><li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:Failed_Payments'><i class='zc-li-outline ui-1-circle-remove'></i>Failed payments</a></li><li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:Failed_Communications'><i class='zc-li-outline ui-2-email'></i>Failed communications</a></li><% } %>
+      </ul>
+      <% if(isAdmin) { %>
+      <h3 class='zcs-font-14 zcs-font-semibold zcs-color-primary zcs-mt-12 zcs-mb-8'>Master setup</h3>
+      <ul class='quick-grid zcs-p-0 zcs-m-0'>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:App_Configurations'><i class='zc-li-outline ui-1-settings-gear-63'></i>App configuration</a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:All_Hubs'><i class='zc-li-outline buildings-1-office'></i>Hubs</a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:Pincode_Mappings'><i class='zc-li-outline location-map-big'></i>Pincode mapping</a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:All_Transport_Routes'><i class='zc-li-outline location-road'></i>Transport routes</a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:All_Vehicles'><i class='zc-li-outline transport-truck-front'></i>Vehicles</a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:Operations_User_Directory'><i class='zc-li-outline users-single-05'></i>Operations users</a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:All_Rate_Cards'><i class='zc-li-outline shopping-credit-card'></i>Rate cards</a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:Rate_Slab_Register'><i class='zc-li-outline business-chart-bar-32'></i>Rate slabs</a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:KYC_Document_Type_Mapping'><i class='zc-li-outline files-2-doc'></i>KYC document types</a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:Loyalty_Rule_Register'><i class='zc-li-outline ui-2-favourite-31'></i>Loyalty rules</a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:Loyalty_Tier_Register'><i class='zc-li-outline business-award-49'></i>Loyalty tiers</a></li>
+        <li class='zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8'><a class='zcs-flex zcs-align-items-center zcs-gap-8 zcs-font-13 zcs-color-primary' href='#Report:Audit_Log_Report'><i class='zc-li-outline files-3-check'></i>Audit log</a></li>
+      </ul>
+      <% } %>
+    </section>
+  </div>
+<% } %>
+</div>

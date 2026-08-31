@@ -1,0 +1,80 @@
+Add_To_Next_DRS as "Add to Next DRS"
+{
+    type = functions
+    form = NDR_Instructions
+    execution type = for each record
+    description = "Returns an acknowledged NDR shipment to destination-hub delivery planning"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                shipment_record = Shipment_Requests[ID == input.Shipment];
+                run_item = Delivery_Run_Sheet_Items[ID == input.Delivery_Run_Item];
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                effective_hub = if(logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate),logged_user.Deputed_Hub,logged_user.Home_Hub);
+                authorised = logged_user.count(ID) > 0 && effective_hub == shipment_record.Destination_Hub;
+                active_assignment = Delivery_Run_Sheet_Items[Shipment == shipment_record.ID && ID != run_item.ID && (Delivery_Status == "Assigned" || Delivery_Status == "Out For Delivery")].count(ID);
+                if(authorised == false)
+                {
+                    info "You are not authorised to return this shipment to delivery planning.";
+                }
+                else if(input.NDR_Status != "Acknowledged" || input.Recipient_Instruction == "Hold at Local Office")
+                {
+                    info "Only an acknowledged redelivery instruction can return to DRS planning.";
+                }
+                else if(shipment_record.Shipment_Status != "Delivery Failed - NDR" || shipment_record.Current_Hub != shipment_record.Destination_Hub || active_assignment > 0)
+                {
+                    info "The shipment is not eligible for destination-hub redelivery planning.";
+                }
+                else
+                {
+                    if(input.Recipient_Instruction == "Reschedule Delivery")
+                    {
+                        shipment_record.Expected_Delivery_Date = input.Reschedule_Date;
+                    }
+                    else if(input.Recipient_Instruction == "Update Delivery Address")
+                    {
+                        shipment_record.Delivery_Address.address_line_1 = input.Updated_Delivery_Address.address_line_1;
+                        shipment_record.Delivery_Address.address_line_2 = input.Updated_Delivery_Address.address_line_2;
+                        shipment_record.Delivery_Address.district_city = input.Updated_Delivery_Address.district_city;
+                        shipment_record.Delivery_Address.state_province = input.Updated_Delivery_Address.state_province;
+                        shipment_record.Delivery_Address.postal_Code = input.Updated_Delivery_Address.postal_Code;
+                        shipment_record.Delivery_Address.country = input.Updated_Delivery_Address.country;
+                        shipment_record.Delivery_Pincode = input.Updated_Delivery_Address.postal_Code;
+                    }
+                    shipment_record.Shipment_Status = "At Delivery Hub";
+                    input.NDR_Status = "Added to Next DRS";
+                    input.Supervisor_Notes = ifnull(input.Supervisor_Notes,"") + "\nReturned to DRS planning by " + zoho.loginuserid + " on " + zoho.currenttime + ".";
+                    tracking_id = insert into Shipment_Tracking_Events
+                    [
+                        Shipment = shipment_record.ID
+                        Event_Time = zoho.currenttime
+                        Event_Status = "At Delivery Hub"
+                        Hub = shipment_record.Destination_Hub
+                        Event_Description = "Recipient instruction accepted; shipment returned to destination-hub delivery planning."
+                        Source = "NDR"
+                        Customer_Visible = true
+                        Created_By_Email = zoho.loginuserid
+                    ];
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Add NDR Shipment to Next DRS"
+                        Module_Name = "NDR Instructions"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "NDR=Acknowledged; Shipment=Delivery Failed - NDR"
+                        After_Data = "NDR=Added to Next DRS; Shipment=At Delivery Hub"
+                        Source = "Report Action"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

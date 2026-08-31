@@ -1,0 +1,88 @@
+Void_Overdue_Invoice as "Void Invoice - Overdue Invoices"
+{
+    type = functions
+    form = Invoices
+    execution type = for each record
+    description = "Voids an eligible invoice, closes its open receivable, and records notification and audit evidence"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                if(input.Invoice_Status == "Paid" || input.Invoice_Status == "Void")
+                {
+                    info "Paid or already void invoices cannot be voided through this action.";
+                }
+                else
+                {
+                    prior_status = input.Invoice_Status;
+                    input.Invoice_Status = "Void";
+                    for each ledger_record in Account_Ledger[Invoice == input.ID && Transaction_Type == "Debit"]
+                    {
+                        reversal_reference = "VOID-" + input.Invoice_Number + "-" + ledger_record.ID;
+                        if(Account_Ledger[Payment_Reference == reversal_reference].count(ID) == 0)
+                        {
+                            reversal_id = insert into Account_Ledger
+                            [
+                                Customer = input.Customer
+                                Shipment = input.Shipment
+                                Invoice = input.ID
+                                Transaction_Type = "Credit"
+                                Amount = ledger_record.Amount
+                                Transaction_Date = zoho.currenttime
+                                Ledger_Status = "Settled"
+                                Payment_Reference = reversal_reference
+                                Notes = "Reversing credit posted because invoice INV-" + input.Invoice_Number + " was voided."
+                                Posted_By_Email = zoho.loginuserid
+                                Customer_Login_Email = ledger_record.Customer_Login_Email
+                            ];
+                        }
+                        ledger_record.Ledger_Status = "Settled";
+                        ledger_record.Notes = ifnull(ledger_record.Notes,"") + " | Invoice voided by " + zoho.loginuserid + ". Reversal: " + reversal_reference + ".";
+                    }
+                    thisapp.Recalculate_Customer_Outstanding(input.Customer);
+                    shipment_record = Shipment_Requests[ID == input.Shipment];
+                    customer_record = Customers[ID == input.Customer];
+                    recipient_email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID);
+                    communication_id = insert into Communication_Log
+                    [
+                        Customer = customer_record.ID
+                        Shipment = shipment_record.ID
+                        Recipient = recipient_email
+                        Channel = "Email"
+                        Template_Code = "INVOICE_VOIDED"
+                        Subject = "Invoice voided: INV-" + input.Invoice_Number
+                        Message_Summary = "Invoice INV-" + input.Invoice_Number + " was voided and its open receivable was closed."
+                        Provider = "Zoho Mail"
+                        Communication_Status = "Sent"
+                        Attempt_Count = 1
+                        Last_Attempt_At = zoho.currenttime
+                    ];
+                    sendmail
+                    [
+                        from: zoho.adminuserid
+                        to: recipient_email
+                        subject: "Invoice voided: INV-" + input.Invoice_Number
+                        message: "Invoice INV-" + input.Invoice_Number + " for AWB " + shipment_record.AWB_Number + " has been voided."
+                    ]
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Void Invoice"
+                        Module_Name = "Invoices"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=" + prior_status
+                        After_Data = "Status=Void; Open receivable closed"
+                        Source = "Report Action"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

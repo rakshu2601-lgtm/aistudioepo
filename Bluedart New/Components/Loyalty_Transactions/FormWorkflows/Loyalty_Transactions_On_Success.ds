@@ -1,0 +1,40 @@
+Loyalty_Transactions_On_Success as "Post Loyalty Adjustment"
+{
+    type = form
+    form = Loyalty_Transactions
+    record event = on add
+    description = "Updates customer balances for authorised direct adjustments and records audit evidence"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(input.Transaction_Type == "Adjust")
+                {
+                    customer_record = Customers[ID == input.Customer];
+                    customer_record.Current_Loyalty_Points = ifnull(customer_record.Current_Loyalty_Points,0) + input.Points;
+                    if(input.Points > 0)
+                    {
+                        customer_record.Lifetime_Loyalty_Points = ifnull(customer_record.Lifetime_Loyalty_Points,0) + input.Points;
+                    }
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Adjust Loyalty Points"
+                        Module_Name = "Loyalty Transactions"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Customer balance before adjustment=" + (ifnull(customer_record.Current_Loyalty_Points,0) - input.Points)
+                        After_Data = "Points=" + input.Points + "; Customer balance=" + customer_record.Current_Loyalty_Points + "; Reference=" + input.Reference
+                        Source = "Admin Correction"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

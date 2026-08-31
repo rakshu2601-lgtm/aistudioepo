@@ -1,0 +1,32 @@
+Delivery_Run_Sheets_On_Success as "Audit Delivery Run Sheet"
+{
+    type = form
+    form = Delivery_Run_Sheets
+    record event = on add or edit
+    description = "Audits creation and controlled draft updates of delivery run sheets"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                action_name = if(input.DRS_Status == "Draft","Save Delivery Run Draft","Update Delivery Run");
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = current_profile
+                    Action_Name = action_name
+                    Module_Name = "Delivery Run Sheets"
+                    Record_ID = input.ID.toString()
+                    Before_Data = ""
+                    After_Data = "DRS=" + input.DRS_Number + "; Hub=" + input.Hub + "; Agent=" + input.Assigned_Agent + "; Zone=" + input.Delivery_Zone + "; Status=" + input.DRS_Status
+                    Source = "Form Workflow"
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

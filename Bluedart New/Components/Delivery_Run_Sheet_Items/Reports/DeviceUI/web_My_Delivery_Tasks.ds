@@ -1,0 +1,5 @@
+report My_Delivery_Tasks
+{
+    quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Delivery_Run_Sheet Stop_Sequence Shipment Delivery_Status Recipient_Name COD_Collected "Mark Arrived" "Deliver Shipment" "Failed Delivery" ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+    detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Delivery_Run_Sheet Shipment Stop_Sequence Delivery_Status Arrived_At Completed_At Proof_Type Recipient_Name COD_Collected NDR_Reason Attempt_Number Agent_Latitude Agent_Longitude EPOD_URL "Mark Arrived" "Deliver Shipment" "Failed Delivery" ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

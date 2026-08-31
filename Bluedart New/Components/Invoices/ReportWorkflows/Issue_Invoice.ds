@@ -1,0 +1,131 @@
+Issue_Invoice as "Issue Invoice"
+{
+    type = functions
+    form = Invoices
+    execution type = for each record
+    description = "Issues a draft invoice, creates one receivable, generates its PDF, archives it, and notifies the customer"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                if(input.Invoice_Status != "Draft")
+                {
+                    info "Only a draft invoice can be issued.";
+                }
+                else
+                {
+                    shipment_record = Shipment_Requests[ID == input.Shipment];
+                    customer_record = Customers[ID == input.Customer];
+                    if(shipment_record.count(ID) == 0 || customer_record.count(ID) == 0 || shipment_record.Customer != customer_record.ID)
+                    {
+                        info "Invoice shipment and customer details are inconsistent.";
+                    }
+                    else
+                    {
+                        expected_total = (ifnull(input.Freight_Subtotal,0) + ifnull(input.Fuel_Surcharge,0) + ifnull(input.COD_Fee,0) + ifnull(input.GST_Amount,0) - ifnull(input.Loyalty_Discount,0) - ifnull(input.Credit_Rebate,0)).round(2);
+                        if(expected_total < 0)
+                        {
+                            expected_total = 0;
+                        }
+                        if((ifnull(input.Invoice_Total,0) - expected_total).abs() > 0.01 || (ifnull(input.Invoice_Total,0) - ifnull(shipment_record.Total_Payable,0)).abs() > 0.01)
+                        {
+                            info "Invoice charges no longer match the shipment. Refresh the draft before issuing it.";
+                        }
+                        else
+                        {
+                            invoice_reference = "INV-" + input.Invoice_Number;
+                            existing_debit = Account_Ledger[Invoice == input.ID && Transaction_Type == "Debit"];
+                            if(existing_debit.count(ID) == 0)
+                            {
+                                ledger_id = insert into Account_Ledger
+                                [
+                                    Customer = customer_record.ID
+                                    Shipment = shipment_record.ID
+                                    Invoice = input.ID
+                                    Transaction_Type = "Debit"
+                                    Amount = input.Invoice_Total
+                                    Transaction_Date = zoho.currenttime
+                                    Due_Date = input.Due_Date
+                                    Ledger_Status = "Open"
+                                    Payment_Reference = invoice_reference
+                                    Notes = "Receivable created when invoice was issued."
+                                    Posted_By_Email = zoho.loginuserid
+                                    Customer_Login_Email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID)
+                                ];
+                                thisapp.Recalculate_Customer_Outstanding(customer_record.ID);
+                            }
+                            input.Invoice_Status = "Issued";
+                            invoice_html = "<html><body style='font-family:Arial,sans-serif;color:#1f2937;margin:32px'><div style='display:flex;justify-content:space-between;border-bottom:3px solid #1d4ed8;padding-bottom:16px'><div><h1 style='margin:0;color:#1d4ed8'>Tax Invoice</h1><p style='margin:6px 0'>Logistics & Loyalty Management</p></div><div style='text-align:right'><b>Invoice " + invoice_reference + "</b><br/>Date: " + input.Invoice_Date + "<br/>Due: " + input.Due_Date + "</div></div><h3>Bill To</h3><p>Customer ID: " + customer_record.Customer_ID + "<br/>Customer: " + customer_record.Full_Name.first_name + " " + customer_record.Full_Name.last_name + "<br/>Email: " + customer_record.Email_ID + "</p><h3>Shipment</h3><p>AWB: " + shipment_record.AWB_Number + "<br/>Mode: " + shipment_record.Transport_Mode + "<br/>Billable Weight: " + shipment_record.Billable_Weight_Kg + " kg</p><table style='border-collapse:collapse;width:100%;margin-top:20px'><tr style='background:#eff6ff'><th style='text-align:left;padding:10px;border:1px solid #cbd5e1'>Charge</th><th style='text-align:right;padding:10px;border:1px solid #cbd5e1'>Amount (INR)</th></tr><tr><td style='padding:10px;border:1px solid #cbd5e1'>Freight</td><td style='text-align:right;padding:10px;border:1px solid #cbd5e1'>" + input.Freight_Subtotal + "</td></tr><tr><td style='padding:10px;border:1px solid #cbd5e1'>Fuel Surcharge</td><td style='text-align:right;padding:10px;border:1px solid #cbd5e1'>" + input.Fuel_Surcharge + "</td></tr><tr><td style='padding:10px;border:1px solid #cbd5e1'>COD Fee</td><td style='text-align:right;padding:10px;border:1px solid #cbd5e1'>" + input.COD_Fee + "</td></tr><tr><td style='padding:10px;border:1px solid #cbd5e1'>GST</td><td style='text-align:right;padding:10px;border:1px solid #cbd5e1'>" + input.GST_Amount + "</td></tr><tr><td style='padding:10px;border:1px solid #cbd5e1'>Loyalty Discount</td><td style='text-align:right;padding:10px;border:1px solid #cbd5e1'>-" + input.Loyalty_Discount + "</td></tr><tr><td style='padding:10px;border:1px solid #cbd5e1'>Credit Rebate</td><td style='text-align:right;padding:10px;border:1px solid #cbd5e1'>-" + input.Credit_Rebate + "</td></tr><tr style='font-weight:bold;background:#f8fafc'><td style='padding:12px;border:1px solid #cbd5e1'>Total</td><td style='text-align:right;padding:12px;border:1px solid #cbd5e1'>INR " + input.Invoice_Total + "</td></tr></table><p style='margin-top:24px'><b>Payment Terms:</b> " + input.Payment_Terms + "</p><p style='font-size:12px;color:#64748b'>This is a system-generated invoice for the shipment identified above.</p></body></html>";
+                            invoice_pdf = zoho.file.convertToPDF(invoice_html);
+                            invoice_file_name = invoice_reference + "_" + shipment_record.AWB_Number + ".pdf";
+                            invoice_pdf.setFileName(invoice_file_name);
+                            workdrive_archived = false;
+                            try
+                            {
+                                workdrive_response = zoho.workdrive.uploadFile(invoice_pdf,"CONFIGURE_INVOICE_FOLDER_ID",encodeUrl(invoice_file_name),true,"zoho_workdrive");
+                                if(workdrive_response.containKey("data"))
+                                {
+                                    workdrive_data = workdrive_response.get("data");
+                                    if(workdrive_data.size() > 0)
+                                    {
+                                        workdrive_attributes = workdrive_data.get(0).get("attributes");
+                                        workdrive_resource_id = workdrive_attributes.get("resource_id");
+                                        input.Invoice_WorkDrive_File_ID = workdrive_resource_id;
+                                        input.Invoice_Download_URL = "https://workdrive.zoho.com/open/" + workdrive_resource_id;
+                                        workdrive_archived = true;
+                                    }
+                                }
+                            }
+                            catch (workdrive_error)
+                            {
+                                input.Invoice_WorkDrive_File_ID = "PENDING-WORKDRIVE-CONFIGURATION";
+                            }
+                            books_sync_status = "Not configured";
+                            input.Zoho_Books_Invoice_ID = "PENDING-BOOKS-CONFIGURATION";
+                            recipient_email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID);
+                            communication_id = insert into Communication_Log
+                            [
+                                Customer = customer_record.ID
+                                Shipment = shipment_record.ID
+                                Recipient = recipient_email
+                                Channel = "Email"
+                                Template_Code = "INVOICE_ISSUED"
+                                Subject = "Invoice " + invoice_reference + " for AWB " + shipment_record.AWB_Number
+                                Message_Summary = "Invoice issued for INR " + input.Invoice_Total + ". WorkDrive archive: " + if(workdrive_archived == true,"Completed","Pending configuration") + "."
+                                Provider = "Zoho Mail"
+                                Communication_Status = "Sent"
+                                Attempt_Count = 1
+                                Last_Attempt_At = zoho.currenttime
+                            ];
+                            sendmail
+                            [
+                                from: zoho.adminuserid
+                                to: recipient_email
+                                subject: "Invoice " + invoice_reference + " for AWB " + shipment_record.AWB_Number
+                                message: "Your shipment invoice for INR " + input.Invoice_Total + " is attached. Payment terms: " + input.Payment_Terms + "; due date: " + input.Due_Date + "."
+                                attachments: file: invoice_pdf
+                            ]
+                            audit_id = insert into Audit_Log
+                            [
+                                Event_Time = zoho.currenttime
+                                Actor_Email = zoho.loginuserid
+                                Actor_Profile = current_profile
+                                Action_Name = "Issue Invoice"
+                                Module_Name = "Invoices"
+                                Record_ID = input.ID.toString()
+                                Before_Data = "Status=Draft; Receivable=Absent"
+                                After_Data = "Status=Issued; Amount=" + input.Invoice_Total + "; WorkDrive Archived=" + workdrive_archived + "; Books Sync=" + books_sync_status
+                                Source = "Report Action"
+                                Severity = "Critical"
+                            ];
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

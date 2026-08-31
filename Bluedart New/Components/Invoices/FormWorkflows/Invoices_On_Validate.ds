@@ -1,0 +1,92 @@
+Invoices_On_Validate as "Validate Invoice"
+{
+    type = form
+    form = Invoices
+    record event = on add or edit
+    description = "Validates shipment ownership, charges, due date, uniqueness, and controlled invoice lifecycle"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(current_profile != "Logistics_Administrator" && current_profile != "Finance_Officer")
+                {
+                    alert "Only finance officers and logistics administrators can maintain invoices.";
+                    cancel submit;
+                }
+                shipment_record = Shipment_Requests[ID == input.Shipment];
+                if(shipment_record.count(ID) == 0)
+                {
+                    alert "Select a valid shipment.";
+                    cancel submit;
+                }
+                if(input.Customer != shipment_record.Customer)
+                {
+                    alert "Invoice customer must match the shipment customer.";
+                    cancel submit;
+                }
+                duplicate_invoice = Invoices[Shipment == input.Shipment && ID != input.ID];
+                if(duplicate_invoice.count(ID) > 0)
+                {
+                    alert "Only one invoice is allowed for each shipment.";
+                    cancel submit;
+                }
+                if(ifnull(input.Freight_Subtotal,0) < 0 || ifnull(input.Fuel_Surcharge,0) < 0 || ifnull(input.COD_Fee,0) < 0 || ifnull(input.GST_Amount,0) < 0 || ifnull(input.Loyalty_Discount,0) < 0 || ifnull(input.Credit_Rebate,0) < 0 || ifnull(input.Invoice_Total,0) < 0)
+                {
+                    alert "Invoice amounts cannot be negative.";
+                    cancel submit;
+                }
+                expected_total = (ifnull(input.Freight_Subtotal,0) + ifnull(input.Fuel_Surcharge,0) + ifnull(input.COD_Fee,0) + ifnull(input.GST_Amount,0) - ifnull(input.Loyalty_Discount,0) - ifnull(input.Credit_Rebate,0)).round(2);
+                if(expected_total < 0)
+                {
+                    expected_total = 0;
+                }
+                if((ifnull(input.Invoice_Total,0) - expected_total).abs() > 0.01)
+                {
+                    alert "Invoice total must equal freight, fuel surcharge, COD fee, and GST less loyalty discount and credit rebate.";
+                    cancel submit;
+                }
+                if((ifnull(input.Freight_Subtotal,0) - ifnull(shipment_record.Base_Rate,0)).abs() > 0.01 || (ifnull(input.Fuel_Surcharge,0) - ifnull(shipment_record.Fuel_Surcharge,0)).abs() > 0.01 || (ifnull(input.COD_Fee,0) - ifnull(shipment_record.COD_Handling_Fee,0)).abs() > 0.01 || (ifnull(input.GST_Amount,0) - ifnull(shipment_record.GST_Amount,0)).abs() > 0.01 || (ifnull(input.Loyalty_Discount,0) - ifnull(shipment_record.Loyalty_Redemption_Amount,0)).abs() > 0.01)
+                {
+                    alert "Invoice charges must match the current shipment rating.";
+                    cancel submit;
+                }
+                expected_due_date = input.Invoice_Date;
+                if(input.Payment_Terms == "Net 15")
+                {
+                    expected_due_date = input.Invoice_Date.addDay(15);
+                }
+                else if(input.Payment_Terms == "Net 30")
+                {
+                    expected_due_date = input.Invoice_Date.addDay(30);
+                }
+                if(input.Due_Date != expected_due_date)
+                {
+                    alert "Due date must follow the selected payment terms.";
+                    cancel submit;
+                }
+                if(input.ID != null)
+                {
+                    stored_invoice = Invoices[ID == input.ID];
+                    if(stored_invoice.count(ID) > 0 && stored_invoice.Invoice_Status != "Draft")
+                    {
+                        protected_changed = input.Shipment != stored_invoice.Shipment || input.Customer != stored_invoice.Customer || input.Invoice_Date != stored_invoice.Invoice_Date || (input.Freight_Subtotal - stored_invoice.Freight_Subtotal).abs() > 0.01 || (input.Fuel_Surcharge - stored_invoice.Fuel_Surcharge).abs() > 0.01 || (input.COD_Fee - stored_invoice.COD_Fee).abs() > 0.01 || (input.GST_Amount - stored_invoice.GST_Amount).abs() > 0.01 || (input.Loyalty_Discount - stored_invoice.Loyalty_Discount).abs() > 0.01 || (input.Credit_Rebate - stored_invoice.Credit_Rebate).abs() > 0.01 || (input.Invoice_Total - stored_invoice.Invoice_Total).abs() > 0.01 || input.Payment_Terms != stored_invoice.Payment_Terms || input.Due_Date != stored_invoice.Due_Date || input.Invoice_Status != stored_invoice.Invoice_Status;
+                        if(protected_changed == true)
+                        {
+                            alert "Issued invoices are immutable. Use the controlled issue, payment, overdue, or void workflows.";
+                            cancel submit;
+                        }
+                    }
+                }
+                else if(input.Invoice_Status != "Draft")
+                {
+                    alert "New invoices must begin in Draft status and be issued from the Invoice Statement report.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

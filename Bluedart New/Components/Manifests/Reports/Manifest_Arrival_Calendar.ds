@@ -1,0 +1,40 @@
+calendar Manifest_Arrival_Calendar
+{
+    displayName = "Manifest Arrival Calendar"
+    show all rows from Manifests [Manifest_Status != "Cancelled"]
+    (
+        Manifest_Number
+        Manifest_Type
+        Origin_Hub
+        Destination_Hub
+        Vehicle
+        Driver
+        Departure_Time
+        Expected_Arrival_Time
+        Actual_Arrival_Time
+        Manifest_Status
+    )
+    filters
+    (
+        Manifest_Type
+        Origin_Hub
+        Destination_Hub
+        Vehicle
+        Driver
+        Manifest_Status
+        Expected_Arrival_Time
+    )
+    options
+    (
+        display type = week
+        week start day = monday
+        display field = Manifest_Number
+        start date = Expected_Arrival_Time
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+}

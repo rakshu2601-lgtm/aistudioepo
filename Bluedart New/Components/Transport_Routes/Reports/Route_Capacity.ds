@@ -1,0 +1,44 @@
+list Route_Capacity
+{
+    displayName = "Route Capacity"
+    show all rows from Transport_Routes [Active == true]
+    (
+        Route_ID
+        Route_Name
+        Origin_Sorting_Hub
+        Destination_Sorting_Hub
+        Transport_Mode
+        Distance_Km
+        Estimated_Transit_Hours
+        Daily_Capacity_Kg
+        Active
+    )
+    filters
+    (
+        Origin_Sorting_Hub
+        Destination_Sorting_Hub
+        Transport_Mode
+        Active
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Origin_Sorting_Hub ascending
+    )
+    sort by
+    (
+        Daily_Capacity_Kg descending
+    )
+    conditional formatting
+    (
+        "Limited Capacity"
+        {
+            condition = (Daily_Capacity_Kg < 1000)
+            fields = [Route_Name, Daily_Capacity_Kg]
+            format = "background-color:#FEF3C7;color:#92400E"
+        }
+    )
+}

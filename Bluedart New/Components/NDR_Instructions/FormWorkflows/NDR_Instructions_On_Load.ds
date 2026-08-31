@@ -1,0 +1,42 @@
+NDR_Instructions_On_Load as "Secure NDR Instruction Load"
+{
+    type = form
+    form = NDR_Instructions
+    record event = on add or edit
+    description = "Locks system-controlled NDR identity, token, timestamps, and status fields"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Customer, Customer_Login_Email, Shipment, Delivery_Run_Item, Secure_Token, Failure_Reason, Submitted_At, NDR_Status, Supervisor_Notes;
+                if(input.ID == null)
+                {
+                    hide Recipient_Instruction, Reschedule_Date, Updated_Delivery_Address;
+                    disable Recipient_Instruction, Reschedule_Date, Updated_Delivery_Address;
+                }
+                else
+                {
+                    show Recipient_Instruction;
+                    disable Recipient_Instruction, Reschedule_Date, Updated_Delivery_Address;
+                    if(input.Recipient_Instruction == "Reschedule Delivery")
+                    {
+                        show Reschedule_Date;
+                        hide Updated_Delivery_Address;
+                    }
+                    else if(input.Recipient_Instruction == "Update Delivery Address")
+                    {
+                        hide Reschedule_Date;
+                        show Updated_Delivery_Address;
+                    }
+                    else
+                    {
+                        hide Reschedule_Date, Updated_Delivery_Address;
+                    }
+                }
+            )
+        }
+    }
+}

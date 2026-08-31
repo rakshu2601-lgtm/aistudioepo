@@ -1,0 +1,31 @@
+COD_Remittances_On_Success as "Audit COD Cash Submission"
+{
+    type = form
+    form = COD_Remittances
+    record event = on edit
+    description = "Audits every agent or supervisor cash-submission update"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = current_profile
+                    Action_Name = "Submit COD Cash"
+                    Module_Name = "COD Remittances"
+                    Record_ID = input.ID.toString()
+                    Before_Data = "Expected=" + input.Expected_Amount
+                    After_Data = "Submitted=" + input.Submitted_Amount + "; Shortfall=" + input.Shortfall_Amount + "; Status=Pending"
+                    Source = "Form Workflow"
+                    Severity = if(input.Shortfall_Amount > 0,"Warning","Info")
+                ];
+            )
+        }
+    }
+}

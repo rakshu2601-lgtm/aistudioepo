@@ -1,0 +1,82 @@
+Mark_Bag_Shipment_Received as "Mark Bag Shipment Received"
+{
+    type = functions
+    form = Bag_Shipments
+    execution type = for each record
+    description = "Confirms physical receipt of an expected AWB and advances its hub milestone"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                bag_record = Logistics_Bags[ID == input.Bag];
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == bag_record.Destination_Hub;
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the destination hub can reconcile this AWB.";
+                }
+                else if((bag_record.Bag_Status != "Received" && bag_record.Bag_Status != "Exception") || input.Scan_Status != "Loaded")
+                {
+                    info "The bag must be received or quarantined and the AWB must still be awaiting reconciliation.";
+                }
+                else
+                {
+                    milestone = "Arrived at Destination Hub";
+                    if(bag_record.Bag_Type == "Feeder")
+                    {
+                        milestone = "Sorted at Origin Hub";
+                    }
+                    else if(bag_record.Bag_Type == "Delivery Feeder")
+                    {
+                        milestone = "At Delivery Hub";
+                    }
+                    else if(bag_record.Bag_Type == "Return")
+                    {
+                        milestone = "Return to Origin";
+                    }
+                    input.Scan_Status = "Received";
+                    input.Received_At = zoho.currenttime;
+                    input.Exception_Notes = "";
+                    shipment_record = Shipment_Requests[ID == input.Shipment];
+                    shipment_record.Shipment_Status = milestone;
+                    shipment_record.Current_Hub = bag_record.Destination_Hub;
+                    tracking_id = insert into Shipment_Tracking_Events
+                    [
+                        Shipment = input.Shipment
+                        Event_Time = zoho.currenttime
+                        Event_Status = milestone
+                        Hub = bag_record.Destination_Hub
+                        Bag = input.Bag
+                        Event_Description = "Shipment reconciled as received from the " + bag_record.Bag_Type + " bag."
+                        Source = "Bag"
+                        Customer_Visible = true
+                        Created_By_Email = zoho.loginuserid
+                    ];
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Mark Bag Shipment Received"
+                        Module_Name = "Bag Shipments"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=Loaded"
+                        After_Data = "Status=Received; Milestone=" + milestone + "; Hub=" + bag_record.Destination_Hub
+                        Source = "Report Action"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,37 @@
+default list All_Vehicles
+{
+    displayName = "All Vehicles"
+    show all rows from Vehicles
+    (
+        Vehicle_Number
+        Vehicle_Type
+        Transport_Mode
+        Owning_Hub
+        Capacity_Kg
+        Assigned_Driver
+        Registration_Expiry
+        Insurance_Expiry
+        Status
+        Active
+    )
+    filters
+    (
+        Vehicle_Type
+        Transport_Mode
+        Owning_Hub
+        Status
+        Active
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Owning_Hub ascending
+    )
+    sort by
+    (
+        Vehicle_Number ascending
+    )
+}

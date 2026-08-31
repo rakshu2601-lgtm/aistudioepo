@@ -1,0 +1,48 @@
+Acknowledge_NDR as "Acknowledge NDR"
+{
+    type = functions
+    form = NDR_Instructions
+    execution type = for each record
+    description = "Acknowledges a new recipient instruction for destination-hub processing"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                shipment_record = Shipment_Requests[ID == input.Shipment];
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                effective_hub = if(logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate),logged_user.Deputed_Hub,logged_user.Home_Hub);
+                authorised = logged_user.count(ID) > 0 && effective_hub == shipment_record.Destination_Hub;
+                if(authorised == false)
+                {
+                    info "You are not authorised to acknowledge this NDR instruction.";
+                }
+                else if(input.NDR_Status != "New")
+                {
+                    info "Only a new recipient instruction can be acknowledged.";
+                }
+                else
+                {
+                    input.NDR_Status = "Acknowledged";
+                    input.Supervisor_Notes = ifnull(input.Supervisor_Notes,"") + "\nAcknowledged by " + zoho.loginuserid + " on " + zoho.currenttime + ".";
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Acknowledge NDR"
+                        Module_Name = "NDR Instructions"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=New"
+                        After_Data = "Status=Acknowledged"
+                        Source = "Report Action"
+                        Severity = "Info"
+                    ];
+                }
+            )
+        }
+    }
+}

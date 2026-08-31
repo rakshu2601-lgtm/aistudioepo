@@ -1,0 +1,50 @@
+list Outstanding_Accounts
+{
+    displayName = "Outstanding Accounts"
+    show all rows from Account_Ledger [(Transaction_Type == "Debit" || (Transaction_Type == "Adjustment" && Amount > 0)) && (Ledger_Status == "Open" || Ledger_Status == "Partially Settled" || Ledger_Status == "Overdue")]
+    (
+        Customer
+        Invoice
+        Shipment
+        Transaction_Type
+        Amount
+        (
+            display = total
+        )
+        Transaction_Date
+        Due_Date
+        Ledger_Status
+        Ageing_Bucket
+        Payment_Reference
+    )
+    filters
+    (
+        Customer
+        Transaction_Type
+        Due_Date
+        Ledger_Status
+        Ageing_Bucket
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Customer ascending
+    )
+    sort by
+    (
+        Due_Date ascending
+        Transaction_Date descending
+    )
+    conditional formatting
+    (
+        "Overdue Account"
+        {
+            condition = (Ledger_Status == "Overdue")
+            fields = [Customer, Invoice, Amount, Due_Date, Ledger_Status]
+            format = "background-color:#FEE2E2;color:#991B1B;font-weight:bold"
+        }
+    )
+}

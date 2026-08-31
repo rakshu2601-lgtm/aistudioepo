@@ -1,0 +1,38 @@
+Retry_Invoice_Document_Archive_Daily as "Retry Invoice Document Archive Daily"
+{
+    type = schedule
+    start = "2026-01-01 03:30:00"
+    frequency = daily
+    time zone = "Asia/Kolkata"
+    description = "Flags issued invoices whose WorkDrive archive still needs deployment configuration"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                pending_invoices = Invoices[Invoice_Status != "Draft" && Invoice_Status != "Void" && (Invoice_WorkDrive_File_ID == null || Invoice_WorkDrive_File_ID == "PENDING-WORKDRIVE-CONFIGURATION")] range from 0 to 199;
+                for each invoice_record in pending_invoices
+                {
+                    if(Audit_Log[Module_Name == "Invoices" && Record_ID == invoice_record.ID.toString() && Action_Name == "Invoice Archive Pending" && Event_Time >= zoho.currentdate].count(ID) == 0)
+                    {
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.adminuserid
+                            Actor_Profile = "System"
+                            Action_Name = "Invoice Archive Pending"
+                            Module_Name = "Invoices"
+                            Record_ID = invoice_record.ID.toString()
+                            Before_Data = "WorkDrive File ID=" + ifnull(invoice_record.Invoice_WorkDrive_File_ID,"")
+                            After_Data = "Configure CONFIGURE_INVOICE_FOLDER_ID and zoho_workdrive connection, then reissue archive through an authorised correction process."
+                            Source = "Schedule"
+                            Severity = "Warning"
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

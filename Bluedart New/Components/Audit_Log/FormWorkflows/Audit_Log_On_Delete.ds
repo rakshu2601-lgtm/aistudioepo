@@ -1,0 +1,19 @@
+Audit_Log_On_Delete as "Prohibit Audit Deletion"
+{
+    type = form
+    form = Audit_Log
+    record event = on delete
+    description = "Prevents deletion of security, operational, and financial evidence"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Audit evidence is immutable and cannot be deleted.";
+                cancel delete;
+            )
+        }
+    }
+}

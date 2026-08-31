@@ -1,0 +1,19 @@
+Hub_Address_On_User_Input as "Capture Hub Coordinates"
+{
+    type = form
+    form = Hubs
+    record event = on add or edit
+    description = "Copies address coordinates into searchable hub fields"
+
+    on user input of Hub_Address
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Latitude = input.Hub_Address.latitude;
+                input.Longitude = input.Hub_Address.longitude;
+            )
+        }
+    }
+}

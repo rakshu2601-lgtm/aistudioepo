@@ -1,0 +1,43 @@
+list In_Transit_Bags
+{
+    displayName = "In Transit Bags"
+    show all rows from Logistics_Bags [Bag_Status == "Dispatched"]
+    (
+        Bag_Number
+        Bag_Type
+        Origin_Hub
+        Destination_Hub
+        Seal_Code
+        Total_Shipments
+        Total_Weight_Kg
+        Dispatched_At
+        Notes
+        custom action "Receive Bag"
+        (
+            workflow = Receive_In_Transit_Bag
+            show action for each record = true
+            column header = "Receive"
+            success message = "Bag receipt evaluated"
+            condition = (Bag_Status == "Dispatched")
+        )
+        custom action "Report Seal Exception"
+        (
+            workflow = Seal_Exception_In_Transit_Bag
+            show action for each record = true
+            column header = "Exception"
+            success message = "Bag exception evaluated"
+            condition = (Bag_Status == "Dispatched")
+        )
+    )
+    filters
+    (
+        Bag_Type
+        Origin_Hub
+        Destination_Hub
+        Dispatched_At
+    )
+    sort by
+    (
+        Dispatched_At descending
+    )
+}

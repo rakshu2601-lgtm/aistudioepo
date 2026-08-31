@@ -1,0 +1,73 @@
+default list Payment_Transaction_Register
+{
+    displayName = "Payment Transactions"
+    show all rows from Payment_Transactions
+    (
+        Payment_Transaction_ID
+        Customer
+        Shipment
+        Invoice
+        Ledger_Entry
+        Gateway
+        Gateway_Order_ID
+        Gateway_Payment_ID
+        Amount
+        Payment_Method
+        Payment_Status
+        Initiated_At
+        Completed_At
+        Gateway_Response_Summary
+        Failure_Reason
+        Customer_Login_Email
+
+        custom action "Confirm Verified Refund"
+        (
+            workflow = Confirm_Verified_Refund
+            show action for each record = true
+            column header = "Confirm Verified Refund"
+            success message = "Verified refund reconciliation completed"
+            condition = (Payment_Status == "Success")
+            confirmation before execution
+            (
+                message for individual record = "Confirm only after the payment provider shows this refund as completed. This posts permanent financial evidence."
+                confirm button text = "Confirm Refund"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Customer
+        Gateway
+        Payment_Method
+        Payment_Status
+        Initiated_At
+        Completed_At
+    )
+    sort by
+    (
+        Initiated_At descending
+        Payment_Transaction_ID descending
+    )
+    conditional formatting
+    (
+        "Successful Payment"
+        {
+            condition = (Payment_Status == "Success")
+            fields = [Payment_Transaction_ID, Customer, Amount, Payment_Status, Completed_At]
+            format = "background-color:#DCFCE7;color:#166534"
+        }
+        "Failed Payment"
+        {
+            condition = (Payment_Status == "Failed")
+            fields = [Payment_Transaction_ID, Customer, Amount, Payment_Status, Failure_Reason]
+            format = "background-color:#FEE2E2;color:#991B1B;font-weight:bold"
+        }
+        "Refunded Payment"
+        {
+            condition = (Payment_Status == "Refunded")
+            fields = [Payment_Transaction_ID, Customer, Amount, Payment_Status, Completed_At]
+            format = "background-color:#FEF3C7;color:#92400E"
+        }
+    )
+}

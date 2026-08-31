@@ -1,0 +1,233 @@
+Complete_Pickup as "Complete Pickup - Pickup Run Items"
+{
+    type = functions
+    form = Pickup_Run_Sheet_Items
+    execution type = for each record
+    description = "Validates proof and approved rerating, transfers shipment custody, and reconciles pickup run progress"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                run_record = Pickup_Run_Sheets[ID == input.Pickup_Run_Sheet];
+                assigned_agent = Operations_Users[ID == run_record.Assigned_Agent];
+                authorised = assigned_agent.Work_Email == zoho.loginuserid || Operations_Users[Work_Email == zoho.loginuserid && Active == true].count(ID) > 0;
+                if(authorised == false)
+                {
+                    info "Only the assigned agent or an active operations user can complete this pickup.";
+                }
+                else if(input.Stop_Status != "Arrived" || (run_record.Status != "Released" && run_record.Status != "In Progress"))
+                {
+                    info "The pickup stop must be marked Arrived on an active run before completion.";
+                }
+                else if(ifnull(input.Pickup_OTP,"").trim() == "" && input.Pickup_Signature == null)
+                {
+                    info "Capture either the pickup OTP or the customer's signature before completion.";
+                }
+                else
+                {
+                    shipment_record = Shipment_Requests[ID == input.Shipment];
+                    customer_record = Customers[ID == shipment_record.Customer];
+                    physical_weight = ifnull(input.Physical_Weight_Kg,shipment_record.Actual_Weight_Kg);
+                    quote = thisapp.Calculate_Shipment_Quote(shipment_record.Customer,shipment_record.Pickup_Pincode,shipment_record.Delivery_Pincode,shipment_record.Transport_Mode,shipment_record.Length_Cm,shipment_record.Width_Cm,shipment_record.Height_Cm,physical_weight,shipment_record.Payment_Type,shipment_record.Loyalty_Points_Redeemed);
+                    if(quote.get("valid") != true)
+                    {
+                        info quote.get("message");
+                    }
+                    else
+                    {
+                        old_total = shipment_record.Total_Payable;
+                        revised_total = quote.get("total_payable");
+                        charge_changed = (revised_total - old_total).abs() > 0.01;
+                        if(charge_changed == true && input.Customer_Approved_Revised_Charge != true)
+                        {
+                            info "Customer approval is required because the physical weight changed the shipment charge.";
+                        }
+                        else
+                        {
+                            input.Physical_Weight_Kg = physical_weight;
+                            input.Revised_Charge = revised_total;
+                            shipment_record.Actual_Weight_Kg = physical_weight;
+                            shipment_record.Volumetric_Weight_Kg = quote.get("volumetric_weight");
+                            shipment_record.Billable_Weight_Kg = quote.get("billable_weight");
+                            shipment_record.Rated_Distance_Km = quote.get("rated_distance");
+                            shipment_record.Applied_Rate_Card = quote.get("rate_card_id");
+                            shipment_record.Applied_Rate_Slab = quote.get("rate_slab_id");
+                            shipment_record.Base_Rate = quote.get("base_rate");
+                            shipment_record.Fuel_Surcharge = quote.get("fuel_surcharge");
+                            shipment_record.COD_Handling_Fee = quote.get("cod_fee");
+                            shipment_record.GST_Amount = quote.get("gst_amount");
+                            shipment_record.Gross_Amount = quote.get("gross_amount");
+                            shipment_record.Loyalty_Redemption_Amount = quote.get("redemption_amount");
+                            shipment_record.Total_Payable = revised_total;
+                            shipment_record.Shipment_Status = "Picked Up";
+                            shipment_record.Current_Hub = run_record.Hub;
+                            if(charge_changed == true)
+                            {
+                                invoice_record = Invoices[Shipment == shipment_record.ID];
+                                if(invoice_record.count(ID) > 0)
+                                {
+                                    if(invoice_record.Invoice_Status == "Draft")
+                                    {
+                                        invoice_record.Freight_Subtotal = shipment_record.Base_Rate;
+                                        invoice_record.Fuel_Surcharge = shipment_record.Fuel_Surcharge;
+                                        invoice_record.COD_Fee = shipment_record.COD_Handling_Fee;
+                                        invoice_record.GST_Amount = shipment_record.GST_Amount;
+                                        invoice_record.Loyalty_Discount = shipment_record.Loyalty_Redemption_Amount;
+                                        invoice_record.Invoice_Total = shipment_record.Total_Payable;
+                                    }
+                                    else if(invoice_record.Invoice_Status != "Void")
+                                    {
+                                        successful_payment_total = 0.0;
+                                        for each successful_payment in Payment_Transactions[Invoice == invoice_record.ID && Payment_Status == "Success"]
+                                        {
+                                            successful_payment_total = successful_payment_total + ifnull(successful_payment.Amount,0);
+                                        }
+                                        invoice_record.Freight_Subtotal = shipment_record.Base_Rate;
+                                        invoice_record.Fuel_Surcharge = shipment_record.Fuel_Surcharge;
+                                        invoice_record.COD_Fee = shipment_record.COD_Handling_Fee;
+                                        invoice_record.GST_Amount = shipment_record.GST_Amount;
+                                        invoice_record.Loyalty_Discount = shipment_record.Loyalty_Redemption_Amount;
+                                        invoice_record.Invoice_Total = shipment_record.Total_Payable;
+                                        if(successful_payment_total >= revised_total)
+                                        {
+                                            invoice_record.Invoice_Status = "Paid";
+                                        }
+                                        else if(successful_payment_total > 0)
+                                        {
+                                            invoice_record.Invoice_Status = "Part Paid";
+                                        }
+                                        else if(invoice_record.Due_Date < zoho.currentdate)
+                                        {
+                                            invoice_record.Invoice_Status = "Overdue";
+                                        }
+                                        else
+                                        {
+                                            invoice_record.Invoice_Status = "Issued";
+                                        }
+                                        ledger_record = Account_Ledger[Invoice == invoice_record.ID && Transaction_Type == "Debit"];
+                                        if(ledger_record.count(ID) > 0)
+                                        {
+                                            rating_adjustment = (revised_total - ledger_record.Amount).round(2);
+                                            adjustment_reference = "RERATE-" + shipment_record.AWB_Number + "-" + input.ID;
+                                            if(rating_adjustment.abs() > 0.01 && Account_Ledger[Payment_Reference == adjustment_reference].count(ID) == 0)
+                                            {
+                                                adjustment_status = "Open";
+                                                if(successful_payment_total >= revised_total)
+                                                {
+                                                    adjustment_status = "Settled";
+                                                }
+                                                else if(successful_payment_total > 0)
+                                                {
+                                                    adjustment_status = "Partially Settled";
+                                                }
+                                                else if(invoice_record.Due_Date < zoho.currentdate)
+                                                {
+                                                    adjustment_status = "Overdue";
+                                                }
+                                                adjustment_id = insert into Account_Ledger
+                                                [
+                                                    Customer = shipment_record.Customer
+                                                    Shipment = shipment_record.ID
+                                                    Invoice = invoice_record.ID
+                                                    Transaction_Type = "Adjustment"
+                                                    Amount = rating_adjustment
+                                                    Transaction_Date = zoho.currenttime
+                                                    Due_Date = invoice_record.Due_Date
+                                                    Ledger_Status = adjustment_status
+                                                    Ageing_Bucket = if(adjustment_status == "Overdue","1-30 Days",if(adjustment_status == "Settled","Not Applicable","Current"))
+                                                    Payment_Reference = adjustment_reference
+                                                    Notes = "Signed adjustment posted after physical-weight rerating at pickup."
+                                                    Posted_By_Email = zoho.loginuserid
+                                                    Customer_Login_Email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID)
+                                                ];
+                                            }
+                                            if(successful_payment_total >= revised_total)
+                                            {
+                                                ledger_record.Ledger_Status = "Settled";
+                                            }
+                                            else if(successful_payment_total > 0)
+                                            {
+                                                ledger_record.Ledger_Status = "Partially Settled";
+                                            }
+                                            else if(invoice_record.Invoice_Status == "Overdue")
+                                            {
+                                                ledger_record.Ledger_Status = "Overdue";
+                                            }
+                                            else
+                                            {
+                                                ledger_record.Ledger_Status = "Open";
+                                            }
+                                            thisapp.Recalculate_Customer_Outstanding(shipment_record.Customer);
+                                        }
+                                    }
+                                }
+                                if(shipment_record.Payment_Type == "Prepaid" && revised_total > old_total)
+                                {
+                                    shipment_record.Payment_Status = "Pending";
+                                }
+                            }
+                            input.Stop_Status = "Picked Up";
+                            input.Completed_At = zoho.currenttime;
+                            resolved_count = Pickup_Run_Sheet_Items[Pickup_Run_Sheet == input.Pickup_Run_Sheet && ID != input.ID && (Stop_Status == "Picked Up" || Stop_Status == "Failed")].count(ID) + 1;
+                            run_record.Completed_Stop_Count = resolved_count;
+                            run_record.Status = "In Progress";
+                            tracking_id = insert into Shipment_Tracking_Events
+                            [
+                                Shipment = shipment_record.ID
+                                Event_Time = zoho.currenttime
+                                Event_Status = "Picked Up"
+                                Hub = run_record.Hub
+                                Agent = assigned_agent.ID
+                                Latitude = input.Agent_Latitude
+                                Longitude = input.Agent_Longitude
+                                Event_Description = "Shipment picked up and custody transferred to the assigned pickup agent. Physical weight: " + physical_weight + " kg."
+                                Source = "Pickup Scan"
+                                Customer_Visible = true
+                                Created_By_Email = zoho.loginuserid
+                            ];
+                            customer_record = Customers[ID == shipment_record.Customer];
+                            communication_id = insert into Communication_Log
+                            [
+                                Customer = customer_record.ID
+                                Shipment = shipment_record.ID
+                                Recipient = customer_record.Email_ID
+                                Channel = "Email"
+                                Template_Code = "SHIPMENT_PICKED_UP"
+                                Subject = "Shipment picked up: AWB " + shipment_record.AWB_Number
+                                Message_Summary = "Shipment pickup completed. Current status: Picked Up."
+                                Provider = "Zoho Mail"
+                                Communication_Status = "Sent"
+                                Attempt_Count = 1
+                                Last_Attempt_At = zoho.currenttime
+                            ];
+                            sendmail
+                            [
+                                from: zoho.adminuserid
+                                to: customer_record.Email_ID
+                                subject: "Shipment picked up: AWB " + shipment_record.AWB_Number
+                                message: "Your shipment has been picked up. Current status: Picked Up."
+                            ]
+                            audit_id = insert into Audit_Log
+                            [
+                                Event_Time = zoho.currenttime
+                                Actor_Email = zoho.loginuserid
+                                Actor_Profile = current_profile
+                                Action_Name = "Complete Pickup"
+                                Module_Name = "Pickup Run Sheet Items"
+                                Record_ID = input.ID.toString()
+                                Before_Data = "Stop Status=Arrived; Shipment Status=" + shipment_record.Shipment_Status + "; Amount=" + old_total
+                                After_Data = "Stop Status=Picked Up; Shipment Status=Picked Up; Physical Weight=" + physical_weight + "; Amount=" + revised_total
+                                Source = "Report Action"
+                                Severity = "Critical"
+                            ];
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,73 @@
+Process_Communication_Queue_Daily as "Process Communication Queue Daily"
+{
+    type = schedule
+    start = "2026-01-01 06:00:00"
+    frequency = daily
+    time zone = "Asia/Kolkata"
+    description = "Processes a bounded notification batch and stops retrying at the active policy limit"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                config_record = App_Configuration[Active == true] range from 0 to 0;
+                retry_limit = if(config_record.count(ID) > 0,config_record.Notification_Retry_Limit,3);
+                queued_records = Communication_Log[(Communication_Status == "Queued" || Communication_Status == "Failed") && Attempt_Count < retry_limit] sort by Communication_ID range from 0 to 49;
+                for each communication_record in queued_records
+                {
+                    communication_record.Attempt_Count = ifnull(communication_record.Attempt_Count,0) + 1;
+                    communication_record.Last_Attempt_At = zoho.currenttime;
+                    try
+                    {
+                        if(communication_record.Channel == "Email")
+                        {
+                            sendmail
+                            [
+                                from: zoho.adminuserid
+                                to: communication_record.Recipient
+                                subject: if(ifnull(communication_record.Subject,"").trim() != "",communication_record.Subject,"Logistics account notification")
+                                message: if(ifnull(communication_record.Message_Summary,"").trim() != "",communication_record.Message_Summary,"A new logistics account notification is available.")
+                            ]
+                            communication_record.Provider = "Zoho Mail";
+                            communication_record.Communication_Status = "Sent";
+                            communication_record.Failure_Reason = "";
+                        }
+                        else if(communication_record.Channel == "Portal Notification")
+                        {
+                            communication_record.Provider = "Other";
+                            communication_record.Communication_Status = "Delivered";
+                            communication_record.Failure_Reason = "Stored as an in-application portal notification.";
+                        }
+                        else
+                        {
+                            communication_record.Communication_Status = "Failed";
+                            communication_record.Failure_Reason = "No DLT-compliant SMS or WhatsApp connection is configured. Configure an approved provider connection before retrying this channel.";
+                        }
+                    }
+                    catch(error_record)
+                    {
+                        communication_record.Communication_Status = "Failed";
+                        communication_record.Failure_Reason = "Delivery attempt failed: " + error_record.message;
+                    }
+                    if(communication_record.Communication_Status == "Failed" || communication_record.Communication_Status == "Sent" || communication_record.Communication_Status == "Delivered")
+                    {
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.adminuserid
+                            Actor_Profile = "System"
+                            Action_Name = "Process Communication Attempt"
+                            Module_Name = "Communication Log"
+                            Record_ID = communication_record.ID.toString()
+                            After_Data = "Channel=" + communication_record.Channel + "; Status=" + communication_record.Communication_Status + "; Attempt=" + communication_record.Attempt_Count + "; Provider=" + communication_record.Provider
+                            Source = "Schedule"
+                            Severity = if(communication_record.Communication_Status == "Failed","Warning","Info")
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

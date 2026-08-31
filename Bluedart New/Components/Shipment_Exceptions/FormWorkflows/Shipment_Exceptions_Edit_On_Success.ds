@@ -1,0 +1,29 @@
+Shipment_Exceptions_Edit_On_Success as "Audit Shipment Exception Update"
+{
+    type = form
+    form = Shipment_Exceptions
+    record event = on edit
+    description = "Audits evidence, ownership, investigation, and claim updates"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = thisapp.permissions.loginUserProfile()
+                    Action_Name = "Update Shipment Exception"
+                    Module_Name = "Shipment Exceptions"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Status=" + input.Exception_Status + "; Owner=" + ifnull(input.Assigned_To_Email,"") + "; Evidence=" + if(input.Evidence_Photo == null,"Missing","Attached")
+                    Source = "Form Workflow"
+                    Severity = if(input.Severity == "Critical","Critical","Warning")
+                ];
+            )
+        }
+    }
+}

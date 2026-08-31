@@ -1,0 +1,26 @@
+list Customer_NDR_Instructions
+{
+    displayName = "My NDR Instructions"
+    show all rows from NDR_Instructions [Customer_Login_Email == zoho.loginuserid]
+    (
+        NDR_ID
+        Customer
+        Shipment
+        Recipient_Instruction
+        Reschedule_Date
+        Updated_Delivery_Address
+        Submitted_At
+        NDR_Status
+    )
+    filters
+    (
+        Recipient_Instruction
+        Reschedule_Date
+        NDR_Status
+    )
+    sort by
+    (
+        Submitted_At descending
+        NDR_ID descending
+    )
+}

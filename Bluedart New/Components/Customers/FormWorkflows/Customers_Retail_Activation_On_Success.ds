@@ -1,0 +1,61 @@
+Customers_Retail_Activation_On_Success as "Activate Verified Retail Customer"
+{
+    type = form
+    form = Customers[Customer_Type == "Retail" && Mobile_OTP_Verified == true && Email_OTP_Verified == true && Onboarding_Status != "Active"]
+    record event = on edit
+    description = "Activates a retail customer after both OTP checks and applies the published default retail rate card"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                customer_record = Customers[ID == input.ID];
+                retail_cards = Rate_Cards[Customer_Type == "Retail" && Default_For_Retail == true && Status == "Published"];
+                customer_record.Onboarding_Status = "Active";
+                customer_record.OTP_Verified_At = zoho.currenttime;
+                customer_record.Payment_Terms = "Prepaid";
+                customer_record.Requested_Credit_Limit = 0;
+                customer_record.Approved_Credit_Limit = 0;
+                if(retail_cards.count() > 0)
+                {
+                    customer_record.Assigned_Rate_Card = retail_cards.ID;
+                }
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = thisapp.permissions.loginUserProfile()
+                    Action_Name = "Activate Retail Customer"
+                    Module_Name = "Customers"
+                    Record_ID = input.ID.toString()
+                    Before_Data = "Status=" + input.Onboarding_Status
+                    After_Data = "Status=Active; Mobile OTP=true; Email OTP=true"
+                    Source = "Form Workflow"
+                    Severity = "Info"
+                ];
+                communication_id = insert into Communication_Log
+                [
+                    Customer = input.ID
+                    Recipient = input.Email_ID
+                    Channel = "Email"
+                    Template_Code = "RETAIL_ACCOUNT_ACTIVATED"
+                    Subject = "Your logistics account is active"
+                    Message_Summary = "Retail customer activated after mobile and email OTP verification."
+                    Provider = "Zoho Mail"
+                    Communication_Status = "Sent"
+                    Attempt_Count = 1
+                    Last_Attempt_At = zoho.currenttime
+                ];
+                sendmail
+                [
+                    from: zoho.adminuserid
+                    to: input.Email_ID
+                    subject: "Your logistics account is active"
+                    message: "Your mobile number and email address are verified. You can now book and track shipments in the customer portal."
+                ]
+            )
+        }
+    }
+}

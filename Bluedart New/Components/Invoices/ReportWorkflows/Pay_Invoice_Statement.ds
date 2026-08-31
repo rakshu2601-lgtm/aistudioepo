@@ -1,0 +1,94 @@
+Pay_Invoice_Statement as "Pay Invoice - Invoice Statement"
+{
+    type = functions
+    form = Invoices
+    execution type = for each record
+    description = "Creates an initiated payment record and opens the configured Zoho Checkout session without inferring success"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                customer_record = Customers[ID == input.Customer];
+                customer_login_email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID);
+                authorised = customer_record.count(ID) > 0 && customer_login_email == zoho.loginuserid;
+                if(authorised == false)
+                {
+                    info "You are not authorised to pay this invoice.";
+                }
+                else if(input.Invoice_Status != "Issued" && input.Invoice_Status != "Part Paid" && input.Invoice_Status != "Overdue")
+                {
+                    info "Only an open issued invoice can be paid.";
+                }
+                else
+                {
+                    ledger_record = Account_Ledger[Invoice == input.ID && Transaction_Type == "Debit" && Ledger_Status != "Settled"];
+                    if(ledger_record.count(ID) == 0)
+                    {
+                        info "No open receivable exists for this invoice.";
+                    }
+                    else
+                    {
+                        payment_amount = ledger_record.Amount;
+                        prior_success_amount = 0.0;
+                        for each successful_payment in Payment_Transactions[Invoice == input.ID && Payment_Status == "Success"]
+                        {
+                            prior_success_amount = prior_success_amount + ifnull(successful_payment.Amount,0);
+                        }
+                        payment_amount = (payment_amount - prior_success_amount).round(2);
+                        if(payment_amount <= 0)
+                        {
+                            info "This invoice has no remaining balance to pay.";
+                        }
+                        else
+                        {
+                            gateway_order_id = "CHK-" + input.Invoice_Number + "-" + zoho.currenttime.toLong();
+                            existing_initiated = Payment_Transactions[Invoice == input.ID && Payment_Status == "Initiated"] sort by Initiated_At desc range from 0 to 0;
+                            if(existing_initiated.count(ID) > 0)
+                            {
+                                payment_record_id = existing_initiated.ID;
+                                gateway_order_id = existing_initiated.Gateway_Order_ID;
+                            }
+                            else
+                            {
+                                payment_record_id = insert into Payment_Transactions
+                                [
+                                    Customer = customer_record.ID
+                                    Shipment = input.Shipment
+                                    Invoice = input.ID
+                                    Ledger_Entry = ledger_record.ID
+                                    Gateway = "Zoho Checkout"
+                                    Gateway_Order_ID = gateway_order_id
+                                    Amount = payment_amount
+                                    Payment_Method = "Other"
+                                    Payment_Status = "Initiated"
+                                    Initiated_At = zoho.currenttime
+                                    Gateway_Response_Summary = "Awaiting configured Checkout session creation and verified reconciliation."
+                                    Customer_Login_Email = customer_login_email
+                                ];
+                            }
+                            audit_id = insert into Audit_Log
+                            [
+                                Event_Time = zoho.currenttime
+                                Actor_Email = zoho.loginuserid
+                                Actor_Profile = current_profile
+                                Action_Name = "Initiate Invoice Payment"
+                                Module_Name = "Invoices"
+                                Record_ID = input.ID.toString()
+                                Before_Data = "Status=" + input.Invoice_Status + "; Remaining=" + payment_amount
+                                After_Data = "Payment Transaction=" + payment_record_id + "; Gateway Order=" + gateway_order_id + "; Status=Initiated"
+                                Source = "Payment"
+                                Severity = "Info"
+                            ];
+                            checkout_url = "https://payments.zoho.com/configure-checkout-session?invoice=" + encodeUrl(input.ID.toString()) + "&payment=" + encodeUrl(payment_record_id.toString()) + "&reference=" + encodeUrl(gateway_order_id) + "&amount=" + encodeUrl(payment_amount.toString());
+                            openUrl(checkout_url,"new window");
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,31 @@
+Loyalty_Rules_On_Success as "Audit Loyalty Rule Save"
+{
+    type = form
+    form = Loyalty_Rules
+    record event = on add or edit
+    description = "Audits loyalty earning policy creation and maintenance"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = current_profile
+                    Action_Name = "Save Loyalty Rule"
+                    Module_Name = "Loyalty Rules"
+                    Record_ID = input.ID.toString()
+                    Before_Data = "Form save completed"
+                    After_Data = "Rule=" + input.Loyalty_Rule_ID + "; Status=" + input.Status + "; Rate=" + input.Points_Per_INR + "; Effective From=" + input.Effective_From + "; Effective To=" + input.Effective_To
+                    Source = "Form Workflow"
+                    Severity = "Warning"
+                ];
+            )
+        }
+    }
+}

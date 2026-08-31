@@ -1,0 +1,5 @@
+report In_Transit_Manifests
+{
+    quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Manifest_Number Manifest_Type Origin_Hub Destination_Hub Vehicle Expected_Arrival_Time Manifest_Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+    detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Manifest_Number Manifest_Type Origin_Hub Destination_Hub Route Vehicle Driver Departure_Time Expected_Arrival_Time Manifest_Status Vehicle_Seal_Code Total_Bags Total_Shipments Total_Weight_Kg ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

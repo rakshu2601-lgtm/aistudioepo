@@ -1,0 +1,36 @@
+"Hub_Supervisor"
+{
+ name = "Hub_Supervisor"
+ type = Users_Permissions
+ permissions = { Chat:true, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+ description = "Supervision of pickup, hub, manifest, and delivery work for an assigned hub"
+ ModulePermissions
+ {
+  Hubs { enabled = Viewall,Tab,View,Search allFieldsVisible = false ReportPermissions { All_Hubs={"View"} Active_Hub_Map={"View"} } FieldPermissions { Hub_ID{visibility:true,readonly:true} Hub_Name{visibility:true,readonly:true} Hub_Type{visibility:true,readonly:true} Hub_Address{visibility:true,readonly:true} Operating_Start_Time{visibility:true,readonly:true} Operating_End_Time{visibility:true,readonly:true} Cut_Off_Time{visibility:true,readonly:true} Daily_Capacity{visibility:true,readonly:true} Contact_Name{visibility:true,readonly:true} Contact_Email{visibility:true,readonly:true} Contact_Phone{visibility:true,readonly:true} Latitude{visibility:false} Longitude{visibility:false} }
+  }
+  Hub_Pincode_Mapping { enabled = Viewall,Tab,View,Search allFieldsVisible = true ReportPermissions { Pincode_Mappings={"View"} Serviceability_Map={"View"} } }
+  Operations_Users { enabled = Viewall,Tab,View,Search allFieldsVisible = false ReportPermissions { Hub_Staff={"View"} Active_Field_Agents={"View"} Agent_Location_Map={"View"} } FieldPermissions { Employee_ID{visibility:true,readonly:true} Employee_Name{visibility:true,readonly:true} Work_Email{visibility:true,readonly:true} Mobile_Number{visibility:true,readonly:true} Application_Role{visibility:true,readonly:true} Home_Hub{visibility:true,readonly:true} Agent_Role{visibility:true,readonly:true} Assigned_Beat{visibility:true,readonly:true} Vehicle_Type{visibility:true,readonly:true} Maximum_Daily_Load_Kg{visibility:true,readonly:true} Deputed_Hub{visibility:true,readonly:true} Current_Latitude{visibility:true,readonly:true} Current_Longitude{visibility:true,readonly:true} Last_Location_At{visibility:true,readonly:true} }
+  }
+  Vehicles { enabled = Viewall,Tab,View,Search allFieldsVisible = true ReportPermissions { All_Vehicles={"View"} Available_Vehicles={"View"} } }
+  Transport_Routes { enabled = Viewall,Tab,View,Search allFieldsVisible = true ReportPermissions { All_Transport_Routes={"View"} Active_Routes={"View"} } }
+  Customers { enabled = Viewall,Tab,View,Search allFieldsVisible = false ReportPermissions { Active_Customers={"View"} } FieldPermissions { Customer_ID{visibility:true,readonly:true} Full_Name{visibility:true,readonly:true} Mobile_Number{visibility:true,readonly:true} Email_ID{visibility:true,readonly:true} Primary_Address{visibility:true,readonly:true} Company_Name{visibility:true,readonly:true} Contact_Person_Name{visibility:true,readonly:true} Contact_Person_Phone{visibility:true,readonly:true} Default_Collection_Center{visibility:true,readonly:true} Approved_Credit_Limit{visibility:false} Requested_Credit_Limit{visibility:false} GSTIN{visibility:false} PAN_Number{visibility:false} Assigned_Rate_Card{visibility:false} Current_Loyalty_Points{visibility:false} Outstanding_Balance{visibility:false} }
+  }
+  Shipment_Requests { enabled = Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = false ReportPermissions { All_Shipments={"View","Edit"} Pickup_Queue={"View","Edit"} Delivery_Queue={"View","Edit"} Active_Shipments={"View"} } FieldPermissions { AWB_Number{visibility:true,readonly:true} Customer{visibility:true,readonly:true} Sender_Name{visibility:true,readonly:true} Sender_Phone{visibility:true,readonly:true} Pickup_Address{visibility:true,readonly:true} Pickup_Pincode{visibility:true,readonly:true} Recipient_Name{visibility:true,readonly:true} Recipient_Phone{visibility:true,readonly:true} Delivery_Address{visibility:true,readonly:true} Delivery_Pincode{visibility:true,readonly:true} Package_Count{visibility:true,readonly:true} Actual_Weight_Kg{visibility:true,readonly:true} Payment_Type{visibility:true,readonly:true} COD_Amount{visibility:true,readonly:true} Payment_Status{visibility:true,readonly:true} Collection_Center{visibility:true,readonly:true} Current_Hub{visibility:true,readonly:true} Shipment_Status{visibility:true,readonly:false} Base_Rate{visibility:false} Fuel_Surcharge{visibility:false} COD_Handling_Fee{visibility:false} GST_Amount{visibility:false} Gross_Amount{visibility:false} Total_Payable{visibility:false} Credit_Check_Status{visibility:false} }
+  }
+  Pickup_Run_Sheets { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { Pickup_Run_Register={"View","Edit"} Today_Pickup_Planner={"View","Edit"} Pickup_Run_Calendar={"View"} } }
+  Pickup_Run_Sheet_Items { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { Pickup_Run_Items={"View","Edit"} Failed_Pickups={"View","Edit"} } }
+  Logistics_Bags { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { All_Logistics_Bags={"View","Edit"} Open_Bags={"View","Edit"} In_Transit_Bags={"View","Edit"} Bag_Status_Board={"View","Edit"} } }
+  Bag_Shipments { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { Bag_Contents={"View","Edit"} Bag_Reconciliation={"View","Edit"} } }
+  Manifests { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { All_Manifests={"View","Edit"} Feeder_Manifests={"View","Edit"} Linehaul_Manifests={"View","Edit"} In_Transit_Manifests={"View","Edit"} Manifest_Status_Board={"View","Edit"} Manifest_Arrival_Calendar={"View"} } }
+  Manifest_Bags { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { Manifest_Bag_List={"View","Edit"} Expected_Master_Bags={"View","Edit"} Manifest_Reconciliation={"View","Edit"} } }
+  Shipment_Exceptions { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { Shipment_Exception_Queue={"View","Edit"} Exception_Status_Board={"View","Edit"} Critical_Exceptions={"View","Edit"} } }
+  Delivery_Run_Sheets { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { Delivery_Run_Register={"View","Edit"} Last_Mile_Dispatcher={"View","Edit"} Delivery_Run_Calendar={"View"} } }
+  Delivery_Run_Sheet_Items { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { Delivery_Run_Items={"View","Edit"} Failed_Deliveries={"View","Edit"} Delivered_Shipments={"View"} } }
+  NDR_Instructions { enabled = Create,Viewall,Modifyall,Tab,View,Edit,Search allFieldsVisible = false ReportPermissions { NDR_Instruction_Action_Queue={"View","Edit"} NDR_RTO_Pending={"View","Edit"} } FieldPermissions { Secure_Token{visibility:false} }
+  }
+  COD_Remittances { enabled = Viewall,Tab,View,Search allFieldsVisible = true ReportPermissions { COD_Remittance_Register={"View"} COD_Pending_Remittance={"View"} } }
+  Shipment_Tracking_Events { enabled = Viewall,Tab,View,Search allFieldsVisible = true ReportPermissions { Tracking_Event_Log={"View"} Shipment_Timeline={"View"} } }
+  Hub_Dashboard { enabled = tab }
+  Shipment_Tracking { enabled = tab }
+ }
+}

@@ -1,0 +1,23 @@
+Audit_Log_On_Load as "Protect Audit Evidence"
+{
+    type = form
+    form = Audit_Log
+    record event = on add or edit
+    description = "Keeps audit evidence read-only in the user interface; records are produced only by trusted workflows"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Event_Time, Actor_Email, Actor_Profile, Action_Name, Module_Name, Record_ID, Before_Data, After_Data, Source, Severity;
+                if(input.ID == null)
+                {
+                    alert "Audit events are created automatically by trusted application workflows.";
+                    openUrl("#Report:Audit_Log_Report","same window");
+                }
+            )
+        }
+    }
+}

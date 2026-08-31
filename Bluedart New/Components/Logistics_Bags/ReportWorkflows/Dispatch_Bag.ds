@@ -1,0 +1,79 @@
+Dispatch_Bag as "Dispatch Bag"
+{
+    type = functions
+    form = Logistics_Bags
+    execution type = for each record
+    description = "Dispatches a sealed bag and records the correct shipment milestone for its movement type"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == input.Origin_Hub;
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the origin hub can dispatch this bag.";
+                }
+                else if(input.Bag_Status != "Sealed" || ifnull(input.Seal_Code,"").trim() == "" || input.Total_Shipments <= 0)
+                {
+                    info "Only a non-empty sealed bag with a seal code can be dispatched.";
+                }
+                else
+                {
+                    milestone = "In Transit";
+                    if(input.Bag_Type == "Feeder")
+                    {
+                        milestone = "Bagged & Dispatched to Origin Hub";
+                    }
+                    else if(input.Bag_Type == "Return")
+                    {
+                        milestone = "Return to Origin";
+                    }
+                    input.Bag_Status = "Dispatched";
+                    input.Dispatched_At = zoho.currenttime;
+                    for each bag_item in Bag_Shipments[Bag == input.ID && Scan_Status == "Loaded"]
+                    {
+                        shipment_record = Shipment_Requests[ID == bag_item.Shipment];
+                        shipment_record.Shipment_Status = milestone;
+                        shipment_record.Current_Hub = input.Origin_Hub;
+                        tracking_id = insert into Shipment_Tracking_Events
+                        [
+                            Shipment = shipment_record.ID
+                            Event_Time = zoho.currenttime
+                            Event_Status = milestone
+                            Hub = input.Origin_Hub
+                            Bag = input.ID
+                            Event_Description = input.Bag_Type + " bag dispatched under seal " + input.Seal_Code + "."
+                            Source = "Bag"
+                            Customer_Visible = true
+                            Created_By_Email = zoho.loginuserid
+                        ];
+                    }
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Dispatch Bag"
+                        Module_Name = "Logistics Bags"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=Sealed"
+                        After_Data = "Status=Dispatched; Milestone=" + milestone + "; Destination=" + input.Destination_Hub
+                        Source = "Report Action"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,76 @@
+Reconcile_Manifest as "Reconcile Manifest"
+{
+    type = functions
+    form = Manifests
+    execution type = for each record
+    description = "Finalises the manifest only after every expected bag and shipment has a terminal reconciliation result"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == input.Destination_Hub;
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the destination hub can reconcile this manifest.";
+                }
+                else if(input.Manifest_Status != "Arrived" && input.Manifest_Status != "Exception")
+                {
+                    info "Only an arrived or quarantined manifest can be reconciled.";
+                }
+                else
+                {
+                    total_manifest_bags = Manifest_Bags[Manifest == input.ID].count(ID);
+                    unresolved_bags = Manifest_Bags[Manifest == input.ID && (Load_Status == "Expected" || Load_Status == "Loaded")].count(ID);
+                    exception_bags = Manifest_Bags[Manifest == input.ID && (Load_Status == "Missing" || Load_Status == "Damaged" || Load_Status == "Short")].count(ID);
+                    unresolved_shipments = 0;
+                    for each received_link in Manifest_Bags[Manifest == input.ID && Load_Status == "Received"]
+                    {
+                        unresolved_shipments = unresolved_shipments + Bag_Shipments[Bag == received_link.Bag && Scan_Status == "Loaded"].count(ID);
+                    }
+                    if(total_manifest_bags == 0 || unresolved_bags > 0 || unresolved_shipments > 0)
+                    {
+                        info "Reconciliation is incomplete. Resolve every expected bag and each loaded shipment first.";
+                    }
+                    else
+                    {
+                        prior_status = input.Manifest_Status;
+                        quarantined_bags = 0;
+                        for each manifest_bag in Manifest_Bags[Manifest == input.ID]
+                        {
+                            bag_record = Logistics_Bags[ID == manifest_bag.Bag];
+                            if(bag_record.Bag_Status == "Exception")
+                            {
+                                quarantined_bags = quarantined_bags + 1;
+                            }
+                        }
+                        input.Manifest_Status = if(exception_bags > 0 || quarantined_bags > 0,"Exception","Reconciled");
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuserid
+                            Actor_Profile = current_profile
+                            Action_Name = "Reconcile Manifest"
+                            Module_Name = "Manifests"
+                            Record_ID = input.ID.toString()
+                            Before_Data = "Status=" + prior_status
+                            After_Data = "Status=" + input.Manifest_Status + "; Exception Bags=" + exception_bags + "; Quarantined Bags=" + quarantined_bags
+                            Source = "Report Action"
+                            Severity = "Critical"
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

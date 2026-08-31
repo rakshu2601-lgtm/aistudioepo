@@ -1,0 +1,32 @@
+Route_On_User_Input as "Apply Manifest Route"
+{
+    type = form
+    form = Manifests
+    record event = on add or edit
+    description = "Filters vehicles by route mode and derives the expected arrival time"
+
+    on user input of Route
+    {
+        actions
+        {
+            custom deluge script
+            (
+                clear Vehicle;
+                if(input.Route != null && input.Origin_Hub != null)
+                {
+                    route_record = Transport_Routes[ID == input.Route && Active == true];
+                    required_mode = if(route_record.Transport_Mode == "Air","Air Support","Surface");
+                    Vehicle:ui.add(Vehicles[Owning_Hub == input.Origin_Hub && Active == true && Status == "Available" && Transport_Mode == required_mode].ID.getall());
+                    if(input.Departure_Time != null)
+                    {
+                        input.Expected_Arrival_Time = input.Departure_Time.addHour(route_record.Estimated_Transit_Hours.round(0));
+                    }
+                }
+                else if(input.Origin_Hub != null)
+                {
+                    Vehicle:ui.add(Vehicles[Owning_Hub == input.Origin_Hub && Active == true && Status == "Available"].ID.getall());
+                }
+            )
+        }
+    }
+}

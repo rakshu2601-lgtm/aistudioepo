@@ -1,0 +1,29 @@
+App_Configuration_On_Success as "Audit Application Configuration"
+{
+    type = form
+    form = App_Configuration
+    record event = on add or edit
+    description = "Writes an audit record whenever the active operations policy is saved"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = "Logistics Administrator"
+                    Action_Name = "Save Operations Policy"
+                    Module_Name = "App Configuration"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Configuration=" + input.Configuration_Name + "; Active=" + input.Active + "; NDR Attempts=" + input.Maximum_NDR_Attempts + "; COD Cycle=" + input.COD_Payout_Cycle
+                    Source = "Form Workflow"
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

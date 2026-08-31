@@ -1,0 +1,74 @@
+Receive_Bag_Manifest_Bag_List as "Receive Bag - Manifest Bag List"
+{
+    type = functions
+    form = Manifest_Bags
+    execution type = for each record
+    description = "Confirms destination receipt only after seal verification and keeps item reconciliation open"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                manifest_record = Manifests[ID == input.Manifest];
+                bag_record = Logistics_Bags[ID == input.Bag];
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == manifest_record.Destination_Hub;
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the destination hub can receive this bag.";
+                }
+                else if((manifest_record.Manifest_Status != "Arrived" && manifest_record.Manifest_Status != "Exception") || input.Load_Status != "Loaded")
+                {
+                    info "Only a loaded bag on an arrived or quarantined manifest can be received.";
+                }
+                else if(input.Seal_Verified != true)
+                {
+                    info "Edit this checklist row and confirm that the bag seal was verified before receipt.";
+                }
+                else if(bag_record.Bag_Status != "Received" && bag_record.Bag_Status != "Exception")
+                {
+                    info "The bag has not been recorded at the destination hub by manifest receiving.";
+                }
+                else
+                {
+                    input.Load_Status = "Received";
+                    input.Received_At = zoho.currenttime;
+                    bag_count = Manifest_Bags[Manifest == input.Manifest].count(ID);
+                    shipment_count = 0;
+                    total_weight = 0.0;
+                    for each manifest_bag in Manifest_Bags[Manifest == input.Manifest]
+                    {
+                        linked_bag = Logistics_Bags[ID == manifest_bag.Bag];
+                        shipment_count = shipment_count + ifnull(linked_bag.Total_Shipments,0);
+                        total_weight = total_weight + ifnull(linked_bag.Total_Weight_Kg,0);
+                    }
+                    manifest_record.Total_Bags = bag_count;
+                    manifest_record.Total_Shipments = shipment_count;
+                    manifest_record.Total_Weight_Kg = total_weight;
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Receive Manifest Bag"
+                        Module_Name = "Manifest Bags"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=Loaded"
+                        After_Data = "Status=Received; Seal Verified=true; Manifest=" + input.Manifest + "; Bag=" + input.Bag
+                        Source = "Report Action"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

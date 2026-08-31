@@ -1,0 +1,38 @@
+default list KYC_Document_Type_Mapping
+{
+    displayName = "KYC Document Type Mapping"
+    show all rows from KYC_Document_Types
+    (
+        Document_Code
+        Document_Name
+        Applies_To
+        Mandatory_By_Default
+        Conditional_On_Credit_Threshold
+        Credit_Threshold
+        Document_Number_Required
+        Expiry_Date_Required
+        Accepted_File_Types
+        Maximum_File_Size_MB
+        Display_Order
+        Active
+    )
+    filters
+    (
+        Applies_To
+        Mandatory_By_Default
+        Conditional_On_Credit_Threshold
+        Active
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Applies_To ascending
+    )
+    sort by
+    (
+        Display_Order ascending
+    )
+}

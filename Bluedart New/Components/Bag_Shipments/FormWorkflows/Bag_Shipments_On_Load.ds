@@ -1,0 +1,33 @@
+Bag_Shipments_On_Load as "Secure Bag Shipment Scan"
+{
+    type = form
+    form = Bag_Shipments
+    record event = on add or edit
+    description = "Restricts scans to open bags and protects reconciliation-controlled fields"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Scan_Status, Scanned_At, Scanned_By_Email, Received_At, Exception_Notes;
+                if(input.ID == null)
+                {
+                    clear Bag;
+                    Bag:ui.add(Logistics_Bags[Bag_Status == "Open"].ID.getall());
+                    clear Shipment;
+                }
+                else
+                {
+                    disable Bag, Shipment;
+                    bag_record = Logistics_Bags[ID == input.Bag];
+                    if(input.Scan_Status == "Loaded" && (bag_record.Bag_Status == "Received" || bag_record.Bag_Status == "Exception"))
+                    {
+                        enable Exception_Notes;
+                    }
+                }
+            )
+        }
+    }
+}

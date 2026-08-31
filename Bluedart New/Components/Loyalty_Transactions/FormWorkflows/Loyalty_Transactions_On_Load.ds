@@ -1,0 +1,40 @@
+Loyalty_Transactions_On_Load as "Secure Loyalty Transaction Load"
+{
+    type = form
+    form = Loyalty_Transactions
+    record event = on add or edit
+    description = "Protects system posting fields and restricts manual entry to authorised adjustments"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Transaction_Date, Expiry_Date, Points_Status, Applied_Tier, Posted_By_Email, Customer_Login_Email;
+                is_portal = thisapp.portal.isUserInProfile("Customer_Portal");
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(is_portal == true)
+                {
+                    disable Customer, Shipment, Transaction_Type, Points, Amount_Equivalent, Reference, Notes;
+                    alert "Loyalty transactions are posted through shipments and authorised finance workflows.";
+                }
+                else if(input.ID != null)
+                {
+                    disable Customer, Shipment, Transaction_Type, Points, Amount_Equivalent, Reference, Notes;
+                }
+                else if(current_profile == "Logistics_Administrator" || current_profile == "Finance_Officer")
+                {
+                    input.Transaction_Type = "Adjust";
+                    disable Transaction_Type, Shipment, Amount_Equivalent;
+                    input.Points_Status = "Available";
+                }
+                else
+                {
+                    disable Customer, Shipment, Transaction_Type, Points, Amount_Equivalent, Reference, Notes;
+                    alert "Only Logistics Administrators and Finance Officers can post manual loyalty adjustments.";
+                }
+            )
+        }
+    }
+}

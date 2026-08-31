@@ -1,0 +1,107 @@
+Delivery_Run_Sheet_Items_On_Validate as "Validate Delivery Stop"
+{
+    type = form
+    form = Delivery_Run_Sheet_Items
+    record event = on add or edit
+    description = "Validates delivery assignment uniqueness, hub custody, assigned-agent access, evidence values, and protected workflow state"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                run_record = Delivery_Run_Sheets[ID == input.Delivery_Run_Sheet];
+                shipment_record = Shipment_Requests[ID == input.Shipment];
+                if(run_record.count(ID) == 0 || shipment_record.count(ID) == 0)
+                {
+                    alert "Select a valid delivery run and shipment.";
+                    cancel submit;
+                }
+                if(input.Stop_Sequence <= 0)
+                {
+                    alert "Stop sequence must be greater than zero.";
+                    cancel submit;
+                }
+                duplicate_sequence = Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.Delivery_Run_Sheet && Stop_Sequence == input.Stop_Sequence && ID != input.ID].count(ID);
+                if(duplicate_sequence > 0)
+                {
+                    alert "This stop sequence is already used in the delivery run.";
+                    cancel submit;
+                }
+                duplicate_active = Delivery_Run_Sheet_Items[Shipment == input.Shipment && ID != input.ID && (Delivery_Status == "Assigned" || Delivery_Status == "Out For Delivery")].count(ID);
+                if(duplicate_active > 0)
+                {
+                    alert "This shipment is already assigned to an active delivery run.";
+                    cancel submit;
+                }
+                if(run_record.Hub != shipment_record.Destination_Hub || run_record.Hub != shipment_record.Current_Hub)
+                {
+                    alert "The shipment must be in custody at this delivery run's hub.";
+                    cancel submit;
+                }
+                if(input.ID == null)
+                {
+                    if(current_profile != "Logistics_Administrator" && current_profile != "Operations_Manager" && current_profile != "Hub_Supervisor")
+                    {
+                        alert "Only authorised operations planners can add delivery stops.";
+                        cancel submit;
+                    }
+                    if(run_record.DRS_Status != "Draft" || shipment_record.Shipment_Status != "At Delivery Hub")
+                    {
+                        alert "Delivery stops can be added only to draft runs for shipments at the delivery hub.";
+                        cancel submit;
+                    }
+                    input.Delivery_Status = "Assigned";
+                    input.Arrived_At = null;
+                    input.Completed_At = null;
+                    input.Attempt_Number = ifnull(shipment_record.NDR_Attempt_Count,0);
+                    input.COD_Collected = 0;
+                    input.EPOD_WorkDrive_File_ID = null;
+                    input.EPOD_URL = null;
+                }
+                else
+                {
+                    previous_record = Delivery_Run_Sheet_Items[ID == input.ID];
+                    assigned_agent = Operations_Users[ID == run_record.Assigned_Agent];
+                    if(current_profile == "Field_Agent" && (assigned_agent.count(ID) == 0 || assigned_agent.Work_Email != zoho.loginuserid))
+                    {
+                        alert "You cannot update another agent's delivery stop.";
+                        cancel submit;
+                    }
+                    if(current_profile != "Field_Agent" && current_profile != "Logistics_Administrator" && current_profile != "Operations_Manager" && current_profile != "Hub_Supervisor")
+                    {
+                        alert "You are not authorised to update delivery stops.";
+                        cancel submit;
+                    }
+                    if(previous_record.Delivery_Status == "Delivered" || previous_record.Delivery_Status == "Failed" || previous_record.Delivery_Status == "RTO")
+                    {
+                        alert "Terminal delivery stops are locked.";
+                        cancel submit;
+                    }
+                    if(input.Delivery_Run_Sheet != previous_record.Delivery_Run_Sheet || input.Shipment != previous_record.Shipment || input.Stop_Sequence != previous_record.Stop_Sequence || input.Delivery_Status != previous_record.Delivery_Status || input.Arrived_At != previous_record.Arrived_At || input.Completed_At != previous_record.Completed_At || input.Attempt_Number != previous_record.Attempt_Number || input.EPOD_WorkDrive_File_ID != previous_record.EPOD_WorkDrive_File_ID || input.EPOD_URL != previous_record.EPOD_URL)
+                    {
+                        alert "Assignment, status, milestone, attempt, and ePOD fields are managed by delivery actions.";
+                        cancel submit;
+                    }
+                }
+                if(input.Agent_Latitude != null && (input.Agent_Latitude < -90 || input.Agent_Latitude > 90))
+                {
+                    alert "Agent latitude must be between -90 and 90.";
+                    cancel submit;
+                }
+                if(input.Agent_Longitude != null && (input.Agent_Longitude < -180 || input.Agent_Longitude > 180))
+                {
+                    alert "Agent longitude must be between -180 and 180.";
+                    cancel submit;
+                }
+                if(ifnull(input.COD_Collected,0) < 0)
+                {
+                    alert "COD collected cannot be negative.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

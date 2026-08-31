@@ -1,0 +1,29 @@
+Hubs_On_Success as "Audit Hub Master"
+{
+    type = form
+    form = Hubs
+    record event = on add or edit
+    description = "Audits hub master changes"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = "Operations"
+                    Action_Name = "Save Hub"
+                    Module_Name = "Hubs"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Hub=" + input.Hub_ID + "; Type=" + input.Hub_Type + "; Capacity=" + input.Daily_Capacity + "; Active=" + input.Active
+                    Source = "Form Workflow"
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

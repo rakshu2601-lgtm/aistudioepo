@@ -1,0 +1,29 @@
+Vehicles_On_Success as "Audit Vehicle Assignment"
+{
+    type = form
+    form = Vehicles
+    record event = on add or edit
+    description = "Audits vehicle status, hub ownership, and driver assignment changes"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = "Operations"
+                    Action_Name = "Save Vehicle"
+                    Module_Name = "Vehicles"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Vehicle=" + input.Vehicle_Number + "; Status=" + input.Status + "; Hub ID=" + input.Owning_Hub + "; Driver ID=" + input.Assigned_Driver
+                    Source = "Form Workflow"
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

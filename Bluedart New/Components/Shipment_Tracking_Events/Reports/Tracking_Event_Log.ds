@@ -1,0 +1,35 @@
+default list Tracking_Event_Log
+{
+    displayName = "Tracking Event Log"
+    show all rows from Shipment_Tracking_Events
+    (
+        Tracking_Event_ID
+        Shipment
+        Event_Time
+        Event_Status
+        Hub
+        Manifest
+        Bag
+        Agent
+        Source
+        Event_Description
+        Customer_Visible
+        Created_By_Email
+    )
+    filters
+    (
+        Shipment
+        Event_Status
+        Hub
+        Manifest
+        Bag
+        Agent
+        Source
+        Customer_Visible
+        Event_Time
+    )
+    sort by
+    (
+        Event_Time descending
+    )
+}

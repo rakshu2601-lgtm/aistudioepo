@@ -1,0 +1,44 @@
+default list All_Customers
+{
+    displayName = "All Customers"
+    show all rows from Customers
+    (
+        Customer_ID
+        Customer_Type
+        Full_Name
+        Company_Name
+        Mobile_Number
+        Email_ID
+        Default_Collection_Center
+        Payment_Terms
+        Approved_Credit_Limit
+        Onboarding_Status
+        Portal_Access_Status
+        Current_Loyalty_Tier
+        Current_Loyalty_Points
+        Outstanding_Balance
+        Active
+    )
+    filters
+    (
+        Customer_Type
+        Default_Collection_Center
+        Payment_Terms
+        Onboarding_Status
+        Portal_Access_Status
+        Current_Loyalty_Tier
+        Active
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Customer_Type ascending
+    )
+    sort by
+    (
+        Customer_ID descending
+    )
+}

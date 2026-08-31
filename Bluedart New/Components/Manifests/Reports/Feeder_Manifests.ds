@@ -1,0 +1,33 @@
+list Feeder_Manifests
+{
+    displayName = "Feeder Manifests"
+    show all rows from Manifests [Manifest_Type == "Feeder" || Manifest_Type == "Delivery Feeder"]
+    (
+        Manifest_Number
+        Manifest_Type
+        Origin_Hub
+        Destination_Hub
+        Vehicle
+        Driver
+        Departure_Time
+        Expected_Arrival_Time
+        Manifest_Status
+        Total_Bags
+        Total_Shipments
+        Total_Weight_Kg
+    )
+    filters
+    (
+        Manifest_Type
+        Origin_Hub
+        Destination_Hub
+        Vehicle
+        Driver
+        Manifest_Status
+        Departure_Time
+    )
+    sort by
+    (
+        Departure_Time descending
+    )
+}

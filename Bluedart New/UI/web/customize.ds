@@ -1,0 +1,25 @@
+customize
+{
+    layout
+    {
+        theme = "theme_2"
+        variant = "variant_2"
+    }
+    font = "lato"
+    color options
+    {
+        name = "BlueDart Accessible"
+        brand color = "#0756A3"
+        type = "custom"
+        dark mode color = "#72B7FF"
+    }
+    logo
+    {
+        preference = "app_icon"
+        placement = "left"
+    }
+    custom css
+    {
+        content = ":root{--bd-blue:#0756A3;--bd-navy:#102A43;--bd-red:#C62828;--bd-bg:#F5F8FC;--bd-focus:#FFB300}.zc-app-header{background:#0756A3;color:#fff}.zc-app-content{background:#F5F8FC}.zc-formbutton,.zc-btn-primary{background:#0756A3;color:#fff;border-radius:6px}.zc-formbutton:focus,.zc-btn-primary:focus,a:focus{outline:3px solid #FFB300;outline-offset:2px}.zc-card{border-radius:8px;box-shadow:0 2px 8px rgba(16,42,67,.12)}"
+    }
+}

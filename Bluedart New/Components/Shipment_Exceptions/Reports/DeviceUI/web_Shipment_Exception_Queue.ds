@@ -1,0 +1,5 @@
+report Shipment_Exception_Queue
+{
+    quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Exception_Number Shipment Exception_Type Severity Reporting_Hub Exception_Status Assigned_To_Email "Take Ownership" "Resolve Exception" ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+    detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Exception_Number Shipment Bag Manifest Exception_Type Severity Reporting_Hub Reported_By_Email Reported_At Evidence_Photo Notes Exception_Status Assigned_To_Email Resolution "Take Ownership" "Resolve Exception" ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

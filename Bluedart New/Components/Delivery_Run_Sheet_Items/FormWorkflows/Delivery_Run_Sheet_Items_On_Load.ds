@@ -1,0 +1,42 @@
+Delivery_Run_Sheet_Items_On_Load as "Secure Delivery Stop"
+{
+    type = form
+    form = Delivery_Run_Sheet_Items
+    record event = on add or edit
+    description = "Locks assignment and workflow-controlled fields and restricts evidence capture to the assigned delivery agent"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Delivery_Status, Arrived_At, Completed_At, Attempt_Number, EPOD_WorkDrive_File_ID, EPOD_URL;
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(input.ID != null)
+                {
+                    run_record = Delivery_Run_Sheets[ID == input.Delivery_Run_Sheet];
+                    assigned_agent = Operations_Users[ID == run_record.Assigned_Agent];
+                    disable Delivery_Run_Sheet, Shipment, Stop_Sequence;
+                    assigned_agent_active = current_profile == "Field_Agent" && assigned_agent.count(ID) > 0 && assigned_agent.Work_Email == zoho.loginuserid && (run_record.DRS_Status == "Released" || run_record.DRS_Status == "In Progress");
+                    if(assigned_agent_active == true && input.Delivery_Status == "Out For Delivery")
+                    {
+                        enable Proof_Type, Recipient_OTP, Recipient_Signature, Delivery_Photo, Recipient_Name, COD_Collected, NDR_Reason, NDR_Notes, Agent_Latitude, Agent_Longitude;
+                    }
+                    else
+                    {
+                        disable Proof_Type, Recipient_OTP, Recipient_Signature, Delivery_Photo, Recipient_Name, COD_Collected, NDR_Reason, NDR_Notes, Agent_Latitude, Agent_Longitude;
+                    }
+                    if(input.Delivery_Status == "Delivered" || input.Delivery_Status == "Failed" || input.Delivery_Status == "RTO")
+                    {
+                        disable Proof_Type, Recipient_OTP, Recipient_Signature, Delivery_Photo, Recipient_Name, COD_Collected, NDR_Reason, NDR_Notes, Agent_Latitude, Agent_Longitude;
+                    }
+                }
+                else
+                {
+                    disable Proof_Type, Recipient_OTP, Recipient_Signature, Delivery_Photo, Recipient_Name, COD_Collected, NDR_Reason, NDR_Notes, Agent_Latitude, Agent_Longitude;
+                }
+            )
+        }
+    }
+}

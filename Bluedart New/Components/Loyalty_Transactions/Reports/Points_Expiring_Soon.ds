@@ -1,0 +1,32 @@
+list Points_Expiring_Soon
+{
+    displayName = "Points Expiring Soon"
+    show all rows from Loyalty_Transactions [Points_Status == "Available" && Expiry_Date in next 30 days]
+    (
+        Loyalty_Transaction_ID
+        Customer
+        Shipment
+        Transaction_Type
+        Points
+        Amount_Equivalent
+        Transaction_Date
+        Expiry_Date
+        Points_Status
+        Applied_Tier
+        Reference
+        Posted_By_Email
+    )
+    filters
+    (
+        Transaction_Type
+        Transaction_Date
+        Expiry_Date
+        Points_Status
+        Applied_Tier
+    )
+    sort by
+    (
+        Expiry_Date ascending
+        Transaction_Date ascending
+    )
+}

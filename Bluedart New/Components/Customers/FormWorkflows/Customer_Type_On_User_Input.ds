@@ -1,0 +1,34 @@
+Customer_Type_On_User_Input as "Configure Customer Type Fields"
+{
+    type = form
+    form = Customers
+    record event = on add or edit
+    description = "Shows business and credit fields only for corporate and wholesale customers"
+
+    on user input of Customer_Type
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Customer_Type == "Corporate" || input.Customer_Type == "Wholesale")
+                {
+                    show Company_Name, GSTIN, PAN_Number, Contact_Person_Name, Contact_Person_Email, Contact_Person_Phone, Requested_Credit_Limit;
+                    enable Company_Name, GSTIN, PAN_Number, Contact_Person_Name, Contact_Person_Email, Contact_Person_Phone, Requested_Credit_Limit;
+                }
+                else
+                {
+                    input.Company_Name = "";
+                    input.GSTIN = "";
+                    input.PAN_Number = "";
+                    input.Contact_Person_Email = "";
+                    input.Contact_Person_Phone = "";
+                    input.Requested_Credit_Limit = 0;
+                    input.Approved_Credit_Limit = 0;
+                    input.Payment_Terms = "Prepaid";
+                    hide Company_Name, GSTIN, PAN_Number, Contact_Person_Name, Contact_Person_Email, Contact_Person_Phone, Requested_Credit_Limit;
+                }
+            )
+        }
+    }
+}

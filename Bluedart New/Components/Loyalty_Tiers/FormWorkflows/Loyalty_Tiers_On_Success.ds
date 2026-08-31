@@ -1,0 +1,31 @@
+Loyalty_Tiers_On_Success as "Audit Loyalty Tier Save"
+{
+    type = form
+    form = Loyalty_Tiers
+    record event = on add or edit
+    description = "Audits changes to quarterly tier qualification and benefit policy"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = current_profile
+                    Action_Name = "Save Loyalty Tier"
+                    Module_Name = "Loyalty Tiers"
+                    Record_ID = input.ID.toString()
+                    Before_Data = "Tier policy save completed"
+                    After_Data = "Tier=" + input.Tier_Name + "; Applies To=" + input.Applies_To + "; Spend=" + input.Minimum_Quarterly_Spend + " to " + input.Maximum_Quarterly_Spend + "; Multiplier=" + input.Points_Multiplier + "; Rebate=" + input.Credit_Rebate_Percent + "; Active=" + input.Active
+                    Source = "Form Workflow"
+                    Severity = "Warning"
+                ];
+            )
+        }
+    }
+}

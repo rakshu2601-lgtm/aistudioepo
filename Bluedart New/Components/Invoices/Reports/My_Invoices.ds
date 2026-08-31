@@ -1,0 +1,48 @@
+list My_Invoices
+{
+    displayName = "My Invoices"
+    show all rows from Invoices [Customer.Portal_Login_Email == zoho.loginuserid || Customer.Email_ID == zoho.loginuserid]
+    (
+        Invoice_Number
+        Shipment
+        Invoice_Date
+        Invoice_Status
+        Invoice_Total
+        Payment_Terms
+        Due_Date
+        Invoice_Download_URL
+        custom action "Pay Now"
+        (
+            workflow = Pay_Invoice_Now
+            show action for each record = true
+            column header = "Pay Now"
+            condition = (Invoice_Status == "Issued" || Invoice_Status == "Part Paid" || Invoice_Status == "Overdue")
+        )
+    )
+    filters
+    (
+        Invoice_Status
+        Invoice_Date
+        Due_Date
+        "Open Invoices" : (Invoice_Status == "Issued" || Invoice_Status == "Part Paid" || Invoice_Status == "Overdue")
+    )
+    sort by
+    (
+        Invoice_Date descending
+    )
+    conditional formatting
+    (
+        "Overdue Invoice"
+        {
+            condition = (Invoice_Status == "Overdue")
+            fields = [Invoice_Number, Invoice_Total, Due_Date, Invoice_Status]
+            format = "background-color:#FEE2E2;color:#991B1B;font-weight:bold"
+        }
+        "Paid Invoice"
+        {
+            condition = (Invoice_Status == "Paid")
+            fields = [Invoice_Number, Invoice_Total, Invoice_Status]
+            format = "background-color:#DCFCE7;color:#166534"
+        }
+    )
+}

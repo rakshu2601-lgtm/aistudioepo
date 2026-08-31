@@ -1,0 +1,123 @@
+Pickup_Run_Sheets_On_Validate as "Validate Pickup Run Sheet"
+{
+    type = form
+    form = Pickup_Run_Sheets
+    record event = on add or edit
+    description = "Validates hub scope, resource eligibility, dates, protected fields, and daily load capacity"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(current_profile != "Logistics_Administrator" && current_profile != "Operations_Manager" && current_profile != "Hub_Supervisor")
+                {
+                    alert "Only authorised operations planners can create or edit pickup run sheets.";
+                    cancel submit;
+                }
+                if(input.Run_Date < zoho.currentdate)
+                {
+                    alert "A pickup run cannot be planned for a past date.";
+                    cancel submit;
+                }
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                if(current_profile == "Hub_Supervisor")
+                {
+                    supervisor_deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= input.Run_Date) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= input.Run_Date);
+                    supervisor_hub = if(supervisor_deputation_active == true,logged_user.Deputed_Hub,logged_user.Home_Hub);
+                    if(logged_user.count(ID) == 0 || supervisor_hub != input.Hub)
+                    {
+                        alert "Hub supervisors can plan pickup runs only for their effective home or deputed hub.";
+                        cancel submit;
+                    }
+                }
+                agent_record = Operations_Users[ID == input.Assigned_Agent && Active == true && Application_Role == "Field Agent" && (Agent_Role == "Pickup" || Agent_Role == "Both")];
+                if(agent_record.count(ID) == 0)
+                {
+                    alert "Select an active pickup-capable field agent.";
+                    cancel submit;
+                }
+                agent_deputation_active = agent_record.Deputed_Hub != null && (agent_record.Deputation_Start_Date == null || agent_record.Deputation_Start_Date <= input.Run_Date) && (agent_record.Deputation_End_Date == null || agent_record.Deputation_End_Date >= input.Run_Date);
+                agent_hub = if(agent_deputation_active == true,agent_record.Deputed_Hub,agent_record.Home_Hub);
+                if(agent_hub != input.Hub)
+                {
+                    alert "The assigned agent is not effective at the selected hub on the run date.";
+                    cancel submit;
+                }
+                previous_record = Pickup_Run_Sheets[ID == input.ID];
+                if(input.ID != null)
+                {
+                    if(previous_record.Status != "Draft")
+                    {
+                        alert "Released pickup runs cannot be edited from the form.";
+                        cancel submit;
+                    }
+                    if(input.Status != previous_record.Status || input.Planned_Stop_Count != previous_record.Planned_Stop_Count || input.Completed_Stop_Count != previous_record.Completed_Stop_Count || input.Total_Planned_Weight_Kg != previous_record.Total_Planned_Weight_Kg || input.Released_At != previous_record.Released_At || input.Completed_At != previous_record.Completed_At)
+                    {
+                        alert "Run status, timestamps, and progress totals are managed by operational workflows.";
+                        cancel submit;
+                    }
+                }
+                planned_count = 0;
+                completed_count = 0;
+                planned_weight = 0.0;
+                if(input.ID != null)
+                {
+                    for each run_item in Pickup_Run_Sheet_Items[Pickup_Run_Sheet == input.ID]
+                    {
+                        if(run_item.Stop_Status != "Cancelled")
+                        {
+                            planned_count = planned_count + 1;
+                            shipment_record = Shipment_Requests[ID == run_item.Shipment];
+                            planned_weight = planned_weight + ifnull(shipment_record.Billable_Weight_Kg,0);
+                            if(run_item.Stop_Status == "Picked Up" || run_item.Stop_Status == "Failed")
+                            {
+                                completed_count = completed_count + 1;
+                            }
+                        }
+                    }
+                }
+                input.Planned_Stop_Count = planned_count;
+                input.Completed_Stop_Count = completed_count;
+                input.Total_Planned_Weight_Kg = planned_weight;
+                other_agent_weight = 0.0;
+                for each other_run in Pickup_Run_Sheets[Assigned_Agent == input.Assigned_Agent && Run_Date == input.Run_Date && ID != input.ID && Status != "Cancelled"]
+                {
+                    other_agent_weight = other_agent_weight + ifnull(other_run.Total_Planned_Weight_Kg,0);
+                }
+                if(agent_record.Maximum_Daily_Load_Kg != null && agent_record.Maximum_Daily_Load_Kg > 0 && other_agent_weight + planned_weight > agent_record.Maximum_Daily_Load_Kg)
+                {
+                    alert "The assigned agent's maximum daily load would be exceeded.";
+                    cancel submit;
+                }
+                if(input.Vehicle != null)
+                {
+                    vehicle_record = Vehicles[ID == input.Vehicle && Active == true && Owning_Hub == input.Hub];
+                    if(vehicle_record.count(ID) == 0)
+                    {
+                        alert "Select an active vehicle owned by the pickup hub.";
+                        cancel submit;
+                    }
+                    if(vehicle_record.Status != "Available" && (input.ID == null || previous_record.Vehicle != input.Vehicle))
+                    {
+                        alert "The selected vehicle is not available.";
+                        cancel submit;
+                    }
+                    duplicate_vehicle_run = Pickup_Run_Sheets[Vehicle == input.Vehicle && Run_Date == input.Run_Date && ID != input.ID && Status != "Cancelled"].count(ID);
+                    if(duplicate_vehicle_run > 0)
+                    {
+                        alert "The selected vehicle is already planned for another run on this date.";
+                        cancel submit;
+                    }
+                    if(planned_weight > vehicle_record.Capacity_Kg)
+                    {
+                        alert "The planned shipment weight exceeds the selected vehicle capacity.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

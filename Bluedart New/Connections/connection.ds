@@ -1,0 +1,9 @@
+connections
+{
+    zoho_workdrive
+    (
+        displayname = "Zoho WorkDrive"
+        connector = zoho_workdrive
+        permissions = {"upload_file"}
+    )
+}

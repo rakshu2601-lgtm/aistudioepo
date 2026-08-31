@@ -1,0 +1,41 @@
+Mark_Overdue_Invoices_Daily as "Mark Overdue Invoices Daily"
+{
+    type = schedule
+    start = "2026-01-01 03:00:00"
+    frequency = daily
+    time zone = "Asia/Kolkata"
+    description = "Marks due open invoices and their receivables overdue in bounded daily batches"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                overdue_invoices = Invoices[(Invoice_Status == "Issued" || Invoice_Status == "Part Paid") && Due_Date < zoho.currentdate] range from 0 to 199;
+                for each invoice_record in overdue_invoices
+                {
+                    prior_status = invoice_record.Invoice_Status;
+                    invoice_record.Invoice_Status = "Overdue";
+                    for each ledger_record in Account_Ledger[Invoice == invoice_record.ID && Ledger_Status != "Settled"]
+                    {
+                        ledger_record.Ledger_Status = "Overdue";
+                    }
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.adminuserid
+                        Actor_Profile = "System"
+                        Action_Name = "Mark Invoice Overdue"
+                        Module_Name = "Invoices"
+                        Record_ID = invoice_record.ID.toString()
+                        Before_Data = "Status=" + prior_status
+                        After_Data = "Status=Overdue; Due Date=" + invoice_record.Due_Date
+                        Source = "Schedule"
+                        Severity = "Warning"
+                    ];
+                }
+            )
+        }
+    }
+}

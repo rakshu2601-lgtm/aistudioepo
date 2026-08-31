@@ -1,0 +1,112 @@
+form NDR_Response
+{
+    title
+    {
+        displayname = "Delivery Instruction Response"
+        on add = "Respond to Failed Delivery"
+    }
+    store data in zc = false
+    captcha = true
+
+    Secure_Response
+    (
+        type = section
+        displayname = "Secure Delivery Response"
+        row = 1
+        column = 0
+    )
+    must have Secure_Token
+    (
+        type = text
+        displayname = "Secure Response Token"
+        maxchar = 128
+        isencrypted = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Recipient_Instruction
+    (
+        type = radiobuttons
+        displayname = "What would you like us to do?"
+        values = {"Reschedule Delivery","Update Delivery Address","Hold at Local Office"}
+        layout = 1
+        row = 1
+        column = 2
+        width = medium
+    )
+    Reschedule_Date
+    (
+        type = date
+        displayname = "Preferred Reschedule Date"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Updated_Delivery_Address
+    (
+        type = address
+        displayname = "Updated Delivery Address"
+        capture_coordinates = true
+        adjust_using_map = true
+        address_line_1
+        (
+            type = address_line_1
+            displayname = "Address Line 1"
+        )
+        address_line_2
+        (
+            type = address_line_2
+            displayname = "Address Line 2"
+        )
+        district_city
+        (
+            type = district_city
+            displayname = "City / District"
+        )
+        state_province
+        (
+            type = state_province
+            displayname = "State"
+        )
+        postal_Code
+        (
+            type = postal_Code
+            displayname = "Pincode"
+        )
+        country
+        (
+            type = country
+            displayname = "Country"
+        )
+        latitude
+        (
+            type = latitude
+            displayname = "Latitude"
+            visibility = false
+        )
+        longitude
+        (
+            type = longitude
+            displayname = "Longitude"
+            visibility = false
+        )
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        Submit_Response
+        (
+            type = button
+            displayname = "Submit Delivery Instruction"
+        )
+        Reset
+        (
+            type = reset
+            displayname = "Reset"
+        )
+    }
+}

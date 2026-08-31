@@ -1,0 +1,24 @@
+list Non_Serviceable_Pincodes
+{
+    displayName = "Non-Serviceable Pincodes"
+    show all rows from Hub_Pincode_Mapping [Serviceability != "Serviceable"]
+    (
+        Pincode
+        Serviceability
+        Service_Zone
+        Beat_Name
+        Primary_Collection_Center
+        Secondary_Overflow_Hub
+        Active
+    )
+    filters
+    (
+        Serviceability
+        Service_Zone
+        Active
+    )
+    sort by
+    (
+        Pincode ascending
+    )
+}

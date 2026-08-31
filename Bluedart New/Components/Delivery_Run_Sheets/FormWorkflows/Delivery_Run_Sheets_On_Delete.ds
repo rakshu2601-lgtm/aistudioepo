@@ -1,0 +1,22 @@
+Delivery_Run_Sheets_On_Delete as "Protect Delivery Run Sheet"
+{
+    type = form
+    form = Delivery_Run_Sheets
+    record event = on delete
+    description = "Prevents deletion of released runs and runs with stop or custody records"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.DRS_Status != "Draft" || Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.ID].count(ID) > 0)
+                {
+                    alert "A delivery run with stops or operational history cannot be deleted. Cancel it through controlled operations instead.";
+                    cancel delete;
+                }
+            )
+        }
+    }
+}

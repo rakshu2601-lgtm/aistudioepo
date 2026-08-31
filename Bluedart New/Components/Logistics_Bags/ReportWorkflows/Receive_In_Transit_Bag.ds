@@ -1,0 +1,68 @@
+Receive_In_Transit_Bag as "Receive Bag - In Transit Bags"
+{
+    type = functions
+    form = Logistics_Bags
+    execution type = for each record
+    description = "Receives a dispatched sealed bag at its destination and reconciles expected contents"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == input.Destination_Hub;
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the destination hub can receive this bag.";
+                }
+                else if(input.Bag_Status != "Dispatched" || ifnull(input.Seal_Code,"").trim() == "")
+                {
+                    info "Only a dispatched bag with an intact recorded seal can be received. Use Report Seal Exception if the seal does not match.";
+                }
+                else
+                {
+                    input.Bag_Status = "Received";
+                    input.Received_At = zoho.currenttime;
+                    for each bag_item in Bag_Shipments[Bag == input.ID && Scan_Status == "Loaded"]
+                    {
+                        shipment_record = Shipment_Requests[ID == bag_item.Shipment];
+                        tracking_id = insert into Shipment_Tracking_Events
+                        [
+                            Shipment = shipment_record.ID
+                            Event_Time = zoho.currenttime
+                            Event_Status = "Information"
+                            Hub = input.Destination_Hub
+                            Bag = input.ID
+                            Event_Description = input.Bag_Type + " bag arrived with the recorded seal intact and is awaiting item-level reconciliation."
+                            Source = "Bag"
+                            Customer_Visible = false
+                            Created_By_Email = zoho.loginuserid
+                        ];
+                    }
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Receive Bag"
+                        Module_Name = "Logistics Bags"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=Dispatched"
+                        After_Data = "Status=Received; Hub=" + input.Destination_Hub + "; Reconciliation=Pending"
+                        Source = "Report Action"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

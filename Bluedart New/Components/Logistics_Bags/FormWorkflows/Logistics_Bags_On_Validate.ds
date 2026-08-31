@@ -1,0 +1,86 @@
+Logistics_Bags_On_Validate as "Validate Logistics Bag"
+{
+    type = form
+    form = Logistics_Bags
+    record event = on add or edit
+    description = "Validates bag route, operator hub ownership, and protected custody state"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                authorised = current_profile == "Logistics_Administrator" || current_profile == "Operations_Manager" || current_profile == "Hub_Supervisor" || current_profile == "Hub_Operator";
+                if(authorised == false)
+                {
+                    alert "You are not authorised to create or edit logistics bags.";
+                    cancel submit;
+                }
+                origin_record = Hubs[ID == input.Origin_Hub && Active == true];
+                destination_record = Hubs[ID == input.Destination_Hub && Active == true];
+                if(origin_record.count(ID) == 0 || destination_record.count(ID) == 0 || input.Origin_Hub == input.Destination_Hub)
+                {
+                    alert "Select different active origin and destination hubs.";
+                    cancel submit;
+                }
+                if(input.Bag_Type == "Feeder" && (origin_record.Hub_Type != "Collection Center" || destination_record.ID != origin_record.Parent_Sorting_Hub))
+                {
+                    alert "A feeder bag must move from a collection center to its parent sorting hub.";
+                    cancel submit;
+                }
+                if(input.Bag_Type == "Master" && (origin_record.Hub_Type != "Sorting Hub" || destination_record.Hub_Type != "Sorting Hub"))
+                {
+                    alert "A master bag must move between sorting hubs.";
+                    cancel submit;
+                }
+                if(input.Bag_Type == "Delivery Feeder" && (origin_record.Hub_Type != "Sorting Hub" || destination_record.Hub_Type != "Collection Center" || destination_record.Parent_Sorting_Hub != origin_record.ID))
+                {
+                    alert "A delivery feeder bag must move from a sorting hub to one of its collection centers.";
+                    cancel submit;
+                }
+                if(current_profile == "Hub_Supervisor" || current_profile == "Hub_Operator")
+                {
+                    logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                    deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                    effective_hub = logged_user.Home_Hub;
+                    if(deputation_active == true)
+                    {
+                        effective_hub = logged_user.Deputed_Hub;
+                    }
+                    if(logged_user.count(ID) == 0 || effective_hub != input.Origin_Hub)
+                    {
+                        alert "Hub users can create or edit bags only for their effective hub.";
+                        cancel submit;
+                    }
+                }
+                if(input.ID == null)
+                {
+                    input.Bag_Status = "Open";
+                    input.Total_Shipments = 0;
+                    input.Total_Weight_Kg = 0;
+                    input.Created_At = zoho.currenttime;
+                    input.Created_By_Email = zoho.loginuserid;
+                    input.Sealed_At = null;
+                    input.Dispatched_At = null;
+                    input.Received_At = null;
+                }
+                else
+                {
+                    previous_record = Logistics_Bags[ID == input.ID];
+                    if(previous_record.Bag_Status != "Open")
+                    {
+                        alert "Sealed or dispatched bags can be changed only through controlled custody actions.";
+                        cancel submit;
+                    }
+                    if(input.Bag_Status != previous_record.Bag_Status || input.Total_Shipments != previous_record.Total_Shipments || input.Total_Weight_Kg != previous_record.Total_Weight_Kg || input.Created_At != previous_record.Created_At || input.Sealed_At != previous_record.Sealed_At || input.Dispatched_At != previous_record.Dispatched_At || input.Received_At != previous_record.Received_At || input.Created_By_Email != previous_record.Created_By_Email)
+                    {
+                        alert "Status, totals, custody timestamps, and creator details are system controlled.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

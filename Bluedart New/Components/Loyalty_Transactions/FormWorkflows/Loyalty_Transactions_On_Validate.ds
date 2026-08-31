@@ -1,0 +1,166 @@
+Loyalty_Transactions_On_Validate as "Validate Loyalty Transaction"
+{
+    type = form
+    form = Loyalty_Transactions
+    record event = on add or edit
+    description = "Enforces immutable posting, ownership, signs, balances, value, expiry, and duplicate controls"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                is_portal = thisapp.portal.isUserInProfile("Customer_Portal");
+                if(input.ID != null)
+                {
+                    alert "Posted loyalty transactions are immutable.";
+                    cancel submit;
+                }
+                else if(is_portal == true)
+                {
+                    alert "Use shipment booking to redeem loyalty points. Direct portal posting is not allowed.";
+                    cancel submit;
+                }
+                else
+                {
+                    customer_record = Customers[ID == input.Customer];
+                    if(customer_record.count(ID) == 0)
+                    {
+                        alert "Select a valid customer.";
+                        cancel submit;
+                    }
+                    else
+                    {
+                        input.Posted_By_Email = zoho.loginuserid;
+                        input.Customer_Login_Email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID);
+                        input.Transaction_Date = zoho.currenttime;
+                        config_record = App_Configuration[Active == true] range from 0 to 0;
+                        point_value = if(config_record.count(ID) > 0,config_record.Loyalty_Redemption_Value_Per_Point,1);
+                        if(input.Transaction_Type != "Rebate")
+                        {
+                            input.Amount_Equivalent = (ifnull(input.Points,0).abs() * point_value).round(2);
+                        }
+                        if(input.Transaction_Type == "Earn")
+                        {
+                            shipment_record = Shipment_Requests[ID == input.Shipment];
+                            if(input.Shipment == null || shipment_record.count(ID) == 0 || shipment_record.Customer != input.Customer || shipment_record.Shipment_Status != "Delivered" || ifnull(input.Points,0) <= 0)
+                            {
+                                alert "Earn entries require positive points and a delivered shipment for the same customer.";
+                                cancel submit;
+                            }
+                            else if(Loyalty_Transactions[Shipment == input.Shipment && Transaction_Type == "Earn"].count(ID) > 0)
+                            {
+                                alert "Loyalty points have already been earned for this shipment.";
+                                cancel submit;
+                            }
+                            else
+                            {
+                                input.Points_Status = "Available";
+                                expiry_months = if(config_record.count(ID) > 0,config_record.Points_Expiry_Months,12);
+                                if(input.Expiry_Date == null)
+                                {
+                                    input.Expiry_Date = zoho.currentdate.addMonth(expiry_months);
+                                }
+                            }
+                        }
+                        else if(input.Transaction_Type == "Redeem")
+                        {
+                            requested_points = 0 - input.Points;
+                            shipment_record = Shipment_Requests[ID == input.Shipment];
+                            if(input.Shipment == null || shipment_record.count(ID) == 0 || shipment_record.Customer != input.Customer || input.Points >= 0 || requested_points > ifnull(customer_record.Current_Loyalty_Points,0))
+                            {
+                                alert "Redeem entries require a shipment, negative points, matching ownership, and sufficient available balance.";
+                                cancel submit;
+                            }
+                            else if(Loyalty_Transactions[Shipment == input.Shipment && Transaction_Type == "Redeem"].count(ID) > 0)
+                            {
+                                alert "Points have already been redeemed for this shipment.";
+                                cancel submit;
+                            }
+                            else
+                            {
+                                input.Points_Status = "Consumed";
+                                input.Expiry_Date = null;
+                            }
+                        }
+                        else if(input.Transaction_Type == "Expire")
+                        {
+                            if(ifnull(input.Points,0) >= 0 || (0 - input.Points) > ifnull(customer_record.Current_Loyalty_Points,0))
+                            {
+                                alert "Expiry entries require negative points that do not exceed the current balance.";
+                                cancel submit;
+                            }
+                            input.Points_Status = "Expired";
+                            input.Expiry_Date = null;
+                        }
+                        else if(input.Transaction_Type == "Reverse")
+                        {
+                            if(ifnull(input.Points,0) == 0 || input.Shipment == null)
+                            {
+                                alert "Reversal entries require non-zero points and a related shipment.";
+                                cancel submit;
+                            }
+                            input.Points_Status = if(input.Points > 0,"Available","Consumed");
+                            if(input.Points > 0 && input.Expiry_Date == null)
+                            {
+                                expiry_months = if(config_record.count(ID) > 0,config_record.Points_Expiry_Months,12);
+                                input.Expiry_Date = zoho.currentdate.addMonth(expiry_months);
+                            }
+                        }
+                        else if(input.Transaction_Type == "Adjust")
+                        {
+                            if(current_profile != "Logistics_Administrator" && current_profile != "Finance_Officer")
+                            {
+                                alert "Only Logistics Administrators and Finance Officers can post adjustments.";
+                                cancel submit;
+                            }
+                            else if(ifnull(input.Points,0) == 0 || ifnull(input.Reference,"").trim() == "" || ifnull(input.Notes,"").trim() == "")
+                            {
+                                alert "Non-zero points, a reference, and explanatory notes are required for an adjustment.";
+                                cancel submit;
+                            }
+                            else if(input.Points < 0 && (0 - input.Points) > ifnull(customer_record.Current_Loyalty_Points,0))
+                            {
+                                alert "A negative adjustment cannot exceed the customer's current loyalty balance.";
+                                cancel submit;
+                            }
+                            else
+                            {
+                                input.Points_Status = if(input.Points > 0,"Available","Consumed");
+                                if(input.Points > 0)
+                                {
+                                    expiry_months = if(config_record.count(ID) > 0,config_record.Points_Expiry_Months,12);
+                                    input.Expiry_Date = zoho.currentdate.addMonth(expiry_months);
+                                }
+                                else
+                                {
+                                    input.Expiry_Date = null;
+                                }
+                            }
+                        }
+                        else if(input.Transaction_Type == "Rebate")
+                        {
+                            if(current_profile != "Logistics_Administrator" && current_profile != "Finance_Officer")
+                            {
+                                alert "Only authorised finance workflows can post rebates.";
+                                cancel submit;
+                            }
+                            else if(input.Points != 0 || input.Amount_Equivalent <= 0)
+                            {
+                                alert "A rebate uses zero points and a positive amount equivalent.";
+                                cancel submit;
+                            }
+                            else
+                            {
+                                input.Points_Status = "Not Applicable";
+                                input.Expiry_Date = null;
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

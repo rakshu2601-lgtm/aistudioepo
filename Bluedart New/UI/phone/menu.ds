@@ -1,0 +1,66 @@
+menu
+{
+    unused
+    {
+        form Account_Ledger {} form App_Configuration {} form Audit_Log {} form Bag_Shipments {} form COD_Remittances {} form Communication_Log {} form Customer_KYC_Documents {} form Customers {}
+        form Delivery_Run_Sheet_Items {} form Delivery_Run_Sheets {} form Hub_Pincode_Mapping {} form Hubs {} form Invoices {} form KYC_Document_Types {} form Logistics_Bags {} form Loyalty_Rules {}
+        form Loyalty_Tiers {} form Loyalty_Transactions {} form Manifest_Bags {} form Manifests {} form NDR_Instructions {} form NDR_Response {} form Operations_Users {} form Payment_Transactions {}
+        form Pickup_Run_Sheet_Items {} form Pickup_Run_Sheets {} form Rate_Cards {} form Rate_Slabs {} form Shipment_Exceptions {} form Shipment_Requests {} form Shipment_Tracking_Events {} form Transport_Routes {} form Vehicles {}
+        report Account_Ledger_Statement {} report Action_Required_Customers {} report Active_Customers {} report Active_Field_Agents {} report Active_Hub_Map {} report Active_Loyalty_Rules {} report Active_Routes {} report Active_Shipments {}
+        report Active_Slabs {} report Active_Tier_Benefits {} report Agent_Location_Map {} report All_Customers {} report All_Hubs {} report All_KYC_Documents {} report All_Rate_Cards {} report All_Shipments {}
+        report All_Transport_Routes {} report All_Vehicles {} report Available_Vehicles {} report Bag_Reconciliation {} report Bag_Status_Board {} report COD_Payout_Due {} report Communication_Log_Report {} report Corporate_KYC_Checklist {}
+        report Credit_Utilization {} report Customer_Tracking_Events {} report Delivered_Shipments {} report Delivery_Queue {} report Delivery_Run_Calendar {} report Delivery_Run_Items {} report Delivery_Run_Register {} report Expiring_Rate_Cards {}
+        report Failed_Communications {} report Failed_Deliveries {} report Failed_Pickups {} report Feeder_Manifests {} report Hub_Capacity {} report Hub_Staff {} report In_Transit_Manifests {} report Invoice_Due_Calendar {}
+        report KYC_Document_Type_Mapping {} report Ledger_Ageing {} report Linehaul_Manifests {} report Loyalty_Activity_By_Type {} report Loyalty_Rule_Register {} report Loyalty_Tier_Register {} report Loyalty_Transaction_Ledger {} report Manifest_Arrival_Calendar {}
+        report Manifest_Reconciliation {} report Manifest_Status_Board {} report My_Account_Statement {} report My_Loyalty_History {} report My_Payments {} report My_Points_Expiring_Soon {} report NDR_RTO_Pending {} report Non_Serviceable_Pincodes {}
+        report Operations_User_Directory {} report Outstanding_Accounts {} report Pickup_Queue {} report Pickup_Run_Calendar {} report Pickup_Run_Items {} report Pincode_Mappings {} report Points_Expiring_Soon {} report Published_Rate_Cards {}
+        report Rate_Slab_Register {} report Route_Capacity {} report Serviceability_Map {} report Shipment_Status_Board {} report Shipment_Timeline {} report Tracking_Event_Log {} report Vehicle_Compliance {} report Wholesale_KYC_Checklist {}
+    }
+    space Customer_Portal_Space
+    {
+        displayname = "Customer Portal" icon = "users-circle-08"
+        section Customer_Dashboard_Section { displayname = "Customer Dashboard" icon = "business-chart-bar-33" page Customer_Dashboard { icon = "users-circle-08" } page Shipment_Tracking { icon = "shopping-delivery-track" } }
+        section Customer_Actions { displayname = "Self-Service Actions" icon = "users-single-01" report My_Profile {} report My_KYC_Checklist {} report My_Shipments {} report My_Invoices {} report Overdue_Invoices {} report Customer_NDR_Instructions {} }
+    }
+    space KYC_Reviewer_Space
+    {
+        displayname = "KYC Reviewer" icon = "business-safe"
+        section KYC_Dashboard_Section { displayname = "KYC Dashboard" icon = "business-chart-bar-33" page KYC_Review { icon = "business-safe" } }
+        section KYC_Actions { displayname = "KYC Actions" icon = "business-notes" report KYC_Review_Queue {} report Verification_Pending {} report Queried_KYC_Documents {} report KYC_Expiry_Alert {} }
+    }
+    space Field_Agent_Space
+    {
+        displayname = "Field Agent" icon = "users-single-position"
+        section Agent_Dashboard_Section { displayname = "Agent Dashboard" icon = "business-chart-bar-33" page Agent_Dashboard { icon = "users-single-position" } }
+        section Agent_Actions { displayname = "Pickup & Delivery" icon = "shopping-delivery-fast" report My_Pickup_Runs {} report My_Pickup_Tasks {} report My_Delivery_Runs {} report My_Delivery_Tasks {} }
+    }
+    space Hub_Operator_Space
+    {
+        displayname = "Hub Operator" icon = "business-building"
+        section Hub_Dashboard_Section { displayname = "Hub Dashboard" icon = "business-chart-bar-33" page Hub_Dashboard { icon = "business-board-30" } }
+        section Hub_Actions { displayname = "Hub Actions" icon = "shopping-bag-17" report Unassigned_Orders {} report Open_Bags {} report In_Transit_Bags {} report Bag_Contents {} report Manifest_Bag_List {} report Expected_Master_Bags {} }
+    }
+    space Hub_Supervisor_Space
+    {
+        displayname = "Hub Supervisor" icon = "users-multiple-11"
+        section Supervisor_Actions { displayname = "Planning & Exceptions" icon = "business-agenda" report Today_Pickup_Planner {} report Pickup_Run_Register {} report Last_Mile_Dispatcher {} report NDR_Instruction_Action_Queue {} report Shipment_Exception_Queue {} }
+    }
+    space Operations_Manager_Space
+    {
+        displayname = "Operations Manager" icon = "business-strategy"
+        section Operations_Actions { displayname = "Network Operations" icon = "business-chart-bar-33" report All_Logistics_Bags {} report All_Manifests {} report Critical_Exceptions {} report Exception_Status_Board {} }
+    }
+    space Finance_Officer_Space
+    {
+        displayname = "Finance Officer" icon = "business-wallet-43"
+        section Finance_Actions { displayname = "Finance Actions" icon = "business-money-coins" report COD_Pending_Remittance {} report COD_Remittance_Register {} report Invoice_Statement {} report Payment_Transaction_Register {} report Failed_Payments {} }
+    }
+    space Logistics_Administrator_Space
+    {
+        displayname = "Logistics Administrator" icon = "business-hammer"
+        section Admin_Dashboard_Section { displayname = "Admin Dashboard" icon = "business-chart-bar-33" page Admin_Dashboard { icon = "business-chart-pie-36" } }
+        section Admin_Actions { displayname = "Audit & Configuration" icon = "business-connect" report App_Configurations {} report Audit_Log_Report {} report Critical_Audit_Events {} }
+        section SharedAnalytics_Section { type = shared_user_report_section displayname = "Reports" icon = "business-chart-bar-33" }
+    }
+    preference { icon { style = outline show = {space,section,component} } }
+}

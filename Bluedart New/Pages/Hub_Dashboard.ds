@@ -1,0 +1,19 @@
+<page linkname = "Hub_Dashboard" parameters = "int Hub_ID" displayname = "Hub Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Hub_Command_Center' elementName='Hub_Command_Center'>
+          <![CDATA[htmlpage Hub_Command_Center()
+            content
+            <%{%>
+              <file name:Hub_Command_Center.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

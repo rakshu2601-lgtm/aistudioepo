@@ -1,0 +1,77 @@
+Loyalty_Rules_On_Validate as "Validate Loyalty Rule"
+{
+    type = form
+    form = Loyalty_Rules
+    record event = on add or edit
+    description = "Validates earning values, lifecycle controls, dates, and deterministic rule selection"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                existing_rule = Loyalty_Rules[ID == input.ID];
+                if(current_profile != "Logistics_Administrator" && current_profile != "Finance_Officer")
+                {
+                    alert "Only Logistics Administrators and Finance Officers can maintain loyalty rules.";
+                    cancel submit;
+                }
+                else if(ifnull(input.Loyalty_Rule_ID,"").trim() == "" || ifnull(input.Rule_Name,"").trim() == "")
+                {
+                    alert "Enter both the loyalty rule ID and rule name.";
+                    cancel submit;
+                }
+                else if(ifnull(input.Minimum_Shipment_Amount,0) < 0 || ifnull(input.Points_Per_INR,0) < 0 || (input.Maximum_Points_Per_Shipment != null && input.Maximum_Points_Per_Shipment < 0) || (input.Points_Expiry_Months != null && input.Points_Expiry_Months <= 0))
+                {
+                    alert "Minimum amount, points rate, and cap cannot be negative; an override expiry must be greater than zero months.";
+                    cancel submit;
+                }
+                else if(input.Effective_To != null && input.Effective_To < input.Effective_From)
+                {
+                    alert "Effective To cannot be earlier than Effective From.";
+                    cancel submit;
+                }
+                else if(input.ID != null && (existing_rule.Loyalty_Rule_ID != input.Loyalty_Rule_ID || existing_rule.Status != input.Status))
+                {
+                    alert "Rule ID and status are system-controlled after creation. Use Activate Rule or Expire Rule for lifecycle changes.";
+                    cancel submit;
+                }
+                else if(input.ID != null && existing_rule.Status == "Expired")
+                {
+                    alert "Expired loyalty rules are immutable. Create a new draft rule instead.";
+                    cancel submit;
+                }
+                else
+                {
+                    input.Loyalty_Rule_ID = input.Loyalty_Rule_ID.trim();
+                    input.Rule_Name = input.Rule_Name.trim();
+                    if(input.ID == null)
+                    {
+                        input.Status = "Draft";
+                    }
+                    if(input.Status == "Active")
+                    {
+                        ambiguous_count = 0;
+                        for each candidate in Loyalty_Rules[ID != input.ID && Status == "Active" && Minimum_Shipment_Amount == input.Minimum_Shipment_Amount]
+                        {
+                            customer_scope_overlaps = candidate.Customer_Type == input.Customer_Type || candidate.Customer_Type == "All" || input.Customer_Type == "All";
+                            mode_scope_overlaps = candidate.Transport_Mode == input.Transport_Mode || candidate.Transport_Mode == "Any" || input.Transport_Mode == "Any";
+                            date_scope_overlaps = (candidate.Effective_To == null || candidate.Effective_To >= input.Effective_From) && (input.Effective_To == null || candidate.Effective_From <= input.Effective_To);
+                            if(customer_scope_overlaps == true && mode_scope_overlaps == true && date_scope_overlaps == true)
+                            {
+                                ambiguous_count = ambiguous_count + 1;
+                            }
+                        }
+                        if(ambiguous_count > 0)
+                        {
+                            alert "An active rule already overlaps this customer, transport, amount threshold, and effective period.";
+                            cancel submit;
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

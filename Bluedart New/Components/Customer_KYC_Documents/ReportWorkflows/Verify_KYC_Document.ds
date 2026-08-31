@@ -1,0 +1,60 @@
+Verify_KYC_Document as "Verify"
+{
+    type = functions
+    form = Customer_KYC_Documents
+    execution type = for each record
+    description = "Verifies and locks an uploaded KYC document for authorised KYC staff"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                if(input.Review_Status != "Pending Verification" || input.Uploaded_File == null)
+                {
+                    info "Only an uploaded document awaiting verification can be verified.";
+                }
+                else
+                {
+                    input.Review_Status = "Verified";
+                    input.Reviewed_By_Email = zoho.loginuserid;
+                    input.Reviewed_On = zoho.currenttime;
+                    input.Locked_After_Verification = true;
+                    customer_record = Customers[ID == input.Customer];
+                    remaining_count = Customer_KYC_Documents[Customer == input.Customer && Required_For_Onboarding == true && Review_Status != "Verified" && ID != input.ID].count(ID);
+                    communication_summary = "KYC document " + input.Document_Type + " has been verified.";
+                    if(remaining_count == 0)
+                    {
+                        communication_summary = "All required KYC documents are verified and the customer is ready for final approval.";
+                    }
+                    communication_id = insert into Communication_Log
+                    [
+                        Customer = customer_record.ID
+                        Recipient = customer_record.Email_ID
+                        Channel = "Portal Notification"
+                        Template_Code = "KYC_DOCUMENT_VERIFIED"
+                        Subject = "KYC document verified"
+                        Message_Summary = communication_summary
+                        Provider = "Other"
+                        Communication_Status = "Queued"
+                        Attempt_Count = 0
+                    ];
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = "POC Process User"
+                        Action_Name = "Verify KYC Document"
+                        Module_Name = "Customer_KYC_Documents"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=Pending Verification"
+                        After_Data = "Status=Verified; Version=" + input.File_Version + "; Required Remaining=" + remaining_count
+                        Source = "Report Action"
+                        Severity = "Warning"
+                    ];
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,70 @@
+Mark_Pickup_Arrived as "Mark Arrived - Pickup Run Items"
+{
+    type = functions
+    form = Pickup_Run_Sheet_Items
+    execution type = for each record
+    description = "Stamps agent arrival and location for an assigned pickup stop"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                run_record = Pickup_Run_Sheets[ID == input.Pickup_Run_Sheet];
+                assigned_agent = Operations_Users[ID == run_record.Assigned_Agent];
+                authorised = assigned_agent.Work_Email == zoho.loginuserid || Operations_Users[Work_Email == zoho.loginuserid && Active == true].count(ID) > 0;
+                if(authorised == false)
+                {
+                    info "Only the assigned agent or an active operations user can mark arrival.";
+                }
+                else if(input.Stop_Status != "Assigned" || (run_record.Status != "Released" && run_record.Status != "In Progress"))
+                {
+                    info "Only an assigned stop on a released pickup run can be marked arrived.";
+                }
+                else
+                {
+                    if(input.Agent_Latitude == null)
+                    {
+                        input.Agent_Latitude = assigned_agent.Current_Latitude;
+                    }
+                    if(input.Agent_Longitude == null)
+                    {
+                        input.Agent_Longitude = assigned_agent.Current_Longitude;
+                    }
+                    input.Stop_Status = "Arrived";
+                    input.Arrived_At = zoho.currenttime;
+                    run_record.Status = "In Progress";
+                    tracking_id = insert into Shipment_Tracking_Events
+                    [
+                        Shipment = input.Shipment
+                        Event_Time = zoho.currenttime
+                        Event_Status = "Information"
+                        Hub = run_record.Hub
+                        Agent = assigned_agent.ID
+                        Latitude = input.Agent_Latitude
+                        Longitude = input.Agent_Longitude
+                        Event_Description = "Pickup agent arrived at the pickup location."
+                        Source = "Pickup Scan"
+                        Customer_Visible = true
+                        Created_By_Email = zoho.loginuserid
+                    ];
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Mark Pickup Arrived"
+                        Module_Name = "Pickup Run Sheet Items"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=Assigned"
+                        After_Data = "Status=Arrived; Time=" + input.Arrived_At + "; Latitude=" + input.Agent_Latitude + "; Longitude=" + input.Agent_Longitude
+                        Source = "Report Action"
+                        Severity = "Info"
+                    ];
+                }
+            )
+        }
+    }
+}

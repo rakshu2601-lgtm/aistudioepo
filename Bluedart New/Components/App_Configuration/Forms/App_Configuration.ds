@@ -1,0 +1,159 @@
+form App_Configuration
+{
+    title
+    {
+        displayname = "Application Configuration"
+        on add = "Add Operations Policy"
+        on edit = "Edit Operations Policy"
+    }
+    success message = "Operations policy saved successfully"
+    General_Settings
+    (
+        type = section
+        displayname = "General Settings"
+        row = 1
+        column = 0
+    )
+    must have unique Configuration_Name
+    (
+        type = text
+        displayname = "Configuration Name"
+        initial value = "Default Operations Policy"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have KYC_Expiry_Alert_Days
+    (
+        type = number
+        displayname = "KYC Expiry Alert Days"
+        initial value = 30
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Notification_Retry_Limit
+    (
+        type = number
+        displayname = "Notification Retry Limit"
+        initial value = 3
+        row = 1
+        column = 2
+        width = medium
+    )
+    Operations_Policy
+    (
+        type = section
+        displayname = "Operations Policy"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have High_Credit_KYC_Threshold
+    (
+        type = INR
+        displayname = "High Credit KYC Threshold"
+        format = commadotindian
+        initial value = 500000
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Maximum_NDR_Attempts
+    (
+        type = number
+        displayname = "Maximum NDR Attempts"
+        initial value = 3
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have COD_Payout_Cycle
+    (
+        type = picklist
+        displayname = "COD Payout Cycle"
+        values = {"T+2","Weekly"}
+        initial value = "T+2"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Loyalty_Rating_Policy
+    (
+        type = section
+        displayname = "Loyalty and Rating"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Points_Expiry_Months
+    (
+        type = number
+        displayname = "Points Expiry Months"
+        initial value = 12
+        row = 3
+        column = 1
+        width = medium
+    )
+    must have Default_Volumetric_Divisor
+    (
+        type = number
+        displayname = "Default Volumetric Divisor"
+        initial value = 5000
+        row = 3
+        column = 2
+        width = medium
+    )
+    must have Loyalty_Redemption_Value_Per_Point
+    (
+        type = INR
+        displayname = "Redemption Value Per Point"
+        format = commadotindian
+        initial value = 1
+        decimalplace = 2
+        maxchar = 16
+        row = 3
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Policy"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Policy"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

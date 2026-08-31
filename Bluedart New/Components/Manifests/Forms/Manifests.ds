@@ -1,0 +1,255 @@
+form Manifests
+{
+    title
+    {
+        displayname = "Manifests"
+        on add = "Create Manifest"
+        on edit = "Edit Manifest"
+    }
+    success message = "Manifest saved successfully"
+    Manifest_Identity
+    (
+        type = section
+        displayname = "Manifest Identity"
+        row = 1
+        column = 0
+    )
+    Manifest_Number
+    (
+        type = autonumber
+        displayname = "Manifest Number"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Manifest_Type
+    (
+        type = picklist
+        displayname = "Manifest Type"
+        values = {"Feeder","Linehaul","Delivery Feeder","Return"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Origin_Hub
+    (
+        type = picklist
+        displayname = "Origin Hub"
+        values = Hubs[Active == true].ID
+        displayformat = [Hub_Name]
+        searchable = true
+        sortorder = ascending
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Destination_Hub
+    (
+        type = picklist
+        displayname = "Destination Hub"
+        values = Hubs[Active == true].ID
+        displayformat = [Hub_Name]
+        searchable = true
+        sortorder = ascending
+        row = 1
+        column = 2
+        width = medium
+    )
+    Route_and_Resources
+    (
+        type = section
+        displayname = "Route and Resources"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Route
+    (
+        type = picklist
+        displayname = "Route"
+        values = Transport_Routes[Active == true].ID
+        displayformat = [Route_Name]
+        searchable = true
+        sortorder = ascending
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Vehicle
+    (
+        type = picklist
+        displayname = "Vehicle"
+        values = Vehicles[Active == true].ID
+        displayformat = [Vehicle_Number]
+        searchable = true
+        sortorder = ascending
+        row = 2
+        column = 2
+        width = medium
+    )
+    Driver
+    (
+        type = picklist
+        displayname = "Driver"
+        values = Operations_Users[Active == true && Application_Role == "Field Agent"].ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        sortorder = ascending
+        row = 2
+        column = 1
+        width = medium
+    )
+    Vehicle_Seal_Code
+    (
+        type = text
+        displayname = "Vehicle Seal Code"
+        maxchar = 80
+        row = 2
+        column = 2
+        width = medium
+    )
+    Timing_and_Status
+    (
+        type = section
+        displayname = "Timing and Status"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Departure_Time
+    (
+        type = datetime
+        displayname = "Departure Time"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Expected_Arrival_Time
+    (
+        type = datetime
+        displayname = "Expected Arrival Time"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Actual_Arrival_Time
+    (
+        type = datetime
+        displayname = "Actual Arrival Time"
+        row = 3
+        column = 1
+        width = medium
+    )
+    must have Manifest_Status
+    (
+        type = picklist
+        displayname = "Manifest Status"
+        values = {"Draft","Closed","In Transit","Arrived","Reconciled","Exception","Cancelled"}
+        initial value = "Draft"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Manifest_Totals
+    (
+        type = section
+        displayname = "Manifest Totals"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    Total_Bags
+    (
+        type = number
+        displayname = "Total Bags"
+        initial value = 0
+        row = 4
+        column = 1
+        width = medium
+    )
+    Total_Shipments
+    (
+        type = number
+        displayname = "Total Shipments"
+        initial value = 0
+        row = 4
+        column = 2
+        width = medium
+    )
+    Total_Weight_Kg
+    (
+        type = decimal
+        displayname = "Total Weight (Kg)"
+        decimalplace = 3
+        initial value = 0
+        row = 4
+        column = 1
+        width = medium
+    )
+    Manifest_Barcode
+    (
+        type = barcode
+        displayname = "Manifest Barcode"
+        value = "${Manifest_Number}"
+        barcode type = "Code-128"
+        row = 4
+        column = 2
+        width = medium
+    )
+    Created_By_Email
+    (
+        type = email
+        displayname = "Created By Email"
+        personal data = true
+        row = 4
+        column = 1
+        width = medium
+    )
+    Manifest_Notes
+    (
+        type = section
+        displayname = "Manifest Notes"
+        visibility = true
+        row = 5
+        column = 1
+    )
+    Notes
+    (
+        type = textarea
+        displayname = "Notes"
+        height = 100px
+        row = 5
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Create Manifest"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Manifest"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

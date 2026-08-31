@@ -1,0 +1,21 @@
+float Recalculate_Customer_Outstanding(int customer_id)
+{
+    recalculated_outstanding = 0.0;
+    customer_record = Customers[ID == customer_id];
+    if(customer_record.count(ID) > 0)
+    {
+        debit_total = ifnull(Account_Ledger[Customer == customer_id && Transaction_Type == "Debit"].sum(Amount),0);
+        refund_total = ifnull(Account_Ledger[Customer == customer_id && Transaction_Type == "Refund"].sum(Amount),0);
+        adjustment_total = ifnull(Account_Ledger[Customer == customer_id && Transaction_Type == "Adjustment"].sum(Amount),0);
+        credit_total = ifnull(Account_Ledger[Customer == customer_id && Transaction_Type == "Credit"].sum(Amount),0);
+        payment_total = ifnull(Account_Ledger[Customer == customer_id && Transaction_Type == "Payment"].sum(Amount),0);
+        rebate_total = ifnull(Account_Ledger[Customer == customer_id && Transaction_Type == "Rebate"].sum(Amount),0);
+        recalculated_outstanding = (debit_total + refund_total + adjustment_total - credit_total - payment_total - rebate_total).round(2);
+        if(recalculated_outstanding < 0)
+        {
+            recalculated_outstanding = 0;
+        }
+        customer_record.Outstanding_Balance = recalculated_outstanding;
+    }
+    return recalculated_outstanding;
+}

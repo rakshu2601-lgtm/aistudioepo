@@ -1,0 +1,253 @@
+form Delivery_Run_Sheet_Items
+{
+    title
+    {
+        displayname = "Delivery Run Sheet Items"
+        on add = "Assign Delivery Stop"
+        on edit = "Capture Delivery Evidence"
+    }
+    success message = "Delivery stop saved successfully"
+    Stop_Assignment
+    (
+        type = section
+        displayname = "Stop Assignment"
+        row = 1
+        column = 0
+    )
+    must have Delivery_Run_Sheet
+    (
+        type = picklist
+        displayname = "Delivery Run Sheet"
+        values = Delivery_Run_Sheets.ID
+        displayformat = [DRS_Number]
+        searchable = true
+        sortorder = ascending
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Shipment
+    (
+        type = picklist
+        displayname = "Shipment"
+        values = Shipment_Requests.ID
+        displayformat = [AWB_Number]
+        searchable = true
+        sortorder = ascending
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Stop_Sequence
+    (
+        type = number
+        displayname = "Stop Sequence"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Delivery_Status
+    (
+        type = picklist
+        displayname = "Delivery Status"
+        values = {"Assigned","Out For Delivery","Delivered","Failed","RTO"}
+        initial value = "Assigned"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Delivery_Execution
+    (
+        type = section
+        displayname = "Delivery Execution"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Arrived_At
+    (
+        type = datetime
+        displayname = "Arrived At"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Completed_At
+    (
+        type = datetime
+        displayname = "Completed At"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Attempt_Number
+    (
+        type = number
+        displayname = "Attempt Number"
+        initial value = 0
+        row = 2
+        column = 1
+        width = medium
+    )
+    Agent_Latitude
+    (
+        type = decimal
+        displayname = "Agent Latitude"
+        decimalplace = 6
+        row = 2
+        column = 2
+        width = medium
+    )
+    Agent_Longitude
+    (
+        type = decimal
+        displayname = "Agent Longitude"
+        decimalplace = 6
+        row = 2
+        column = 1
+        width = medium
+    )
+    Delivery_Proof
+    (
+        type = section
+        displayname = "Delivery Proof"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Proof_Type
+    (
+        type = picklist
+        displayname = "Proof Type"
+        values = {"OTP","Signature","Photo"}
+        row = 3
+        column = 1
+        width = medium
+    )
+    Recipient_OTP
+    (
+        type = text
+        displayname = "Recipient OTP"
+        maxchar = 8
+        isencrypted = true
+        personal data = true
+        row = 3
+        column = 2
+        width = medium
+    )
+    Recipient_Signature
+    (
+        type = signature
+        displayname = "Recipient Signature"
+        personal data = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Delivery_Photo
+    (
+        type = image
+        displayname = "Delivery Photo"
+        source = file,camera
+        aspect ratio = original
+        show gallery = true
+        personal data = true
+        row = 3
+        column = 2
+        width = medium
+    )
+    Recipient_Name
+    (
+        type = text
+        displayname = "Recipient Name"
+        maxchar = 100
+        personal data = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    COD_Collected
+    (
+        type = INR
+        displayname = "COD Collected"
+        format = commadotindian
+        decimalplace = 2
+        initial value = 0
+        row = 3
+        column = 2
+        width = medium
+    )
+    Failure_and_EPOD
+    (
+        type = section
+        displayname = "Failure and ePOD"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    NDR_Reason
+    (
+        type = picklist
+        displayname = "NDR Reason"
+        values = {"Customer Door Locked","Refused COD","Wrong Address","Recipient Unavailable","Other"}
+        row = 4
+        column = 1
+        width = medium
+    )
+    NDR_Notes
+    (
+        type = textarea
+        displayname = "NDR Notes"
+        height = 100px
+        row = 4
+        column = 2
+        width = medium
+    )
+    EPOD_WorkDrive_File_ID
+    (
+        type = text
+        displayname = "ePOD WorkDrive File ID"
+        row = 4
+        column = 1
+        width = medium
+    )
+    EPOD_URL
+    (
+        type = url
+        displayname = "ePOD URL"
+        target = new window
+        enable = linkname, title
+        row = 4
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Assignment"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Save Evidence"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

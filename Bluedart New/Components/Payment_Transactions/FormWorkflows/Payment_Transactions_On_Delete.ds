@@ -1,0 +1,19 @@
+Payment_Transactions_On_Delete as "Protect Payment Evidence"
+{
+    type = form
+    form = Payment_Transactions
+    record event = on delete
+    description = "Prohibits deletion of payment initiation and reconciliation evidence"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Payment transactions cannot be deleted. Preserve provider and accounting evidence.";
+                cancel delete;
+            )
+        }
+    }
+}

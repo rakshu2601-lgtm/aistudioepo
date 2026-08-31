@@ -1,0 +1,52 @@
+Application_Role_On_User_Input as "Update Fields for Application Role"
+{
+    type = form
+    form = Operations_Users
+    record event = on add or edit
+    description = "Updates agent and hub assignment fields when the role changes"
+
+    on user input of Application_Role
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Application_Role == "Field Agent")
+                {
+                    show Agent_Role, Assigned_Beat, Assigned_Pincodes, Vehicle_Type, Maximum_Daily_Load_Kg, Current_Latitude, Current_Longitude, Last_Location_At;
+                    enable Agent_Role, Assigned_Beat, Assigned_Pincodes, Vehicle_Type, Maximum_Daily_Load_Kg;
+                    if(input.Work_Email != null && input.Work_Email.toLowerCase() == zoho.loginuserid.toLowerCase())
+                    {
+                        enable Current_Latitude, Current_Longitude;
+                    }
+                    else
+                    {
+                        disable Current_Latitude, Current_Longitude;
+                    }
+                    disable Last_Location_At;
+                }
+                else
+                {
+                    input.Agent_Role = "Not Applicable";
+                    input.Assigned_Beat = "";
+                    input.Assigned_Pincodes = "";
+                    input.Vehicle_Type = null;
+                    input.Maximum_Daily_Load_Kg = null;
+                    hide Agent_Role, Assigned_Beat, Assigned_Pincodes, Vehicle_Type, Maximum_Daily_Load_Kg, Current_Latitude, Current_Longitude, Last_Location_At;
+                }
+                if(input.Application_Role in {"Hub Supervisor","Hub Operator","Field Agent"})
+                {
+                    show Home_Hub, Deputed_Hub, Deputation_Start_Date, Deputation_End_Date;
+                }
+                else
+                {
+                    input.Home_Hub = null;
+                    input.Deputed_Hub = null;
+                    input.Deputation_Start_Date = null;
+                    input.Deputation_End_Date = null;
+                    hide Home_Hub, Deputed_Hub, Deputation_Start_Date, Deputation_End_Date;
+                }
+            )
+        }
+    }
+}

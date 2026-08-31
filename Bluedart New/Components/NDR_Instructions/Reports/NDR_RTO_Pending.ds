@@ -1,0 +1,25 @@
+list NDR_RTO_Pending
+{
+    displayName = "RTO Pending"
+    show all rows from NDR_Instructions [NDR_Status == "RTO"]
+    (
+        NDR_ID
+        Shipment
+        Delivery_Run_Item
+        Failure_Reason
+        Submitted_At
+        NDR_Status
+        Supervisor_Notes
+    )
+    filters
+    (
+        Failure_Reason
+        Submitted_At
+        NDR_Status
+    )
+    sort by
+    (
+        Submitted_At descending
+        NDR_ID descending
+    )
+}

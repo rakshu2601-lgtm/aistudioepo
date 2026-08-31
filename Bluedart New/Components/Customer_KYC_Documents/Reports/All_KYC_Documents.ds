@@ -1,0 +1,39 @@
+default list All_KYC_Documents
+{
+    displayName = "All KYC Documents"
+    show all rows from Customer_KYC_Documents
+    (
+        KYC_Document_ID
+        Customer
+        Document_Type
+        Required_For_Onboarding
+        Document_Number
+        Expiry_Date
+        File_Version
+        Review_Status
+        Uploaded_On
+        Reviewed_By_Email
+        Reviewed_On
+        Locked_After_Verification
+    )
+    filters
+    (
+        Customer
+        Document_Type
+        Required_For_Onboarding
+        Review_Status
+        Expiry_Date
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Review_Status ascending
+    )
+    sort by
+    (
+        KYC_Document_ID descending
+    )
+}

@@ -1,0 +1,28 @@
+Delivery_Runs_Date_Input as "Refresh Delivery Resources by Date"
+{
+    type = form
+    form = Delivery_Run_Sheets
+    record event = on add or edit
+    description = "Refreshes deputation-sensitive delivery resources when the run date changes"
+
+    on user input of Run_Date
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Assigned_Agent = null;
+                input.Vehicle = null;
+                clear Assigned_Agent;
+                clear Vehicle;
+                if(input.Hub != null && input.Run_Date != null)
+                {
+                    eligible_agents = Operations_Users[Active == true && Application_Role == "Field Agent" && (Agent_Role == "Delivery" || Agent_Role == "Both") && ((Deputed_Hub == input.Hub && (Deputation_Start_Date == null || Deputation_Start_Date <= input.Run_Date) && (Deputation_End_Date == null || Deputation_End_Date >= input.Run_Date)) || (Home_Hub == input.Hub && (Deputed_Hub == null || (Deputation_Start_Date != null && Deputation_Start_Date > input.Run_Date) || (Deputation_End_Date != null && Deputation_End_Date < input.Run_Date))))];
+                    Assigned_Agent:ui.add(eligible_agents.ID.getall());
+                    eligible_vehicles = Vehicles[Owning_Hub == input.Hub && Active == true && Status == "Available"];
+                    Vehicle:ui.add(eligible_vehicles.ID.getall());
+                }
+            )
+        }
+    }
+}

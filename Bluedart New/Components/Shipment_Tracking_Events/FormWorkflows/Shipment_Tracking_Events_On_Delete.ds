@@ -1,0 +1,19 @@
+Shipment_Tracking_Events_On_Delete as "Prevent Tracking Event Deletion"
+{
+    type = form
+    form = Shipment_Tracking_Events
+    record event = on delete
+    description = "Preserves the immutable shipment chain of custody by blocking event deletion"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Shipment tracking events are immutable and cannot be deleted.";
+                cancel delete;
+            )
+        }
+    }
+}

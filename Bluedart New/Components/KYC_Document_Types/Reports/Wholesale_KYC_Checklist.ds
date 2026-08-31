@@ -1,0 +1,29 @@
+list Wholesale_KYC_Checklist
+{
+    displayName = "Wholesale KYC Checklist"
+    show all rows from KYC_Document_Types [(Applies_To == "Wholesale" || Applies_To == "Both") && Active == true]
+    (
+        Document_Code
+        Document_Name
+        Applies_To
+        Mandatory_By_Default
+        Conditional_On_Credit_Threshold
+        Credit_Threshold
+        Document_Number_Required
+        Expiry_Date_Required
+        Accepted_File_Types
+        Maximum_File_Size_MB
+        Display_Order
+        Active
+    )
+    filters
+    (
+        Mandatory_By_Default
+        Conditional_On_Credit_Threshold
+        Active
+    )
+    sort by
+    (
+        Display_Order ascending
+    )
+}

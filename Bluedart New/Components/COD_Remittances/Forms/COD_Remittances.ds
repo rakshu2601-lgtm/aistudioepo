@@ -1,0 +1,196 @@
+form COD_Remittances
+{
+    title
+    {
+        displayname = "COD Remittances"
+        on add = "Record COD Remittance"
+        on edit = "Update COD Remittance"
+    }
+    success message = "COD remittance saved successfully"
+
+    Remittance_Identity
+    (
+        type = section
+        displayname = "Remittance Identity"
+        row = 1
+        column = 0
+    )
+    Remittance_Number
+    (
+        type = autonumber
+        displayname = "Remittance Number"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Delivery_Run_Sheet
+    (
+        type = picklist
+        displayname = "Delivery Run Sheet"
+        values = Delivery_Run_Sheets.ID
+        displayformat = [DRS_Number]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Agent
+    (
+        type = picklist
+        displayname = "Delivery Agent"
+        values = Operations_Users.ID
+        displayformat = [Employee_ID]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Hub
+    (
+        type = picklist
+        displayname = "Hub"
+        values = Hubs.ID
+        displayformat = [Hub_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Remittance_Date
+    (
+        type = date
+        displayname = "Remittance Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    Cash_Reconciliation
+    (
+        type = section
+        displayname = "Cash Reconciliation"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Expected_Amount
+    (
+        type = INR
+        displayname = "Expected Amount"
+        format = commadotindian
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Submitted_Amount
+    (
+        type = INR
+        displayname = "Submitted Amount"
+        format = commadotindian
+        initial value = 0
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 2
+        width = medium
+    )
+    Shortfall_Amount
+    (
+        type = INR
+        displayname = "Shortfall Amount"
+        format = commadotindian
+        initial value = 0
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Remittance_Status
+    (
+        type = picklist
+        displayname = "Remittance Status"
+        values = {"Pending","Confirmed","Shortfall"}
+        initial value = "Pending"
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    Confirmation_and_Payout
+    (
+        type = section
+        displayname = "Confirmation and Payout"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Cashier_Email
+    (
+        type = email
+        displayname = "Cashier Email"
+        personal data = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Confirmed_At
+    (
+        type = datetime
+        displayname = "Confirmed At"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Customer_Payout_Due_Date
+    (
+        type = date
+        displayname = "Customer Payout Due Date"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Notes
+    (
+        type = textarea
+        displayname = "Notes"
+        height = 100px
+        row = 3
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit Remittance"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Remittance"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

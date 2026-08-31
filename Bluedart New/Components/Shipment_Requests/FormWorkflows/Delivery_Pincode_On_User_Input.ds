@@ -1,0 +1,48 @@
+Delivery_Pincode_On_User_Input as "Rate Shipment on Delivery Pincode Change"
+{
+    type = form
+    form = Shipment_Requests
+    record event = on add or edit
+    description = "Recalculates distance and charges when the delivery pincode changes"
+
+    on user input of Delivery_Pincode
+    {
+        actions
+        {
+            custom deluge script
+            (
+                quote = thisapp.Calculate_Shipment_Quote(ifnull(input.Customer,0),ifnull(input.Pickup_Pincode,""),ifnull(input.Delivery_Pincode,""),ifnull(input.Transport_Mode,""),ifnull(input.Length_Cm,0),ifnull(input.Width_Cm,0),ifnull(input.Height_Cm,0),ifnull(input.Actual_Weight_Kg,0),ifnull(input.Payment_Type,""),ifnull(input.Loyalty_Points_Redeemed,0));
+                if(quote.get("valid") == true)
+                {
+                    input.Volumetric_Weight_Kg = quote.get("volumetric_weight");
+                    input.Billable_Weight_Kg = quote.get("billable_weight");
+                    input.Rated_Distance_Km = quote.get("rated_distance");
+                    input.Applied_Rate_Card = quote.get("rate_card_id");
+                    input.Applied_Rate_Slab = quote.get("rate_slab_id");
+                    input.Base_Rate = quote.get("base_rate");
+                    input.Fuel_Surcharge = quote.get("fuel_surcharge");
+                    input.COD_Handling_Fee = quote.get("cod_fee");
+                    input.GST_Amount = quote.get("gst_amount");
+                    input.Gross_Amount = quote.get("gross_amount");
+                    input.Loyalty_Redemption_Amount = quote.get("redemption_amount");
+                    input.Total_Payable = quote.get("total_payable");
+                }
+                else
+                {
+                    input.Volumetric_Weight_Kg = 0;
+                    input.Billable_Weight_Kg = 0;
+                    input.Rated_Distance_Km = 0;
+                    input.Applied_Rate_Card = null;
+                    input.Applied_Rate_Slab = null;
+                    input.Base_Rate = 0;
+                    input.Fuel_Surcharge = 0;
+                    input.COD_Handling_Fee = 0;
+                    input.GST_Amount = 0;
+                    input.Gross_Amount = 0;
+                    input.Loyalty_Redemption_Amount = 0;
+                    input.Total_Payable = 0;
+                }
+            )
+        }
+    }
+}

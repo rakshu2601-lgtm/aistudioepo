@@ -1,0 +1,28 @@
+list My_KYC_Checklist
+{
+    displayName = "My KYC Checklist"
+    show all rows from Customer_KYC_Documents [Customer.Portal_Login_Email == zoho.loginuserid || Customer.Email_ID == zoho.loginuserid]
+    (
+        KYC_Document_ID
+        Document_Type
+        Required_For_Onboarding
+        Document_Number
+        Expiry_Date
+        Uploaded_File
+        File_Version
+        Review_Status
+        Review_Remarks
+        Uploaded_On
+        Reviewed_On
+        Locked_After_Verification
+    )
+    filters
+    (
+        Review_Status
+        Required_For_Onboarding
+    )
+    sort by
+    (
+        KYC_Document_ID ascending
+    )
+}

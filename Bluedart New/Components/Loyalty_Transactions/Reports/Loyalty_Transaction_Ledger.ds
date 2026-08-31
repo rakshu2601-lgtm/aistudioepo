@@ -1,0 +1,34 @@
+default list Loyalty_Transaction_Ledger
+{
+    displayName = "Loyalty Transaction Ledger"
+    show all rows from Loyalty_Transactions
+    (
+        Loyalty_Transaction_ID
+        Customer
+        Shipment
+        Transaction_Type
+        Points
+        Amount_Equivalent
+        Transaction_Date
+        Expiry_Date
+        Points_Status
+        Applied_Tier
+        Reference
+        Notes
+        Posted_By_Email
+        Customer_Login_Email
+    )
+    filters
+    (
+        Transaction_Type
+        Transaction_Date
+        Expiry_Date
+        Points_Status
+        Applied_Tier
+    )
+    sort by
+    (
+        Transaction_Date descending
+        Loyalty_Transaction_ID descending
+    )
+}

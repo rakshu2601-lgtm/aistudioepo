@@ -1,0 +1,36 @@
+list Available_Vehicles
+{
+    displayName = "Available Vehicles"
+    show all rows from Vehicles [Status == "Available" && Active == true]
+    (
+        Vehicle_Number
+        Vehicle_Type
+        Transport_Mode
+        Owning_Hub
+        Capacity_Kg
+        Assigned_Driver
+        Registration_Expiry
+        Insurance_Expiry
+        Status
+        Active
+    )
+    filters
+    (
+        Vehicle_Type
+        Transport_Mode
+        Owning_Hub
+        Active
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Owning_Hub ascending
+    )
+    sort by
+    (
+        Capacity_Kg descending
+    )
+}

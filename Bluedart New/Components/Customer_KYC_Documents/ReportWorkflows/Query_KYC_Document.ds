@@ -1,0 +1,68 @@
+Query_KYC_Document as "Query KYC Document"
+{
+    type = functions
+    form = Customer_KYC_Documents
+    execution type = for each record
+    description = "Returns an uploaded KYC document for customer correction with mandatory reviewer remarks"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                if(input.Review_Status != "Pending Verification")
+                {
+                    info "Only a document awaiting verification can be queried.";
+                }
+                else if(ifnull(input.Review_Remarks,"").trim() == "")
+                {
+                    info "Enter review remarks before querying this document.";
+                }
+                else
+                {
+                    input.Review_Status = "Query";
+                    input.Reviewed_By_Email = zoho.loginuserid;
+                    input.Reviewed_On = zoho.currenttime;
+                    input.Locked_After_Verification = false;
+                    customer_record = Customers[ID == input.Customer];
+                    queried_count = Customer_KYC_Documents[Customer == input.Customer && Review_Status == "Query" && ID != input.ID].count(ID) + 1;
+                    customer_record.Onboarding_Status = "Action Required";
+                    communication_id = insert into Communication_Log
+                    [
+                        Customer = customer_record.ID
+                        Recipient = customer_record.Email_ID
+                        Channel = "Email"
+                        Template_Code = "KYC_DOCUMENT_QUERY"
+                        Subject = "KYC document correction required"
+                        Message_Summary = "Document " + input.Document_Type + " requires correction: " + input.Review_Remarks
+                        Provider = "Zoho Mail"
+                        Communication_Status = "Sent"
+                        Attempt_Count = 1
+                        Last_Attempt_At = zoho.currenttime
+                    ];
+                    sendmail
+                    [
+                        from: zoho.adminuserid
+                        to: customer_record.Email_ID
+                        subject: "KYC document correction required"
+                        message: "A KYC document requires correction. Sign in to the customer portal to review the remarks and upload a corrected version."
+                    ]
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = "POC Process User"
+                        Action_Name = "Query KYC Document"
+                        Module_Name = "Customer_KYC_Documents"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=Pending Verification"
+                        After_Data = "Status=Query; Queried Documents=" + queried_count + "; Remarks=" + input.Review_Remarks
+                        Source = "Report Action"
+                        Severity = "Warning"
+                    ];
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,59 @@
+Unseal_Bag as "Unseal Bag"
+{
+    type = functions
+    form = Logistics_Bags
+    execution type = for each record
+    description = "Unseals a received bag at the destination after custody verification"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == input.Destination_Hub;
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the destination hub can unseal this bag.";
+                }
+                else if(input.Bag_Status != "Received" || ifnull(input.Seal_Code,"").trim() == "")
+                {
+                    info "Only a received bag with a verified seal can be unsealed.";
+                }
+                else
+                {
+                    pending_reconciliation = Bag_Shipments[Bag == input.ID && Scan_Status == "Loaded"].count(ID);
+                    if(pending_reconciliation > 0)
+                    {
+                        info "Reconcile every expected AWB as received, missing, damaged, or removed before unsealing the bag.";
+                    }
+                    else
+                    {
+                        input.Bag_Status = "Unsealed";
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuserid
+                            Actor_Profile = current_profile
+                            Action_Name = "Unseal Bag"
+                            Module_Name = "Logistics Bags"
+                            Record_ID = input.ID.toString()
+                            Before_Data = "Status=Received; Seal=" + input.Seal_Code
+                            After_Data = "Status=Unsealed; Reconciliation=Complete"
+                            Source = "Report Action"
+                            Severity = "Critical"
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

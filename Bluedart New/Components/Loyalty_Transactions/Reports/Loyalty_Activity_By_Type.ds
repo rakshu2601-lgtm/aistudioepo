@@ -1,0 +1,39 @@
+list Loyalty_Activity_By_Type
+{
+    displayName = "Loyalty Activity by Type"
+    show all rows from Loyalty_Transactions
+    (
+        Loyalty_Transaction_ID
+        Customer
+        Shipment
+        Transaction_Type
+        Points
+        Amount_Equivalent
+        Transaction_Date
+        Expiry_Date
+        Points_Status
+        Applied_Tier
+        Reference
+    )
+    filters
+    (
+        Transaction_Type
+        Transaction_Date
+        Expiry_Date
+        Points_Status
+        Applied_Tier
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Transaction_Type ascending
+        Points_Status ascending
+    )
+    sort by
+    (
+        Transaction_Date descending
+    )
+}

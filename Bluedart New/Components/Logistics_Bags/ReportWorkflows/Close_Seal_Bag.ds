@@ -1,0 +1,69 @@
+Close_Seal_Bag as "Close & Seal - Open Bags"
+{
+    type = functions
+    form = Logistics_Bags
+    execution type = for each record
+    description = "Computes loaded contents and seals an open logistics bag"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                effective_hub = logged_user.Home_Hub;
+                if(deputation_active == true)
+                {
+                    effective_hub = logged_user.Deputed_Hub;
+                }
+                authorised = logged_user.count(ID) > 0 && effective_hub == input.Origin_Hub;
+                if(authorised == false)
+                {
+                    info "Only an active operations user at the origin hub can seal this bag.";
+                }
+                else if(input.Bag_Status != "Open" || ifnull(input.Seal_Code,"").trim() == "")
+                {
+                    info "The bag must be open and have a seal code before sealing.";
+                }
+                else
+                {
+                    shipment_count = 0;
+                    total_weight = 0.0;
+                    for each bag_item in Bag_Shipments[Bag == input.ID && Scan_Status == "Loaded"]
+                    {
+                        shipment_count = shipment_count + 1;
+                        shipment_record = Shipment_Requests[ID == bag_item.Shipment];
+                        total_weight = total_weight + ifnull(shipment_record.Billable_Weight_Kg,0);
+                    }
+                    if(shipment_count == 0)
+                    {
+                        info "Scan at least one shipment into the bag before sealing.";
+                    }
+                    else
+                    {
+                        input.Total_Shipments = shipment_count;
+                        input.Total_Weight_Kg = total_weight;
+                        input.Bag_Status = "Sealed";
+                        input.Sealed_At = zoho.currenttime;
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuserid
+                            Actor_Profile = current_profile
+                            Action_Name = "Close and Seal Bag"
+                            Module_Name = "Logistics Bags"
+                            Record_ID = input.ID.toString()
+                            Before_Data = "Status=Open"
+                            After_Data = "Status=Sealed; Seal=" + input.Seal_Code + "; Shipments=" + shipment_count + "; Weight=" + total_weight
+                            Source = "Report Action"
+                            Severity = "Critical"
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

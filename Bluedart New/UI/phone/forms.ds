@@ -1,0 +1,14 @@
+forms
+{
+    form Customers { label placement = left }
+    form Customer_KYC_Documents { label placement = left }
+    form Shipment_Requests { label placement = left }
+    form Pickup_Run_Sheet_Items { label placement = left }
+    form Delivery_Run_Sheet_Items { label placement = left }
+    form NDR_Instructions { label placement = left }
+    form NDR_Response { label placement = left }
+    form Loyalty_Transactions { label placement = left }
+    form Invoices { label placement = left }
+    form Payment_Transactions { label placement = left }
+    form Operations_Users { label placement = left }
+}

@@ -1,0 +1,14 @@
+report My_Pickup_Tasks
+{
+    quickview
+    (
+        layout ( type = -1 datablock1 ( layout type = -1 fields ( Pickup_Run_Sheet Stop_Sequence Shipment Stop_Status Physical_Weight_Kg "Mark Arrived" "Complete Pickup" "Fail Pickup" ) ) )
+        menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) )
+        action ( on tap ( View Record ) on long press ( Edit Delete Duplicate View Record ) on left swipe ( Delete ) on right swipe ( Edit ) )
+    )
+    detailview
+    (
+        layout ( type = 1 datablock1 ( layout type = -2 fields ( Pickup_Run_Sheet Stop_Sequence Shipment Stop_Status Arrived_At Physical_Weight_Kg Revised_Charge Customer_Approved_Revised_Charge Completed_At Agent_Latitude Agent_Longitude Failure_Reason "Mark Arrived" "Complete Pickup" "Fail Pickup" ) ) )
+        menu ( header ( Edit Duplicate Delete ) )
+    )
+}

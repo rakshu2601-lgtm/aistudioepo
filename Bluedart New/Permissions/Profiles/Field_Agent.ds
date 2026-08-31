@@ -1,0 +1,24 @@
+"Field_Agent"
+{
+ name = "Field_Agent"
+ type = Users_Permissions
+ permissions = { Chat:true, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+ description = "Assigned first-mile pickup and last-mile delivery execution"
+ ModulePermissions
+ {
+  Operations_Users { enabled = View,Edit,Search allFieldsVisible = false FieldPermissions { Employee_ID{visibility:true,readonly:true} Employee_Name{visibility:true,readonly:true} Work_Email{visibility:true,readonly:true} Mobile_Number{visibility:true,readonly:true} Home_Hub{visibility:true,readonly:true} Agent_Role{visibility:true,readonly:true} Assigned_Beat{visibility:true,readonly:true} Vehicle_Type{visibility:true,readonly:true} Maximum_Daily_Load_Kg{visibility:true,readonly:true} Deputed_Hub{visibility:true,readonly:true} Current_Latitude{visibility:true,readonly:false} Current_Longitude{visibility:true,readonly:false} Last_Location_At{visibility:true,readonly:true} }
+  }
+  Shipment_Requests { enabled = View,Search allFieldsVisible = false FieldPermissions { AWB_Number{visibility:true,readonly:true} Sender_Name{visibility:true,readonly:true} Sender_Phone{visibility:true,readonly:true} Pickup_Address{visibility:true,readonly:true} Pickup_Pincode{visibility:true,readonly:true} Recipient_Name{visibility:true,readonly:true} Recipient_Phone{visibility:true,readonly:true} Delivery_Address{visibility:true,readonly:true} Delivery_Pincode{visibility:true,readonly:true} Package_Count{visibility:true,readonly:true} Actual_Weight_Kg{visibility:true,readonly:true} Payment_Type{visibility:true,readonly:true} COD_Amount{visibility:true,readonly:true} Payment_Status{visibility:true,readonly:true} Shipment_Status{visibility:true,readonly:true} Declared_Value{visibility:false} Base_Rate{visibility:false} Gross_Amount{visibility:false} Total_Payable{visibility:false} Credit_Check_Status{visibility:false} }
+  }
+  Pickup_Run_Sheets { enabled = View,Search allFieldsVisible = true ReportPermissions { My_Pickup_Runs={"View","Edit"} } }
+  Pickup_Run_Sheet_Items { enabled = View,Edit,Search,Tab allFieldsVisible = false ReportPermissions { My_Pickup_Tasks={"View","Edit"} } FieldPermissions { Pickup_Run_Sheet{visibility:true,readonly:true} Shipment{visibility:true,readonly:true} Stop_Sequence{visibility:true,readonly:true} Stop_Status{visibility:true,readonly:false} Arrived_At{visibility:true,readonly:true} Physical_Weight_Kg{visibility:true,readonly:false} Revised_Charge{visibility:true,readonly:true} Customer_Approved_Revised_Charge{visibility:true,readonly:false} Pickup_OTP{visibility:true,readonly:false} Pickup_Signature{visibility:true,readonly:false} Failure_Reason{visibility:true,readonly:false} Completed_At{visibility:true,readonly:true} Agent_Latitude{visibility:true,readonly:false} Agent_Longitude{visibility:true,readonly:false} }
+  }
+  Delivery_Run_Sheets { enabled = View,Search allFieldsVisible = true ReportPermissions { My_Delivery_Runs={"View","Edit"} } }
+  Delivery_Run_Sheet_Items { enabled = View,Edit,Search,Tab allFieldsVisible = false ReportPermissions { My_Delivery_Tasks={"View","Edit"} } FieldPermissions { Delivery_Run_Sheet{visibility:true,readonly:true} Shipment{visibility:true,readonly:true} Stop_Sequence{visibility:true,readonly:true} Delivery_Status{visibility:true,readonly:false} Arrived_At{visibility:true,readonly:true} Completed_At{visibility:true,readonly:true} Proof_Type{visibility:true,readonly:false} Recipient_OTP{visibility:true,readonly:false} Recipient_Signature{visibility:true,readonly:false} Delivery_Photo{visibility:true,readonly:false} Recipient_Name{visibility:true,readonly:false} COD_Collected{visibility:true,readonly:false} NDR_Reason{visibility:true,readonly:false} NDR_Notes{visibility:true,readonly:false} Attempt_Number{visibility:true,readonly:true} Agent_Latitude{visibility:true,readonly:false} Agent_Longitude{visibility:true,readonly:false} EPOD_WorkDrive_File_ID{visibility:false} EPOD_URL{visibility:true,readonly:true} }
+  }
+  COD_Remittances { enabled = View,Search allFieldsVisible = false ReportPermissions { COD_Pending_Remittance={"View"} } FieldPermissions { Remittance_Number{visibility:true,readonly:true} Delivery_Run_Sheet{visibility:true,readonly:true} Expected_Amount{visibility:true,readonly:true} Submitted_Amount{visibility:true,readonly:true} Shortfall_Amount{visibility:true,readonly:true} Remittance_Status{visibility:true,readonly:true} Remittance_Date{visibility:true,readonly:true} }
+  }
+  Agent_Dashboard { enabled = tab }
+  Shipment_Tracking { enabled = tab }
+ }
+}

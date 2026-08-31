@@ -1,0 +1,35 @@
+default list All_Transport_Routes
+{
+    displayName = "All Transport Routes"
+    show all rows from Transport_Routes
+    (
+        Route_ID
+        Route_Name
+        Origin_Sorting_Hub
+        Destination_Sorting_Hub
+        Transport_Mode
+        Distance_Km
+        Estimated_Transit_Hours
+        Daily_Capacity_Kg
+        Active
+    )
+    filters
+    (
+        Origin_Sorting_Hub
+        Destination_Sorting_Hub
+        Transport_Mode
+        Active
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Transport_Mode ascending
+    )
+    sort by
+    (
+        Route_Name ascending
+    )
+}

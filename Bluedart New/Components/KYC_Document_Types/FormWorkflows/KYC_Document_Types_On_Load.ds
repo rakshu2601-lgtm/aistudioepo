@@ -1,0 +1,26 @@
+KYC_Document_Types_On_Load as "Configure Credit Threshold Field"
+{
+    type = form
+    form = KYC_Document_Types
+    record event = on add or edit
+    description = "Shows the credit threshold only for conditional KYC documents"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Conditional_On_Credit_Threshold == true)
+                {
+                    show Credit_Threshold;
+                    enable Credit_Threshold;
+                }
+                else
+                {
+                    hide Credit_Threshold;
+                }
+            )
+        }
+    }
+}

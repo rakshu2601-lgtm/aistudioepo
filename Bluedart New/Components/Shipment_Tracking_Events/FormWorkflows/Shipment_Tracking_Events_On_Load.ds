@@ -1,0 +1,37 @@
+Shipment_Tracking_Events_On_Load as "Secure Tracking Event Form"
+{
+    type = form
+    form = Shipment_Tracking_Events
+    record event = on add or edit
+    description = "Protects immutable event metadata and prevents unauthorised direct-record access"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Created_By_Email;
+                is_portal = thisapp.portal.isUserInProfile("Customer_Portal");
+                if(is_portal == true)
+                {
+                    hide Hub, Manifest, Bag, Agent, Latitude, Longitude, Customer_Visible, Created_By_Email;
+                    if(input.ID != null)
+                    {
+                        shipment_record = Shipment_Requests[ID == input.Shipment];
+                        customer_record = Customers[ID == shipment_record.Customer];
+                        if(input.Customer_Visible != true || (customer_record.Portal_Login_Email != zoho.loginuserid && customer_record.Email_ID != zoho.loginuserid))
+                        {
+                            alert "You are not authorised to access this tracking event.";
+                        }
+                        disable Shipment, Event_Time, Event_Status, Source, Event_Description;
+                    }
+                }
+                else if(input.ID != null && thisapp.permissions.loginUserProfile() != "Logistics_Administrator")
+                {
+                    disable Shipment, Event_Time, Event_Status, Source, Hub, Manifest, Bag, Agent, Latitude, Longitude, Event_Description, Customer_Visible;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,19 @@
+COD_Remittances_On_Delete as "Protect COD Remittance Evidence"
+{
+    type = form
+    form = COD_Remittances
+    record event = on delete
+    description = "Prevents deletion of financial custody evidence"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "COD remittance records are financial evidence and cannot be deleted.";
+                cancel delete;
+            )
+        }
+    }
+}

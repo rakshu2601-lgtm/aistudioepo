@@ -1,0 +1,52 @@
+Rate_Slabs_On_Validate as "Validate Rate Slab"
+{
+    type = form
+    form = Rate_Slabs
+    record event = on add or edit
+    description = "Validates slab bounds, charges, parent compatibility, and overlapping active bands"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(ifnull(input.Minimum_Weight_Kg,-1) < 0 || ifnull(input.Minimum_Distance_Km,-1) < 0)
+                {
+                    alert "Minimum weight and distance cannot be negative.";
+                    cancel submit;
+                }
+                if(input.Maximum_Weight_Kg <= input.Minimum_Weight_Kg)
+                {
+                    alert "Maximum weight must be greater than minimum weight.";
+                    cancel submit;
+                }
+                if(input.Maximum_Distance_Km <= input.Minimum_Distance_Km)
+                {
+                    alert "Maximum distance must be greater than minimum distance.";
+                    cancel submit;
+                }
+                if(ifnull(input.Base_Rate,-1) < 0 || ifnull(input.Additional_Kg_Rate,-1) < 0)
+                {
+                    alert "Base and additional kilogram rates cannot be negative.";
+                    cancel submit;
+                }
+                parent_rate_card = Rate_Cards[ID == input.Rate_Card];
+                if(parent_rate_card.Status == "Expired")
+                {
+                    alert "Rate slabs cannot be added to an expired rate card.";
+                    cancel submit;
+                }
+                if(input.Active == true)
+                {
+                    overlapping_slabs = Rate_Slabs[Rate_Card == input.Rate_Card && Service_Zone == input.Service_Zone && Active == true && ID != input.ID && Minimum_Weight_Kg <= input.Maximum_Weight_Kg && Maximum_Weight_Kg >= input.Minimum_Weight_Kg && Minimum_Distance_Km <= input.Maximum_Distance_Km && Maximum_Distance_Km >= input.Minimum_Distance_Km].count();
+                    if(overlapping_slabs > 0)
+                    {
+                        alert "This active weight and distance band overlaps another slab for the same rate card and service zone.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

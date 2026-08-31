@@ -1,0 +1,65 @@
+Activate_Loyalty_Rule as "Activate Loyalty Rule"
+{
+    type = functions
+    form = Loyalty_Rules
+    execution type = for each record
+    description = "Activates a draft earning rule only when its scope and period remain deterministic"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(current_profile != "Logistics_Administrator" && current_profile != "Finance_Officer")
+                {
+                    info "Only Logistics Administrators and Finance Officers can activate loyalty rules.";
+                }
+                else if(input.Status != "Draft")
+                {
+                    info "Only draft loyalty rules can be activated.";
+                }
+                else if(input.Effective_To != null && input.Effective_To < zoho.currentdate)
+                {
+                    info "This rule's effective period has already ended.";
+                }
+                else
+                {
+                    ambiguous_count = 0;
+                    for each candidate in Loyalty_Rules[ID != input.ID && Status == "Active" && Minimum_Shipment_Amount == input.Minimum_Shipment_Amount]
+                    {
+                        customer_scope_overlaps = candidate.Customer_Type == input.Customer_Type || candidate.Customer_Type == "All" || input.Customer_Type == "All";
+                        mode_scope_overlaps = candidate.Transport_Mode == input.Transport_Mode || candidate.Transport_Mode == "Any" || input.Transport_Mode == "Any";
+                        date_scope_overlaps = (candidate.Effective_To == null || candidate.Effective_To >= input.Effective_From) && (input.Effective_To == null || candidate.Effective_From <= input.Effective_To);
+                        if(customer_scope_overlaps == true && mode_scope_overlaps == true && date_scope_overlaps == true)
+                        {
+                            ambiguous_count = ambiguous_count + 1;
+                        }
+                    }
+                    if(ambiguous_count > 0)
+                    {
+                        info "Activation would overlap another active rule at the same amount threshold.";
+                    }
+                    else
+                    {
+                        input.Status = "Active";
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuserid
+                            Actor_Profile = current_profile
+                            Action_Name = "Activate Loyalty Rule"
+                            Module_Name = "Loyalty Rules"
+                            Record_ID = input.ID.toString()
+                            Before_Data = "Status=Draft"
+                            After_Data = "Status=Active; Rule=" + input.Loyalty_Rule_ID + "; Effective From=" + input.Effective_From + "; Effective To=" + input.Effective_To
+                            Source = "Report Action"
+                            Severity = "Critical"
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

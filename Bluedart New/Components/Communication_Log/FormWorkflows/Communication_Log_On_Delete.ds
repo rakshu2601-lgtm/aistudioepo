@@ -1,0 +1,19 @@
+Communication_Log_On_Delete as "Prohibit Communication Deletion"
+{
+    type = form
+    form = Communication_Log
+    record event = on delete
+    description = "Preserves communication attempts and provider outcomes"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Communication delivery history cannot be deleted.";
+                cancel delete;
+            )
+        }
+    }
+}

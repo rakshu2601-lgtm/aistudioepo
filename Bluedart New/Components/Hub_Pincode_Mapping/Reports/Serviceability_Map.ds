@@ -1,0 +1,48 @@
+list Serviceability_Map
+{
+    displayName = "Serviceability Map"
+    show all rows from Hub_Pincode_Mapping
+    (
+        Pincode
+        Serviceability
+        Service_Zone
+        Beat_Name
+        Primary_Collection_Center
+        Secondary_Overflow_Hub
+        Approx_Distance_From_Primary_Km
+        Active
+    )
+    filters
+    (
+        Serviceability
+        Service_Zone
+        Active
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Serviceability ascending
+    )
+    sort by
+    (
+        Pincode ascending
+    )
+    conditional formatting
+    (
+        "Non-Serviceable"
+        {
+            condition = (Serviceability == "Non-Serviceable")
+            fields = [Pincode, Serviceability]
+            format = "background-color:#FEE2E2;color:#991B1B"
+        }
+        "Out of Delivery Area"
+        {
+            condition = (Serviceability == "ODA")
+            fields = [Pincode, Serviceability]
+            format = "background-color:#FEF3C7;color:#92400E"
+        }
+    )
+}

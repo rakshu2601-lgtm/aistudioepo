@@ -1,0 +1,149 @@
+Delivery_Run_Sheets_On_Validate as "Validate Delivery Run Sheet"
+{
+    type = form
+    form = Delivery_Run_Sheets
+    record event = on add or edit
+    description = "Validates hub scope, delivery resources, protected totals, dates, and shared daily capacity"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(current_profile != "Logistics_Administrator" && current_profile != "Operations_Manager" && current_profile != "Hub_Supervisor")
+                {
+                    alert "Only authorised operations planners can create or edit delivery run sheets.";
+                    cancel submit;
+                }
+                if(input.Run_Date < zoho.currentdate)
+                {
+                    alert "A delivery run cannot be planned for a past date.";
+                    cancel submit;
+                }
+                selected_hub = Hubs[ID == input.Hub && Hub_Type == "Collection Center" && Active == true];
+                if(selected_hub.count(ID) == 0)
+                {
+                    alert "Select an active collection center or delivery hub.";
+                    cancel submit;
+                }
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                if(current_profile == "Hub_Supervisor")
+                {
+                    supervisor_deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= input.Run_Date) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= input.Run_Date);
+                    supervisor_hub = if(supervisor_deputation_active == true,logged_user.Deputed_Hub,logged_user.Home_Hub);
+                    if(logged_user.count(ID) == 0 || supervisor_hub != input.Hub)
+                    {
+                        alert "Hub supervisors can plan delivery runs only for their effective home or deputed hub.";
+                        cancel submit;
+                    }
+                }
+                agent_record = Operations_Users[ID == input.Assigned_Agent && Active == true && Application_Role == "Field Agent" && (Agent_Role == "Delivery" || Agent_Role == "Both")];
+                if(agent_record.count(ID) == 0)
+                {
+                    alert "Select an active delivery-capable field agent.";
+                    cancel submit;
+                }
+                agent_deputation_active = agent_record.Deputed_Hub != null && (agent_record.Deputation_Start_Date == null || agent_record.Deputation_Start_Date <= input.Run_Date) && (agent_record.Deputation_End_Date == null || agent_record.Deputation_End_Date >= input.Run_Date);
+                agent_hub = if(agent_deputation_active == true,agent_record.Deputed_Hub,agent_record.Home_Hub);
+                if(agent_hub != input.Hub)
+                {
+                    alert "The assigned agent is not effective at the selected hub on the run date.";
+                    cancel submit;
+                }
+                previous_record = Delivery_Run_Sheets[ID == input.ID];
+                if(input.ID != null)
+                {
+                    if(previous_record.DRS_Status != "Draft")
+                    {
+                        alert "Released delivery runs cannot be edited from the form.";
+                        cancel submit;
+                    }
+                    if(input.DRS_Status != previous_record.DRS_Status || input.Planned_Stop_Count != previous_record.Planned_Stop_Count || input.Delivered_Count != previous_record.Delivered_Count || input.Failed_Count != previous_record.Failed_Count || input.Expected_COD_Amount != previous_record.Expected_COD_Amount || input.Collected_COD_Amount != previous_record.Collected_COD_Amount || input.Released_At != previous_record.Released_At || input.Completed_At != previous_record.Completed_At)
+                    {
+                        alert "Run status, timestamps, COD, and progress totals are managed by operational workflows.";
+                        cancel submit;
+                    }
+                }
+                planned_count = 0;
+                delivered_count = 0;
+                failed_count = 0;
+                planned_weight = 0.0;
+                expected_cod = 0.0;
+                collected_cod = 0.0;
+                if(input.ID != null)
+                {
+                    for each run_item in Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.ID]
+                    {
+                        planned_count = planned_count + 1;
+                        shipment_record = Shipment_Requests[ID == run_item.Shipment];
+                        planned_weight = planned_weight + ifnull(shipment_record.Billable_Weight_Kg,0);
+                        if(shipment_record.Payment_Type == "COD")
+                        {
+                            expected_cod = expected_cod + ifnull(shipment_record.COD_Amount,0);
+                        }
+                        if(run_item.Delivery_Status == "Delivered")
+                        {
+                            delivered_count = delivered_count + 1;
+                            collected_cod = collected_cod + ifnull(run_item.COD_Collected,0);
+                        }
+                        else if(run_item.Delivery_Status == "Failed" || run_item.Delivery_Status == "RTO")
+                        {
+                            failed_count = failed_count + 1;
+                        }
+                    }
+                }
+                input.Planned_Stop_Count = planned_count;
+                input.Delivered_Count = delivered_count;
+                input.Failed_Count = failed_count;
+                input.Expected_COD_Amount = expected_cod;
+                input.Collected_COD_Amount = collected_cod;
+                other_agent_weight = 0.0;
+                for each pickup_run in Pickup_Run_Sheets[Assigned_Agent == input.Assigned_Agent && Run_Date == input.Run_Date && Status != "Cancelled"]
+                {
+                    other_agent_weight = other_agent_weight + ifnull(pickup_run.Total_Planned_Weight_Kg,0);
+                }
+                for each other_run in Delivery_Run_Sheets[Assigned_Agent == input.Assigned_Agent && Run_Date == input.Run_Date && ID != input.ID && DRS_Status != "Cancelled"]
+                {
+                    for each other_item in Delivery_Run_Sheet_Items[Delivery_Run_Sheet == other_run.ID]
+                    {
+                        other_shipment = Shipment_Requests[ID == other_item.Shipment];
+                        other_agent_weight = other_agent_weight + ifnull(other_shipment.Billable_Weight_Kg,0);
+                    }
+                }
+                if(agent_record.Maximum_Daily_Load_Kg != null && agent_record.Maximum_Daily_Load_Kg > 0 && other_agent_weight + planned_weight > agent_record.Maximum_Daily_Load_Kg)
+                {
+                    alert "The assigned agent's combined pickup and delivery load would exceed the daily limit.";
+                    cancel submit;
+                }
+                if(input.Vehicle != null)
+                {
+                    vehicle_record = Vehicles[ID == input.Vehicle && Active == true && Owning_Hub == input.Hub];
+                    if(vehicle_record.count(ID) == 0)
+                    {
+                        alert "Select an active vehicle owned by the delivery hub.";
+                        cancel submit;
+                    }
+                    if(vehicle_record.Status != "Available" && (input.ID == null || previous_record.Vehicle != input.Vehicle))
+                    {
+                        alert "The selected vehicle is not available.";
+                        cancel submit;
+                    }
+                    duplicate_delivery_run = Delivery_Run_Sheets[Vehicle == input.Vehicle && Run_Date == input.Run_Date && ID != input.ID && DRS_Status != "Cancelled"].count(ID);
+                    duplicate_pickup_run = Pickup_Run_Sheets[Vehicle == input.Vehicle && Run_Date == input.Run_Date && Status != "Cancelled"].count(ID);
+                    if(duplicate_delivery_run > 0 || duplicate_pickup_run > 0)
+                    {
+                        alert "The selected vehicle is already planned for another run on this date.";
+                        cancel submit;
+                    }
+                    if(planned_weight > vehicle_record.Capacity_Kg)
+                    {
+                        alert "The planned shipment weight exceeds the selected vehicle capacity.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

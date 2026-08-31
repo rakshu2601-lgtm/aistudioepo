@@ -1,0 +1,30 @@
+Pickup_Run_Sheets_On_Success as "Audit Pickup Run Planning"
+{
+    type = form
+    form = Pickup_Run_Sheets
+    record event = on add or edit
+    description = "Audits creation and draft updates of pickup run plans"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = current_profile
+                    Action_Name = "Save Pickup Run Sheet"
+                    Module_Name = "Pickup Run Sheets"
+                    Record_ID = input.ID.toString()
+                    After_Data = "PRS=" + input.PRS_Number + "; Hub=" + input.Hub + "; Agent=" + input.Assigned_Agent + "; Run Date=" + input.Run_Date + "; Status=" + input.Status
+                    Source = "Form Workflow"
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

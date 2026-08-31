@@ -1,0 +1,18 @@
+View_Customer_KYC as "View KYC"
+{
+    type = functions
+    form = Customers
+    execution type = for each record
+    description = "Opens the secure KYC review workspace for the selected customer"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                openUrl("#Page:KYC_Review?Customer_ID=" + input.ID,"same window");
+            )
+        }
+    }
+}

@@ -1,0 +1,19 @@
+<page linkname = "Shipment_Tracking" parameters = "int Shipment_ID" displayname = "Shipment Tracking"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Shipment_Tracking_Snippet' elementName='Shipment_Tracking_Snippet'>
+          <![CDATA[htmlpage Shipment_Tracking_Snippet()
+            content
+            <%{%>
+                <file name:Shipment_Tracking_Snippet.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

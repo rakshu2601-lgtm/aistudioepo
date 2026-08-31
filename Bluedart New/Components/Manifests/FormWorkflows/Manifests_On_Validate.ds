@@ -1,0 +1,144 @@
+Manifests_On_Validate as "Validate Manifest"
+{
+    type = form
+    form = Manifests
+    record event = on add or edit
+    description = "Validates manifest topology, route, resources, timing, capacity prerequisites, and protected state"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                authorised = current_profile == "Logistics_Administrator" || current_profile == "Operations_Manager" || current_profile == "Hub_Supervisor" || current_profile == "Hub_Operator";
+                if(authorised == false)
+                {
+                    alert "You are not authorised to create or edit manifests.";
+                    cancel submit;
+                }
+                origin_record = Hubs[ID == input.Origin_Hub && Active == true];
+                destination_record = Hubs[ID == input.Destination_Hub && Active == true];
+                if(origin_record.count(ID) == 0 || destination_record.count(ID) == 0 || input.Origin_Hub == input.Destination_Hub)
+                {
+                    alert "Select different active origin and destination hubs.";
+                    cancel submit;
+                }
+                if(input.Manifest_Type == "Feeder" && (origin_record.Hub_Type != "Collection Center" || destination_record.ID != origin_record.Parent_Sorting_Hub))
+                {
+                    alert "A feeder manifest must move from a collection center to its parent sorting hub.";
+                    cancel submit;
+                }
+                if(input.Manifest_Type == "Linehaul" && (origin_record.Hub_Type != "Sorting Hub" || destination_record.Hub_Type != "Sorting Hub"))
+                {
+                    alert "A linehaul manifest must move between sorting hubs.";
+                    cancel submit;
+                }
+                if(input.Manifest_Type == "Delivery Feeder" && (origin_record.Hub_Type != "Sorting Hub" || destination_record.Hub_Type != "Collection Center" || destination_record.Parent_Sorting_Hub != origin_record.ID))
+                {
+                    alert "A delivery feeder manifest must move from a sorting hub to one of its collection centers.";
+                    cancel submit;
+                }
+                if(input.Manifest_Type == "Linehaul")
+                {
+                    route_record = Transport_Routes[ID == input.Route && Active == true && Origin_Sorting_Hub == input.Origin_Hub && Destination_Sorting_Hub == input.Destination_Hub];
+                    if(route_record.count(ID) == 0)
+                    {
+                        alert "Select an active route matching the linehaul hub pair.";
+                        cancel submit;
+                    }
+                }
+                else if(input.Route != null)
+                {
+                    alert "A transport route is used only for linehaul manifests.";
+                    cancel submit;
+                }
+                vehicle_record = Vehicles[ID == input.Vehicle && Active == true && Owning_Hub == input.Origin_Hub];
+                if(vehicle_record.count(ID) == 0)
+                {
+                    alert "Select an active vehicle owned by the origin hub.";
+                    cancel submit;
+                }
+                if(vehicle_record.Status != "Available" && (input.ID == null || Manifests[ID == input.ID].Vehicle != input.Vehicle))
+                {
+                    alert "The selected vehicle is not available.";
+                    cancel submit;
+                }
+                if(input.Manifest_Type == "Linehaul")
+                {
+                    required_mode = if(route_record.Transport_Mode == "Air","Air Support","Surface");
+                    if(vehicle_record.Transport_Mode != required_mode)
+                    {
+                        alert "The selected vehicle transport mode is not compatible with the route.";
+                        cancel submit;
+                    }
+                }
+                if(input.Driver != null)
+                {
+                    driver_record = Operations_Users[ID == input.Driver && Active == true && Application_Role == "Field Agent"];
+                    if(driver_record.count(ID) == 0)
+                    {
+                        alert "Select an active field agent as driver.";
+                        cancel submit;
+                    }
+                    driver_deputation_active = driver_record.Deputed_Hub != null && (driver_record.Deputation_Start_Date == null || driver_record.Deputation_Start_Date <= zoho.currentdate) && (driver_record.Deputation_End_Date == null || driver_record.Deputation_End_Date >= zoho.currentdate);
+                    driver_hub = if(driver_deputation_active == true,driver_record.Deputed_Hub,driver_record.Home_Hub);
+                    if(driver_hub != input.Origin_Hub)
+                    {
+                        alert "The selected driver is not effective at the origin hub.";
+                        cancel submit;
+                    }
+                }
+                if(input.Departure_Time != null && input.Expected_Arrival_Time != null && input.Expected_Arrival_Time <= input.Departure_Time)
+                {
+                    alert "Expected arrival must be later than departure.";
+                    cancel submit;
+                }
+                if(input.ID != null && input.Total_Weight_Kg > vehicle_record.Capacity_Kg)
+                {
+                    alert "Manifest weight exceeds the selected vehicle capacity.";
+                    cancel submit;
+                }
+                if(current_profile == "Hub_Supervisor" || current_profile == "Hub_Operator")
+                {
+                    logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                    deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                    effective_hub = logged_user.Home_Hub;
+                    if(deputation_active == true)
+                    {
+                        effective_hub = logged_user.Deputed_Hub;
+                    }
+                    if(logged_user.count(ID) == 0 || effective_hub != input.Origin_Hub)
+                    {
+                        alert "Hub users can create or edit manifests only for their effective hub.";
+                        cancel submit;
+                    }
+                }
+                if(input.ID == null)
+                {
+                    input.Manifest_Status = "Draft";
+                    input.Total_Bags = 0;
+                    input.Total_Shipments = 0;
+                    input.Total_Weight_Kg = 0;
+                    input.Actual_Arrival_Time = null;
+                    input.Created_By_Email = zoho.loginuserid;
+                }
+                else
+                {
+                    previous_record = Manifests[ID == input.ID];
+                    if(previous_record.Manifest_Status != "Draft")
+                    {
+                        alert "Closed or dispatched manifests can be changed only through controlled custody actions.";
+                        cancel submit;
+                    }
+                    if(input.Manifest_Status != previous_record.Manifest_Status || input.Total_Bags != previous_record.Total_Bags || input.Total_Shipments != previous_record.Total_Shipments || input.Total_Weight_Kg != previous_record.Total_Weight_Kg || input.Actual_Arrival_Time != previous_record.Actual_Arrival_Time || input.Created_By_Email != previous_record.Created_By_Email)
+                    {
+                        alert "Manifest status, totals, arrival, and creator details are system controlled.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

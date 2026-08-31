@@ -1,0 +1,36 @@
+Manifest_Type_On_User_Input as "Filter Manifest Destination"
+{
+    type = form
+    form = Manifests
+    record event = on add or edit
+    description = "Filters destination hubs and route requirements by trip type"
+
+    on user input of Manifest_Type
+    {
+        actions
+        {
+            custom deluge script
+            (
+                clear Destination_Hub;
+                clear Route;
+                if(input.Manifest_Type == "Feeder" && input.Origin_Hub != null)
+                {
+                    origin_record = Hubs[ID == input.Origin_Hub];
+                    Destination_Hub:ui.add(Hubs[ID == origin_record.Parent_Sorting_Hub && Active == true].ID.getall());
+                }
+                else if(input.Manifest_Type == "Linehaul")
+                {
+                    Destination_Hub:ui.add(Hubs[Hub_Type == "Sorting Hub" && Active == true && ID != input.Origin_Hub].ID.getall());
+                }
+                else if(input.Manifest_Type == "Delivery Feeder" && input.Origin_Hub != null)
+                {
+                    Destination_Hub:ui.add(Hubs[Hub_Type == "Collection Center" && Parent_Sorting_Hub == input.Origin_Hub && Active == true].ID.getall());
+                }
+                else
+                {
+                    Destination_Hub:ui.add(Hubs[Active == true && ID != input.Origin_Hub].ID.getall());
+                }
+            )
+        }
+    }
+}

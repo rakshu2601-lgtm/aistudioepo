@@ -1,0 +1,64 @@
+default list Bag_Contents
+{
+    displayName = "Bag Contents"
+    show all rows from Bag_Shipments
+    (
+        Bag
+        Shipment
+        Scan_Status
+        Scanned_At
+        Scanned_By_Email
+        Received_At
+        Exception_Notes
+        custom action "Mark Received"
+        (
+            workflow = Mark_Bag_Shipment_Received
+            show action for each record = true
+            column header = "Mark Received"
+            success message = "Receipt reconciliation evaluated"
+            condition = (Scan_Status == "Loaded")
+        )
+        custom action "Mark Missing"
+        (
+            workflow = Mark_Bag_Shipment_Missing
+            show action for each record = true
+            column header = "Mark Missing"
+            success message = "Missing reconciliation evaluated"
+            condition = (Scan_Status == "Loaded")
+            confirmation before execution
+            (
+                message for individual record = "Mark this expected AWB as missing and open an exception?"
+                confirm button text = "Mark Missing"
+                cancel button text = "Cancel"
+            )
+        )
+        custom action "Mark Damaged"
+        (
+            workflow = Mark_Bag_Shipment_Damaged
+            show action for each record = true
+            column header = "Mark Damaged"
+            success message = "Damage reconciliation evaluated"
+            condition = (Scan_Status == "Loaded")
+        )
+        custom action "Remove Shipment"
+        (
+            workflow = Remove_Bag_Shipment
+            show action for each record = true
+            column header = "Remove Shipment"
+            success message = "Bag removal evaluated"
+            condition = (Scan_Status == "Loaded")
+        )
+    )
+    filters
+    (
+        Bag
+        Shipment
+        Scan_Status
+        Scanned_At
+        Received_At
+    )
+    sort by
+    (
+        Scanned_At descending
+    )
+}

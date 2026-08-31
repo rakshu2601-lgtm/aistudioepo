@@ -1,0 +1,51 @@
+Rate_Cards_On_Validate as "Validate Rate Card"
+{
+    type = form
+    form = Rate_Cards
+    record event = on add or edit
+    description = "Validates pricing policy, effective dates, and retail default uniqueness"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(ifnull(input.Fuel_Surcharge_Percent,-1) < 0 || ifnull(input.COD_Handling_Fee,-1) < 0 || ifnull(input.GST_Percent,-1) < 0 || ifnull(input.Contract_Discount_Percent,-1) < 0)
+                {
+                    alert "Surcharges, fees, taxes, and discounts cannot be negative.";
+                    cancel submit;
+                }
+                if(input.Fuel_Surcharge_Percent > 100 || input.GST_Percent > 100 || input.Contract_Discount_Percent > 100)
+                {
+                    alert "Percentage values cannot exceed 100.";
+                    cancel submit;
+                }
+                if(ifnull(input.Volumetric_Divisor,0) <= 0)
+                {
+                    alert "Volumetric divisor must be greater than zero.";
+                    cancel submit;
+                }
+                if(input.Effective_To != null && input.Effective_To < input.Effective_From)
+                {
+                    alert "Effective To cannot be before Effective From.";
+                    cancel submit;
+                }
+                if(input.Default_For_Retail == true && input.Customer_Type not in {"Retail","All"})
+                {
+                    alert "Only Retail or All customer rate cards can be the retail default.";
+                    cancel submit;
+                }
+                if(input.Default_For_Retail == true && input.Status == "Published")
+                {
+                    published_default_count = Rate_Cards[Default_For_Retail == true && Status == "Published" && ID != input.ID].count();
+                    if(published_default_count > 0)
+                    {
+                        alert "Only one published retail default rate card is allowed.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

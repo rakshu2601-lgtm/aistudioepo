@@ -1,0 +1,49 @@
+"Logistics_Administrator"
+{
+    name = "Logistics_Administrator"
+    type = Users_Permissions
+    permissions = { Chat:true, Predefined:false, ApiAccess:true, PIIAccess:true, ePHIAccess:false }
+    description = "Full application configuration and logistics operations administration"
+    ModulePermissions
+    {
+        App_Configuration { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { App_Configurations={"View","Edit","Delete"} } }
+        Hubs { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Hubs={"View","Edit","Delete"} Active_Hub_Map={"View"} Hub_Capacity={"View"} } }
+        Hub_Pincode_Mapping { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Pincode_Mappings={"View","Edit","Delete"} Serviceability_Map={"View"} Non_Serviceable_Pincodes={"View"} } }
+        Operations_Users { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Operations_User_Directory={"View","Edit","Delete"} Hub_Staff={"View"} Active_Field_Agents={"View"} Agent_Location_Map={"View"} } }
+        Vehicles { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Vehicles={"View","Edit","Delete"} Available_Vehicles={"View"} Vehicle_Compliance={"View"} } }
+        Transport_Routes { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Transport_Routes={"View","Edit","Delete"} Active_Routes={"View"} Route_Capacity={"View"} } }
+        Rate_Cards { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Rate_Cards={"View","Edit","Delete"} Published_Rate_Cards={"View"} Expiring_Rate_Cards={"View"} } }
+        Rate_Slabs { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Rate_Slab_Register={"View","Edit","Delete"} Active_Slabs={"View"} } }
+        KYC_Document_Types { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { KYC_Document_Type_Mapping={"View","Edit","Delete"} Corporate_KYC_Checklist={"View"} Wholesale_KYC_Checklist={"View"} } }
+        Customers { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Customers={"View","Edit","Delete"} Verification_Pending={"View","Edit"} Action_Required_Customers={"View","Edit"} KYC_Expiry_Alert={"View"} Active_Customers={"View"} My_Profile={"View"} } }
+        Customer_KYC_Documents { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_KYC_Documents={"View","Edit","Delete"} KYC_Review_Queue={"View","Edit"} Queried_KYC_Documents={"View","Edit"} My_KYC_Checklist={"View"} } }
+        Shipment_Requests { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Shipments={"View","Edit","Delete"} My_Shipments={"View"} Shipment_Status_Board={"View","Edit"} Unassigned_Orders={"View","Edit"} Pickup_Queue={"View","Edit"} Delivery_Queue={"View","Edit"} Active_Shipments={"View"} } }
+        Shipment_Tracking_Events { enabled = Create,Viewall,Export,Tab,View,Search allFieldsVisible = true ReportPermissions { Tracking_Event_Log={"View"} Shipment_Timeline={"View"} Customer_Tracking_Events={"View"} } }
+        Pickup_Run_Sheets { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Pickup_Run_Register={"View","Edit","Delete"} Today_Pickup_Planner={"View","Edit"} My_Pickup_Runs={"View","Edit"} Pickup_Run_Calendar={"View"} } }
+        Pickup_Run_Sheet_Items { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Pickup_Run_Items={"View","Edit","Delete"} My_Pickup_Tasks={"View","Edit"} Failed_Pickups={"View","Edit"} } }
+        Logistics_Bags { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Logistics_Bags={"View","Edit","Delete"} Open_Bags={"View","Edit"} In_Transit_Bags={"View","Edit"} Bag_Status_Board={"View","Edit"} } }
+        Bag_Shipments { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Bag_Contents={"View","Edit","Delete"} Bag_Reconciliation={"View","Edit"} } }
+        Manifests { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Manifests={"View","Edit","Delete"} Feeder_Manifests={"View","Edit"} Linehaul_Manifests={"View","Edit"} In_Transit_Manifests={"View","Edit"} Manifest_Status_Board={"View","Edit"} Manifest_Arrival_Calendar={"View"} } }
+        Manifest_Bags { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Manifest_Bag_List={"View","Edit","Delete"} Expected_Master_Bags={"View","Edit"} Manifest_Reconciliation={"View","Edit"} } }
+        Shipment_Exceptions { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Shipment_Exception_Queue={"View","Edit","Delete"} Exception_Status_Board={"View","Edit"} Critical_Exceptions={"View","Edit"} } }
+        Delivery_Run_Sheets { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Delivery_Run_Register={"View","Edit","Delete"} Last_Mile_Dispatcher={"View","Edit"} My_Delivery_Runs={"View","Edit"} Delivery_Run_Calendar={"View"} } }
+        Delivery_Run_Sheet_Items { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Delivery_Run_Items={"View","Edit","Delete"} My_Delivery_Tasks={"View","Edit"} Failed_Deliveries={"View","Edit"} Delivered_Shipments={"View"} } }
+        NDR_Instructions { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = false ReportPermissions { NDR_Instruction_Action_Queue={"View","Edit"} NDR_RTO_Pending={"View","Edit"} Customer_NDR_Instructions={"View"} } FieldPermissions { Secure_Token{visibility:false} } }
+        NDR_Response { enabled = Viewall,View,Search allFieldsVisible = true }
+        COD_Remittances { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { COD_Remittance_Register={"View","Edit","Delete"} COD_Pending_Remittance={"View","Edit"} COD_Payout_Due={"View"} } }
+        Loyalty_Rules { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Loyalty_Rule_Register={"View","Edit","Delete"} Active_Loyalty_Rules={"View","Edit"} } }
+        Loyalty_Tiers { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Loyalty_Tier_Register={"View","Edit","Delete"} Active_Tier_Benefits={"View"} } }
+        Loyalty_Transactions { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Loyalty_Transaction_Ledger={"View","Edit","Delete"} My_Loyalty_History={"View"} Points_Expiring_Soon={"View"} My_Points_Expiring_Soon={"View"} Loyalty_Activity_By_Type={"View"} } }
+        Invoices { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Invoice_Statement={"View","Edit","Delete"} Overdue_Invoices={"View","Edit"} Invoice_Due_Calendar={"View"} My_Invoices={"View","Edit"} } }
+        Account_Ledger { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Account_Ledger_Statement={"View","Edit","Delete"} My_Account_Statement={"View"} Outstanding_Accounts={"View"} Credit_Utilization={"View"} Ledger_Ageing={"View"} } }
+        Payment_Transactions { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Payment_Transaction_Register={"View","Edit","Delete"} Failed_Payments={"View","Edit"} My_Payments={"View"} } }
+        Audit_Log { enabled = Create,Viewall,Export,Tab,View,Search allFieldsVisible = true ReportPermissions { Audit_Log_Report={"View"} Critical_Audit_Events={"View"} } }
+        Communication_Log { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Communication_Log_Report={"View","Edit","Delete"} Failed_Communications={"View","Edit"} } }
+        Customer_Dashboard { enabled = tab }
+        Shipment_Tracking { enabled = tab }
+        Hub_Dashboard { enabled = tab }
+        Agent_Dashboard { enabled = tab }
+        Admin_Dashboard { enabled = tab }
+        KYC_Review { enabled = tab }
+    }
+}

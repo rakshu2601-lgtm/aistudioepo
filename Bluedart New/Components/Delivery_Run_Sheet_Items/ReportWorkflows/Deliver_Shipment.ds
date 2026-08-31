@@ -1,0 +1,223 @@
+Deliver_Shipment as "Deliver Shipment - My Delivery Tasks"
+{
+    type = functions
+    form = Delivery_Run_Sheet_Items
+    execution type = for each record
+    description = "Validates proof, COD, recipient, and location; completes delivery; generates ePOD; and posts one-time loyalty"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                run_record = Delivery_Run_Sheets[ID == input.Delivery_Run_Sheet];
+                assigned_agent = Operations_Users[ID == run_record.Assigned_Agent];
+                authorised = assigned_agent.count(ID) > 0 && assigned_agent.Work_Email == zoho.loginuserid || Operations_Users[Work_Email == zoho.loginuserid && Active == true].count(ID) > 0;
+                shipment_record = Shipment_Requests[ID == input.Shipment];
+                if(authorised == false)
+                {
+                    info "Only the assigned agent or an active operations user can complete delivery.";
+                }
+                else if(input.Delivery_Status != "Out For Delivery" || shipment_record.Shipment_Status != "Out For Delivery (OFD)" || (run_record.DRS_Status != "Released" && run_record.DRS_Status != "In Progress"))
+                {
+                    info "The shipment and stop must both be out for delivery on an active run.";
+                }
+                else if(input.Arrived_At == null)
+                {
+                    info "Mark arrival before completing delivery.";
+                }
+                else if(ifnull(input.Recipient_Name,"").trim() == "")
+                {
+                    info "Recipient name is required for delivery proof.";
+                }
+                else if(input.Agent_Latitude == null || input.Agent_Longitude == null)
+                {
+                    info "Agent latitude and longitude are required for delivery completion.";
+                }
+                else
+                {
+                    proof_count = 0;
+                    if(ifnull(input.Recipient_OTP,"").trim() != "")
+                    {
+                        proof_count = proof_count + 1;
+                    }
+                    if(input.Recipient_Signature != null)
+                    {
+                        proof_count = proof_count + 1;
+                    }
+                    if(input.Delivery_Photo != null)
+                    {
+                        proof_count = proof_count + 1;
+                    }
+                    proof_valid = proof_count == 1 && ((input.Proof_Type == "OTP" && ifnull(input.Recipient_OTP,"").trim() != "") || (input.Proof_Type == "Signature" && input.Recipient_Signature != null) || (input.Proof_Type == "Photo" && input.Delivery_Photo != null));
+                    if(proof_valid == false)
+                    {
+                        info "Capture exactly one proof item and select its matching OTP, signature, or photo proof type.";
+                    }
+                    else
+                    {
+                        expected_cod = if(shipment_record.Payment_Type == "COD",ifnull(shipment_record.COD_Amount,0),0);
+                        cod_valid = (ifnull(input.COD_Collected,0) - expected_cod).abs() <= 0.01;
+                        if(cod_valid == false)
+                        {
+                            info "COD collected must exactly match the shipment COD amount of INR " + expected_cod + ".";
+                        }
+                        else
+                        {
+                            customer_record = Customers[ID == shipment_record.Customer];
+                            prior_shipment_status = shipment_record.Shipment_Status;
+                            input.Delivery_Status = "Delivered";
+                            input.Completed_At = zoho.currenttime;
+                            input.Attempt_Number = ifnull(shipment_record.NDR_Attempt_Count,0) + 1;
+                            input.NDR_Reason = null;
+                            input.NDR_Notes = null;
+                            shipment_record.Shipment_Status = "Delivered";
+                            shipment_record.Current_Hub = run_record.Hub;
+                            tracking_id = insert into Shipment_Tracking_Events
+                            [
+                                Shipment = shipment_record.ID
+                                Event_Time = zoho.currenttime
+                                Event_Status = "Delivered"
+                                Hub = run_record.Hub
+                                Agent = assigned_agent.ID
+                                Latitude = input.Agent_Latitude
+                                Longitude = input.Agent_Longitude
+                                Event_Description = "Shipment delivered to " + input.Recipient_Name + " with " + input.Proof_Type + " proof."
+                                Source = "Delivery"
+                                Customer_Visible = true
+                                Created_By_Email = zoho.loginuserid
+                            ];
+                            loyalty_points = 0.0;
+                            loyalty_reference = "No active loyalty rule matched";
+                            if(shipment_record.Loyalty_Awarded != true && Loyalty_Transactions[Shipment == shipment_record.ID && Transaction_Type == "Earn"].count(ID) == 0)
+                            {
+                                rule_record = Loyalty_Rules[Status == "Active" && Effective_From <= zoho.currentdate && (Effective_To == null || Effective_To >= zoho.currentdate) && (Customer_Type == customer_record.Customer_Type || Customer_Type == "All") && (Transport_Mode == shipment_record.Transport_Mode || Transport_Mode == "Any") && Minimum_Shipment_Amount <= shipment_record.Total_Payable] sort by Minimum_Shipment_Amount desc range from 0 to 0;
+                                if(rule_record.count(ID) > 0)
+                                {
+                                    tier_multiplier = 1.0;
+                                    if(customer_record.Current_Loyalty_Tier != "None")
+                                    {
+                                        tier_record = Loyalty_Tiers[Tier_Name == customer_record.Current_Loyalty_Tier && Active == true];
+                                        if(tier_record.count(ID) > 0)
+                                        {
+                                            tier_multiplier = ifnull(tier_record.Points_Multiplier,1);
+                                        }
+                                    }
+                                    loyalty_points = (shipment_record.Total_Payable * rule_record.Points_Per_INR * tier_multiplier).round(2);
+                                    if(rule_record.Maximum_Points_Per_Shipment != null && rule_record.Maximum_Points_Per_Shipment > 0 && loyalty_points > rule_record.Maximum_Points_Per_Shipment)
+                                    {
+                                        loyalty_points = rule_record.Maximum_Points_Per_Shipment;
+                                    }
+                                    if(loyalty_points > 0)
+                                    {
+                                        config_record = App_Configuration[Active == true] range from 0 to 0;
+                                        expiry_months = if(rule_record.Points_Expiry_Months != null && rule_record.Points_Expiry_Months > 0,rule_record.Points_Expiry_Months,if(config_record.count(ID) > 0,config_record.Points_Expiry_Months,12));
+                                        point_value = if(config_record.count(ID) > 0,config_record.Loyalty_Redemption_Value_Per_Point,1);
+                                        loyalty_id = insert into Loyalty_Transactions
+                                        [
+                                            Customer = customer_record.ID
+                                            Shipment = shipment_record.ID
+                                            Transaction_Type = "Earn"
+                                            Points = loyalty_points
+                                            Amount_Equivalent = (loyalty_points * point_value).round(2)
+                                            Transaction_Date = zoho.currenttime
+                                            Expiry_Date = zoho.currentdate.addMonth(expiry_months)
+                                            Points_Status = "Available"
+                                            Applied_Tier = customer_record.Current_Loyalty_Tier
+                                            Reference = "Delivered AWB " + shipment_record.AWB_Number
+                                            Notes = "Points earned after confirmed delivery using rule " + rule_record.Rule_Name
+                                            Posted_By_Email = zoho.loginuserid
+                                            Customer_Login_Email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID)
+                                        ];
+                                        customer_record.Current_Loyalty_Points = ifnull(customer_record.Current_Loyalty_Points,0) + loyalty_points;
+                                        customer_record.Lifetime_Loyalty_Points = ifnull(customer_record.Lifetime_Loyalty_Points,0) + loyalty_points;
+                                        customer_record.Quarterly_Eligible_Spend = ifnull(customer_record.Quarterly_Eligible_Spend,0) + shipment_record.Total_Payable;
+                                        shipment_record.Loyalty_Awarded = true;
+                                        loyalty_reference = "Earned " + loyalty_points + " points";
+                                    }
+                                }
+                            }
+                            epod_html = "<html><body style='font-family:Arial,sans-serif;color:#1f2937'><h1>Electronic Proof of Delivery</h1><table style='border-collapse:collapse;width:100%'><tr><td><b>AWB</b></td><td>" + shipment_record.AWB_Number + "</td></tr><tr><td><b>DRS</b></td><td>" + run_record.DRS_Number + "</td></tr><tr><td><b>Delivered At</b></td><td>" + input.Completed_At + "</td></tr><tr><td><b>Recipient</b></td><td>" + input.Recipient_Name + "</td></tr><tr><td><b>Proof Type</b></td><td>" + input.Proof_Type + "</td></tr><tr><td><b>COD Collected</b></td><td>INR " + input.COD_Collected + "</td></tr><tr><td><b>Agent</b></td><td>" + assigned_agent.Employee_Name.first_name + "</td></tr><tr><td><b>Coordinates</b></td><td>" + input.Agent_Latitude + ", " + input.Agent_Longitude + "</td></tr></table><p>This system-generated ePOD is backed by the delivery evidence retained in the logistics application.</p></body></html>";
+                            epod_pdf = zoho.file.convertToPDF(epod_html);
+                            epod_file_name = "EPOD_" + shipment_record.AWB_Number + ".pdf";
+                            epod_pdf.setFileName(epod_file_name);
+                            workdrive_uploaded = false;
+                            try
+                            {
+                                workdrive_response = zoho.workdrive.uploadFile(epod_pdf,"CONFIGURE_EPOD_FOLDER_ID",encodeUrl(epod_file_name),true,"zoho_workdrive");
+                                if(workdrive_response.containKey("data"))
+                                {
+                                    workdrive_data = workdrive_response.get("data");
+                                    if(workdrive_data.size() > 0)
+                                    {
+                                        workdrive_attributes = workdrive_data.get(0).get("attributes");
+                                        workdrive_resource_id = workdrive_attributes.get("resource_id");
+                                        input.EPOD_WorkDrive_File_ID = workdrive_resource_id;
+                                        input.EPOD_URL = "https://workdrive.zoho.com/open/" + workdrive_resource_id;
+                                        shipment_record.EPOD_WorkDrive_File_ID = workdrive_resource_id;
+                                        shipment_record.EPOD_Download_URL = input.EPOD_URL;
+                                        workdrive_uploaded = true;
+                                    }
+                                }
+                            }
+                            catch (workdrive_error)
+                            {
+                                input.EPOD_WorkDrive_File_ID = "PENDING-WORKDRIVE-CONFIGURATION";
+                                shipment_record.EPOD_WorkDrive_File_ID = input.EPOD_WorkDrive_File_ID;
+                            }
+                            delivered_count = Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.Delivery_Run_Sheet && ID != input.ID && Delivery_Status == "Delivered"].count(ID) + 1;
+                            failed_count = Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.Delivery_Run_Sheet && ID != input.ID && (Delivery_Status == "Failed" || Delivery_Status == "RTO")].count(ID);
+                            collected_cod = ifnull(input.COD_Collected,0);
+                            for each delivered_item in Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.Delivery_Run_Sheet && ID != input.ID && Delivery_Status == "Delivered"]
+                            {
+                                collected_cod = collected_cod + ifnull(delivered_item.COD_Collected,0);
+                            }
+                            run_record.Delivered_Count = delivered_count;
+                            run_record.Failed_Count = failed_count;
+                            run_record.Collected_COD_Amount = collected_cod;
+                            run_record.DRS_Status = "In Progress";
+                            recipient_email = if(ifnull(shipment_record.Recipient_Email,"").trim() != "",shipment_record.Recipient_Email,customer_record.Email_ID);
+                            communication_id = insert into Communication_Log
+                            [
+                                Customer = customer_record.ID
+                                Shipment = shipment_record.ID
+                                Recipient = recipient_email
+                                Channel = "Email"
+                                Template_Code = "SHIPMENT_DELIVERED"
+                                Subject = "Shipment delivered: AWB " + shipment_record.AWB_Number
+                                Message_Summary = "Shipment delivered successfully. ePOD generated; WorkDrive archive status: " + if(workdrive_uploaded == true,"Archived","Pending configuration") + "."
+                                Provider = "Zoho Mail"
+                                Communication_Status = "Sent"
+                                Attempt_Count = 1
+                                Last_Attempt_At = zoho.currenttime
+                            ];
+                            sendmail
+                            [
+                                from: zoho.adminuserid
+                                to: recipient_email
+                                subject: "Shipment delivered: AWB " + shipment_record.AWB_Number
+                                message: "Your shipment was delivered successfully to " + input.Recipient_Name + ". " + loyalty_reference + ". The electronic proof of delivery is attached."
+                                Attachments : file : epod_pdf
+                            ]
+                            audit_id = insert into Audit_Log
+                            [
+                                Event_Time = zoho.currenttime
+                                Actor_Email = zoho.loginuserid
+                                Actor_Profile = current_profile
+                                Action_Name = "Deliver Shipment"
+                                Module_Name = "Delivery Run Sheet Items"
+                                Record_ID = input.ID.toString()
+                                Before_Data = "Stop=Out For Delivery; Shipment=" + prior_shipment_status
+                                After_Data = "Stop=Delivered; Shipment=Delivered; Proof=" + input.Proof_Type + "; COD=" + input.COD_Collected + "; " + loyalty_reference + "; WorkDrive Archived=" + workdrive_uploaded
+                                Source = "Report Action"
+                                Severity = "Critical"
+                            ];
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

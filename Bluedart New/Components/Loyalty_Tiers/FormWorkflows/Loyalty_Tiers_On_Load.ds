@@ -1,0 +1,21 @@
+Loyalty_Tiers_On_Load as "Secure Loyalty Tier Load"
+{
+    type = form
+    form = Loyalty_Tiers
+    record event = on add or edit
+    description = "Protects the tier identity once created"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.ID != null)
+                {
+                    disable Tier_Name;
+                }
+            )
+        }
+    }
+}

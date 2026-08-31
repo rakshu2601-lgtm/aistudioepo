@@ -1,0 +1,61 @@
+default list Pickup_Run_Items
+{
+    displayName = "Pickup Run Items"
+    show all rows from Pickup_Run_Sheet_Items
+    (
+        Pickup_Run_Sheet
+        Stop_Sequence
+        Shipment
+        Stop_Status
+        Arrived_At
+        Physical_Weight_Kg
+        Revised_Charge
+        Customer_Approved_Revised_Charge
+        Completed_At
+        Agent_Latitude
+        Agent_Longitude
+        Failure_Reason
+        custom action "Mark Arrived"
+        (
+            workflow = Mark_Pickup_Arrived
+            show action for each record = true
+            column header = "Mark Arrived"
+            success message = "Pickup arrival evaluated"
+            condition = (Stop_Status == "Assigned")
+        )
+        custom action "Complete Pickup"
+        (
+            workflow = Complete_Pickup
+            show action for each record = true
+            column header = "Complete Pickup"
+            success message = "Pickup completion evaluated"
+            condition = (Stop_Status == "Arrived")
+            confirmation before execution
+            (
+                message for individual record = "Complete this pickup and transfer custody to the assigned agent?"
+                confirm button text = "Complete Pickup"
+                cancel button text = "Cancel"
+            )
+        )
+        custom action "Fail Pickup"
+        (
+            workflow = Fail_Pickup
+            show action for each record = true
+            column header = "Fail Pickup"
+            success message = "Pickup failure evaluated"
+            condition = (Stop_Status == "Assigned" || Stop_Status == "Arrived")
+        )
+    )
+    filters
+    (
+        Pickup_Run_Sheet
+        Shipment
+        Stop_Status
+        Completed_At
+    )
+    sort by
+    (
+        Pickup_Run_Sheet descending
+        Stop_Sequence ascending
+    )
+}

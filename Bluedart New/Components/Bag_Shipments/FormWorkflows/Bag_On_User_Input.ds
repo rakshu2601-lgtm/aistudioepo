@@ -1,0 +1,38 @@
+Bag_On_User_Input as "Filter Compatible Bag Shipments"
+{
+    type = form
+    form = Bag_Shipments
+    record event = on add or edit
+    description = "Shows only shipments at the bag origin that match the selected movement leg"
+
+    on user input of Bag
+    {
+        actions
+        {
+            custom deluge script
+            (
+                clear Shipment;
+                bag_record = Logistics_Bags[ID == input.Bag && Bag_Status == "Open"];
+                if(bag_record.count(ID) > 0)
+                {
+                    if(bag_record.Bag_Type == "Feeder")
+                    {
+                        Shipment:ui.add(Shipment_Requests[Current_Hub == bag_record.Origin_Hub && Collection_Center == bag_record.Origin_Hub && Origin_Sorting_Hub == bag_record.Destination_Hub && (Shipment_Status == "Picked Up" || Shipment_Status == "Inbound at Branch Station")].ID.getall());
+                    }
+                    else if(bag_record.Bag_Type == "Master")
+                    {
+                        Shipment:ui.add(Shipment_Requests[Current_Hub == bag_record.Origin_Hub && Origin_Sorting_Hub == bag_record.Origin_Hub && Destination_Sorting_Hub == bag_record.Destination_Hub && Shipment_Status == "Sorted at Origin Hub"].ID.getall());
+                    }
+                    else if(bag_record.Bag_Type == "Delivery Feeder")
+                    {
+                        Shipment:ui.add(Shipment_Requests[Current_Hub == bag_record.Origin_Hub && Destination_Sorting_Hub == bag_record.Origin_Hub && Destination_Hub == bag_record.Destination_Hub && Shipment_Status == "Arrived at Destination Hub"].ID.getall());
+                    }
+                    else
+                    {
+                        Shipment:ui.add(Shipment_Requests[Current_Hub == bag_record.Origin_Hub && Shipment_Status == "Return to Origin"].ID.getall());
+                    }
+                }
+            )
+        }
+    }
+}

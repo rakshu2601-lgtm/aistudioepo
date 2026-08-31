@@ -1,0 +1,48 @@
+Pickup_Run_Sheets_On_Load as "Prepare Pickup Run Planner"
+{
+    type = form
+    form = Pickup_Run_Sheets
+    record event = on add or edit
+    description = "Sets the supervisor hub, filters eligible agents and vehicles, and locks derived and released run data"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Status, Planned_Stop_Count, Completed_Stop_Count, Total_Planned_Weight_Kg, Released_At, Completed_At;
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(input.ID == null && current_profile == "Hub_Supervisor")
+                {
+                    logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                    if(logged_user.count(ID) > 0)
+                    {
+                        deputation_active = logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= input.Run_Date) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= input.Run_Date);
+                        if(deputation_active == true)
+                        {
+                            input.Hub = logged_user.Deputed_Hub;
+                        }
+                        else
+                        {
+                            input.Hub = logged_user.Home_Hub;
+                        }
+                    }
+                }
+                clear Assigned_Agent;
+                clear Vehicle;
+                if(input.Hub != null && input.Run_Date != null)
+                {
+                    eligible_agents = Operations_Users[Active == true && Application_Role == "Field Agent" && (Agent_Role == "Pickup" || Agent_Role == "Both") && ((Deputed_Hub == input.Hub && (Deputation_Start_Date == null || Deputation_Start_Date <= input.Run_Date) && (Deputation_End_Date == null || Deputation_End_Date >= input.Run_Date)) || (Home_Hub == input.Hub && (Deputed_Hub == null || (Deputation_Start_Date != null && Deputation_Start_Date > input.Run_Date) || (Deputation_End_Date != null && Deputation_End_Date < input.Run_Date))))];
+                    Assigned_Agent:ui.add(eligible_agents.ID.getall());
+                    eligible_vehicles = Vehicles[Owning_Hub == input.Hub && Active == true && (Status == "Available" || ID == input.Vehicle)];
+                    Vehicle:ui.add(eligible_vehicles.ID.getall());
+                }
+                if(input.ID != null && input.Status != "Draft")
+                {
+                    disable Hub, Assigned_Agent, Run_Date, Beat_Name, Vehicle, Supervisor_Notes;
+                }
+            )
+        }
+    }
+}

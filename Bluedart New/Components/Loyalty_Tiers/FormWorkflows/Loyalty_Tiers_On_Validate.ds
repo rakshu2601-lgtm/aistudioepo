@@ -1,0 +1,86 @@
+Loyalty_Tiers_On_Validate as "Validate Loyalty Tier"
+{
+    type = form
+    form = Loyalty_Tiers
+    record event = on add or edit
+    description = "Validates ordered, non-overlapping quarterly qualification bands and nonnegative benefits"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                existing_tier = Loyalty_Tiers[ID == input.ID];
+                if(current_profile != "Logistics_Administrator" && current_profile != "Finance_Officer")
+                {
+                    alert "Only Logistics Administrators and Finance Officers can maintain loyalty tiers.";
+                    cancel submit;
+                }
+                else if(ifnull(input.Minimum_Quarterly_Spend,0) < 0 || (input.Maximum_Quarterly_Spend != null && input.Maximum_Quarterly_Spend < 0) || ifnull(input.Points_Multiplier,0) < 0 || ifnull(input.Credit_Rebate_Percent,0) < 0)
+                {
+                    alert "Spend thresholds, point multipliers, and rebate percentages cannot be negative.";
+                    cancel submit;
+                }
+                else if(input.Maximum_Quarterly_Spend != null && input.Maximum_Quarterly_Spend < input.Minimum_Quarterly_Spend)
+                {
+                    alert "Maximum quarterly spend cannot be lower than minimum quarterly spend.";
+                    cancel submit;
+                }
+                else if(input.Credit_Rebate_Percent > 100)
+                {
+                    alert "Credit rebate percent cannot exceed 100.";
+                    cancel submit;
+                }
+                else if(ifnull(input.Display_Order,0) <= 0)
+                {
+                    alert "Display order must be greater than zero.";
+                    cancel submit;
+                }
+                else if(input.ID != null && existing_tier.Tier_Name != input.Tier_Name)
+                {
+                    alert "Tier name is immutable after creation.";
+                    cancel submit;
+                }
+                else if((input.Tier_Name == "Silver" && input.Display_Order != 1) || (input.Tier_Name == "Gold" && input.Display_Order != 2) || (input.Tier_Name == "Platinum" && input.Display_Order != 3))
+                {
+                    alert "Use display order 1 for Silver, 2 for Gold, and 3 for Platinum.";
+                    cancel submit;
+                }
+                else if(input.Active == true)
+                {
+                    overlap_count = 0;
+                    order_conflict_count = 0;
+                    for each candidate in Loyalty_Tiers[ID != input.ID && Active == true]
+                    {
+                        scope_overlaps = candidate.Applies_To == input.Applies_To || candidate.Applies_To == "All" || input.Applies_To == "All" || candidate.Applies_To == "Both" || input.Applies_To == "Both";
+                        if(scope_overlaps == true)
+                        {
+                            band_overlaps = (candidate.Maximum_Quarterly_Spend == null || candidate.Maximum_Quarterly_Spend >= input.Minimum_Quarterly_Spend) && (input.Maximum_Quarterly_Spend == null || candidate.Minimum_Quarterly_Spend <= input.Maximum_Quarterly_Spend);
+                            order_conflicts = candidate.Display_Order == input.Display_Order || (candidate.Display_Order < input.Display_Order && candidate.Minimum_Quarterly_Spend > input.Minimum_Quarterly_Spend) || (candidate.Display_Order > input.Display_Order && candidate.Minimum_Quarterly_Spend < input.Minimum_Quarterly_Spend);
+                            if(band_overlaps == true)
+                            {
+                                overlap_count = overlap_count + 1;
+                            }
+                            if(order_conflicts == true)
+                            {
+                                order_conflict_count = order_conflict_count + 1;
+                            }
+                        }
+                    }
+                    if(overlap_count > 0)
+                    {
+                        alert "This active qualification band overlaps another tier applicable to the same customer scope.";
+                        cancel submit;
+                    }
+                    else if(order_conflict_count > 0)
+                    {
+                        alert "Active tier spend thresholds must increase in Silver, Gold, and Platinum display order.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

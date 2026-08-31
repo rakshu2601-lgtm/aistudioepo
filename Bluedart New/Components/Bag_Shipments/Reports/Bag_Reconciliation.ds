@@ -1,0 +1,35 @@
+list Bag_Reconciliation
+{
+    displayName = "Bag Reconciliation"
+    show all rows from Bag_Shipments
+    (
+        Bag
+        Shipment
+        Scan_Status
+        Scanned_At
+        Scanned_By_Email
+        Received_At
+        Exception_Notes
+    )
+    filters
+    (
+        Bag
+        Shipment
+        Scan_Status
+        Scanned_At
+        Received_At
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Bag descending
+        Scan_Status ascending
+    )
+    sort by
+    (
+        Scanned_At descending
+    )
+}

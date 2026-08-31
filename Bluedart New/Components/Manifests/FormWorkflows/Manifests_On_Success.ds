@@ -1,0 +1,32 @@
+Manifests_On_Success as "Audit Manifest Save"
+{
+    type = form
+    form = Manifests
+    record event = on add or edit
+    description = "Audits manifest creation and permitted draft changes"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                action_name = "Save Manifest";
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = current_profile
+                    Action_Name = action_name
+                    Module_Name = "Manifests"
+                    Record_ID = input.ID.toString()
+                    Before_Data = "Draft manifest data"
+                    After_Data = "Type=" + input.Manifest_Type + "; Origin=" + input.Origin_Hub + "; Destination=" + input.Destination_Hub + "; Vehicle=" + input.Vehicle
+                    Source = "Form Workflow"
+                    Severity = "High"
+                ];
+            )
+        }
+    }
+}

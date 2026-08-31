@@ -1,0 +1,29 @@
+Rate_Slabs_On_Success as "Audit Rate Slab"
+{
+    type = form
+    form = Rate_Slabs
+    record event = on add or edit
+    description = "Audits rate slab band and charge changes"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = "Pricing Administration"
+                    Action_Name = "Save Rate Slab"
+                    Module_Name = "Rate Slabs"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Rate Card ID=" + input.Rate_Card + "; Slab=" + input.Slab_Name + "; Weight=" + input.Minimum_Weight_Kg + "-" + input.Maximum_Weight_Kg + "; Distance=" + input.Minimum_Distance_Km + "-" + input.Maximum_Distance_Km + "; Active=" + input.Active
+                    Source = "Form Workflow"
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

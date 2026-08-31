@@ -1,0 +1,26 @@
+list KYC_Expiry_Alert
+{
+    displayName = "KYC Expiry Alert"
+    show all rows from Customers [Customer_Type != "Retail" && KYC_Expiry_Date is not null && Active == true]
+    (
+        Customer_ID
+        Customer_Type
+        Company_Name
+        Full_Name
+        Email_ID
+        KYC_Verified_Date
+        KYC_Expiry_Date
+        Onboarding_Status
+        Portal_Access_Status
+    )
+    filters
+    (
+        Customer_Type
+        KYC_Expiry_Date
+        Onboarding_Status
+    )
+    sort by
+    (
+        KYC_Expiry_Date ascending
+    )
+}

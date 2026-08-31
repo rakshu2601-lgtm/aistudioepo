@@ -1,0 +1,19 @@
+Account_Ledger_On_Delete as "Protect Account Ledger"
+{
+    type = form
+    form = Account_Ledger
+    record event = on delete
+    description = "Prevents deletion of financial ledger evidence"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Ledger entries cannot be deleted. Post an authorised reversing entry instead.";
+                cancel delete;
+            )
+        }
+    }
+}

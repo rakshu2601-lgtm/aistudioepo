@@ -1,0 +1,21 @@
+map Active_Hub_Map
+{
+    displayName = "Active Hub Map"
+    show all rows from Hubs [Active == true]
+    (
+        Hub_ID
+        Hub_Name
+        Hub_Type
+        Hub_Address
+        Daily_Capacity
+        Contact_Phone
+    )
+    filters
+    (
+        Hub_Type
+    )
+    options
+    (
+        display field = Hub_Address
+    )
+}

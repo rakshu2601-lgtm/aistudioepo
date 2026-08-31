@@ -1,0 +1,36 @@
+Logistics_Bags_On_Load as "Secure Logistics Bag"
+{
+    type = form
+    form = Logistics_Bags
+    record event = on add or edit
+    description = "Defaults the operator hub and locks custody-controlled fields"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Bag_Status, Total_Shipments, Total_Weight_Kg, Created_At, Sealed_At, Dispatched_At, Received_At, Created_By_Email;
+                current_profile = thisapp.permissions.loginUserProfile();
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                if(input.ID == null && (current_profile == "Hub_Operator" || current_profile == "Hub_Supervisor") && logged_user.count(ID) > 0)
+                {
+                    deputation_active = logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                    if(deputation_active == true)
+                    {
+                        input.Origin_Hub = logged_user.Deputed_Hub;
+                    }
+                    else
+                    {
+                        input.Origin_Hub = logged_user.Home_Hub;
+                    }
+                }
+                if(input.ID != null && input.Bag_Status != "Open")
+                {
+                    disable Bag_Type, Origin_Hub, Destination_Hub, Seal_Code;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,98 @@
+Shipment_Exceptions_On_Validate as "Validate Shipment Exception"
+{
+    type = form
+    form = Shipment_Exceptions
+    record event = on add or edit
+    description = "Enforces exception references, evidence, ownership, hub access, and controlled resolution"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                authorised_profile = current_profile == "Logistics_Administrator" || current_profile == "Operations_Manager" || current_profile == "Hub_Supervisor";
+                logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                effective_hub = null;
+                if(logged_user.count(ID) > 0)
+                {
+                    effective_hub = logged_user.Home_Hub;
+                    deputation_active = logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= zoho.currentdate) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= zoho.currentdate);
+                    if(deputation_active == true)
+                    {
+                        effective_hub = logged_user.Deputed_Hub;
+                    }
+                }
+                hub_authorised = current_profile != "Hub_Supervisor" || effective_hub == input.Reporting_Hub;
+                if(authorised_profile == false || hub_authorised == false)
+                {
+                    alert "Only authorised operations management or the reporting hub supervisor can save this exception.";
+                    cancel submit;
+                }
+                if(input.Shipment == null && input.Bag == null && input.Manifest == null)
+                {
+                    alert "Link at least one shipment, bag, or manifest to the exception.";
+                    cancel submit;
+                }
+                evidence_required = input.Exception_Type == "Missing" || input.Exception_Type == "Damaged" || input.Exception_Type == "Short" || input.Exception_Type == "Seal Mismatch";
+                if(evidence_required == true && input.Evidence_Photo == null)
+                {
+                    alert "A photo is mandatory for missing, damaged, short, and seal mismatch exceptions.";
+                    cancel submit;
+                }
+                if(input.Assigned_To_Email != null)
+                {
+                    assignee = Operations_Users[Work_Email == input.Assigned_To_Email && Active == true];
+                    if(assignee.count(ID) == 0)
+                    {
+                        alert "Assign the exception to an active operations user email.";
+                        cancel submit;
+                    }
+                }
+                if(input.Exception_Status == "Investigating" && input.Assigned_To_Email == null)
+                {
+                    alert "Assign an owner before moving an exception to Investigating.";
+                    cancel submit;
+                }
+                if(input.Exception_Status == "Claim Raised" && ifnull(input.Resolution,"").trim() == "")
+                {
+                    alert "Enter claim or escalation details in Resolution before raising a claim.";
+                    cancel submit;
+                }
+                if(input.ID == null)
+                {
+                    input.Reported_By_Email = zoho.loginuserid;
+                    input.Reported_At = zoho.currenttime;
+                    input.Exception_Status = "Open";
+                    input.Resolved_By_Email = null;
+                    input.Resolved_At = null;
+                }
+                else
+                {
+                    existing_record = Shipment_Exceptions[ID == input.ID];
+                    input.Shipment = existing_record.Shipment;
+                    input.Bag = existing_record.Bag;
+                    input.Manifest = existing_record.Manifest;
+                    input.Exception_Type = existing_record.Exception_Type;
+                    input.Severity = existing_record.Severity;
+                    input.Reporting_Hub = existing_record.Reporting_Hub;
+                    input.Reported_By_Email = existing_record.Reported_By_Email;
+                    input.Reported_At = existing_record.Reported_At;
+                    input.Resolved_By_Email = existing_record.Resolved_By_Email;
+                    input.Resolved_At = existing_record.Resolved_At;
+                    if(existing_record.Exception_Status == "Resolved")
+                    {
+                        alert "Resolved exception evidence is immutable.";
+                        cancel submit;
+                    }
+                    if(input.Exception_Status == "Resolved")
+                    {
+                        alert "Use the Resolve Exception report action so resolver evidence and linked records are updated together.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

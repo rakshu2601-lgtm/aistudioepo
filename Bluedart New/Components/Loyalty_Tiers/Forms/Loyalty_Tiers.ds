@@ -1,0 +1,146 @@
+form Loyalty_Tiers
+{
+    title
+    {
+        displayname = "Loyalty Tiers"
+        on add = "Create Loyalty Tier"
+        on edit = "Edit Loyalty Tier"
+    }
+    success message = "Loyalty tier saved successfully"
+
+    Tier_Definition
+    (
+        type = section
+        displayname = "Tier Definition"
+        row = 1
+        column = 0
+    )
+    must have Tier_Name
+    (
+        type = picklist
+        displayname = "Tier Name"
+        values = {"Silver","Gold","Platinum"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Applies_To
+    (
+        type = picklist
+        displayname = "Applies To"
+        values = {"Corporate","Wholesale","Both","All"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Display_Order
+    (
+        type = number
+        displayname = "Display Order"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    Qualification_Band
+    (
+        type = section
+        displayname = "Quarterly Qualification Band"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Minimum_Quarterly_Spend
+    (
+        type = INR
+        displayname = "Minimum Quarterly Spend"
+        format = commadotindian
+        initial value = 0
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 1
+        width = medium
+    )
+    Maximum_Quarterly_Spend
+    (
+        type = INR
+        displayname = "Maximum Quarterly Spend"
+        format = commadotindian
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    Tier_Benefits
+    (
+        type = section
+        displayname = "Tier Benefits"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Points_Multiplier
+    (
+        type = decimal
+        displayname = "Points Multiplier"
+        initial value = 1
+        decimalplace = 2
+        maxchar = 8
+        row = 3
+        column = 1
+        width = medium
+    )
+    must have Credit_Rebate_Percent
+    (
+        type = decimal
+        displayname = "Credit Rebate Percent"
+        initial value = 0
+        decimalplace = 2
+        maxchar = 6
+        row = 3
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Tier"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Tier"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

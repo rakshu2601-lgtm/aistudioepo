@@ -1,0 +1,126 @@
+Complete_Last_Mile_Delivery_Run as "Complete Run - Last Mile Dispatcher"
+{
+    type = functions
+    form = Delivery_Run_Sheets
+    execution type = for each record
+    description = "Reconciles terminal delivery outcomes, creates pending COD remittance, releases the vehicle, and completes the run"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                assigned_agent = Operations_Users[ID == input.Assigned_Agent];
+                authorised = assigned_agent.count(ID) > 0 && assigned_agent.Work_Email == zoho.loginuserid || Operations_Users[Work_Email == zoho.loginuserid && Active == true].count(ID) > 0;
+                if(authorised == false)
+                {
+                    info "Only the assigned agent or an active operations user can complete this delivery run.";
+                }
+                else if(input.DRS_Status != "Released" && input.DRS_Status != "In Progress")
+                {
+                    info "Only a released or in-progress delivery run can be completed.";
+                }
+                else
+                {
+                    logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                    deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= input.Run_Date) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= input.Run_Date);
+                    effective_hub = if(deputation_active == true,logged_user.Deputed_Hub,logged_user.Home_Hub);
+                    if(logged_user.count(ID) == 0 || effective_hub != input.Hub)
+                    {
+                        info "Only an active operations user at the run's effective hub can complete it.";
+                    }
+                    else
+                    {
+                        planned_count = 0;
+                        delivered_count = 0;
+                        failed_count = 0;
+                        unresolved_count = 0;
+                        expected_cod = 0.0;
+                        delivered_cod_expected = 0.0;
+                        collected_cod = 0.0;
+                        for each run_item in Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.ID]
+                        {
+                            planned_count = planned_count + 1;
+                            shipment_record = Shipment_Requests[ID == run_item.Shipment];
+                            if(shipment_record.Payment_Type == "COD")
+                            {
+                                expected_cod = expected_cod + ifnull(shipment_record.COD_Amount,0);
+                            }
+                            if(run_item.Delivery_Status == "Delivered")
+                            {
+                                delivered_count = delivered_count + 1;
+                                collected_cod = collected_cod + ifnull(run_item.COD_Collected,0);
+                                if(shipment_record.Payment_Type == "COD")
+                                {
+                                    delivered_cod_expected = delivered_cod_expected + ifnull(shipment_record.COD_Amount,0);
+                                }
+                            }
+                            else if(run_item.Delivery_Status == "Failed" || run_item.Delivery_Status == "RTO")
+                            {
+                                failed_count = failed_count + 1;
+                            }
+                            else
+                            {
+                                unresolved_count = unresolved_count + 1;
+                            }
+                        }
+                        if(planned_count == 0 || unresolved_count > 0)
+                        {
+                            info "Every delivery stop must be marked Delivered, Failed, or RTO before completing the run.";
+                        }
+                        else
+                        {
+                            prior_status = input.DRS_Status;
+                            input.Planned_Stop_Count = planned_count;
+                            input.Delivered_Count = delivered_count;
+                            input.Failed_Count = failed_count;
+                            input.Expected_COD_Amount = expected_cod;
+                            input.Collected_COD_Amount = collected_cod;
+                            input.DRS_Status = "Completed";
+                            input.Completed_At = zoho.currenttime;
+                            if(input.Vehicle != null)
+                            {
+                                vehicle_record = Vehicles[ID == input.Vehicle];
+                                if(vehicle_record.count(ID) > 0 && vehicle_record.Status == "Assigned" && vehicle_record.Assigned_Driver == input.Assigned_Agent)
+                                {
+                                    vehicle_record.Status = "Available";
+                                    vehicle_record.Assigned_Driver = null;
+                                }
+                            }
+                            if(delivered_cod_expected > 0 && COD_Remittances[Delivery_Run_Sheet == input.ID].count(ID) == 0)
+                            {
+                                remittance_id = insert into COD_Remittances
+                                [
+                                    Delivery_Run_Sheet = input.ID
+                                    Agent = input.Assigned_Agent
+                                    Hub = input.Hub
+                                    Remittance_Date = zoho.currentdate
+                                    Expected_Amount = delivered_cod_expected
+                                    Submitted_Amount = 0
+                                    Shortfall_Amount = delivered_cod_expected
+                                    Remittance_Status = "Pending"
+                                    Notes = "Created automatically when DRS " + input.DRS_Number + " was completed."
+                                ];
+                            }
+                            audit_id = insert into Audit_Log
+                            [
+                                Event_Time = zoho.currenttime
+                                Actor_Email = zoho.loginuserid
+                                Actor_Profile = current_profile
+                                Action_Name = "Complete Delivery Run"
+                                Module_Name = "Delivery Run Sheets"
+                                Record_ID = input.ID.toString()
+                                Before_Data = "Status=" + prior_status
+                                After_Data = "Status=Completed; Delivered=" + delivered_count + "; Failed or RTO=" + failed_count + "; COD Expected on Delivered=" + delivered_cod_expected + "; COD Collected=" + collected_cod
+                                Source = "Report Action"
+                                Severity = "Warning"
+                            ];
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

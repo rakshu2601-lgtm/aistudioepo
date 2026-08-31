@@ -1,0 +1,53 @@
+Invoices_On_Load as "Protect Invoice Fields"
+{
+    type = form
+    form = Invoices
+    record event = on add or edit
+    description = "Restricts invoice maintenance to authorised finance users and protects system-managed fields"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                disable Zoho_Books_Invoice_ID;
+                disable Invoice_WorkDrive_File_ID;
+                disable Invoice_Download_URL;
+                if(current_profile != "Logistics_Administrator" && current_profile != "Finance_Officer")
+                {
+                    disable Shipment;
+                    disable Customer;
+                    disable Invoice_Date;
+                    disable Freight_Subtotal;
+                    disable Fuel_Surcharge;
+                    disable COD_Fee;
+                    disable GST_Amount;
+                    disable Loyalty_Discount;
+                    disable Credit_Rebate;
+                    disable Invoice_Total;
+                    disable Payment_Terms;
+                    disable Due_Date;
+                    disable Invoice_Status;
+                }
+                if(input.ID != null && input.Invoice_Status != "Draft")
+                {
+                    disable Shipment;
+                    disable Customer;
+                    disable Invoice_Date;
+                    disable Freight_Subtotal;
+                    disable Fuel_Surcharge;
+                    disable COD_Fee;
+                    disable GST_Amount;
+                    disable Loyalty_Discount;
+                    disable Credit_Rebate;
+                    disable Invoice_Total;
+                    disable Payment_Terms;
+                    disable Due_Date;
+                    disable Invoice_Status;
+                }
+            )
+        }
+    }
+}

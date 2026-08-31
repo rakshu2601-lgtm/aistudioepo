@@ -1,0 +1,19 @@
+Loyalty_Rules_On_Delete as "Protect Loyalty Rule History"
+{
+    type = form
+    form = Loyalty_Rules
+    record event = on delete
+    description = "Prevents deletion of earning-policy history"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Loyalty rules are policy evidence and cannot be deleted. Expire active rules instead.";
+                cancel delete;
+            )
+        }
+    }
+}

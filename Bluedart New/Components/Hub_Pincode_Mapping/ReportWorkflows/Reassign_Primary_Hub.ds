@@ -1,0 +1,41 @@
+Reassign_Primary_Hub as "Reassign Primary Hub"
+{
+    type = functions
+    form = Hub_Pincode_Mapping
+    execution type = for each record
+    description = "Swaps the primary collection center with the configured overflow hub"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                if(input.Secondary_Overflow_Hub == null)
+                {
+                    info "Configure an overflow hub before reassignment.";
+                }
+                else
+                {
+                    previous_primary = input.Primary_Collection_Center;
+                    previous_secondary = input.Secondary_Overflow_Hub;
+                    input.Primary_Collection_Center = previous_secondary;
+                    input.Secondary_Overflow_Hub = previous_primary;
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = "Operations Manager"
+                        Action_Name = "Reassign Primary Hub"
+                        Module_Name = "Hub Pincode Mapping"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Primary Hub ID=" + previous_primary + "; Overflow Hub ID=" + previous_secondary
+                        After_Data = "Primary Hub ID=" + previous_secondary + "; Overflow Hub ID=" + previous_primary
+                        Source = "Report Action"
+                        Severity = "Warning"
+                    ];
+                }
+            )
+        }
+    }
+}

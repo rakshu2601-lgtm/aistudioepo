@@ -1,0 +1,85 @@
+Payment_Transactions_On_Validate as "Validate Payment Transaction"
+{
+    type = form
+    form = Payment_Transactions
+    record event = on add or edit
+    description = "Accepts initiation records only and protects all gateway reconciliation values from direct editing"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                customer_record = Customers[ID == input.Customer];
+                if(customer_record.count(ID) == 0)
+                {
+                    alert "Select a valid customer.";
+                    cancel submit;
+                }
+                else
+                {
+                    if(ifnull(input.Amount,0) <= 0)
+                    {
+                        alert "Payment amount must be greater than zero.";
+                        cancel submit;
+                    }
+                    if(input.Invoice != null)
+                    {
+                        invoice_record = Invoices[ID == input.Invoice];
+                        if(invoice_record.count(ID) == 0 || invoice_record.Customer != customer_record.ID || (input.Shipment != null && invoice_record.Shipment != input.Shipment))
+                        {
+                            alert "The invoice does not match the selected customer and shipment.";
+                            cancel submit;
+                        }
+                        else if(invoice_record.Invoice_Status == "Draft" || invoice_record.Invoice_Status == "Paid" || invoice_record.Invoice_Status == "Void")
+                        {
+                            alert "Payments may be initiated only for issued, part-paid, or overdue invoices.";
+                            cancel submit;
+                        }
+                        else
+                        {
+                            verified_paid_total = ifnull(Account_Ledger[Invoice == invoice_record.ID && Transaction_Type == "Payment"].sum(Amount),0);
+                            remaining_due = (ifnull(invoice_record.Invoice_Total,0) - verified_paid_total).round(2);
+                            if(remaining_due <= 0 || input.Amount > remaining_due + 0.01)
+                            {
+                                alert "Payment amount exceeds the verified remaining invoice balance.";
+                                cancel submit;
+                            }
+                        }
+                    }
+                    if(input.Shipment != null)
+                    {
+                        shipment_record = Shipment_Requests[ID == input.Shipment];
+                        if(shipment_record.count(ID) == 0 || shipment_record.Customer != customer_record.ID)
+                        {
+                            alert "The shipment does not belong to the selected customer.";
+                            cancel submit;
+                        }
+                    }
+                    if(input.ID == null)
+                    {
+                        if(input.Payment_Status != "Initiated" || input.Ledger_Entry != null || ifnull(input.Gateway_Payment_ID,"").trim() != "" || input.Completed_At != null)
+                        {
+                            alert "A new transaction must begin in Initiated status without settlement references.";
+                            cancel submit;
+                        }
+                        input.Initiated_At = zoho.currenttime;
+                        input.Gateway_Response_Summary = "Payment initiated; awaiting a verified provider result.";
+                        input.Failure_Reason = "";
+                        input.Customer_Login_Email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID);
+                    }
+                    else
+                    {
+                        stored_record = Payment_Transactions[ID == input.ID];
+                        if(input.Customer != stored_record.Customer || input.Shipment != stored_record.Shipment || input.Invoice != stored_record.Invoice || input.Ledger_Entry != stored_record.Ledger_Entry || input.Gateway != stored_record.Gateway || input.Gateway_Order_ID != stored_record.Gateway_Order_ID || input.Gateway_Payment_ID != stored_record.Gateway_Payment_ID || input.Amount != stored_record.Amount || input.Payment_Method != stored_record.Payment_Method || input.Payment_Status != stored_record.Payment_Status || input.Initiated_At != stored_record.Initiated_At || input.Completed_At != stored_record.Completed_At || input.Gateway_Response_Summary != stored_record.Gateway_Response_Summary || input.Failure_Reason != stored_record.Failure_Reason || input.Customer_Login_Email != stored_record.Customer_Login_Email)
+                        {
+                            alert "Payment transactions are immutable outside verified payment and refund workflows.";
+                            cancel submit;
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

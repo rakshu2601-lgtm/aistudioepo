@@ -1,0 +1,230 @@
+form Shipment_Exceptions
+{
+    title
+    {
+        displayname = "Shipment Exceptions"
+        on add = "Report Shipment Exception"
+        on edit = "Update Shipment Exception"
+    }
+    success message = "Shipment exception saved successfully"
+    Exception_Identity
+    (
+        type = section
+        displayname = "Exception Identity"
+        row = 1
+        column = 0
+    )
+    Exception_Number
+    (
+        type = autonumber
+        displayname = "Exception Number"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    Shipment
+    (
+        type = picklist
+        displayname = "Shipment"
+        values = Shipment_Requests.ID
+        displayformat = [AWB_Number]
+        searchable = true
+        sortorder = ascending
+        row = 1
+        column = 1
+        width = medium
+    )
+    Bag
+    (
+        type = picklist
+        displayname = "Bag"
+        values = Logistics_Bags.ID
+        displayformat = [Bag_Number]
+        searchable = true
+        sortorder = ascending
+        row = 1
+        column = 2
+        width = medium
+    )
+    Manifest
+    (
+        type = picklist
+        displayname = "Manifest"
+        values = Manifests.ID
+        displayformat = [Manifest_Number]
+        searchable = true
+        sortorder = ascending
+        row = 1
+        column = 1
+        width = medium
+    )
+    Classification_and_Reporting
+    (
+        type = section
+        displayname = "Classification and Reporting"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Exception_Type
+    (
+        type = picklist
+        displayname = "Exception Type"
+        values = {"Missing","Damaged","Short","Misroute","Seal Mismatch","Weight Variance","Payment","COD","Other"}
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Severity
+    (
+        type = radiobuttons
+        displayname = "Severity"
+        values = {"Low","Medium","High","Critical"}
+        layout = 2
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Reporting_Hub
+    (
+        type = picklist
+        displayname = "Reporting Hub"
+        values = Hubs[Active == true].ID
+        displayformat = [Hub_Name]
+        searchable = true
+        sortorder = ascending
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Reported_By_Email
+    (
+        type = email
+        displayname = "Reported By Email"
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Reported_At
+    (
+        type = datetime
+        displayname = "Reported At"
+        initial value = "${zoho.currenttime}"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Evidence_and_Notes
+    (
+        type = section
+        displayname = "Evidence and Notes"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Evidence_Photo
+    (
+        type = image
+        displayname = "Evidence Photo"
+        source = file,camera
+        camera = primary
+        switch camera = true
+        show gallery = true
+        preview duration = 0
+        row = 3
+        column = 1
+        width = medium
+    )
+    must have Notes
+    (
+        type = textarea
+        displayname = "Exception Notes"
+        height = 120px
+        row = 3
+        column = 2
+        width = medium
+    )
+    Ownership_and_Resolution
+    (
+        type = section
+        displayname = "Ownership and Resolution"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    must have Exception_Status
+    (
+        type = picklist
+        displayname = "Exception Status"
+        values = {"Open","Investigating","Resolved","Claim Raised"}
+        initial value = "Open"
+        row = 4
+        column = 1
+        width = medium
+    )
+    Assigned_To_Email
+    (
+        type = email
+        displayname = "Assigned To Email"
+        row = 4
+        column = 2
+        width = medium
+    )
+    Resolution
+    (
+        type = textarea
+        displayname = "Resolution"
+        height = 120px
+        row = 4
+        column = 1
+        width = medium
+    )
+    Resolved_By_Email
+    (
+        type = email
+        displayname = "Resolved By Email"
+        row = 4
+        column = 2
+        width = medium
+    )
+    Resolved_At
+    (
+        type = datetime
+        displayname = "Resolved At"
+        row = 4
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Report Exception"
+                tooltip = "Create the internal exception record"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Exception"
+                tooltip = "Save evidence, ownership, or investigation updates"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

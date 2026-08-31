@@ -1,0 +1,31 @@
+timeline Customer_Tracking_Events
+{
+    displayName = "My Shipment Tracking Events"
+    show all rows from Shipment_Tracking_Events [Customer_Visible == true && Shipment.Customer == Customers[Portal_Login_Email == zoho.loginuserid || Email_ID == zoho.loginuserid].ID]
+    (
+        Shipment
+        Event_Status
+        Event_Time
+        Hub
+        Source
+        Event_Description
+        Customer_Visible
+    )
+    filters
+    (
+        Shipment
+        Event_Status
+        Hub
+        Source
+        Event_Time
+    )
+    sort by
+    (
+        Event_Time ascending
+    )
+    options
+    (
+        display field = Event_Status
+        start date = Event_Time
+    )
+}

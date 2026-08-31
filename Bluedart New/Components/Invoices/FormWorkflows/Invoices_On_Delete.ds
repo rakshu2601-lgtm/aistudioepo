@@ -1,0 +1,19 @@
+Invoices_On_Delete as "Prevent Invoice Deletion"
+{
+    type = form
+    form = Invoices
+    record event = on delete
+    description = "Retains invoice evidence by preventing record deletion"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Invoice records cannot be deleted. Use Void Invoice when a billing record must be cancelled.";
+                cancel delete;
+            )
+        }
+    }
+}

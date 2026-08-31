@@ -1,0 +1,165 @@
+Release_Delivery_Run as "Release Delivery Run"
+{
+    type = functions
+    form = Delivery_Run_Sheets
+    execution type = for each record
+    description = "Validates last-mile custody and capacity, releases stops, and moves shipments out for delivery"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(input.DRS_Status != "Draft")
+                {
+                    info "Only draft delivery runs can be released.";
+                }
+                else if(input.Run_Date < zoho.currentdate)
+                {
+                    info "A delivery run scheduled in the past cannot be released.";
+                }
+                else
+                {
+                    logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                    deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= input.Run_Date) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= input.Run_Date);
+                    effective_hub = if(deputation_active == true,logged_user.Deputed_Hub,logged_user.Home_Hub);
+                    if(logged_user.count(ID) == 0 || effective_hub != input.Hub)
+                    {
+                        info "Only an active operations user at the run's effective hub can release it.";
+                    }
+                    else
+                    {
+                        agent_record = Operations_Users[ID == input.Assigned_Agent && Active == true && Application_Role == "Field Agent" && (Agent_Role == "Delivery" || Agent_Role == "Both")];
+                        agent_deputation_active = agent_record.count(ID) > 0 && agent_record.Deputed_Hub != null && (agent_record.Deputation_Start_Date == null || agent_record.Deputation_Start_Date <= input.Run_Date) && (agent_record.Deputation_End_Date == null || agent_record.Deputation_End_Date >= input.Run_Date);
+                        agent_hub = if(agent_deputation_active == true,agent_record.Deputed_Hub,agent_record.Home_Hub);
+                        if(agent_record.count(ID) == 0 || agent_hub != input.Hub)
+                        {
+                            info "The assigned delivery agent is not effective at this hub on the run date.";
+                        }
+                        else
+                        {
+                            planned_count = 0;
+                            planned_weight = 0.0;
+                            expected_cod = 0.0;
+                            invalid_count = 0;
+                            for each run_item in Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.ID]
+                            {
+                                planned_count = planned_count + 1;
+                                shipment_record = Shipment_Requests[ID == run_item.Shipment];
+                                if(run_item.Delivery_Status != "Assigned" || shipment_record.count(ID) == 0 || shipment_record.Shipment_Status != "At Delivery Hub" || shipment_record.Current_Hub != input.Hub || shipment_record.Destination_Hub != input.Hub)
+                                {
+                                    invalid_count = invalid_count + 1;
+                                }
+                                else
+                                {
+                                    planned_weight = planned_weight + ifnull(shipment_record.Billable_Weight_Kg,0);
+                                    if(shipment_record.Payment_Type == "COD")
+                                    {
+                                        expected_cod = expected_cod + ifnull(shipment_record.COD_Amount,0);
+                                    }
+                                }
+                            }
+                            if(planned_count == 0)
+                            {
+                                info "Add at least one delivery stop before releasing the run.";
+                            }
+                            else if(invalid_count > 0)
+                            {
+                                info "One or more stops are not assigned, not at this delivery hub, or no longer eligible for release.";
+                            }
+                            else
+                            {
+                                other_agent_weight = 0.0;
+                                for each pickup_run in Pickup_Run_Sheets[Assigned_Agent == input.Assigned_Agent && Run_Date == input.Run_Date && Status != "Cancelled"]
+                                {
+                                    other_agent_weight = other_agent_weight + ifnull(pickup_run.Total_Planned_Weight_Kg,0);
+                                }
+                                for each other_run in Delivery_Run_Sheets[Assigned_Agent == input.Assigned_Agent && Run_Date == input.Run_Date && ID != input.ID && DRS_Status != "Cancelled"]
+                                {
+                                    for each other_item in Delivery_Run_Sheet_Items[Delivery_Run_Sheet == other_run.ID]
+                                    {
+                                        other_shipment = Shipment_Requests[ID == other_item.Shipment];
+                                        other_agent_weight = other_agent_weight + ifnull(other_shipment.Billable_Weight_Kg,0);
+                                    }
+                                }
+                                agent_overloaded = agent_record.Maximum_Daily_Load_Kg != null && agent_record.Maximum_Daily_Load_Kg > 0 && other_agent_weight + planned_weight > agent_record.Maximum_Daily_Load_Kg;
+                                vehicle_invalid = false;
+                                if(input.Vehicle != null)
+                                {
+                                    vehicle_record = Vehicles[ID == input.Vehicle && Active == true && Owning_Hub == input.Hub && Status == "Available"];
+                                    duplicate_delivery_run = Delivery_Run_Sheets[Vehicle == input.Vehicle && Run_Date == input.Run_Date && ID != input.ID && DRS_Status != "Cancelled"].count(ID);
+                                    duplicate_pickup_run = Pickup_Run_Sheets[Vehicle == input.Vehicle && Run_Date == input.Run_Date && Status != "Cancelled"].count(ID);
+                                    vehicle_invalid = vehicle_record.count(ID) == 0 || duplicate_delivery_run > 0 || duplicate_pickup_run > 0 || planned_weight > vehicle_record.Capacity_Kg;
+                                }
+                                if(agent_overloaded == true)
+                                {
+                                    info "The assigned agent's combined pickup and delivery load would exceed the daily limit.";
+                                }
+                                else if(vehicle_invalid == true)
+                                {
+                                    info "The selected vehicle is unavailable, double-booked, or below the required capacity.";
+                                }
+                                else
+                                {
+                                    for each release_item in Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.ID]
+                                    {
+                                        release_shipment = Shipment_Requests[ID == release_item.Shipment];
+                                        release_item.Delivery_Status = "Out For Delivery";
+                                        release_shipment.Shipment_Status = "Out For Delivery (OFD)";
+                                        release_shipment.Current_Hub = input.Hub;
+                                        tracking_id = insert into Shipment_Tracking_Events
+                                        [
+                                            Shipment = release_shipment.ID
+                                            Event_Time = zoho.currenttime
+                                            Event_Status = "Out For Delivery (OFD)"
+                                            Source = "Delivery"
+                                            Hub = input.Hub
+                                            Agent = input.Assigned_Agent
+                                            Event_Description = "Shipment released from the delivery hub and assigned to the last-mile agent."
+                                            Customer_Visible = true
+                                            Created_By_Email = zoho.loginuserid
+                                        ];
+                                    }
+                                    input.Planned_Stop_Count = planned_count;
+                                    input.Delivered_Count = 0;
+                                    input.Failed_Count = 0;
+                                    input.Expected_COD_Amount = expected_cod;
+                                    input.Collected_COD_Amount = 0;
+                                    input.DRS_Status = "Released";
+                                    input.Released_At = zoho.currenttime;
+                                    if(input.Vehicle != null)
+                                    {
+                                        vehicle_record.Status = "Assigned";
+                                        vehicle_record.Assigned_Driver = input.Assigned_Agent;
+                                    }
+                                    audit_id = insert into Audit_Log
+                                    [
+                                        Event_Time = zoho.currenttime
+                                        Actor_Email = zoho.loginuserid
+                                        Actor_Profile = current_profile
+                                        Action_Name = "Release Delivery Run"
+                                        Module_Name = "Delivery Run Sheets"
+                                        Record_ID = input.ID.toString()
+                                        Before_Data = "Status=Draft"
+                                        After_Data = "Status=Released; Stops=" + planned_count + "; Weight Kg=" + planned_weight + "; Expected COD=" + expected_cod
+                                        Source = "Report Action"
+                                        Severity = "Warning"
+                                    ];
+                                    sendmail
+                                    (
+                                        from : zoho.adminuserid
+                                        to : agent_record.Work_Email
+                                        subject : "Delivery run released: DRS " + input.DRS_Number
+                                        message : "Your delivery run for " + input.Run_Date + " has been released with " + planned_count + " stops in zone " + input.Delivery_Zone + "."
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

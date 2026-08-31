@@ -1,0 +1,26 @@
+list Failed_Pickups
+{
+    displayName = "Failed Pickups"
+    show all rows from Pickup_Run_Sheet_Items [Stop_Status == "Failed"]
+    (
+        Pickup_Run_Sheet
+        Stop_Sequence
+        Shipment
+        Stop_Status
+        Arrived_At
+        Failure_Reason
+        Completed_At
+        Agent_Latitude
+        Agent_Longitude
+    )
+    filters
+    (
+        Pickup_Run_Sheet
+        Shipment
+        Completed_At
+    )
+    sort by
+    (
+        Completed_At descending
+    )
+}

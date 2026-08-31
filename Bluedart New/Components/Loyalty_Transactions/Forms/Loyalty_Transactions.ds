@@ -1,0 +1,198 @@
+form Loyalty_Transactions
+{
+    title
+    {
+        displayname = "Loyalty Transactions"
+        on add = "Post Loyalty Transaction"
+        on edit = "View Loyalty Transaction"
+    }
+    success message = "Loyalty transaction posted successfully"
+
+    Transaction_Identity
+    (
+        type = section
+        displayname = "Transaction Identity"
+        row = 1
+        column = 0
+    )
+    Loyalty_Transaction_ID
+    (
+        type = autonumber
+        displayname = "Loyalty Transaction ID"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Customer
+    (
+        type = picklist
+        displayname = "Customer"
+        values = Customers.ID
+        displayformat = [Customer_ID]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Shipment
+    (
+        type = picklist
+        displayname = "Shipment"
+        values = Shipment_Requests.ID
+        displayformat = [AWB_Number]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Transaction_Type
+    (
+        type = picklist
+        displayname = "Transaction Type"
+        values = {"Earn","Redeem","Expire","Adjust","Rebate","Reverse"}
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    Points_and_Value
+    (
+        type = section
+        displayname = "Points and Value"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Points
+    (
+        type = decimal
+        displayname = "Points"
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Amount_Equivalent
+    (
+        type = INR
+        displayname = "Amount Equivalent"
+        format = commadotindian
+        initial value = 0
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Transaction_Date
+    (
+        type = datetime
+        displayname = "Transaction Date"
+        initial value = "${zoho.currenttime}"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Expiry_Date
+    (
+        type = date
+        displayname = "Expiry Date"
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    Posting_Details
+    (
+        type = section
+        displayname = "Posting Details"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Points_Status
+    (
+        type = picklist
+        displayname = "Points Status"
+        values = {"Available","Consumed","Expired","Not Applicable"}
+        row = 3
+        column = 1
+        width = medium
+    )
+    must have Applied_Tier
+    (
+        type = picklist
+        displayname = "Applied Tier"
+        values = {"None","Silver","Gold","Platinum"}
+        initial value = "None"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Reference
+    (
+        type = text
+        displayname = "Reference"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Notes
+    (
+        type = textarea
+        displayname = "Notes"
+        height = 100px
+        row = 3
+        column = 2
+        width = medium
+    )
+    Posted_By_Email
+    (
+        type = email
+        displayname = "Posted By Email"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Customer_Login_Email
+    (
+        type = email
+        displayname = "Customer Login Email"
+        personal data = true
+        row = 3
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Post Transaction"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

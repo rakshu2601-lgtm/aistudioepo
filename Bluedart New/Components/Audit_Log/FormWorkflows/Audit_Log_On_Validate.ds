@@ -1,0 +1,42 @@
+Audit_Log_On_Validate as "Validate Immutable Audit Event"
+{
+    type = form
+    form = Audit_Log
+    record event = on add or edit
+    description = "Stamps missing actor metadata on new events and prohibits every edit to recorded evidence"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.ID != null)
+                {
+                    alert "Audit evidence is immutable and cannot be edited.";
+                    cancel submit;
+                }
+                else
+                {
+                    if(input.Event_Time == null)
+                    {
+                        input.Event_Time = zoho.currenttime;
+                    }
+                    if(ifnull(input.Actor_Email,"").trim() == "")
+                    {
+                        input.Actor_Email = if(ifnull(zoho.loginuserid,"").trim() != "",zoho.loginuserid,zoho.adminuserid);
+                    }
+                    if(ifnull(input.Actor_Profile,"").trim() == "")
+                    {
+                        input.Actor_Profile = if(ifnull(zoho.loginuserid,"").trim() != "",thisapp.permissions.loginUserProfile(),"System");
+                    }
+                    if(ifnull(input.Action_Name,"").trim() == "" || ifnull(input.Module_Name,"").trim() == "" || ifnull(input.Record_ID,"").trim() == "")
+                    {
+                        alert "Action name, module name, and record ID are required for audit evidence.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

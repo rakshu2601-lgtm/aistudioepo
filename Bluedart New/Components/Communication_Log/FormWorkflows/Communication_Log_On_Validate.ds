@@ -1,0 +1,51 @@
+Communication_Log_On_Validate as "Validate Communication Queue"
+{
+    type = form
+    form = Communication_Log
+    record event = on add or edit
+    description = "Validates queue ownership, channel addressing, and immutable provider outcomes"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(ifnull(input.Attempt_Count,0) < 0)
+                {
+                    alert "Attempt count cannot be negative.";
+                    cancel submit;
+                }
+                if(input.Channel == "Email" && input.Recipient.matches("[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?") == false)
+                {
+                    alert "Enter a valid email recipient for an email communication.";
+                    cancel submit;
+                }
+                if(input.ID == null)
+                {
+                    input.Attempt_Count = ifnull(input.Attempt_Count,0);
+                    if(input.Communication_Status == "Queued")
+                    {
+                        input.Last_Attempt_At = null;
+                        input.Provider_Message_ID = "";
+                        input.Failure_Reason = "";
+                    }
+                    else if(input.Attempt_Count == 0)
+                    {
+                        input.Attempt_Count = 1;
+                        input.Last_Attempt_At = zoho.currenttime;
+                    }
+                }
+                else
+                {
+                    existing_record = Communication_Log[ID == input.ID];
+                    if(existing_record.count(ID) > 0 && ifnull(existing_record.Attempt_Count,0) > 0 && (input.Recipient != existing_record.Recipient || input.Channel != existing_record.Channel || input.Template_Code != existing_record.Template_Code || input.Provider != existing_record.Provider || input.Subject != existing_record.Subject || input.Message_Summary != existing_record.Message_Summary))
+                    {
+                        alert "Attempted communications are immutable. Queue a new communication instead.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

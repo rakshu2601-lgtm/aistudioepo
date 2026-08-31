@@ -1,0 +1,30 @@
+Customer_Portal_On_Validate as "Protect Customer System Fields"
+{
+    type = form
+    form = Customers
+    record event = on edit
+    description = "Prevents portal owners from changing approval, financial, lifecycle, and ownership fields through direct requests"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(thisapp.portal.isUserInProfile("Customer_Portal") == true)
+                {
+                    if(old.Portal_Login_Email != zoho.loginuserid && old.Email_ID != zoho.loginuserid)
+                    {
+                        alert "You cannot update another customer's record.";
+                        cancel submit;
+                    }
+                    if(old.Registration_Source != input.Registration_Source || old.Customer_Type != input.Customer_Type || old.Email_ID != input.Email_ID || old.Portal_Login_Email != input.Portal_Login_Email || old.Active != input.Active || old.Approved_Credit_Limit != input.Approved_Credit_Limit || old.Payment_Terms != input.Payment_Terms || old.Assigned_Rate_Card != input.Assigned_Rate_Card || old.Default_Collection_Center != input.Default_Collection_Center || old.Mobile_OTP_Verified != input.Mobile_OTP_Verified || old.Email_OTP_Verified != input.Email_OTP_Verified || old.OTP_Verified_At != input.OTP_Verified_At || old.Onboarding_Status != input.Onboarding_Status || old.KYC_Submitted_On != input.KYC_Submitted_On || old.KYC_Verified_Date != input.KYC_Verified_Date || old.KYC_Expiry_Date != input.KYC_Expiry_Date || old.Portal_Access_Status != input.Portal_Access_Status || old.Current_Loyalty_Points != input.Current_Loyalty_Points || old.Lifetime_Loyalty_Points != input.Lifetime_Loyalty_Points || old.Current_Loyalty_Tier != input.Current_Loyalty_Tier || old.Quarterly_Eligible_Spend != input.Quarterly_Eligible_Spend || old.Outstanding_Balance != input.Outstanding_Balance)
+                    {
+                        alert "Approval, pricing, KYC status, loyalty, and financial fields are managed by authorised workflows.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

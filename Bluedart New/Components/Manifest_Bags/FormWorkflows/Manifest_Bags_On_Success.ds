@@ -1,0 +1,29 @@
+Manifest_Bags_On_Success as "Audit Manifest Bag Checklist"
+{
+    type = form
+    form = Manifest_Bags
+    record event = on add or edit
+    description = "Audits expected-bag creation and destination evidence preparation"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = thisapp.permissions.loginUserProfile()
+                    Action_Name = "Save Manifest Bag Checklist"
+                    Module_Name = "Manifest Bags"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Manifest=" + input.Manifest + "; Bag=" + input.Bag + "; Status=" + input.Load_Status + "; Seal Verified=" + input.Seal_Verified
+                    Source = "Form Workflow"
+                    Severity = "Critical"
+                ];
+            )
+        }
+    }
+}

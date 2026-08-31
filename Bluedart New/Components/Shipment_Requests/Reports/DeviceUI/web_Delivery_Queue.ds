@@ -1,0 +1,5 @@
+report Delivery_Queue
+{
+    quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( AWB_Number Customer Recipient_Name Delivery_Pincode Payment_Type COD_Amount Shipment_Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+    detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( AWB_Number Customer Recipient_Name Recipient_Phone Delivery_Address Delivery_Pincode Payment_Type COD_Amount Destination_Hub NDR_Attempt_Count Expected_Delivery_Date Shipment_Status ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

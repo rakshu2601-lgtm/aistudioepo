@@ -1,0 +1,78 @@
+default list Invoice_Statement
+{
+    displayName = "Invoice Statement"
+    show all rows from Invoices
+    (
+        Invoice_Number
+        Shipment
+        Customer
+        Invoice_Date
+        Invoice_Total
+        Payment_Terms
+        Due_Date
+        Invoice_Status
+        Invoice_Download_URL
+        custom action "Issue Invoice"
+        (
+            workflow = Issue_Invoice
+            show action for each record = true
+            column header = "Issue Invoice"
+            success message = "Invoice issuance completed"
+            condition = (Invoice_Status == "Draft")
+            confirmation before execution
+            (
+                message for individual record = "Issue this invoice and create its receivable?"
+                confirm button text = "Issue Invoice"
+                cancel button text = "Cancel"
+            )
+        )
+        custom action "Pay Now"
+        (
+            workflow = Pay_Invoice_Statement
+            show action for each record = true
+            column header = "Pay Now"
+            condition = (Invoice_Status == "Issued" || Invoice_Status == "Part Paid" || Invoice_Status == "Overdue")
+        )
+        custom action "Void Invoice"
+        (
+            workflow = Void_Invoice
+            show action for each record = true
+            column header = "Void Invoice"
+            success message = "Invoice voided"
+            condition = (Invoice_Status == "Draft" || Invoice_Status == "Issued" || Invoice_Status == "Part Paid" || Invoice_Status == "Overdue")
+            confirmation before execution
+            (
+                message for individual record = "Void this invoice? This will close its open receivable."
+                confirm button text = "Void Invoice"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Invoice_Status
+        Payment_Terms
+        Invoice_Date
+        Due_Date
+        "Open Invoices" : (Invoice_Status == "Issued" || Invoice_Status == "Part Paid" || Invoice_Status == "Overdue")
+    )
+    sort by
+    (
+        Invoice_Date descending
+    )
+    conditional formatting
+    (
+        "Overdue Invoice"
+        {
+            condition = (Invoice_Status == "Overdue")
+            fields = [Invoice_Number, Customer, Invoice_Total, Due_Date, Invoice_Status]
+            format = "background-color:#FEE2E2;color:#991B1B;font-weight:bold"
+        }
+        "Paid Invoice"
+        {
+            condition = (Invoice_Status == "Paid")
+            fields = [Invoice_Number, Invoice_Total, Invoice_Status]
+            format = "background-color:#DCFCE7;color:#166534"
+        }
+    )
+}

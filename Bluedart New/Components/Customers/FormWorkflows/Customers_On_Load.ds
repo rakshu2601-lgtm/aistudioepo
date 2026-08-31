@@ -1,0 +1,52 @@
+Customers_On_Load as "Secure and Configure Customer Form"
+{
+    type = form
+    form = Customers
+    record event = on add or edit
+    description = "Configures customer-type fields and enforces portal ownership at form load"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Customer_Type == "Corporate" || input.Customer_Type == "Wholesale")
+                {
+                    show Company_Name, GSTIN, PAN_Number, Contact_Person_Name, Contact_Person_Email, Contact_Person_Phone, Requested_Credit_Limit;
+                }
+                else
+                {
+                    hide Company_Name, GSTIN, PAN_Number, Contact_Person_Name, Contact_Person_Email, Contact_Person_Phone, Requested_Credit_Limit;
+                }
+                disable OTP_Verified_At, KYC_Submitted_On, KYC_Verified_Date, KYC_Expiry_Date, Current_Loyalty_Points, Lifetime_Loyalty_Points, Current_Loyalty_Tier, Quarterly_Eligible_Spend, Loyalty_Tier_Last_Reviewed_At, Outstanding_Balance;
+                if(input.Portal_Access_Status == "Active" || input.Portal_Access_Status == "Invitation Sent")
+                {
+                    disable Portal_Login_Email;
+                }
+                is_portal = thisapp.portal.isUserInProfile("Customer_Portal");
+                if(is_portal == true)
+                {
+                    if(input.ID == null)
+                    {
+                        input.Registration_Source = "Customer Portal";
+                        input.Email_ID = zoho.loginuserid;
+                        input.Portal_Login_Email = zoho.loginuserid;
+                    }
+                    disable Mobile_OTP_Verified, Email_OTP_Verified;
+                    owner_match = input.ID == null || input.Email_ID == zoho.loginuserid || input.Portal_Login_Email == zoho.loginuserid;
+                    if(owner_match == false)
+                    {
+                        disable Registration_Source, Customer_Type, Full_Name, Mobile_Number, Email_ID, Portal_Login_Email, Primary_Address, Active, Company_Name, GSTIN, PAN_Number, Contact_Person_Name, Contact_Person_Email, Contact_Person_Phone, Requested_Credit_Limit, Approved_Credit_Limit, Payment_Terms, Assigned_Rate_Card, Default_Collection_Center, Onboarding_Status, Portal_Access_Status;
+                        alert "You are not authorised to access this customer record.";
+                        openUrl("#Page:Customer_Dashboard","same window");
+                    }
+                    else
+                    {
+                        disable Registration_Source, Customer_Type, Email_ID, Portal_Login_Email, Active, Approved_Credit_Limit, Payment_Terms, Assigned_Rate_Card, Default_Collection_Center, Onboarding_Status, Portal_Access_Status;
+                    }
+                }
+            )
+        }
+    }
+}

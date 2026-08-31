@@ -1,0 +1,75 @@
+Recalculate_Loyalty_Tiers_Quarterly as "Recalculate Loyalty Tiers Quarterly"
+{
+    type = schedule
+    start = "2025-01-01 02:00:00"
+    frequency = daily
+    time zone = "Asia/Kolkata"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                current_month = zoho.currentdate.getMonth();
+                is_quarter_start = zoho.currentdate.getDay() == 1 && (current_month == 1 || current_month == 4 || current_month == 7 || current_month == 10);
+                quarter_start = zoho.currentdate.toStartOfMonth();
+                review_cutoff = quarter_start.addDay(-1);
+                if(is_quarter_start == true)
+                {
+                    for each customer_record in Customers[Active == true && (Customer_Type == "Corporate" || Customer_Type == "Wholesale") && (Loyalty_Tier_Last_Reviewed_At == null || Loyalty_Tier_Last_Reviewed_At < review_cutoff)] range from 0 to 199
+                    {
+                        prior_tier = customer_record.Current_Loyalty_Tier;
+                        eligible_spend = ifnull(customer_record.Quarterly_Eligible_Spend,0);
+                        qualifying_tier = Loyalty_Tiers[Active == true && (Applies_To == customer_record.Customer_Type || Applies_To == "Both" || Applies_To == "All") && Minimum_Quarterly_Spend <= eligible_spend && (Maximum_Quarterly_Spend == null || Maximum_Quarterly_Spend >= eligible_spend)] sort by Display_Order desc range from 0 to 0;
+                        new_tier = "None";
+                        if(qualifying_tier.count(ID) > 0)
+                        {
+                            new_tier = qualifying_tier.Tier_Name;
+                        }
+                        customer_record.Current_Loyalty_Tier = new_tier;
+                        customer_record.Quarterly_Eligible_Spend = 0;
+                        customer_record.Loyalty_Tier_Last_Reviewed_At = zoho.currenttime;
+                        if(prior_tier != new_tier)
+                        {
+                            recipient_email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID);
+                            communication_id = insert into Communication_Log
+                            [
+                                Customer = customer_record.ID
+                                Recipient = recipient_email
+                                Channel = "Email"
+                                Template_Code = "LOYALTY_TIER_CHANGED"
+                                Subject = "Your loyalty tier is now " + new_tier
+                                Message_Summary = "Quarterly qualification completed using eligible spend of INR " + eligible_spend + ". Tier changed from " + prior_tier + " to " + new_tier + "."
+                                Provider = "Zoho Mail"
+                                Communication_Status = "Sent"
+                                Attempt_Count = 1
+                                Last_Attempt_At = zoho.currenttime
+                            ];
+                            sendmail
+                            [
+                                from: zoho.adminuserid
+                                to: recipient_email
+                                subject: "Your loyalty tier is now " + new_tier
+                                message: "Your quarterly loyalty review is complete. Eligible spend: INR " + eligible_spend + ". Previous tier: " + prior_tier + ". Current tier: " + new_tier + "."
+                            ]
+                        }
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.adminuserid
+                            Actor_Profile = "Scheduled Workflow"
+                            Action_Name = "Recalculate Loyalty Tier"
+                            Module_Name = "Customers"
+                            Record_ID = customer_record.ID.toString()
+                            Before_Data = "Tier=" + prior_tier + "; Quarterly spend=" + eligible_spend
+                            After_Data = "Tier=" + new_tier + "; Quarterly spend reset to 0"
+                            Source = "Schedule"
+                            Severity = "Info"
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,30 @@
+Logistics_Bags_On_Success as "Audit Logistics Bag"
+{
+    type = form
+    form = Logistics_Bags
+    record event = on add or edit
+    description = "Audits logistics bag creation and open-state maintenance"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = current_profile
+                    Action_Name = "Save Logistics Bag"
+                    Module_Name = "Logistics Bags"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Bag=" + input.Bag_Number + "; Type=" + input.Bag_Type + "; Origin=" + input.Origin_Hub + "; Destination=" + input.Destination_Hub + "; Status=" + input.Bag_Status
+                    Source = "Form Workflow"
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

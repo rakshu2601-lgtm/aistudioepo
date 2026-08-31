@@ -1,0 +1,155 @@
+Confirm_COD_Pending_Remittance as "Confirm Remittance - COD Pending"
+{
+    type = functions
+    form = COD_Remittances
+    execution type = for each record
+    description = "Confirms cashier custody, flags shortfalls, calculates payout due date, and posts COD settlement credits"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = "POC Process User";
+                current_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                effective_hub = if(current_user.count(ID) > 0 && current_user.Deputed_Hub != null && (current_user.Deputation_Start_Date == null || current_user.Deputation_Start_Date <= input.Remittance_Date) && (current_user.Deputation_End_Date == null || current_user.Deputation_End_Date >= input.Remittance_Date),current_user.Deputed_Hub,current_user.Home_Hub);
+                authorised = current_user.count(ID) > 0 && effective_hub == input.Hub;
+                run_record = Delivery_Run_Sheets[ID == input.Delivery_Run_Sheet];
+                expected_amount = 0.0;
+                for each delivered_item in Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.Delivery_Run_Sheet && Delivery_Status == "Delivered"]
+                {
+                    shipment_record = Shipment_Requests[ID == delivered_item.Shipment];
+                    if(shipment_record.count(ID) > 0 && shipment_record.Payment_Type == "COD")
+                    {
+                        expected_amount = expected_amount + ifnull(shipment_record.COD_Amount,0);
+                    }
+                }
+                submitted_amount = ifnull(input.Submitted_Amount,0);
+                shortfall_amount = expected_amount - submitted_amount;
+                assigned_agent = Operations_Users[ID == input.Agent];
+                if(authorised == false)
+                {
+                    info "Only Finance or an authorised operations supervisor can confirm COD cash.";
+                }
+                else if(input.Remittance_Status == "Confirmed")
+                {
+                    info "This COD remittance is already confirmed.";
+                }
+                else if(run_record.count(ID) == 0 || run_record.DRS_Status != "Completed" || run_record.Assigned_Agent != input.Agent || run_record.Hub != input.Hub)
+                {
+                    info "The remittance no longer matches a completed delivery run.";
+                }
+                else if(expected_amount <= 0 || submitted_amount < 0 || submitted_amount > expected_amount)
+                {
+                    info "Submitted cash must be between zero and the delivered COD total.";
+                }
+                else
+                {
+                    prior_status = input.Remittance_Status;
+                    input.Expected_Amount = expected_amount;
+                    input.Shortfall_Amount = shortfall_amount;
+                    input.Cashier_Email = zoho.loginuserid;
+                    input.Confirmed_At = zoho.currenttime;
+                    if(shortfall_amount > 0.01)
+                    {
+                        input.Remittance_Status = "Shortfall";
+                        input.Customer_Payout_Due_Date = null;
+                        input.Notes = ifnull(input.Notes,"") + "\nCashier identified an INR " + shortfall_amount + " shortfall on " + zoho.currenttime + ".";
+                        if(assigned_agent.count(ID) > 0)
+                        {
+                            sendmail
+                            [
+                                from: zoho.adminuserid
+                                to: assigned_agent.Work_Email
+                                subject: "COD cash shortfall: DRS " + run_record.DRS_Number
+                                message: "Finance identified a COD cash shortfall of INR " + shortfall_amount + ". Submit the balance and update the remittance record."
+                            ]
+                            communication_id = insert into Communication_Log
+                            [
+                                Recipient = assigned_agent.Work_Email
+                                Channel = "Email"
+                                Template_Code = "COD_SHORTFALL"
+                                Subject = "COD cash shortfall: DRS " + run_record.DRS_Number
+                                Message_Summary = "Agent notified of INR " + shortfall_amount + " COD shortfall."
+                                Provider = "Zoho Mail"
+                                Communication_Status = "Sent"
+                                Attempt_Count = 1
+                                Last_Attempt_At = zoho.currenttime
+                            ];
+                        }
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuserid
+                            Actor_Profile = current_profile
+                            Action_Name = "Confirm COD Shortfall"
+                            Module_Name = "COD Remittances"
+                            Record_ID = input.ID.toString()
+                            Before_Data = "Status=" + prior_status + "; Expected=" + expected_amount + "; Submitted=" + submitted_amount
+                            After_Data = "Status=Shortfall; Shortfall=" + shortfall_amount
+                            Source = "Report Action"
+                            Severity = "Critical"
+                        ];
+                    }
+                    else
+                    {
+                        config_record = App_Configuration[Active == true] range from 0 to 0;
+                        payout_cycle = if(config_record.count(ID) > 0,config_record.COD_Payout_Cycle,"T+2");
+                        payout_due_date = if(payout_cycle == "Weekly",zoho.currentdate.toStartOfWeek().addDay(8),zoho.currentdate.addBusinessDay(2));
+                        input.Remittance_Status = "Confirmed";
+                        input.Shortfall_Amount = 0;
+                        input.Customer_Payout_Due_Date = payout_due_date;
+                        for each delivered_item in Delivery_Run_Sheet_Items[Delivery_Run_Sheet == input.Delivery_Run_Sheet && Delivery_Status == "Delivered" && COD_Collected > 0]
+                        {
+                            shipment_record = Shipment_Requests[ID == delivered_item.Shipment];
+                            customer_record = Customers[ID == shipment_record.Customer];
+                            payment_reference = "COD-" + input.Remittance_Number + "-" + shipment_record.AWB_Number;
+                            if(Account_Ledger[Payment_Reference == payment_reference].count(ID) == 0)
+                            {
+                                ledger_id = insert into Account_Ledger
+                                [
+                                    Customer = shipment_record.Customer
+                                    Shipment = shipment_record.ID
+                                    Transaction_Type = "COD Settlement"
+                                    Amount = delivered_item.COD_Collected
+                                    Transaction_Date = zoho.currenttime
+                                    Due_Date = payout_due_date
+                                    Ledger_Status = "Open"
+                                    Payment_Reference = payment_reference
+                                    Notes = "COD confirmed from DRS " + run_record.DRS_Number + "."
+                                    Posted_By_Email = zoho.loginuserid
+                                    Customer_Login_Email = if(ifnull(customer_record.Portal_Login_Email,"").trim() != "",customer_record.Portal_Login_Email,customer_record.Email_ID)
+                                ];
+                            }
+                            thisapp.Recalculate_Customer_Outstanding(shipment_record.Customer);
+                        }
+                        if(assigned_agent.count(ID) > 0)
+                        {
+                            sendmail
+                            [
+                                from: zoho.adminuserid
+                                to: assigned_agent.Work_Email
+                                subject: "COD cash confirmed: DRS " + run_record.DRS_Number
+                                message: "Finance confirmed COD cash of INR " + expected_amount + ". Customer payout is due on " + payout_due_date + "."
+                            ]
+                        }
+                        audit_id = insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuserid
+                            Actor_Profile = current_profile
+                            Action_Name = "Confirm COD Remittance"
+                            Module_Name = "COD Remittances"
+                            Record_ID = input.ID.toString()
+                            Before_Data = "Status=" + prior_status + "; Expected=" + expected_amount + "; Submitted=" + submitted_amount
+                            After_Data = "Status=Confirmed; Payout Cycle=" + payout_cycle + "; Payout Due=" + payout_due_date
+                            Source = "Report Action"
+                            Severity = "Critical"
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

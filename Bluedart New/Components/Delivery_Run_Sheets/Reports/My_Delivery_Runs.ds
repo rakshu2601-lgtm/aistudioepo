@@ -1,0 +1,40 @@
+list My_Delivery_Runs
+{
+    displayName = "My Delivery Runs"
+    show all rows from Delivery_Run_Sheets [Assigned_Agent.Work_Email == zoho.loginuserid && DRS_Status != "Draft"]
+    (
+        DRS_Number
+        Run_Date
+        Hub
+        Delivery_Zone
+        Assigned_Agent
+        Vehicle
+        DRS_Status
+        Planned_Stop_Count
+        Delivered_Count
+        Failed_Count
+        Expected_COD_Amount
+        Collected_COD_Amount
+        Released_At
+        Completed_At
+        custom action "Complete Run"
+        (
+            workflow = Complete_Delivery_Run
+            show action for each record = true
+            column header = "Complete Run"
+            success message = "Delivery run completion evaluated"
+            condition = (DRS_Status == "Released" || DRS_Status == "In Progress")
+        )
+    )
+    filters
+    (
+        Run_Date
+        Hub
+        DRS_Status
+    )
+    sort by
+    (
+        Run_Date descending
+        DRS_Number descending
+    )
+}

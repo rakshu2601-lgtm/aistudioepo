@@ -1,0 +1,39 @@
+KYC_Document_Types_On_Validate as "Validate KYC Document Type"
+{
+    type = form
+    form = KYC_Document_Types
+    record event = on add or edit
+    description = "Validates conditional thresholds and upload configuration"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Conditional_On_Credit_Threshold == true && ifnull(input.Credit_Threshold,0) <= 0)
+                {
+                    alert "Credit Threshold must be greater than zero for a conditional document.";
+                    cancel submit;
+                }
+                if(ifnull(input.Maximum_File_Size_MB,0) <= 0 || input.Maximum_File_Size_MB > 50)
+                {
+                    alert "Maximum file size must be between 1 and 50 MB.";
+                    cancel submit;
+                }
+                if(ifnull(input.Display_Order,0) <= 0)
+                {
+                    alert "Display Order must be greater than zero.";
+                    cancel submit;
+                }
+                file_types = ifnull(input.Accepted_File_Types,"").toLowerCase().replaceAll(" ","");
+                if(file_types == "" || file_types.contains(".") || !file_types.matches("[a-z0-9]+(,[a-z0-9]+)*"))
+                {
+                    alert "Accepted File Types must be lowercase extensions separated by commas, for example pdf,jpg,jpeg.";
+                    cancel submit;
+                }
+                input.Accepted_File_Types = file_types;
+            )
+        }
+    }
+}

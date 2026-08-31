@@ -1,0 +1,57 @@
+list KYC_Review_Queue
+{
+    displayName = "KYC Review Queue"
+    show all rows from Customer_KYC_Documents [Review_Status == "Pending Verification"]
+    (
+        KYC_Document_ID
+        Customer
+        Document_Type
+        Required_For_Onboarding
+        Document_Number
+        Expiry_Date
+        Uploaded_File
+        File_Version
+        Review_Status
+        Review_Remarks
+        Uploaded_On
+        custom action "Verify"
+        (
+            workflow = Verify_KYC_Document
+            show action for each record = true
+            column header = "Verify"
+            success message = "KYC document verified"
+            condition = (Review_Status == "Pending Verification")
+            confirmation before execution
+            (
+                message for individual record = "Verify and lock this KYC document?"
+                confirm button text = "Verify"
+                cancel button text = "Cancel"
+            )
+        )
+        custom action "Query"
+        (
+            workflow = Query_KYC_Document
+            show action for each record = true
+            column header = "Query"
+            success message = "KYC document returned for correction"
+            condition = (Review_Status == "Pending Verification")
+            confirmation before execution
+            (
+                message for individual record = "Return this document to the customer using the saved review remarks?"
+                confirm button text = "Query"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Customer
+        Document_Type
+        Required_For_Onboarding
+        Review_Status
+    )
+    sort by
+    (
+        Uploaded_On ascending
+    )
+}

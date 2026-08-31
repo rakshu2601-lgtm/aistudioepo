@@ -1,0 +1,79 @@
+default list All_Manifests
+{
+    displayName = "All Manifests"
+    show all rows from Manifests
+    (
+        Manifest_Number
+        Manifest_Type
+        Origin_Hub
+        Destination_Hub
+        Route
+        Vehicle
+        Driver
+        Departure_Time
+        Expected_Arrival_Time
+        Actual_Arrival_Time
+        Manifest_Status
+        Vehicle_Seal_Code
+        Total_Bags
+        Total_Shipments
+        Total_Weight_Kg
+        Created_By_Email
+        Notes
+        custom action "Close Manifest"
+        (
+            workflow = Close_Manifest
+            show action for each record = true
+            column header = "Close Manifest"
+            success message = "Manifest closed"
+            condition = (Manifest_Status == "Draft")
+        )
+        custom action "Dispatch Manifest"
+        (
+            workflow = Dispatch_Manifest
+            show action for each record = true
+            column header = "Dispatch Manifest"
+            success message = "Manifest dispatched"
+            condition = (Manifest_Status == "Closed")
+        )
+        custom action "Receive Manifest"
+        (
+            workflow = Receive_Manifest
+            show action for each record = true
+            column header = "Receive Manifest"
+            success message = "Manifest arrival recorded"
+            condition = (Manifest_Status == "In Transit")
+        )
+        custom action "Reconcile Manifest"
+        (
+            workflow = Reconcile_Manifest
+            show action for each record = true
+            column header = "Reconcile Manifest"
+            success message = "Manifest reconciliation checked"
+            condition = (Manifest_Status == "Arrived" || Manifest_Status == "Exception")
+        )
+        custom action "Cancel Manifest"
+        (
+            workflow = Cancel_Manifest
+            show action for each record = true
+            column header = "Cancel Manifest"
+            success message = "Manifest cancelled"
+            condition = (Manifest_Status == "Draft")
+        )
+    )
+    filters
+    (
+        Manifest_Type
+        Origin_Hub
+        Destination_Hub
+        Vehicle
+        Driver
+        Manifest_Status
+        Departure_Time
+        Expected_Arrival_Time
+    )
+    sort by
+    (
+        Departure_Time descending
+    )
+}

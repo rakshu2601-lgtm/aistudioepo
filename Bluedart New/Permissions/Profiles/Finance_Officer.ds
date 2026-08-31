@@ -1,0 +1,25 @@
+"Finance_Officer"
+{
+ name = "Finance_Officer"
+ type = Users_Permissions
+ permissions = { Chat:true, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+ description = "Invoice, payment, credit, COD, and loyalty financial control"
+ ModulePermissions
+ {
+  Customers { enabled = Viewall,Modifyall,Export,Tab,View,Edit,Search allFieldsVisible = false ReportPermissions { All_Customers={"View","Edit"} Active_Customers={"View"} } FieldPermissions { Customer_ID{visibility:true,readonly:true} Customer_Type{visibility:true,readonly:true} Full_Name{visibility:true,readonly:true} Email_ID{visibility:true,readonly:true} Company_Name{visibility:true,readonly:true} Requested_Credit_Limit{visibility:true,readonly:false} Approved_Credit_Limit{visibility:true,readonly:false} Payment_Terms{visibility:true,readonly:false} Assigned_Rate_Card{visibility:true,readonly:false} Current_Loyalty_Points{visibility:true,readonly:true} Current_Loyalty_Tier{visibility:true,readonly:true} Quarterly_Eligible_Spend{visibility:true,readonly:true} Outstanding_Balance{visibility:true,readonly:true} GSTIN{visibility:false} PAN_Number{visibility:false} Primary_Address{visibility:false} Onboarding_Status{visibility:true,readonly:true} }
+  }
+  Rate_Cards { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Rate_Cards={"View","Edit","Delete"} Published_Rate_Cards={"View"} Expiring_Rate_Cards={"View"} } }
+  Rate_Slabs { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Rate_Slab_Register={"View","Edit","Delete"} Active_Slabs={"View"} } }
+  Shipment_Requests { enabled = Viewall,Export,Tab,View,Search allFieldsVisible = false ReportPermissions { All_Shipments={"View"} } FieldPermissions { AWB_Number{visibility:true,readonly:true} Customer{visibility:true,readonly:true} Declared_Value{visibility:true,readonly:true} Base_Rate{visibility:true,readonly:true} Fuel_Surcharge{visibility:true,readonly:true} COD_Handling_Fee{visibility:true,readonly:true} GST_Amount{visibility:true,readonly:true} Gross_Amount{visibility:true,readonly:true} Loyalty_Redemption_Amount{visibility:true,readonly:true} Total_Payable{visibility:true,readonly:true} Payment_Type{visibility:true,readonly:true} COD_Amount{visibility:true,readonly:true} Payment_Status{visibility:true,readonly:true} Credit_Check_Status{visibility:true,readonly:true} Shipment_Status{visibility:true,readonly:true} }
+  }
+  COD_Remittances { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { COD_Remittance_Register={"View","Edit"} COD_Pending_Remittance={"View","Edit"} COD_Payout_Due={"View"} } }
+  Loyalty_Rules { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Loyalty_Rule_Register={"View","Edit","Delete"} Active_Loyalty_Rules={"View","Edit"} } }
+  Loyalty_Tiers { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Loyalty_Tier_Register={"View","Edit","Delete"} Active_Tier_Benefits={"View"} } }
+  Loyalty_Transactions { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { Loyalty_Transaction_Ledger={"View","Edit"} Points_Expiring_Soon={"View"} Loyalty_Activity_By_Type={"View"} } }
+  Invoices { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { Invoice_Statement={"View","Edit"} Overdue_Invoices={"View","Edit"} Invoice_Due_Calendar={"View"} } }
+  Account_Ledger { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Search allFieldsVisible = true ReportPermissions { Account_Ledger_Statement={"View","Edit"} Outstanding_Accounts={"View"} Credit_Utilization={"View"} Ledger_Ageing={"View"} } }
+  Payment_Transactions { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Search allFieldsVisible = false ReportPermissions { Payment_Transaction_Register={"View","Edit"} Failed_Payments={"View","Edit"} } FieldPermissions { Customer{visibility:true,readonly:true} Shipment{visibility:true,readonly:true} Invoice{visibility:true,readonly:true} Ledger_Entry{visibility:true,readonly:true} Gateway{visibility:true,readonly:true} Gateway_Order_ID{visibility:true,readonly:true} Gateway_Payment_ID{visibility:true,readonly:true} Amount{visibility:true,readonly:true} Payment_Method{visibility:true,readonly:true} Payment_Status{visibility:true,readonly:true} Initiated_At{visibility:true,readonly:true} Completed_At{visibility:true,readonly:true} Gateway_Response_Summary{visibility:false} Failure_Reason{visibility:true,readonly:true} }
+  }
+  Admin_Dashboard { enabled = tab }
+ }
+}

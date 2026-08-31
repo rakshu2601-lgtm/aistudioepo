@@ -1,0 +1,36 @@
+list In_Transit_Manifests
+{
+    displayName = "In Transit Manifests"
+    show all rows from Manifests [Manifest_Status == "In Transit"]
+    (
+        Manifest_Number
+        Manifest_Type
+        Origin_Hub
+        Destination_Hub
+        Route
+        Vehicle
+        Driver
+        Departure_Time
+        Expected_Arrival_Time
+        Manifest_Status
+        Vehicle_Seal_Code
+        Total_Bags
+        Total_Shipments
+        Total_Weight_Kg
+    )
+    filters
+    (
+        Manifest_Type
+        Origin_Hub
+        Destination_Hub
+        Route
+        Vehicle
+        Driver
+        Expected_Arrival_Time
+        Manifest_Status
+    )
+    sort by
+    (
+        Expected_Arrival_Time ascending
+    )
+}

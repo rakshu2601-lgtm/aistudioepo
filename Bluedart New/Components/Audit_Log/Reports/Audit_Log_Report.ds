@@ -1,0 +1,48 @@
+default list Audit_Log_Report
+{
+    displayName = "Audit Log"
+    show all rows from Audit_Log
+    (
+        Audit_ID
+        Event_Time
+        Actor_Email
+        Actor_Profile
+        Action_Name
+        Module_Name
+        Record_ID
+        Before_Data
+        After_Data
+        Source
+        Severity
+    )
+    filters
+    (
+        Event_Time
+        Actor_Email
+        Actor_Profile
+        Action_Name
+        Module_Name
+        Source
+        Severity
+    )
+    sort by
+    (
+        Event_Time descending
+        Audit_ID descending
+    )
+    conditional formatting
+    (
+        "Critical Event"
+        {
+            condition = (Severity == "Critical")
+            fields = [Audit_ID, Event_Time, Actor_Email, Action_Name, Module_Name, Severity]
+            format = "background-color:#FEE2E2;color:#991B1B;font-weight:bold"
+        }
+        "Warning Event"
+        {
+            condition = (Severity == "Warning")
+            fields = [Audit_ID, Event_Time, Actor_Email, Action_Name, Module_Name, Severity]
+            format = "background-color:#FEF3C7;color:#92400E"
+        }
+    )
+}

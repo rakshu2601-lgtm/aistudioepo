@@ -1,0 +1,5 @@
+report Customer_NDR_Instructions
+{
+    quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( NDR_ID Customer Shipment Recipient_Instruction Reschedule_Date Updated_Delivery_Address Submitted_At NDR_Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+    detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( NDR_ID Customer Shipment Recipient_Instruction Reschedule_Date Updated_Delivery_Address Submitted_At NDR_Status ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

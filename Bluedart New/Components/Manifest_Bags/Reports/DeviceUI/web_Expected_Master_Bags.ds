@@ -1,0 +1,5 @@
+report Expected_Master_Bags
+{
+    quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Manifest Manifest_Type Bag Load_Status Seal_Verified "Receive Bag" "Mark Missing" "Mark Damaged" "Mark Short" ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+    detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Manifest Manifest_Type Bag Load_Status Loaded_At Received_At Seal_Verified Exception_Photo Exception_Notes "Receive Bag" "Mark Missing" "Mark Damaged" "Mark Short" ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

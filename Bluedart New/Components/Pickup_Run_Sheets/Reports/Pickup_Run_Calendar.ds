@@ -1,0 +1,38 @@
+calendar Pickup_Run_Calendar
+{
+    displayName = "Pickup Run Calendar"
+    show all rows from Pickup_Run_Sheets
+    (
+        PRS_Number
+        Run_Date
+        Hub
+        Assigned_Agent
+        Beat_Name
+        Vehicle
+        Status
+        Planned_Stop_Count
+        Completed_Stop_Count
+        Total_Planned_Weight_Kg
+    )
+    filters
+    (
+        Hub
+        Assigned_Agent
+        Vehicle
+        Status
+        Run_Date
+    )
+    options
+    (
+        display type = week
+        week start day = monday
+        display field = PRS_Number
+        start date = Run_Date
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+}

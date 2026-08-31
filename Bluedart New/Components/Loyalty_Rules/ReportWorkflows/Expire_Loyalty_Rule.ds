@@ -1,0 +1,48 @@
+Expire_Loyalty_Rule as "Expire Rule - Loyalty Rule Register"
+{
+    type = functions
+    form = Loyalty_Rules
+    execution type = for each record
+    description = "Ends an active earning rule and preserves its effective-period history"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(current_profile != "Logistics_Administrator" && current_profile != "Finance_Officer")
+                {
+                    info "Only Logistics Administrators and Finance Officers can expire loyalty rules.";
+                }
+                else if(input.Status != "Active")
+                {
+                    info "Only active loyalty rules can be expired.";
+                }
+                else
+                {
+                    previous_effective_to = input.Effective_To;
+                    input.Status = "Expired";
+                    if(input.Effective_To == null || input.Effective_To > zoho.currentdate)
+                    {
+                        input.Effective_To = zoho.currentdate;
+                    }
+                    audit_id = insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuserid
+                        Actor_Profile = current_profile
+                        Action_Name = "Expire Loyalty Rule"
+                        Module_Name = "Loyalty Rules"
+                        Record_ID = input.ID.toString()
+                        Before_Data = "Status=Active; Effective To=" + previous_effective_to
+                        After_Data = "Status=Expired; Effective To=" + input.Effective_To
+                        Source = "Report Action"
+                        Severity = "Critical"
+                    ];
+                }
+            )
+        }
+    }
+}

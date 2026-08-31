@@ -1,0 +1,36 @@
+list Active_Slabs
+{
+    displayName = "Active Rate Slabs"
+    show all rows from Rate_Slabs [Active == true]
+    (
+        Rate_Card
+        Slab_Name
+        Service_Zone
+        Minimum_Weight_Kg
+        Maximum_Weight_Kg
+        Minimum_Distance_Km
+        Maximum_Distance_Km
+        Base_Rate
+        Additional_Kg_Rate
+        Active
+    )
+    filters
+    (
+        Rate_Card
+        Service_Zone
+        Active
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Rate_Card ascending
+    )
+    sort by
+    (
+        Minimum_Weight_Kg ascending
+        Minimum_Distance_Km ascending
+    )
+}

@@ -1,0 +1,54 @@
+default list Account_Ledger_Statement
+{
+    displayName = "Account Ledger Statement"
+    show all rows from Account_Ledger
+    (
+        Ledger_Entry_ID
+        Customer
+        Shipment
+        Invoice
+        Transaction_Type
+        Amount
+        (
+            display = total
+        )
+        Transaction_Date
+        Due_Date
+        Ledger_Status
+        Ageing_Bucket
+        Payment_Reference
+        Notes
+        Posted_By_Email
+        Customer_Login_Email
+    )
+    filters
+    (
+        Customer
+        Transaction_Type
+        Transaction_Date
+        Due_Date
+        Ledger_Status
+        Ageing_Bucket
+        "Open Entries" : (Ledger_Status == "Open" || Ledger_Status == "Partially Settled" || Ledger_Status == "Overdue")
+    )
+    sort by
+    (
+        Transaction_Date descending
+        Ledger_Entry_ID descending
+    )
+    conditional formatting
+    (
+        "Overdue Balance"
+        {
+            condition = (Ledger_Status == "Overdue")
+            fields = [Customer, Amount, Due_Date, Ledger_Status, Ageing_Bucket]
+            format = "background-color:#FEE2E2;color:#991B1B;font-weight:bold"
+        }
+        "Settled Entry"
+        {
+            condition = (Ledger_Status == "Settled")
+            fields = [Customer, Amount, Ledger_Status]
+            format = "background-color:#ECFDF5;color:#065F46"
+        }
+    )
+}

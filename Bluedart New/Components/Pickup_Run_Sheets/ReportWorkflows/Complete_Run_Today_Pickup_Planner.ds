@@ -1,0 +1,96 @@
+Complete_Run_Today_Pickup_Planner as "Complete Run - Today's Pickup Planner"
+{
+    type = functions
+    form = Pickup_Run_Sheets
+    execution type = for each record
+    description = "Reconciles terminal pickup stops, completes the run, releases its vehicle, and audits the action"
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                assigned_agent = Operations_Users[ID == input.Assigned_Agent];
+                authorised = assigned_agent.Work_Email == zoho.loginuserid || Operations_Users[Work_Email == zoho.loginuserid && Active == true].count(ID) > 0;
+                if(authorised == false)
+                {
+                    info "Only the assigned agent or an active operations user can complete this pickup run.";
+                }
+                else if(input.Status != "Released" && input.Status != "In Progress")
+                {
+                    info "Only a released or in-progress pickup run can be completed.";
+                }
+                else
+                {
+                    logged_user = Operations_Users[Work_Email == zoho.loginuserid && Active == true];
+                    deputation_active = logged_user.count(ID) > 0 && logged_user.Deputed_Hub != null && (logged_user.Deputation_Start_Date == null || logged_user.Deputation_Start_Date <= input.Run_Date) && (logged_user.Deputation_End_Date == null || logged_user.Deputation_End_Date >= input.Run_Date);
+                    effective_hub = if(deputation_active == true,logged_user.Deputed_Hub,logged_user.Home_Hub);
+                    if(assigned_agent.Work_Email != zoho.loginuserid && (logged_user.count(ID) == 0 || effective_hub != input.Hub))
+                    {
+                        info "Only the assigned agent or an active operations user at the run's effective hub can complete it.";
+                    }
+                    else
+                    {
+                        planned_count = 0;
+                        completed_count = 0;
+                        planned_weight = 0.0;
+                        unresolved_count = 0;
+                        for each run_item in Pickup_Run_Sheet_Items[Pickup_Run_Sheet == input.ID]
+                        {
+                            if(run_item.Stop_Status != "Cancelled")
+                            {
+                                planned_count = planned_count + 1;
+                                shipment_record = Shipment_Requests[ID == run_item.Shipment];
+                                planned_weight = planned_weight + ifnull(shipment_record.Billable_Weight_Kg,0);
+                                if(run_item.Stop_Status == "Picked Up" || run_item.Stop_Status == "Failed")
+                                {
+                                    completed_count = completed_count + 1;
+                                }
+                                else
+                                {
+                                    unresolved_count = unresolved_count + 1;
+                                }
+                            }
+                        }
+                        if(planned_count == 0 || unresolved_count > 0)
+                        {
+                            info "Every active pickup stop must be marked Picked Up or Failed before completing the run.";
+                        }
+                        else
+                        {
+                            prior_status = input.Status;
+                            input.Planned_Stop_Count = planned_count;
+                            input.Completed_Stop_Count = completed_count;
+                            input.Total_Planned_Weight_Kg = planned_weight;
+                            input.Status = "Completed";
+                            input.Completed_At = zoho.currenttime;
+                            if(input.Vehicle != null)
+                            {
+                                vehicle_record = Vehicles[ID == input.Vehicle];
+                                if(vehicle_record.count(ID) > 0 && vehicle_record.Status == "Assigned")
+                                {
+                                    vehicle_record.Status = "Available";
+                                    vehicle_record.Assigned_Driver = null;
+                                }
+                            }
+                            audit_id = insert into Audit_Log
+                            [
+                                Event_Time = zoho.currenttime
+                                Actor_Email = zoho.loginuserid
+                                Actor_Profile = "POC Process User"
+                                Action_Name = "Complete Pickup Run"
+                                Module_Name = "Pickup Run Sheets"
+                                Record_ID = input.ID.toString()
+                                Before_Data = "Status=" + prior_status
+                                After_Data = "Status=Completed; Resolved Stops=" + completed_count + "; Weight Kg=" + planned_weight
+                                Source = "Report Action"
+                                Severity = "Warning"
+                            ];
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

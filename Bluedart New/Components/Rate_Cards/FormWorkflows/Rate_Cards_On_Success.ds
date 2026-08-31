@@ -1,0 +1,34 @@
+Rate_Cards_On_Success as "Audit Rate Card"
+{
+    type = form
+    form = Rate_Cards
+    record event = on add or edit
+    description = "Audits rate policy, publishing, and expiry changes"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_severity = "Info";
+                if(input.Status == "Published" || input.Status == "Expired")
+                {
+                    audit_severity = "Warning";
+                }
+                audit_id = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuserid
+                    Actor_Profile = "Pricing Administration"
+                    Action_Name = "Save Rate Card"
+                    Module_Name = "Rate Cards"
+                    Record_ID = input.ID.toString()
+                    After_Data = "Rate Card=" + input.Rate_Card_ID + "; Customer Type=" + input.Customer_Type + "; Mode=" + input.Transport_Mode + "; Status=" + input.Status
+                    Source = "Form Workflow"
+                    Severity = audit_severity
+                ];
+            )
+        }
+    }
+}

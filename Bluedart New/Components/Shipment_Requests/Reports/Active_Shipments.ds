@@ -1,0 +1,35 @@
+map Active_Shipments
+{
+    displayName = "Active Shipments"
+    show all rows from Shipment_Requests [Shipment_Status != "Delivered" && Shipment_Status != "Cancelled"]
+    (
+        AWB_Number
+        Customer
+        Recipient_Name
+        Delivery_Address
+        Delivery_Pincode
+        Destination_Hub
+        Current_Hub
+        Expected_Delivery_Date
+        Shipment_Status
+    )
+    filters
+    (
+        Customer
+        Delivery_Pincode
+        Destination_Hub
+        Current_Hub
+        Expected_Delivery_Date
+        Shipment_Status
+    )
+    options
+    (
+        display field = Delivery_Address
+        location
+        (
+            latitude = 20.5937
+            longitude = 78.9629
+        )
+        radius = 2500 Kms
+    )
+}

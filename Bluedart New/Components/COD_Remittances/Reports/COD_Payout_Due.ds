@@ -1,0 +1,34 @@
+calendar COD_Payout_Due
+{
+    displayName = "COD Payout Due"
+    show all rows from COD_Remittances [Remittance_Status == "Confirmed" && Customer_Payout_Due_Date is not null]
+    (
+        Remittance_Number
+        Delivery_Run_Sheet
+        Agent
+        Hub
+        Expected_Amount
+        Customer_Payout_Due_Date
+        Remittance_Status
+    )
+    filters
+    (
+        Agent
+        Hub
+        Customer_Payout_Due_Date
+        Remittance_Status
+    )
+    options
+    (
+        display type = month
+        week start day = monday
+        display field = Remittance_Number
+        start date = Customer_Payout_Due_Date
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+}

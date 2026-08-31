@@ -1,0 +1,48 @@
+Hub_Pincode_Mapping_On_Validate as "Validate Pincode Mapping"
+{
+    type = form
+    form = Hub_Pincode_Mapping
+    record event = on add or edit
+    description = "Validates pincode format and collection center assignments"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                pincode_text = ifnull(input.Pincode,"").trim();
+                if(pincode_text.length() != 6 || !pincode_text.matches("[0-9]{6}"))
+                {
+                    alert "Pincode must contain exactly six digits.";
+                    cancel submit;
+                }
+                if(ifnull(input.Approx_Distance_From_Primary_Km,-1) < 0)
+                {
+                    alert "Approximate distance cannot be negative.";
+                    cancel submit;
+                }
+                if(input.Secondary_Overflow_Hub != null && input.Primary_Collection_Center == input.Secondary_Overflow_Hub)
+                {
+                    alert "Primary and overflow hubs must be different.";
+                    cancel submit;
+                }
+                primary_hub = Hubs[ID == input.Primary_Collection_Center];
+                if(primary_hub.count() == 0 || primary_hub.Hub_Type != "Collection Center" || primary_hub.Active != true)
+                {
+                    alert "Primary hub must be an active collection center.";
+                    cancel submit;
+                }
+                if(input.Secondary_Overflow_Hub != null)
+                {
+                    secondary_hub = Hubs[ID == input.Secondary_Overflow_Hub];
+                    if(secondary_hub.count() == 0 || secondary_hub.Hub_Type != "Collection Center" || secondary_hub.Active != true)
+                    {
+                        alert "Overflow hub must be an active collection center.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

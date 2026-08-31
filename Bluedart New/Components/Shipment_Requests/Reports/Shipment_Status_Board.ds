@@ -1,0 +1,40 @@
+kanban Shipment_Status_Board
+{
+    displayName = "Shipment Status Board"
+    show all rows from Shipment_Requests
+    (
+        AWB_Number
+        Customer
+        Collection_Center
+        Destination_Hub
+        Current_Hub
+        Transport_Mode
+        Payment_Type
+        Total_Payable
+        Booked_On
+        Expected_Delivery_Date
+        Shipment_Status
+    )
+    filters
+    (
+        Customer
+        Collection_Center
+        Destination_Hub
+        Current_Hub
+        Transport_Mode
+        Payment_Type
+        Shipment_Status
+    )
+    sort by
+    (
+        Booked_On descending
+    )
+    options
+    (
+        display field = Shipment_Status
+        othercolumn = "Other"
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

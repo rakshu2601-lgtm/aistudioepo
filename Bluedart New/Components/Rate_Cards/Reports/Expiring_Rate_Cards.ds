@@ -1,0 +1,44 @@
+calendar Expiring_Rate_Cards
+{
+    displayName = "Expiring Rate Cards"
+    show all rows from Rate_Cards [Effective_To != null && Status != "Expired"]
+    (
+        Rate_Card_ID
+        Rate_Card_Name
+        Customer_Type
+        Transport_Mode
+        Effective_From
+        Effective_To
+        Default_For_Retail
+        Status
+    )
+    filters
+    (
+        Customer_Type
+        Transport_Mode
+        Default_For_Retail
+        Status
+    )
+    options
+    (
+        display type = month
+        week start day = monday
+        display field = Rate_Card_Name
+        start date = Effective_To
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+    conditional formatting
+    (
+        "Retail Default"
+        {
+            condition = (Default_For_Retail == true)
+            fields = [Rate_Card_Name, Default_For_Retail]
+            format = "background-color:#DBEAFE;color:#1E40AF"
+        }
+    )
+}

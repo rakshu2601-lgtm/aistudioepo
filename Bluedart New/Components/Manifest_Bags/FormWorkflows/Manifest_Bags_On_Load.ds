@@ -1,0 +1,33 @@
+Manifest_Bags_On_Load as "Secure Manifest Bag Checklist"
+{
+    type = form
+    form = Manifest_Bags
+    record event = on add or edit
+    description = "Filters draft trip bags and protects custody-controlled checklist fields"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Manifest_Type, Load_Status, Loaded_At, Received_At, Seal_Verified, Exception_Photo, Exception_Notes;
+                if(input.ID == null)
+                {
+                    clear Manifest;
+                    Manifest:ui.add(Manifests[Manifest_Status == "Draft"].ID.getall());
+                    clear Bag;
+                }
+                else
+                {
+                    disable Manifest, Bag;
+                    manifest_record = Manifests[ID == input.Manifest];
+                    if((manifest_record.Manifest_Status == "Arrived" || manifest_record.Manifest_Status == "Exception") && input.Load_Status == "Loaded")
+                    {
+                        enable Seal_Verified, Exception_Photo, Exception_Notes;
+                    }
+                }
+            )
+        }
+    }
+}

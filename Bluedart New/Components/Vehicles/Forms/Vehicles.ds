@@ -1,0 +1,156 @@
+form Vehicles
+{
+    title
+    {
+        displayname = "Vehicles"
+        on add = "Add Vehicle"
+        on edit = "Edit Vehicle"
+    }
+    success message = "Vehicle saved successfully"
+    Vehicle_Identity
+    (
+        type = section
+        displayname = "Vehicle Identity"
+        row = 1
+        column = 0
+    )
+    must have unique Vehicle_Number
+    (
+        type = text
+        displayname = "Vehicle Number"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Vehicle_Type
+    (
+        type = picklist
+        displayname = "Vehicle Type"
+        values = {"Bike","Van","Feeder Truck","Linehaul Truck","Other"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Transport_Mode
+    (
+        type = picklist
+        displayname = "Transport Mode"
+        values = {"Surface","Air Support","Local"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"Available","Assigned","Maintenance","Inactive"}
+        initial value = "Available"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Capacity_and_Assignment
+    (
+        type = section
+        displayname = "Capacity and Assignment"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Owning_Hub
+    (
+        type = picklist
+        displayname = "Owning Hub"
+        values = Hubs[Active == true].ID
+        displayformat = [Hub_Name]
+        searchable = true
+        sortorder = ascending
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Capacity_Kg
+    (
+        type = decimal
+        displayname = "Capacity (Kg)"
+        decimalplace = 2
+        row = 2
+        column = 2
+        width = medium
+    )
+    Assigned_Driver
+    (
+        type = picklist
+        displayname = "Assigned Driver"
+        values = Operations_Users[Application_Role == "Field Agent" && Active == true].ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        sortorder = ascending
+        row = 2
+        column = 1
+        width = medium
+    )
+    Compliance
+    (
+        type = section
+        displayname = "Compliance"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Registration_Expiry
+    (
+        type = date
+        displayname = "Registration Expiry"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Insurance_Expiry
+    (
+        type = date
+        displayname = "Insurance Expiry"
+        row = 3
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Vehicle"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Vehicle"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}
