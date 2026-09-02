@@ -1,0 +1,14 @@
+report Open_Feedback
+{
+ quickview
+ (
+  layout ( type = -1 datablock1 ( layout type = -1 fields ( Document Review_Cycle_Number Reviewer_User Feedback_Category Feedback_Status Added_Time ) ) )
+  menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) )
+  action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) )
+ )
+ detailview
+ (
+  layout ( type = 1 datablock1 ( layout type = -2 fields ( Document Review_Cycle_Number Reviewer_User Feedback_Category Feedback_Comments Resource_Response Feedback_Status Added_Time ) ) )
+  menu ( header ( Edit Duplicate Delete ) )
+ )
+}

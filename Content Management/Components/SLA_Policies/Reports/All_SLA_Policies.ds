@@ -1,0 +1,30 @@
+default list All_SLA_Policies
+{
+    displayName = "All SLA Policies"
+    show all rows from SLA_Policies
+    (
+        Policy_Name
+        Product
+        Session_Type
+        Document_Type
+        Review_Cycle_Type
+        SLA_Business_Days
+        Priority
+        Effective_From
+        Effective_To
+        Active
+    )
+    filters
+    (
+        Product
+        Session_Type
+        Document_Type
+        Review_Cycle_Type
+        Active
+    )
+    sort by
+    (
+        Priority descending
+        Policy_Name ascending
+    )
+}

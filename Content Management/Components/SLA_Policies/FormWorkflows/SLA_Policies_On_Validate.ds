@@ -1,0 +1,56 @@
+SLA_Policies_On_Validate as "Validate SLA Policy"
+{
+    type = form
+    form = SLA_Policies
+    record event = on add or edit
+    description = "Validates policy scope, dates, duration, and overlapping active rules."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(ifnull(input.SLA_Business_Days,0) <= 0)
+                {
+                    alert(SLA_Business_Days, "SLA business days must be greater than zero.");
+                    cancel submit;
+                }
+                if(input.Effective_From != null && input.Effective_To != null && input.Effective_To < input.Effective_From)
+                {
+                    alert(Effective_To, "Effective To cannot be earlier than Effective From.");
+                    cancel submit;
+                }
+                if(input.Product == null && input.Session_Type == null && input.Document_Type == null && input.Review_Cycle_Type == "Any")
+                {
+                    alert "Select at least one scope dimension or a specific review cycle.";
+                    cancel submit;
+                }
+                if(input.Active == true)
+                {
+                    for each existing_policy in SLA_Policies[Active == true && ID != input.ID]
+                    {
+                        same_product = (existing_policy.Product == input.Product);
+                        same_session_type = (existing_policy.Session_Type == input.Session_Type);
+                        same_document_type = (existing_policy.Document_Type == input.Document_Type);
+                        same_cycle = (existing_policy.Review_Cycle_Type == input.Review_Cycle_Type);
+                        dates_overlap = true;
+                        if(existing_policy.Effective_To != null && input.Effective_From != null && existing_policy.Effective_To < input.Effective_From)
+                        {
+                            dates_overlap = false;
+                        }
+                        if(input.Effective_To != null && existing_policy.Effective_From != null && input.Effective_To < existing_policy.Effective_From)
+                        {
+                            dates_overlap = false;
+                        }
+                        if(same_product && same_session_type && same_document_type && same_cycle && dates_overlap)
+                        {
+                            alert "An active SLA policy with the same scope and overlapping effective dates already exists.";
+                            cancel submit;
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

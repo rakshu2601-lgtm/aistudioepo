@@ -1,0 +1,28 @@
+default list Audit_Trail
+{
+    displayName = "Audit Trail"
+    show all rows from Audit_Log
+    (
+        Audit_ID
+        Document
+        Action_Name
+        From_State
+        To_State
+        Performed_By
+        Performed_On
+        Assigned_Reviewer
+        SLA_Due_On
+        Details
+    )
+    filters
+    (
+        Action_Name
+        From_State
+        To_State
+        Performed_By
+    )
+    sort by
+    (
+        Performed_On descending
+    )
+}

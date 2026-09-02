@@ -1,0 +1,42 @@
+kanban Review_Pipeline
+{
+    displayName = "Review Pipeline"
+    show all rows from Content_Documents
+    (
+        Document_ID
+        Document_Title
+        Product
+        Assigned_Reviewer
+        Due_On
+        SLA_Status
+        Stage
+    )
+    filters
+    (
+        Product
+        Assigned_Reviewer
+        SLA_Status
+    )
+    options
+    (
+        display field = Stage
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+    conditional formatting
+    (
+        "Overdue"
+        {
+            condition = (SLA_Status == "Overdue" || SLA_Status == "Breached")
+            fields = [Document_Title, Due_On, SLA_Status]
+            format = "background-color:#FDE8E8;color:#9B1C1C"
+        }
+        "Due Soon"
+        {
+            condition = (SLA_Status == "Due Soon")
+            fields = [Document_Title, Due_On, SLA_Status]
+            format = "background-color:#FFF8DB;color:#8A5A00"
+        }
+    )
+}

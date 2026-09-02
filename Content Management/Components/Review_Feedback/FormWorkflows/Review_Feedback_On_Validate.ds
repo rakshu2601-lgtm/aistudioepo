@@ -1,0 +1,42 @@
+Review_Feedback_On_Validate as "Validate Review Feedback"
+{
+    type = form
+    form = Review_Feedback
+    record event = on add or edit
+    description = "Enforces reviewer ownership and resource/reviewer resolution responsibilities."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                is_admin = thisapp.permissions.isUserInProfile("Content Administrator");
+                document_record = Content_Documents[ID == input.Document];
+                if(document_record.count() == 0)
+                {
+                    alert "Select a valid content document.";
+                    cancel submit;
+                }
+                if(is_admin == false && input.Reviewer_User != document_record.Assigned_Reviewer)
+                {
+                    alert "Reviewer must match the reviewer assigned to the content document.";
+                    cancel submit;
+                }
+                if(input.ID != null)
+                {
+                    if(input.Feedback_Status == "Addressed" && is_admin == false && document_record.Resource_User.email != zoho.loginuserid)
+                    {
+                        alert "Only the document resource may mark feedback as addressed.";
+                        cancel submit;
+                    }
+                    if(input.Feedback_Status == "Closed" && is_admin == false && document_record.Assigned_Reviewer.email != zoho.loginuserid)
+                    {
+                        alert "Only the assigned reviewer may close feedback.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

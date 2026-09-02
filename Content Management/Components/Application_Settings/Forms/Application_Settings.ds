@@ -1,0 +1,118 @@
+form Application_Settings
+{
+    displayname = "Application Settings"
+    success message = "Application settings saved successfully."
+
+        Configuration
+        (
+            type = section
+            displayname = "Configuration"
+            row = 1
+            column = 0
+        )
+        must have unique Configuration_Key
+        (
+            type = text
+            displayname = "Configuration Key"
+            initial value = "GLOBAL"
+            row = 1
+            column = 1
+            width = medium
+        )
+        must have Default_SLA_Business_Days
+        (
+            type = number
+            displayname = "Default SLA (Business Days)"
+            row = 1
+            column = 1
+            width = medium
+        )
+        must have Due_Soon_Lead_Business_Days
+        (
+            type = number
+            displayname = "Due Soon Lead (Business Days)"
+            initial value = 1
+            row = 1
+            column = 2
+            width = medium
+        )
+        must have Reminder_Time_UTC
+        (
+            type = time
+            displayname = "Reminder Time (UTC)"
+            initial value = "09:00:00"
+            row = 1
+            column = 2
+        )
+        Automation
+        (
+            type = section
+            displayname = "Automation"
+            visibility = true
+            row = 2
+            column = 1
+        )
+        must have Time_Zone
+        (
+            type = picklist
+            displayname = "Time Zone"
+            values = {"UTC"}
+            initial value = "UTC"
+            row = 2
+            column = 1
+        )
+        must have Auto_Assignment_Strategy
+        (
+            type = picklist
+            displayname = "Auto Assignment Strategy"
+            values = {"Least Open Workload"}
+            initial value = "Least Open Workload"
+            row = 2
+            column = 1
+        )
+        Reminders_Enabled
+        (
+            type = checkbox
+            displayname = "Reminders Enabled"
+            initial value = true
+            row = 2
+            column = 2
+        )
+        Last_Reference_Data_Seeded_On
+        (
+            type = datetime
+            displayname = "Last Reference Data Seeded On"
+            row = 2
+            column = 2
+        )
+
+    actions
+    {
+        on add
+        {
+            Save
+            (
+                type = submit
+                displayname = "Save Settings"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Settings"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

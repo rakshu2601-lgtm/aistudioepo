@@ -1,0 +1,19 @@
+<page linkname = "Administration_Center" parameters = "string section" displayname = "Administration Center"/>
+<content>
+<zml mobileDeviceConfig='{"layout":{"displayType":"card","design":"onebyone","forcedOrientation":false}}' tabletDeviceConfig='{"layout":{"displayType":"plain","design":"onebyone","forcedOrientation":false}}'>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Administration_Center_Snippet' elementName='Administration Center'>
+          <![CDATA[htmlpage Administration_Center_Snippet()
+             content
+             <%{%>
+                 <file name:Administration_Center/Administration_Workspace.dshtml/>
+             <%}%>
+         ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

@@ -1,0 +1,54 @@
+default list All_Content_Documents
+{
+    displayName = "All Content Documents"
+    show all rows from Content_Documents
+    (
+        Document_ID
+        Document_Title
+        Product
+        Session
+        Document_Type
+        Resource_User
+        Assigned_Reviewer
+        Stage
+        Due_On
+        SLA_Status
+        Downstream_Route
+        Modified_Time
+    )
+    filters
+    (
+        Product
+        Session
+        Document_Type
+        Stage
+        SLA_Status
+        Assigned_Reviewer
+        Resource_User
+    )
+    sort by
+    (
+        Modified_Time descending
+    )
+    conditional formatting
+    (
+        "Overdue"
+        {
+            condition = (SLA_Status == "Overdue" || SLA_Status == "Breached")
+            fields = [Document_Title, Stage, Due_On, SLA_Status]
+            format = "background-color:#FDE8E8;color:#9B1C1C;font-weight:bold"
+        }
+        "Due Soon"
+        {
+            condition = (SLA_Status == "Due Soon")
+            fields = [Document_Title, Due_On, SLA_Status]
+            format = "background-color:#FFF8DB;color:#8A5A00"
+        }
+        "Completed"
+        {
+            condition = (Stage == "Review Completed" || Stage == "Ready for Downstream")
+            fields = [Document_Title, Stage, SLA_Status]
+            format = "background-color:#E8F7EE;color:#146C43"
+        }
+    )
+}

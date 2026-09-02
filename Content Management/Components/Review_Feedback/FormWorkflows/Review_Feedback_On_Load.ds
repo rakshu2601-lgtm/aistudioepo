@@ -1,0 +1,56 @@
+Review_Feedback_On_Load as "Load Feedback Workspace"
+{
+    type = form
+    form = Review_Feedback
+    record event = on add or edit
+    description = "Applies role-aware edit controls for comments, responses, status, and timestamps."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Addressed_On, Closed_On;
+                document_record = Content_Documents[ID == input.Document];
+                is_admin = thisapp.permissions.isUserInProfile("Content Administrator");
+                is_resource = document_record.count() > 0 && document_record.Resource_User.email == zoho.loginuserid;
+                is_reviewer = document_record.count() > 0 && document_record.Assigned_Reviewer.email == zoho.loginuserid;
+                if(input.Feedback_Status == "Open" || input.Feedback_Status == "Addressed")
+                {
+                    show Resource_Response;
+                }
+                else
+                {
+                    hide Resource_Response;
+                }
+                if(is_admin == false && is_resource)
+                {
+                    disable Document;
+                    disable Review_Cycle_Number;
+                    disable Reviewer_User;
+                    disable Feedback_Category;
+                    disable Feedback_Comments;
+                    disable Reference_File;
+                    enable Resource_Response;
+                    enable Feedback_Status;
+                }
+                if(is_admin == false && is_reviewer)
+                {
+                    disable Resource_Response;
+                }
+                if(is_admin == false && is_resource == false && is_reviewer == false)
+                {
+                    disable Document;
+                    disable Review_Cycle_Number;
+                    disable Reviewer_User;
+                    disable Feedback_Category;
+                    disable Feedback_Comments;
+                    disable Reference_File;
+                    disable Feedback_Status;
+                    disable Resource_Response;
+                }
+            )
+        }
+    }
+}

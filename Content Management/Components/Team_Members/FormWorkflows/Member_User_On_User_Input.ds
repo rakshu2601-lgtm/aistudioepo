@@ -1,0 +1,22 @@
+Member_User_On_User_Input as "Populate Member Details"
+{
+    type = form
+    form = Team_Members
+    record event = on add or edit
+    description = "Copies available account details from the selected Creator user."
+
+    on user input of Member_User
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Member_User != null)
+                {
+                    input.Email = input.Member_User.email;
+                    input.Display_Name = input.Member_User.User_name;
+                }
+            )
+        }
+    }
+}

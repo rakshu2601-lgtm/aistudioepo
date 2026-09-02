@@ -1,0 +1,22 @@
+default list All_Team_Members
+{
+    displayName = "All Team Members"
+    show all rows from Team_Members
+    (
+        Display_Name
+        Email
+        Member_Roles
+        Product_Coverage
+        Reviewer_Capacity
+        Active
+    )
+    filters
+    (
+        Member_Roles
+        Active
+    )
+    sort by
+    (
+        Display_Name ascending
+    )
+}

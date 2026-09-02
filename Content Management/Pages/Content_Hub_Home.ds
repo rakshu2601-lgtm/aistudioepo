@@ -1,0 +1,31 @@
+<page linkname = "Content_Hub_Home" displayname = "Content Hub Home"/>
+<content>
+<zml mobileDeviceConfig='{"layout":{"displayType":"card","design":"onebyone","forcedOrientation":false}}' tabletDeviceConfig='{"layout":{"displayType":"plain","design":"onebyone","forcedOrientation":false}}'>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Content_Hub_Dashboard' elementName='Content Hub Dashboard'>
+          <![CDATA[htmlpage Content_Hub_Dashboard()
+             content
+             <%{%>
+                 <file name:Content_Hub_Home/Dashboard.dshtml/>
+             <%}%>
+         ]]>
+        </dsp>
+      </column>
+    </row>
+    <row>
+      <column width='100%'>
+        <dsp id='Content_Hub_Pipeline' elementName='Content Hub Pipeline'>
+          <![CDATA[htmlpage Content_Hub_Pipeline()
+             content
+             <%{%>
+                 <file name:Content_Hub_Home/Pipeline.dshtml/>
+             <%}%>
+         ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

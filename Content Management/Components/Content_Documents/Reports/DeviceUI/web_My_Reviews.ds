@@ -1,0 +1,14 @@
+report My_Reviews
+{
+ quickview
+ (
+  layout ( type = -1 datablock1 ( layout type = -1 fields ( Document_ID Document_Title Product Session Document_Type Resource_User Due_On SLA_Status Stage ) ) )
+  menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) )
+  action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) )
+ )
+ detailview
+ (
+  layout ( type = 1 datablock1 ( layout type = -2 fields ( Document_ID Document_Title Product Session Document_Type Resource_User Source_Files Content_URL Version_Label Review_Cycle_Number Review_Cycle_Type Due_On SLA_Status Review_Summary Stage ) ) )
+  menu ( header ( Edit Duplicate Delete ) )
+ )
+}

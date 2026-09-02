@@ -1,0 +1,27 @@
+Downstream_Routes_On_Validate as "Validate Downstream Route"
+{
+    type = form
+    form = Downstream_Routes
+    record event = on add or edit
+    description = "Ensures every route has a destination and that nonstandard processes have instructions."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if((input.Destination_Team == null || input.Destination_Team.trim() == "") && (input.Destination_Email == null || input.Destination_Email == ""))
+                {
+                    alert "Enter either a destination team or destination email.";
+                    cancel submit;
+                }
+                if(input.Route_Type == "Other Process" && (input.Instructions == null || input.Instructions.trim() == ""))
+                {
+                    alert(Instructions, "Instructions are required for an Other Process route.");
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

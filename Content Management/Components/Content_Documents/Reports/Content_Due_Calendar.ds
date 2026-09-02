@@ -1,0 +1,48 @@
+calendar Content_Due_Calendar
+{
+    displayName = "Content Due Calendar"
+    show all rows from Content_Documents [Due_On is not null]
+    (
+        Document_Title
+        Product
+        Assigned_Reviewer
+        Stage
+        Due_On
+        SLA_Status
+    )
+    filters
+    (
+        Product
+        Assigned_Reviewer
+        Stage
+        SLA_Status
+    )
+    options
+    (
+        display type = month
+        week start day = monday
+        display field = Document_Title
+        start date = Due_On
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+    conditional formatting
+    (
+        "Overdue"
+        {
+            condition = (SLA_Status == "Overdue" || SLA_Status == "Breached")
+            fields = [Document_Title, Due_On, SLA_Status]
+            format = "background-color:#FDE8E8;color:#9B1C1C"
+        }
+        "Due Soon"
+        {
+            condition = (SLA_Status == "Due Soon")
+            fields = [Document_Title, Due_On, SLA_Status]
+            format = "background-color:#FFF8DB;color:#8A5A00"
+        }
+    )
+}

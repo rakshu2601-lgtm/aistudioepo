@@ -1,0 +1,33 @@
+calendar Session_Calendar
+{
+    displayName = "Session Calendar"
+    show all rows from Sessions
+    (
+        Session_Name
+        Product
+        Session_Type
+        Start_Date_Time
+        End_Date_Time
+        Status
+    )
+    filters
+    (
+        Product
+        Session_Type
+        Status
+    )
+    options
+    (
+        display type = month
+        week start day = monday
+        display field = Session_Name
+        start date = Start_Date_Time
+        end date = End_Date_Time
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+}

@@ -1,0 +1,14 @@
+report All_SLA_Policies
+{
+ quickview
+ (
+  layout ( type = -1 datablock1 ( layout type = -1 fields ( Policy_Name Product Session_Type Document_Type Review_Cycle_Type SLA_Business_Days Priority Active ) ) )
+  menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) )
+  action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) )
+ )
+ detailview
+ (
+  layout ( type = 1 datablock1 ( layout type = -2 fields ( Policy_Name Product Session_Type Document_Type Review_Cycle_Type SLA_Business_Days Priority Effective_From Effective_To Active ) ) )
+  menu ( header ( Edit Duplicate Delete ) )
+ )
+}

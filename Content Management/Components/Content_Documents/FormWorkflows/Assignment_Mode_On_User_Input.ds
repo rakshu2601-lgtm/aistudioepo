@@ -1,0 +1,44 @@
+Assignment_Mode_On_User_Input as "Change Reviewer Assignment Mode"
+{
+    type = form
+    form = Content_Documents
+    record event = on add or edit
+    description = "Shows manual reviewer selection or performs least-workload automatic assignment."
+
+    on user input of Assignment_Mode
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Assignment_Mode == "Manual")
+                {
+                    show Assigned_Reviewer;
+                    enable Assigned_Reviewer;
+                    input.Assigned_Reviewer = null;
+                }
+                else
+                {
+                    hide Assigned_Reviewer;
+                    input.Assigned_Reviewer = null;
+                    best_load = 999999999;
+                    best_member_id = 999999999999999999;
+                    for each member in Team_Members[Active == true && Member_Roles.contains("Content Reviewer")] sort by ID
+                    {
+                        if(member.Product_Coverage.isEmpty() || member.Product_Coverage.contains(input.Product))
+                        {
+                            open_load = Content_Documents[Assigned_Reviewer == member.Member_User && (Stage == "Review Under Progress" || Stage == "Feedback Changes Completed")].count();
+                            within_capacity = member.Reviewer_Capacity == 0 || open_load < member.Reviewer_Capacity;
+                            if(within_capacity && (open_load < best_load || (open_load == best_load && member.ID < best_member_id)))
+                            {
+                                input.Assigned_Reviewer = member.Member_User;
+                                best_load = open_load;
+                                best_member_id = member.ID;
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

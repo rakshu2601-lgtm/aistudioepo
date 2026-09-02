@@ -1,0 +1,57 @@
+Application_Settings_On_Success as "Seed Reference Data"
+{
+    type = form
+    form = Application_Settings
+    record event = on add or edit
+    description = "Creates missing starter products, session types, and document types without changing existing master records."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                product_names = {"Zoho Creator","Zoho Flow","Zoho RPA","Zoho QEngine","Zoho Tables"};
+                for each product_name in product_names
+                {
+                    if(Products[Product_Name == product_name].count() == 0)
+                    {
+                        insert into Products
+                        [
+                            Product_Name = product_name
+                            Active = true
+                        ];
+                    }
+                }
+                session_type_names = {"Webinar","Online Training","Event","Roadshow","In-Person Workshop"};
+                for each session_type_name in session_type_names
+                {
+                    if(Session_Types[Session_Type_Name == session_type_name].count() == 0)
+                    {
+                        insert into Session_Types
+                        [
+                            Session_Type_Name = session_type_name
+                            Active = true
+                        ];
+                    }
+                }
+                document_type_names = {"Promotional Document","Connect Post","Email Invite","Cliq Channel"};
+                for each document_type_name in document_type_names
+                {
+                    if(Document_Types[Document_Type_Name == document_type_name].count() == 0)
+                    {
+                        insert into Document_Types
+                        [
+                            Document_Type_Name = document_type_name
+                            File_Expected = true
+                            URL_Allowed = true
+                            Active = true
+                        ];
+                    }
+                }
+                settings_record = Application_Settings[ID == input.ID];
+                settings_record.Last_Reference_Data_Seeded_On = zoho.currenttime;
+            )
+        }
+    }
+}

@@ -1,0 +1,15 @@
+default list Configuration_Settings
+{
+    displayName = "Configuration Settings"
+    show all rows from Application_Settings
+    (
+        Configuration_Key
+        Default_SLA_Business_Days
+        Due_Soon_Lead_Business_Days
+        Reminder_Time_UTC
+        Time_Zone
+        Auto_Assignment_Strategy
+        Reminders_Enabled
+        Last_Reference_Data_Seeded_On
+    )
+}

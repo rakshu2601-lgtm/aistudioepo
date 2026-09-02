@@ -1,0 +1,47 @@
+Overdue_Reminder as "Overdue Reminder"
+{
+    type = schedule
+    form = Content_Documents[(Stage == "Review Under Progress" || Stage == "Feedback Changes Completed")]
+    start = Due_On
+    frequency = daily
+    time zone = "UTC"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                settings = Application_Settings[Configuration_Key == "GLOBAL"];
+                utc_day = zoho.currenttime.getDayOfWeek();
+                utc_date = zoho.currenttime.toDate();
+                holiday_count = Holidays[Active == true && Holiday_Date == utc_date].count();
+                if(settings.count() > 0 && settings.Reminders_Enabled == true && input.Due_On != null && zoho.currenttime > input.Due_On && utc_day != 1 && utc_day != 7 && holiday_count == 0)
+                {
+                    input.SLA_Status = "Overdue";
+                    record_link = zoho.appuri + "#Report:All_Content_Documents/" + input.ID;
+                    sendmail
+                    (
+                        from : zoho.adminuserid
+                        to : input.Assigned_Reviewer.email
+                        cc : input.Resource_User.email
+                        subject : "Overdue content review: " + input.Document_Title
+                        message : "Document: " + input.Document_Title + "<br>Stage: " + input.Stage + "<br>Session: " + input.Session.Session_Name + "<br>Due (UTC): " + input.Due_On + "<br><a href='" + record_link + "'>Open content record</a>"
+                    )
+                    insert into Audit_Log
+                    [
+                        Document = input.ID
+                        Action_Name = "Overdue Reminder"
+                        From_State = input.Stage
+                        To_State = input.Stage
+                        Performed_By = zoho.adminuserid
+                        Performed_On = zoho.currenttime
+                        Assigned_Reviewer = input.Assigned_Reviewer.email
+                        SLA_Due_On = input.Due_On
+                        Details = "UTC overdue reminder sent on a business day."
+                    ];
+                }
+            )
+        }
+    }
+}

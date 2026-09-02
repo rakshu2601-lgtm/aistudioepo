@@ -1,0 +1,29 @@
+Team_Members_On_Load as "Load Team Member"
+{
+    type = form
+    form = Team_Members
+    record event = on add or edit
+    description = "Protects populated user identity details while allowing administrators to correct them."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                is_admin = thisapp.permissions.isUserInProfile("Content Administrator");
+                if(is_admin == false)
+                {
+                    if(input.Email != null && input.Email != "")
+                    {
+                        disable Email;
+                    }
+                    if(input.Display_Name != null && input.Display_Name != "")
+                    {
+                        disable Display_Name;
+                    }
+                }
+            )
+        }
+    }
+}

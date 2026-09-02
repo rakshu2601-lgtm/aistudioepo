@@ -1,0 +1,151 @@
+form Review_Feedback
+{
+    displayname = "Review Feedback"
+    success message = "Feedback saved successfully."
+
+        Feedback_Details
+        (
+            type = section
+            displayname = "Feedback Details"
+            row = 1
+            column = 0
+        )
+        Feedback_ID
+        (
+            type = autonumber
+            displayname = "Feedback ID"
+            start index = 1
+            row = 1
+            column = 1
+        )
+        must have Document
+        (
+            type = picklist
+            displayname = "Document"
+            values = Content_Documents.ID
+            displayformat = [Document_Title]
+            searchable = true
+            row = 1
+            column = 1
+            width = medium
+        )
+        must have Review_Cycle_Number
+        (
+            type = number
+            displayname = "Review Cycle Number"
+            row = 1
+            column = 2
+            width = medium
+        )
+        must have Reviewer_User
+        (
+            type = picklist
+            displayname = "Reviewer"
+            module = users
+            displayformat = [name]
+            row = 1
+            column = 1
+            width = medium
+        )
+        Feedback_Category
+        (
+            type = picklist
+            displayname = "Feedback Category"
+            values = {"Content","Brand","Accuracy","Design","Compliance","Other"}
+            row = 1
+            column = 2
+            width = medium
+        )
+        must have Feedback_Comments
+        (
+            type = textarea
+            displayname = "Feedback Comments"
+            height = 120px
+            row = 1
+            column = 1
+            width = medium
+        )
+        Reference_File
+        (
+            type = upload file
+            displayname = "Reference File"
+            file count = 3
+            browse = local_drive, google_docs, zoho_docs
+            row = 1
+            column = 2
+            width = medium
+        )
+        Resolution
+        (
+            type = section
+            displayname = "Resolution"
+            visibility = true
+            row = 2
+            column = 1
+        )
+        Feedback_Status
+        (
+            type = picklist
+            displayname = "Feedback Status"
+            values = {"Open","Addressed","Closed"}
+            initial value = "Open"
+            row = 2
+            column = 1
+            width = medium
+        )
+        Resource_Response
+        (
+            type = textarea
+            displayname = "Resource Response"
+            height = 120px
+            row = 2
+            column = 2
+            width = medium
+        )
+        Addressed_On
+        (
+            type = datetime
+            displayname = "Addressed On"
+            row = 2
+            column = 1
+            width = medium
+        )
+        Closed_On
+        (
+            type = datetime
+            displayname = "Closed On"
+            row = 2
+            column = 2
+            width = medium
+        )
+
+    actions
+    {
+        on add
+        {
+            Save
+            (
+                type = submit
+                displayname = "Save Feedback"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Feedback"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

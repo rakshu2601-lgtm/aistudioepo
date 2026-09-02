@@ -1,0 +1,14 @@
+report Configuration_Settings
+{
+ quickview
+ (
+  layout ( type = -1 datablock1 ( layout type = -1 fields ( Configuration_Key Default_SLA_Business_Days Due_Soon_Lead_Business_Days Reminder_Time_UTC Time_Zone Reminders_Enabled ) ) )
+  menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) )
+  action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) )
+ )
+ detailview
+ (
+  layout ( type = 1 datablock1 ( layout type = -2 fields ( Configuration_Key Default_SLA_Business_Days Due_Soon_Lead_Business_Days Reminder_Time_UTC Time_Zone Auto_Assignment_Strategy Reminders_Enabled Last_Reference_Data_Seeded_On ) ) )
+  menu ( header ( Edit Duplicate Delete ) )
+ )
+}

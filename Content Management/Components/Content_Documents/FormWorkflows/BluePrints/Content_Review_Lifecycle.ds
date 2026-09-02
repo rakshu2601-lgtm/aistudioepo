@@ -1,0 +1,547 @@
+Content_Review_Lifecycle as "Content Review Lifecycle"
+{
+    type = blueprint
+    form = Content_Documents
+
+    start
+    {
+        start stage = "Draft"
+    }
+
+    stages
+    {
+        "Draft" { }
+        "Review Under Progress" { }
+        "Feedback Fixes In Progress" { }
+        "Feedback Changes Completed" { }
+        "Review Completed" { }
+        "Ready for Downstream" { }
+    }
+
+    transitions
+    {
+        Submit_For_Review as "Submit For Review"
+        {
+            type = normal
+            from stage = "Draft"
+            to stage = "Review Under Progress"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Content Administrator"}
+                    userfields = {Resource_User}
+                )
+                transition criteria = ((Source_Files is not null || Content_URL is not null) && Assigned_Reviewer is not null && Applied_SLA_Business_Days > 0)
+                confirmation before execution
+                (
+                    message = "Submit this content to the assigned reviewer?"
+                    confirm button text = "Submit"
+                    cancel button text = "Keep Draft"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Submitted_On = zoho.currenttime;
+                        Last_Status_Changed_On = zoho.currenttime;
+                        Review_Cycle_Type = "Initial Review";
+                        due_cursor = zoho.currenttime;
+                        counted_days = 0;
+                        iteration_budget = Applied_SLA_Business_Days * 3 + 14;
+                        iterations = ".".leftpad(iteration_budget - 1).toList("");
+                        for each iteration in iterations
+                        {
+                            if(counted_days < Applied_SLA_Business_Days)
+                            {
+                                due_cursor = due_cursor.addDay(1);
+                                day_number = due_cursor.getDayOfWeek();
+                                holiday_date = due_cursor.toDate();
+                                holiday_count = Holidays[Active == true && Holiday_Date == holiday_date].count();
+                                if(day_number != 1 && day_number != 7 && holiday_count == 0)
+                                {
+                                    counted_days = counted_days + 1;
+                                }
+                            }
+                        }
+                        Due_On = due_cursor;
+                        lead_days = 1;
+                        settings = Application_Settings[Configuration_Key == "GLOBAL"];
+                        if(settings.count() > 0) { lead_days = settings.Due_Soon_Lead_Business_Days; }
+                        reminder_cursor = due_cursor;
+                        reminder_count = 0;
+                        reminder_budget = lead_days * 3 + 14;
+                        reminder_iterations = ".".leftpad(reminder_budget - 1).toList("");
+                        for each reminder_iteration in reminder_iterations
+                        {
+                            if(reminder_count < lead_days)
+                            {
+                                reminder_cursor = reminder_cursor.addDay(-1);
+                                reminder_day = reminder_cursor.getDayOfWeek();
+                                reminder_date = reminder_cursor.toDate();
+                                reminder_holiday_count = Holidays[Active == true && Holiday_Date == reminder_date].count();
+                                if(reminder_day != 1 && reminder_day != 7 && reminder_holiday_count == 0)
+                                {
+                                    reminder_count = reminder_count + 1;
+                                }
+                            }
+                        }
+                        Due_Soon_Reminder_On = reminder_cursor;
+                        SLA_Status = "On Track";
+                        record_link = zoho.appuri + "#Report:All_Content_Documents/" + input.ID;
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : input.Assigned_Reviewer.email
+                            subject : "Content review assigned: " + input.Document_Title
+                            message : "Document: " + input.Document_Title + "<br>Stage: Review Under Progress<br>Session: " + input.Session.Session_Name + "<br>Due (UTC): " + Due_On + "<br><a href='" + record_link + "'>Open content record</a>"
+                        )
+                        insert into Audit_Log
+                        [
+                            Document = input.ID
+                            Action_Name = "Submit For Review"
+                            From_State = "Draft"
+                            To_State = "Review Under Progress"
+                            Performed_By = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Assigned_Reviewer = input.Assigned_Reviewer.email
+                            SLA_Due_On = Due_On
+                            Details = "Initial review submitted and SLA started."
+                        ];
+                    )
+                }
+            }
+        }
+
+        Request_Changes as "Request Changes"
+        {
+            type = normal
+            from stage = "Review Under Progress"
+            to stage = "Feedback Fixes In Progress"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Content Administrator"}
+                    userfields = {Assigned_Reviewer}
+                )
+                confirmation before execution
+                (
+                    message = "Send the review feedback back to the resource for fixes?"
+                    confirm button text = "Request Changes"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Last_Status_Changed_On = zoho.currenttime;
+                        if(input.Due_On != null && zoho.currenttime <= input.Due_On) { SLA_Status = "Met"; } else { SLA_Status = "Breached"; }
+                        insert into Review_Feedback
+                        [
+                            Document = input.ID
+                            Review_Cycle_Number = input.Review_Cycle_Number
+                            Reviewer_User = input.Assigned_Reviewer
+                            Feedback_Category = "Content"
+                            Feedback_Comments = input.Review_Summary
+                            Reference_File = input.Review_Attachment
+                            Feedback_Status = "Open"
+                        ];
+                        record_link = zoho.appuri + "#Report:My_Submissions/" + input.ID;
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : input.Resource_User.email
+                            subject : "Changes requested: " + input.Document_Title
+                            message : "Document: " + input.Document_Title + "<br>Stage: Feedback Fixes In Progress<br>Session: " + input.Session.Session_Name + "<br>Review due (UTC): " + input.Due_On + "<br>Feedback: " + input.Review_Summary + "<br><a href='" + record_link + "'>Open submission</a>"
+                        )
+                        insert into Audit_Log
+                        [
+                            Document = input.ID
+                            Action_Name = "Request Changes"
+                            From_State = "Review Under Progress"
+                            To_State = "Feedback Fixes In Progress"
+                            Performed_By = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Assigned_Reviewer = input.Assigned_Reviewer.email
+                            SLA_Due_On = input.Due_On
+                            Details = input.Review_Summary
+                        ];
+                    )
+                }
+            }
+        }
+
+        Approve_Without_Changes as "Approve Without Changes"
+        {
+            type = normal
+            from stage = "Review Under Progress"
+            to stage = "Review Completed"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Content Administrator"}
+                    userfields = {Assigned_Reviewer}
+                )
+                confirmation before execution
+                (
+                    message = "Give final approval without requesting changes?"
+                    confirm button text = "Approve"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Final_Approved_On = zoho.currenttime;
+                        Last_Status_Changed_On = zoho.currenttime;
+                        if(input.Due_On != null && zoho.currenttime <= input.Due_On) { SLA_Status = "Met"; } else { SLA_Status = "Breached"; }
+                        record_link = zoho.appuri + "#Report:My_Submissions/" + input.ID;
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : input.Resource_User.email
+                            subject : "Content approved: " + input.Document_Title
+                            message : "Document: " + input.Document_Title + "<br>Stage: Review Completed<br>Session: " + input.Session.Session_Name + "<br>Due (UTC): " + input.Due_On + "<br><a href='" + record_link + "'>Open submission</a>"
+                        )
+                        insert into Audit_Log
+                        [
+                            Document = input.ID
+                            Action_Name = "Approve Without Changes"
+                            From_State = "Review Under Progress"
+                            To_State = "Review Completed"
+                            Performed_By = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Assigned_Reviewer = input.Assigned_Reviewer.email
+                            SLA_Due_On = input.Due_On
+                            Details = input.Final_Reviewer_Comments
+                        ];
+                    )
+                }
+            }
+        }
+
+        Submit_Fixes as "Submit Fixes"
+        {
+            type = normal
+            from stage = "Feedback Fixes In Progress"
+            to stage = "Feedback Changes Completed"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Content Administrator"}
+                    userfields = {Resource_User}
+                )
+                confirmation before execution
+                (
+                    message = "Submit the updated content for fix verification?"
+                    confirm button text = "Submit Fixes"
+                    cancel button text = "Continue Editing"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Review_Cycle_Number = ifnull(input.Review_Cycle_Number,1) + 1;
+                        Review_Cycle_Type = "Fix Verification";
+                        Last_Status_Changed_On = zoho.currenttime;
+                        Selected_SLA_Policy = null;
+                        settings = Application_Settings[Configuration_Key == "GLOBAL"];
+                        if(settings.count() > 0) { Applied_SLA_Business_Days = settings.Default_SLA_Business_Days; }
+                        best_cycle_rank = -1;
+                        best_dimension_count = -1;
+                        best_priority = -999999;
+                        best_effective = null;
+                        best_id = 0;
+                        for each policy in SLA_Policies[Active == true]
+                        {
+                            effective_now = (policy.Effective_From == null || policy.Effective_From <= zoho.currentdate) && (policy.Effective_To == null || policy.Effective_To >= zoho.currentdate);
+                            scope_matches = (policy.Product == null || policy.Product == input.Product) && (policy.Session_Type == null || policy.Session_Type == input.Session.Session_Type) && (policy.Document_Type == null || policy.Document_Type == input.Document_Type);
+                            cycle_matches = policy.Review_Cycle_Type == "Any" || policy.Review_Cycle_Type == "Fix Verification";
+                            if(effective_now && scope_matches && cycle_matches)
+                            {
+                                cycle_rank = if(policy.Review_Cycle_Type == "Fix Verification",1,0);
+                                dimensions = 0;
+                                if(policy.Product != null) { dimensions = dimensions + 1; }
+                                if(policy.Session_Type != null) { dimensions = dimensions + 1; }
+                                if(policy.Document_Type != null) { dimensions = dimensions + 1; }
+                                newer_effective = best_effective == null || (policy.Effective_From != null && policy.Effective_From > best_effective);
+                                better = cycle_rank > best_cycle_rank || (cycle_rank == best_cycle_rank && dimensions > best_dimension_count) || (cycle_rank == best_cycle_rank && dimensions == best_dimension_count && policy.Priority > best_priority) || (cycle_rank == best_cycle_rank && dimensions == best_dimension_count && policy.Priority == best_priority && newer_effective) || (cycle_rank == best_cycle_rank && dimensions == best_dimension_count && policy.Priority == best_priority && policy.Effective_From == best_effective && policy.ID > best_id);
+                                if(better)
+                                {
+                                    Selected_SLA_Policy = policy.ID;
+                                    Applied_SLA_Business_Days = policy.SLA_Business_Days;
+                                    best_cycle_rank = cycle_rank;
+                                    best_dimension_count = dimensions;
+                                    best_priority = policy.Priority;
+                                    best_effective = policy.Effective_From;
+                                    best_id = policy.ID;
+                                }
+                            }
+                        }
+                        due_cursor = zoho.currenttime;
+                        counted_days = 0;
+                        iteration_budget = Applied_SLA_Business_Days * 3 + 14;
+                        iterations = ".".leftpad(iteration_budget - 1).toList("");
+                        for each iteration in iterations
+                        {
+                            if(counted_days < Applied_SLA_Business_Days)
+                            {
+                                due_cursor = due_cursor.addDay(1);
+                                day_number = due_cursor.getDayOfWeek();
+                                holiday_date = due_cursor.toDate();
+                                holiday_count = Holidays[Active == true && Holiday_Date == holiday_date].count();
+                                if(day_number != 1 && day_number != 7 && holiday_count == 0) { counted_days = counted_days + 1; }
+                            }
+                        }
+                        Due_On = due_cursor;
+                        lead_days = 1;
+                        if(settings.count() > 0) { lead_days = settings.Due_Soon_Lead_Business_Days; }
+                        reminder_cursor = due_cursor;
+                        reminder_count = 0;
+                        reminder_budget = lead_days * 3 + 14;
+                        reminder_iterations = ".".leftpad(reminder_budget - 1).toList("");
+                        for each reminder_iteration in reminder_iterations
+                        {
+                            if(reminder_count < lead_days)
+                            {
+                                reminder_cursor = reminder_cursor.addDay(-1);
+                                reminder_day = reminder_cursor.getDayOfWeek();
+                                reminder_date = reminder_cursor.toDate();
+                                reminder_holiday_count = Holidays[Active == true && Holiday_Date == reminder_date].count();
+                                if(reminder_day != 1 && reminder_day != 7 && reminder_holiday_count == 0) { reminder_count = reminder_count + 1; }
+                            }
+                        }
+                        Due_Soon_Reminder_On = reminder_cursor;
+                        SLA_Status = "On Track";
+                        for each feedback_record in Review_Feedback[Document == input.ID && Feedback_Status == "Open"]
+                        {
+                            feedback_record.Feedback_Status = "Addressed";
+                        }
+                        record_link = zoho.appuri + "#Report:My_Reviews/" + input.ID;
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : input.Assigned_Reviewer.email
+                            subject : "Fixes ready for review: " + input.Document_Title
+                            message : "Document: " + input.Document_Title + "<br>Stage: Feedback Changes Completed<br>Session: " + input.Session.Session_Name + "<br>Due (UTC): " + Due_On + "<br><a href='" + record_link + "'>Open review</a>"
+                        )
+                        insert into Audit_Log
+                        [
+                            Document = input.ID
+                            Action_Name = "Submit Fixes"
+                            From_State = "Feedback Fixes In Progress"
+                            To_State = "Feedback Changes Completed"
+                            Performed_By = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Assigned_Reviewer = input.Assigned_Reviewer.email
+                            SLA_Due_On = Due_On
+                            Details = input.Resource_Response
+                        ];
+                    )
+                }
+            }
+        }
+
+        Request_Further_Changes as "Request Further Changes"
+        {
+            type = normal
+            from stage = "Feedback Changes Completed"
+            to stage = "Feedback Fixes In Progress"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Content Administrator"}
+                    userfields = {Assigned_Reviewer}
+                )
+                confirmation before execution
+                (
+                    message = "Return the content for another round of fixes?"
+                    confirm button text = "Request More Changes"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Last_Status_Changed_On = zoho.currenttime;
+                        if(input.Due_On != null && zoho.currenttime <= input.Due_On) { SLA_Status = "Met"; } else { SLA_Status = "Breached"; }
+                        insert into Review_Feedback
+                        [
+                            Document = input.ID
+                            Review_Cycle_Number = input.Review_Cycle_Number
+                            Reviewer_User = input.Assigned_Reviewer
+                            Feedback_Category = "Content"
+                            Feedback_Comments = input.Review_Summary
+                            Reference_File = input.Review_Attachment
+                            Feedback_Status = "Open"
+                        ];
+                        record_link = zoho.appuri + "#Report:My_Submissions/" + input.ID;
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : input.Resource_User.email
+                            subject : "Further changes requested: " + input.Document_Title
+                            message : "Document: " + input.Document_Title + "<br>Stage: Feedback Fixes In Progress<br>Session: " + input.Session.Session_Name + "<br>Due (UTC): " + input.Due_On + "<br>Feedback: " + input.Review_Summary + "<br><a href='" + record_link + "'>Open submission</a>"
+                        )
+                        insert into Audit_Log
+                        [
+                            Document = input.ID
+                            Action_Name = "Request Further Changes"
+                            From_State = "Feedback Changes Completed"
+                            To_State = "Feedback Fixes In Progress"
+                            Performed_By = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Assigned_Reviewer = input.Assigned_Reviewer.email
+                            SLA_Due_On = input.Due_On
+                            Details = input.Review_Summary
+                        ];
+                    )
+                }
+            }
+        }
+
+        Final_Good_To_Go as "Final Good To Go"
+        {
+            type = normal
+            from stage = "Feedback Changes Completed"
+            to stage = "Review Completed"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Content Administrator"}
+                    userfields = {Assigned_Reviewer}
+                )
+                confirmation before execution
+                (
+                    message = "Confirm final good to go for this content?"
+                    confirm button text = "Final Approval"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Final_Approved_On = zoho.currenttime;
+                        Last_Status_Changed_On = zoho.currenttime;
+                        if(input.Due_On != null && zoho.currenttime <= input.Due_On) { SLA_Status = "Met"; } else { SLA_Status = "Breached"; }
+                        for each feedback_record in Review_Feedback[Document == input.ID && Feedback_Status == "Addressed"]
+                        {
+                            feedback_record.Feedback_Status = "Closed";
+                        }
+                        record_link = zoho.appuri + "#Report:My_Submissions/" + input.ID;
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : input.Resource_User.email
+                            subject : "Final approval: " + input.Document_Title
+                            message : "Document: " + input.Document_Title + "<br>Stage: Review Completed<br>Session: " + input.Session.Session_Name + "<br>Due (UTC): " + input.Due_On + "<br><a href='" + record_link + "'>Open submission</a>"
+                        )
+                        insert into Audit_Log
+                        [
+                            Document = input.ID
+                            Action_Name = "Final Good To Go"
+                            From_State = "Feedback Changes Completed"
+                            To_State = "Review Completed"
+                            Performed_By = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Assigned_Reviewer = input.Assigned_Reviewer.email
+                            SLA_Due_On = input.Due_On
+                            Details = input.Final_Reviewer_Comments
+                        ];
+                    )
+                }
+            }
+        }
+
+        Send_Downstream as "Send Downstream"
+        {
+            type = normal
+            from stage = "Review Completed"
+            to stage = "Ready for Downstream"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Content Administrator"}
+                    userfields = {Resource_User}
+                )
+                transition criteria = (Downstream_Route is not null)
+                confirmation before execution
+                (
+                    message = "Route this approved content to the selected downstream process?"
+                    confirm button text = "Send Downstream"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Routed_On = zoho.currenttime;
+                        Last_Status_Changed_On = zoho.currenttime;
+                        route = Downstream_Routes[ID == input.Downstream_Route];
+                        record_link = zoho.appuri + "#Report:All_Content_Documents/" + input.ID;
+                        if(route.count() > 0 && route.Destination_Email not in {""," ","null"})
+                        {
+                            sendmail
+                            (
+                                from : zoho.adminuserid
+                                to : route.Destination_Email
+                                cc : input.Resource_User.email
+                                subject : "Approved content handoff: " + input.Document_Title
+                                message : "Document: " + input.Document_Title + "<br>Stage: Ready for Downstream<br>Session: " + input.Session.Session_Name + "<br>Review due (UTC): " + input.Due_On + "<br>Route instructions: " + route.Instructions + "<br>Handoff notes: " + input.Handoff_Notes + "<br><a href='" + record_link + "'>Open content record</a>"
+                            )
+                        }
+                        if(input.Assigned_Reviewer != null)
+                        {
+                            sendmail
+                            (
+                                from : zoho.adminuserid
+                                to : input.Assigned_Reviewer.email
+                                subject : "Content routed downstream: " + input.Document_Title
+                                message : "Document: " + input.Document_Title + "<br>Stage: Ready for Downstream<br>Session: " + input.Session.Session_Name + "<br><a href='" + record_link + "'>Open content record</a>"
+                            )
+                        }
+                        insert into Audit_Log
+                        [
+                            Document = input.ID
+                            Action_Name = "Send Downstream"
+                            From_State = "Review Completed"
+                            To_State = "Ready for Downstream"
+                            Performed_By = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Assigned_Reviewer = input.Assigned_Reviewer.email
+                            SLA_Due_On = input.Due_On
+                            Details = "Route: " + route.Route_Name + ". " + input.Handoff_Notes
+                        ];
+                    )
+                }
+            }
+        }
+    }
+}

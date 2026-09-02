@@ -1,0 +1,22 @@
+End_Date_Time_On_User_Input as "Validate Session End"
+{
+    type = form
+    form = Sessions
+    record event = on add or edit
+    description = "Provides immediate feedback when the selected end precedes the start."
+
+    on user input of End_Date_Time
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Start_Date_Time != null && input.End_Date_Time != null && input.End_Date_Time < input.Start_Date_Time)
+                {
+                    alert "End date and time cannot be earlier than start date and time.";
+                    input.End_Date_Time = null;
+                }
+            )
+        }
+    }
+}

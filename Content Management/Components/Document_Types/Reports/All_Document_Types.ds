@@ -1,0 +1,20 @@
+default list All_Document_Types
+{
+    displayName = "All Document Types"
+    show all rows from Document_Types
+    (
+        Document_Type_Name
+        File_Expected
+        URL_Allowed
+        Active
+        Description
+    )
+    filters
+    (
+        Active
+    )
+    sort by
+    (
+        Document_Type_Name ascending
+    )
+}

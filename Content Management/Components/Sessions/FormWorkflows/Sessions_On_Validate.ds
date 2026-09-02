@@ -1,0 +1,22 @@
+Sessions_On_Validate as "Validate Session Schedule"
+{
+    type = form
+    form = Sessions
+    record event = on add or edit
+    description = "Ensures the session end date and time does not precede its start."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Start_Date_Time != null && input.End_Date_Time != null && input.End_Date_Time < input.Start_Date_Time)
+                {
+                    alert(End_Date_Time, "End date and time cannot be earlier than start date and time.");
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

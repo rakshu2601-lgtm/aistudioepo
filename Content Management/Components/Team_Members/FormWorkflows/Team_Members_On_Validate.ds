@@ -1,0 +1,28 @@
+Team_Members_On_Validate as "Validate Team Member"
+{
+    type = form
+    form = Team_Members
+    record event = on add or edit
+    description = "Prevents duplicate application users and invalid reviewer capacity values."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(ifnull(input.Reviewer_Capacity,0) < 0)
+                {
+                    alert(Reviewer_Capacity, "Reviewer capacity cannot be negative.");
+                    cancel submit;
+                }
+                duplicate_count = Team_Members[Member_User == input.Member_User && ID != input.ID].count();
+                if(duplicate_count > 0)
+                {
+                    alert(Member_User, "This application user is already registered as a team member.");
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

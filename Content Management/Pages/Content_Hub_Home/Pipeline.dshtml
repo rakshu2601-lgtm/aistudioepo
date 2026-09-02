@@ -1,0 +1,8 @@
+<style>
+.ch-pipeline-shell{width:100%;padding:0 clamp(10px,2vw,28px) clamp(18px,2vw,28px);box-sizing:border-box;background:#f8fafc}.ch-pipeline-shell *{box-sizing:border-box}.ch-pipeline-card{width:100%;min-width:0;overflow:hidden;border:1px solid var(--zcs_tertiary_border_color);border-radius:16px;background:#fff;box-shadow:0 8px 24px rgba(30,41,59,.05)}.ch-pipeline-embed{width:100%;min-height:620px;overflow:auto}.ch-pipeline-embed:focus-within{outline:3px solid #93c5fd;outline-offset:2px}@media(max-width:768px){.ch-pipeline-shell{padding-left:10px;padding-right:10px}.ch-pipeline-card{border-radius:12px}.ch-pipeline-embed{min-height:560px}}
+</style>
+<div class='ch-pipeline-shell'>
+  <div class='ch-pipeline-card'>
+    <div class='ch-pipeline-embed' zc-component='report' zc-linkname='Review_Pipeline' zc-height='620px'></div>
+  </div>
+</div>

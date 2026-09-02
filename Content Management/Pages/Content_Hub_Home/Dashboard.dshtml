@@ -1,0 +1,157 @@
+<%
+draftCount = Content_Documents[Stage == "Draft"].count();
+activeReviewCount = Content_Documents[Stage == "Review Under Progress" || Stage == "Feedback Changes Completed"].count();
+fixesCount = Content_Documents[Stage == "Feedback Fixes In Progress"].count();
+dueSoonCount = Content_Documents[SLA_Status == "Due Soon"].count();
+overdueCount = Content_Documents[SLA_Status == "Overdue" || SLA_Status == "Breached"].count();
+readyCount = Content_Documents[Stage == "Ready for Downstream"].count();
+recentDocuments = Content_Documents[ID != 0] sort by Modified_Time desc range from 1 to 6;
+displayName = zoho.loginuser;
+teamMember = Team_Members[Email == zoho.loginuserid];
+if(teamMember.count() > 0 && teamMember.Display_Name != null && teamMember.Display_Name != "")
+{
+    displayName = teamMember.Display_Name;
+}
+safeDisplayName = ifnull(displayName,"there").toString();
+safeDisplayName = safeDisplayName.replaceAll("&","&amp;",true);
+safeDisplayName = safeDisplayName.replaceAll("<","&lt;",true);
+safeDisplayName = safeDisplayName.replaceAll(">","&gt;",true);
+safeDisplayName = safeDisplayName.replaceAll("\"","&quot;",true);
+safeDisplayName = safeDisplayName.replaceAll("'","&#39;",true);
+%>
+<style>
+/* zcs-global.css: included once on Content_Hub_Home */
+:root{--zcs-theme-brand-color:var(--zcs_brand_color);--zcs-light-bg-color:var(--zcs_brand_light_color);--zcs-primary-text-color:var(--zcs_primary_text_color);--zcs-secondary-text-color:var(--zcs_secondary_text_color);--zcs-teritiary-text-color:var(--zcs_tertiary_text_color);--zcs-border-color:var(--zcs_tertiary_border_color);--zcs-white-color:#fff;--zcs-primary-btn-color:var(--zcs_brand_color);--zcs-primary-btn-text-color:var(--zcs_brand_foreground_color);font-size:16px;line-height:1.5}
+.zcs-flex{display:flex}.zcs-inline-flex{display:inline-flex}.zcs-row{display:flex;flex-wrap:wrap}.zcs-direction-column{flex-direction:column}.zcs-align-items-center{align-items:center}.zcs-align-items-start{align-items:flex-start}.zcs-justify-center{justify-content:center}.zcs-justify-space-between{justify-content:space-between}.zcs-col-common{flex:1 1 0}.zcs-no-shrink{flex-shrink:0}.zcs-gap-4{gap:.25rem}.zcs-gap-8{gap:.5rem}.zcs-gap-10{gap:.625rem}.zcs-gap-12{gap:.75rem}.zcs-gap-16{gap:1rem}.zcs-gap-20{gap:1.25rem}.zcs-gap-24{gap:1.5rem}.zcs-w-full{width:100%}.zcs-wh-full{width:100%;height:100%}.zcs-p-0{padding:0}.zcs-p-8{padding:.5rem}.zcs-p-12{padding:.75rem}.zcs-p-16{padding:1rem}.zcs-p-20{padding:1.25rem}.zcs-p-24{padding:1.5rem}.zcs-px-10{padding-left:.625rem;padding-right:.625rem}.zcs-px-12{padding-left:.75rem;padding-right:.75rem}.zcs-px-16{padding-left:1rem;padding-right:1rem}.zcs-px-20{padding-left:1.25rem;padding-right:1.25rem}.zcs-px-30{padding-left:1.875rem;padding-right:1.875rem}.zcs-py-2{padding-top:.125rem;padding-bottom:.125rem}.zcs-py-4{padding-top:.25rem;padding-bottom:.25rem}.zcs-py-8{padding-top:.5rem;padding-bottom:.5rem}.zcs-py-12{padding-top:.75rem;padding-bottom:.75rem}.zcs-py-16{padding-top:1rem;padding-bottom:1rem}.zcs-py-24{padding-top:1.5rem;padding-bottom:1.5rem}.zcs-m-0{margin:0}.zcs-mt-4{margin-top:.25rem}.zcs-mt-8{margin-top:.5rem}.zcs-mt-10{margin-top:.625rem}.zcs-mt-12{margin-top:.75rem}.zcs-mt-16{margin-top:1rem}.zcs-mt-20{margin-top:1.25rem}.zcs-mb-0{margin-bottom:0}.zcs-mb-4{margin-bottom:.25rem}.zcs-mb-8{margin-bottom:.5rem}.zcs-mb-12{margin-bottom:.75rem}.zcs-mb-16{margin-bottom:1rem}.zcs-mx-0{margin-left:0;margin-right:0}.zcs-font-11{font-size:.6875rem}.zcs-font-12{font-size:.75rem}.zcs-font-13{font-size:.8125rem}.zcs-font-14{font-size:.875rem}.zcs-font-15{font-size:.9375rem}.zcs-font-16{font-size:1rem}.zcs-font-18{font-size:1.125rem}.zcs-font-20{font-size:1.25rem}.zcs-font-22{font-size:1.375rem}.zcs-font-24{font-size:1.5rem}.zcs-font-30{font-size:1.875rem}.zcs-font-normal{font-weight:400}.zcs-font-medium{font-weight:500}.zcs-font-semibold{font-weight:600}.zcs-font-bold{font-weight:700}.zcs-lh-heading{line-height:1.25}.zcs-lh-body{line-height:1.5}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-secondary{color:var(--zcs-secondary-text-color)}.zcs-color-tertiary{color:var(--zcs-teritiary-text-color)}.zcs-color-white{color:#fff}.zcs-text-center{text-align:center}.zcs-text-right{text-align:right}.zcs-box-border{box-sizing:border-box}.zcs-rounded-sm{border-radius:.25rem}.zcs-rounded-md{border-radius:.375rem}.zcs-rounded-lg{border-radius:.5rem}.zcs-rounded-xl{border-radius:.75rem}.zcs-rounded-half{border-radius:50%}.zcs-relative{position:relative}.zcs-absolute{position:absolute}.zcs-list-none{list-style:none}.zcs-ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.zcs-break-words{overflow-wrap:break-word}.zcs-card{background:var(--zcs-white-color);border:1px solid var(--zcs_tertiary_border_color);border-radius:12px}.zcs-cursor-pointer{cursor:pointer}
+.ch-home,.ch-home *{box-sizing:border-box}.ch-home{width:100%;padding:clamp(12px,2vw,28px);background:linear-gradient(180deg,#f6f8ff 0,#f8fafc 250px,#f8fafc 100%);color:var(--zcs-primary-text-color);font-family:inherit}.ch-home a{text-decoration:none}.ch-home .zcs-page-header{min-height:174px;padding:clamp(20px,3vw,36px);border:1px solid rgba(255,255,255,.2);border-radius:20px;background:linear-gradient(125deg,#312e81 0%,#4338ca 42%,#2563eb 100%);box-shadow:0 18px 45px rgba(49,46,129,.18);position:relative;overflow:hidden}.ch-home .zcs-page-header:after{content:'';position:absolute;right:-64px;top:-92px;width:270px;height:270px;border:52px solid rgba(255,255,255,.08);border-radius:50%}.ch-home .ch-header-copy,.ch-home .ch-header-actions{position:relative;z-index:1}.ch-home .ch-eyebrow{letter-spacing:.08em;text-transform:uppercase;color:#dbeafe}.ch-home .ch-greeting{font-size:clamp(1.65rem,3vw,2.5rem);color:#fff}.ch-home .ch-header-desc{max-width:700px;color:#e0e7ff}.ch-home .ch-alert-pill{border:1px solid rgba(255,255,255,.5);background:rgba(15,23,42,.25);color:#fff}.ch-home .ch-section{margin-top:clamp(18px,2vw,26px)}.ch-home .ch-section-head{margin-bottom:12px}.ch-home .ch-section-title{font-size:1.15rem}.ch-home .ch-kpi-grid{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:14px}.ch-home .zcs-template-card.ch-kpi{width:auto;height:auto;min-height:142px;padding:18px;overflow:visible;border-color:#e0e7ff;box-shadow:0 8px 24px rgba(30,41,59,.05);transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}.ch-home .ch-kpi:hover{transform:translateY(-2px);border-color:#818cf8;box-shadow:0 12px 28px rgba(67,56,202,.1)}.ch-home .ch-kpi-icon{width:40px;height:40px;border-radius:11px;background:#eef2ff;color:#4338ca}.ch-home .ch-kpi-value{font-size:1.8rem;color:#172554}.ch-home .ch-kpi-note{color:#64748b}.ch-home .ch-kpi-warning .ch-kpi-icon{background:#fff7ed;color:#b45309}.ch-home .ch-kpi-danger{border-color:#fecaca}.ch-home .ch-kpi-danger .ch-kpi-icon{background:#fef2f2;color:#b91c1c}.ch-home .ch-kpi-success .ch-kpi-icon{background:#ecfdf5;color:#047857}.ch-home .ch-main-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.7fr);gap:18px;align-items:stretch}.ch-home .ch-card{padding:20px;box-shadow:0 8px 24px rgba(30,41,59,.04)}.ch-home .zcs-button{width:auto;min-width:5rem;min-height:40px;border-radius:8px;transition:background .2s ease,border-color .2s ease,transform .2s ease}.ch-home .zcs-primary-button{background:var(--zcs_brand_color);color:var(--zcs_brand_foreground_color)}.ch-home .zcs-primary-button:hover{background:var(--zcs_brand_dark_color);transform:translateY(-1px)}.ch-home .zcs-primary-outline-button{border:1px solid var(--zcs_brand_color);background:#fff;color:var(--zcs_brand_color)}.ch-home .zcs-primary-outline-button:hover{background:var(--zcs_component_hover_color)}.ch-home .zcs-button:focus-visible,.ch-home a:focus-visible{outline:3px solid #93c5fd;outline-offset:3px}.ch-home .ch-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.ch-home .ch-action{min-height:116px;padding:16px;align-items:flex-start;border-color:#e0e7ff}.ch-home .ch-action:hover{border-color:#6366f1;background:#f8faff}.ch-home .ch-action-icon{width:36px;height:36px;background:#eef2ff;color:#4338ca;border-radius:10px}.ch-home .ch-action-arrow{color:#6366f1}.ch-home .ch-stage-strip{overflow:auto;padding:8px 2px 4px}.ch-home .ch-stage-strip ul{min-width:720px}.ch-home .zcs-stepper{list-style:none}.ch-home .zcs-stepper-status{width:30px;height:30px;background:#fff;border:2px solid #6366f1;color:#4338ca;z-index:1}.ch-home .zcs-stepper:not(:last-child):before{content:'';width:100%;height:2px;background:#c7d2fe;position:absolute;top:14px;left:50%}.ch-home .zcs-stepper-text{max-width:120px;color:#334155}.ch-home .zcs-badge{width:auto;border:1px solid}.ch-home .zcs-badge-filled-outline.zcs-badge-blue{background:#eff6ff;border-color:#60a5fa;color:#1d4ed8}.ch-home .zcs-badge-filled-outline.zcs-badge-green{background:#ecfdf5;border-color:#34d399;color:#047857}.ch-home .zcs-badge-filled-outline.zcs-badge-yellow{background:#fffbeb;border-color:#fbbf24;color:#92400e}.ch-home .zcs-badge-filled-outline.zcs-badge-red{background:#fef2f2;border-color:#f87171;color:#991b1b}.ch-home .ch-recent-list{max-height:480px;overflow:auto}.ch-home .ch-recent-list li+li{border-top:1px solid #e8eaf2}.ch-home .ch-doc-link{min-width:0;color:inherit}.ch-home .ch-doc-link:hover .ch-doc-title{color:#4338ca;text-decoration:underline}.ch-home .zcs-avatar{width:38px;height:38px;background:#eef2ff;color:#4338ca;border-radius:10px}.ch-home .ch-doc-meta{color:#64748b}.ch-home .ch-recent-right{align-items:flex-end;min-width:132px}.ch-home .ch-empty{min-height:290px}.ch-home .ch-empty-icon{width:64px;height:64px;border-radius:18px;background:#eef2ff;color:#4338ca}.ch-home .ch-pipeline-intro{border-left:4px solid #4f46e5;background:linear-gradient(90deg,#eef2ff 0%,#fff 70%)}
+@media(max-width:1280px){.ch-home .ch-kpi-grid{grid-template-columns:repeat(3,minmax(160px,1fr))}}
+@media(max-width:920px){.ch-home .zcs-page-header{align-items:flex-start;flex-direction:column}.ch-home .ch-main-grid{grid-template-columns:1fr}.ch-home .ch-actions{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:680px){.ch-home{padding:10px}.ch-home .zcs-page-header{min-height:auto;border-radius:16px}.ch-home .ch-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ch-home .ch-actions{grid-template-columns:1fr}.ch-home .ch-action{min-height:92px}.ch-home .ch-card{padding:16px}.ch-home .ch-recent-list li{align-items:flex-start;flex-direction:column}.ch-home .ch-recent-right{width:100%;align-items:flex-start;flex-direction:row;justify-content:space-between}.ch-home .ch-header-actions{width:100%}.ch-home .ch-alert-pill{width:100%;justify-content:center}}
+@media(max-width:420px){.ch-home .ch-kpi-grid{grid-template-columns:1fr}.ch-home .zcs-template-card.ch-kpi{min-height:124px}.ch-home .ch-doc-meta{white-space:normal}}
+</style>
+<div class='ch-home'>
+  <header class='zcs-page-header zcs-w-full zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-24'>
+    <div class='ch-header-copy'>
+      <div class='ch-eyebrow zcs-font-12 zcs-font-semibold zcs-mb-8'>Content Review Hub</div>
+      <h1 class='ch-greeting zcs-font-bold zcs-lh-heading zcs-m-0'>Welcome, <%=safeDisplayName%></h1>
+      <p class='ch-header-desc zcs-font-15 zcs-lh-body zcs-mt-10 zcs-mb-0'>Track review health, focus on urgent work, and move content confidently from draft to downstream handoff.</p>
+    </div>
+    <div class='ch-header-actions zcs-flex zcs-direction-column zcs-align-items-center zcs-gap-8'>
+      <% if(overdueCount > 0) { %>
+      <a class='ch-alert-pill zcs-inline-flex zcs-align-items-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-lg zcs-font-14 zcs-font-semibold' href='#Report:Overdue_Reviews' target='_parent' aria-label='Open overdue reviews'>
+        <i class='zc-li-outline ui-3-alert' aria-hidden='true'></i><span><%=overdueCount%> overdue</span><i class='zc-li-outline arrows-1-tail-right' aria-hidden='true'></i>
+      </a>
+      <% } else { %>
+      <div class='ch-alert-pill zcs-inline-flex zcs-align-items-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-lg zcs-font-14 zcs-font-semibold'>
+        <i class='zc-li-outline ui-1-check-circle-08' aria-hidden='true'></i><span>No overdue reviews</span>
+      </div>
+      <% } %>
+    </div>
+  </header>
+
+  <section class='ch-section' aria-labelledby='ch-kpi-heading'>
+    <div class='ch-section-head zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-12'>
+      <div><h2 id='ch-kpi-heading' class='ch-section-title zcs-font-semibold zcs-color-primary zcs-m-0'>Review overview</h2><p class='zcs-font-13 zcs-color-secondary zcs-mt-4 zcs-mb-0'>Current content volume by stage and SLA health</p></div>
+      <a class='zcs-font-14 zcs-font-medium' href='#Report:All_Content_Documents' target='_parent'>View all documents</a>
+    </div>
+    <div class='ch-kpi-grid'>
+      <a class='zcs-template-card ch-kpi zcs-card zcs-flex zcs-direction-column zcs-justify-space-between' href='#Report:All_Content_Documents?Stage=Draft' target='_parent'>
+        <div class='zcs-flex zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-14 zcs-font-medium zcs-color-secondary'>Draft</span><span class='ch-kpi-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline files-2-doc' aria-hidden='true'></i></span></div>
+        <div><strong class='ch-kpi-value zcs-font-bold'><%=draftCount%></strong><div class='ch-kpi-note zcs-font-12'>Preparing for submission</div></div>
+      </a>
+      <a class='zcs-template-card ch-kpi zcs-card zcs-flex zcs-direction-column zcs-justify-space-between' href='#Report:Review_Pipeline' target='_parent'>
+        <div class='zcs-flex zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-14 zcs-font-medium zcs-color-secondary'>Active Review</span><span class='ch-kpi-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline ui-2-time' aria-hidden='true'></i></span></div>
+        <div><strong class='ch-kpi-value zcs-font-bold'><%=activeReviewCount%></strong><div class='ch-kpi-note zcs-font-12'>Awaiting reviewer action</div></div>
+      </a>
+      <a class='zcs-template-card ch-kpi ch-kpi-warning zcs-card zcs-flex zcs-direction-column zcs-justify-space-between' href='#Report:All_Content_Documents?Stage=Feedback%20Fixes%20In%20Progress' target='_parent'>
+        <div class='zcs-flex zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-14 zcs-font-medium zcs-color-secondary'>Fixes in Progress</span><span class='ch-kpi-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline design-paint-37' aria-hidden='true'></i></span></div>
+        <div><strong class='ch-kpi-value zcs-font-bold'><%=fixesCount%></strong><div class='ch-kpi-note zcs-font-12'>Changes being addressed</div></div>
+      </a>
+      <a class='zcs-template-card ch-kpi ch-kpi-warning zcs-card zcs-flex zcs-direction-column zcs-justify-space-between' href='#Report:All_Content_Documents?SLA_Status=Due%20Soon' target='_parent'>
+        <div class='zcs-flex zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-14 zcs-font-medium zcs-color-secondary'>Due Soon</span><span class='ch-kpi-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline ui-2-time' aria-hidden='true'></i></span></div>
+        <div><strong class='ch-kpi-value zcs-font-bold'><%=dueSoonCount%></strong><div class='ch-kpi-note zcs-font-12'>Needs timely attention</div></div>
+      </a>
+      <a class='zcs-template-card ch-kpi ch-kpi-danger zcs-card zcs-flex zcs-direction-column zcs-justify-space-between' href='#Report:Overdue_Reviews' target='_parent'>
+        <div class='zcs-flex zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-14 zcs-font-medium zcs-color-secondary'>Overdue</span><span class='ch-kpi-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline ui-3-alert' aria-hidden='true'></i></span></div>
+        <div><strong class='ch-kpi-value zcs-font-bold'><%=overdueCount%></strong><div class='ch-kpi-note zcs-font-12'>Past the review SLA</div></div>
+      </a>
+      <a class='zcs-template-card ch-kpi ch-kpi-success zcs-card zcs-flex zcs-direction-column zcs-justify-space-between' href='#Report:All_Content_Documents?Stage=Ready%20for%20Downstream' target='_parent'>
+        <div class='zcs-flex zcs-align-items-center zcs-justify-space-between'><span class='zcs-font-14 zcs-font-medium zcs-color-secondary'>Ready for Downstream</span><span class='ch-kpi-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline ui-1-check-circle-08' aria-hidden='true'></i></span></div>
+        <div><strong class='ch-kpi-value zcs-font-bold'><%=readyCount%></strong><div class='ch-kpi-note zcs-font-12'>Approved and routed</div></div>
+      </a>
+    </div>
+  </section>
+
+  <section class='ch-section ch-main-grid'>
+    <div class='ch-card zcs-card'>
+      <div class='ch-section-head'><h2 class='ch-section-title zcs-font-semibold zcs-color-primary zcs-m-0'>Workflow at a glance</h2><p class='zcs-font-13 zcs-color-secondary zcs-mt-4 zcs-mb-0'>A consistent path from creation through final handoff</p></div>
+      <div class='zcs-stepper-wrapper ch-stage-strip' aria-label='Content workflow stages'>
+        <ul class='zcs-flex zcs-gap-8 zcs-p-0 zcs-m-0'>
+          <li class='zcs-stepper zcs-col-common zcs-flex zcs-direction-column zcs-align-items-center zcs-gap-4 zcs-text-center zcs-relative'><span class='zcs-stepper-status zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-half zcs-font-12 zcs-font-bold'>1</span><span class='zcs-stepper-text zcs-font-12'>Draft</span></li>
+          <li class='zcs-stepper zcs-col-common zcs-flex zcs-direction-column zcs-align-items-center zcs-gap-4 zcs-text-center zcs-relative'><span class='zcs-stepper-status zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-half zcs-font-12 zcs-font-bold'>2</span><span class='zcs-stepper-text zcs-font-12'>Active Review</span></li>
+          <li class='zcs-stepper zcs-col-common zcs-flex zcs-direction-column zcs-align-items-center zcs-gap-4 zcs-text-center zcs-relative'><span class='zcs-stepper-status zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-half zcs-font-12 zcs-font-bold'>3</span><span class='zcs-stepper-text zcs-font-12'>Fixes</span></li>
+          <li class='zcs-stepper zcs-col-common zcs-flex zcs-direction-column zcs-align-items-center zcs-gap-4 zcs-text-center zcs-relative'><span class='zcs-stepper-status zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-half zcs-font-12 zcs-font-bold'>4</span><span class='zcs-stepper-text zcs-font-12'>Fix Verification</span></li>
+          <li class='zcs-stepper zcs-col-common zcs-flex zcs-direction-column zcs-align-items-center zcs-gap-4 zcs-text-center zcs-relative'><span class='zcs-stepper-status zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-half zcs-font-12 zcs-font-bold'>5</span><span class='zcs-stepper-text zcs-font-12'>Review Complete</span></li>
+          <li class='zcs-stepper zcs-col-common zcs-flex zcs-direction-column zcs-align-items-center zcs-gap-4 zcs-text-center zcs-relative'><span class='zcs-stepper-status zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-half zcs-font-12 zcs-font-bold'>6</span><span class='zcs-stepper-text zcs-font-12'>Downstream Ready</span></li>
+        </ul>
+      </div>
+      <div class='ch-section-head zcs-mt-20'><h2 class='ch-section-title zcs-font-semibold zcs-color-primary zcs-m-0'>Go to a workspace</h2><p class='zcs-font-13 zcs-color-secondary zcs-mt-4 zcs-mb-0'>Available destinations follow your profile permissions</p></div>
+      <div class='ch-actions'>
+        <a class='ch-action zcs-quick-action-item zcs-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-gap-12' href='#Page:Submission_Workspace' target='_parent'><span class='zcs-flex zcs-align-items-center zcs-justify-space-between zcs-w-full'><span class='ch-action-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline files-2-doc' aria-hidden='true'></i></span><i class='ch-action-arrow zc-li-outline arrows-1-tail-right' aria-hidden='true'></i></span><span><strong class='zcs-font-15 zcs-color-primary'>Submission Workspace</strong><span class='zcs-font-12 zcs-color-secondary zcs-mt-4' style='display:block'>Create and manage content</span></span></a>
+        <a class='ch-action zcs-quick-action-item zcs-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-gap-12' href='#Page:Review_Workspace' target='_parent'><span class='zcs-flex zcs-align-items-center zcs-justify-space-between zcs-w-full'><span class='ch-action-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline ui-1-eye-17' aria-hidden='true'></i></span><i class='ch-action-arrow zc-li-outline arrows-1-tail-right' aria-hidden='true'></i></span><span><strong class='zcs-font-15 zcs-color-primary'>Review Workspace</strong><span class='zcs-font-12 zcs-color-secondary zcs-mt-4' style='display:block'>Prioritize assigned reviews</span></span></a>
+        <a class='ch-action zcs-quick-action-item zcs-card zcs-flex zcs-direction-column zcs-justify-space-between zcs-gap-12' href='#Page:Administration_Center' target='_parent'><span class='zcs-flex zcs-align-items-center zcs-justify-space-between zcs-w-full'><span class='ch-action-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline ui-1-settings-gear-63' aria-hidden='true'></i></span><i class='ch-action-arrow zc-li-outline arrows-1-tail-right' aria-hidden='true'></i></span><span><strong class='zcs-font-15 zcs-color-primary'>Administration Center</strong><span class='zcs-font-12 zcs-color-secondary zcs-mt-4' style='display:block'>Configure teams and policies</span></span></a>
+      </div>
+    </div>
+
+    <div class='ch-card zcs-card'>
+      <div class='ch-section-head zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-12'><div><h2 class='ch-section-title zcs-font-semibold zcs-color-primary zcs-m-0'>Recent documents</h2><p class='zcs-font-13 zcs-color-secondary zcs-mt-4 zcs-mb-0'>Latest updates across the hub</p></div><a class='zcs-font-13 zcs-font-medium' href='#Report:All_Content_Documents' target='_parent'>View all</a></div>
+      <% if(recentDocuments.count() == 0) { %>
+      <div class='zcs-nodata-wrapper ch-empty zcs-wh-full zcs-flex zcs-align-items-center zcs-justify-center zcs-text-center'>
+        <div class='zcs-nodata-content zcs-p-20'><span class='ch-empty-icon zcs-inline-flex zcs-align-items-center zcs-justify-center zcs-font-24'><i class='zc-li-outline files-2-doc' aria-hidden='true'></i></span><h3 class='zcs-nodata-header zcs-font-18 zcs-font-medium zcs-color-primary zcs-mt-12 zcs-mb-0'>No content documents yet</h3><p class='zcs-nodata-desc zcs-font-14 zcs-color-secondary zcs-mt-8 zcs-mb-0'>Start in the Submission Workspace when you are ready to add the first document.</p><div class='zcs-nodata-btn-wrapper zcs-flex zcs-align-items-center zcs-justify-center zcs-mt-20'><a class='zcs-button zcs-primary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-font-14' href='#Page:Submission_Workspace' target='_parent'><i class='zcs-button-icon zc-li-outline ui-1-simple-add' aria-hidden='true'></i><span>Open Submission Workspace</span></a></div></div>
+      </div>
+      <% } else { %>
+      <div class='ch-recent-list zcs-px-0 zcs-py-0'>
+        <ul class='zcs-flex zcs-direction-column zcs-m-0 zcs-p-0 zcs-list-none'>
+          <% for each document in recentDocuments { 
+             rawTitle = ifnull(document.Document_Title,"Untitled document").toString();
+             safeTitle = rawTitle.replaceAll("&","&amp;",true);
+             safeTitle = safeTitle.replaceAll("<","&lt;",true);
+             safeTitle = safeTitle.replaceAll(">","&gt;",true);
+             safeTitle = safeTitle.replaceAll("\"","&quot;",true);
+             safeTitle = safeTitle.replaceAll("'","&#39;",true);
+             rawProduct = ifnull(document.Product.Product_Name,"No product").toString();
+             safeProduct = rawProduct.replaceAll("&","&amp;",true);
+             safeProduct = safeProduct.replaceAll("<","&lt;",true);
+             safeProduct = safeProduct.replaceAll(">","&gt;",true);
+             safeProduct = safeProduct.replaceAll("\"","&quot;",true);
+             safeProduct = safeProduct.replaceAll("'","&#39;",true);
+             rawStage = ifnull(document.Stage,"Draft").toString();
+             safeStage = rawStage.replaceAll("&","&amp;",true);
+             safeStage = safeStage.replaceAll("<","&lt;",true);
+             safeStage = safeStage.replaceAll(">","&gt;",true);
+             safeStage = safeStage.replaceAll("\"","&quot;",true);
+             safeStage = safeStage.replaceAll("'","&#39;",true);
+             badgeClass = "zcs-badge-blue";
+             badgeIcon = "loader-dots-06";
+             if(rawStage == "Draft") { badgeClass = "zcs-badge-yellow"; badgeIcon = "files-2-doc"; }
+             if(rawStage == "Review Completed" || rawStage == "Ready for Downstream") { badgeClass = "zcs-badge-green"; badgeIcon = "ui-1-check-circle-08"; }
+             if(document.SLA_Status == "Overdue" || document.SLA_Status == "Breached") { badgeClass = "zcs-badge-red"; badgeIcon = "ui-3-alert"; }
+             modifiedText = document.Modified_Time.toString("dd MMM, hh:mm a");
+             recordUrl = "#Report:All_Content_Documents?recLinkID=" + document.ID + "&viewLinkName=All_Content_Documents";
+          %>
+          <li class='zcs-row zcs-align-items-center zcs-justify-space-between zcs-gap-16 zcs-py-12'>
+            <a class='ch-doc-link zcs-flex zcs-align-items-center zcs-gap-10 zcs-col-common' href='<%=recordUrl%>' target='_parent' aria-label='Open <%=safeTitle%>'><span class='zcs-avatar zcs-flex zcs-align-items-center zcs-justify-center zcs-no-shrink'><i class='zc-li-outline files-2-doc' aria-hidden='true'></i></span><span class='zcs-flex zcs-direction-column zcs-col-common zcs-ellipsis'><strong class='ch-doc-title zcs-font-14 zcs-font-medium zcs-color-primary zcs-ellipsis'><%=safeTitle%></strong><span class='ch-doc-meta zcs-font-12 zcs-ellipsis'><%=safeProduct%> · Updated <%=modifiedText%></span></span></a>
+            <div class='ch-recent-right zcs-flex zcs-direction-column zcs-gap-4'><span class='zcs-badge zcs-badge-filled-outline zcs-inline-flex zcs-align-items-center zcs-justify-center zcs-gap-4 zcs-rounded-sm zcs-px-10 zcs-py-2 <%=badgeClass%>'><i class='zcs-badge-icon zcs-no-shrink zc-li-outline <%=badgeIcon%>' aria-hidden='true'></i><span class='zcs-badge-text zcs-font-11 zcs-font-medium'><%=safeStage%></span></span><span class='zcs-font-11 zcs-color-secondary'><%=ifnull(document.Document_ID,document.ID)%></span></div>
+          </li>
+          <% } %>
+        </ul>
+      </div>
+      <% } %>
+    </div>
+  </section>
+
+  <section class='ch-section ch-pipeline-intro zcs-card zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-16 zcs-p-20' aria-labelledby='ch-pipeline-heading'>
+    <div><h2 id='ch-pipeline-heading' class='ch-section-title zcs-font-semibold zcs-color-primary zcs-m-0'>Review pipeline</h2><p class='zcs-font-13 zcs-color-secondary zcs-mt-4 zcs-mb-0'>Scan work by stage, reviewer, product, and SLA status.</p></div>
+    <a class='zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-font-14' href='#Page:Review_Workspace' target='_parent'><span>Open review workspace</span><i class='zcs-button-icon zc-li-outline arrows-1-tail-right' aria-hidden='true'></i></a>
+  </section>
+</div>

@@ -1,0 +1,84 @@
+Content_Documents_On_Success as "Synchronize Assignment and SLA"
+{
+    type = form
+    form = Content_Documents
+    record event = on add or edit
+    description = "Re-resolves automatic reviewer assignment and SLA for draft records after relevant edits."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Stage == "Draft")
+                {
+                    resolved_reviewer = input.Assigned_Reviewer;
+                    if(input.Assignment_Mode == "Auto")
+                    {
+                        resolved_reviewer = null;
+                        best_load = 999999999;
+                        best_member_id = 999999999999999999;
+                        for each member in Team_Members[Active == true && Member_Roles.contains("Content Reviewer")] sort by ID
+                        {
+                            if(member.Product_Coverage.isEmpty() || member.Product_Coverage.contains(input.Product))
+                            {
+                                open_load = Content_Documents[Assigned_Reviewer == member.Member_User && (Stage == "Review Under Progress" || Stage == "Feedback Changes Completed")].count();
+                                within_capacity = member.Reviewer_Capacity == 0 || open_load < member.Reviewer_Capacity;
+                                if(within_capacity && (open_load < best_load || (open_load == best_load && member.ID < best_member_id)))
+                                {
+                                    resolved_reviewer = member.Member_User;
+                                    best_load = open_load;
+                                    best_member_id = member.ID;
+                                }
+                            }
+                        }
+                    }
+                    resolved_policy = null;
+                    resolved_days = input.Applied_SLA_Business_Days;
+                    fallback_settings = Application_Settings[Configuration_Key == "GLOBAL"];
+                    if(fallback_settings.count() > 0) { resolved_days = fallback_settings.Default_SLA_Business_Days; }
+                    best_cycle_rank = -1;
+                    best_dimension_count = -1;
+                    best_priority = -999999;
+                    best_effective = null;
+                    best_id = 0;
+                    session_type_id = input.Session.Session_Type;
+                    for each policy in SLA_Policies[Active == true]
+                    {
+                        effective_now = (policy.Effective_From == null || policy.Effective_From <= zoho.currentdate) && (policy.Effective_To == null || policy.Effective_To >= zoho.currentdate);
+                        scope_matches = (policy.Product == null || policy.Product == input.Product) && (policy.Session_Type == null || policy.Session_Type == session_type_id) && (policy.Document_Type == null || policy.Document_Type == input.Document_Type);
+                        cycle_matches = policy.Review_Cycle_Type == "Any" || policy.Review_Cycle_Type == input.Review_Cycle_Type;
+                        if(effective_now && scope_matches && cycle_matches)
+                        {
+                            cycle_rank = if(policy.Review_Cycle_Type == input.Review_Cycle_Type,1,0);
+                            dimensions = 0;
+                            if(policy.Product != null) { dimensions = dimensions + 1; }
+                            if(policy.Session_Type != null) { dimensions = dimensions + 1; }
+                            if(policy.Document_Type != null) { dimensions = dimensions + 1; }
+                            newer_effective = best_effective == null || (policy.Effective_From != null && policy.Effective_From > best_effective);
+                            better = cycle_rank > best_cycle_rank || (cycle_rank == best_cycle_rank && dimensions > best_dimension_count) || (cycle_rank == best_cycle_rank && dimensions == best_dimension_count && policy.Priority > best_priority) || (cycle_rank == best_cycle_rank && dimensions == best_dimension_count && policy.Priority == best_priority && newer_effective) || (cycle_rank == best_cycle_rank && dimensions == best_dimension_count && policy.Priority == best_priority && policy.Effective_From == best_effective && policy.ID > best_id);
+                            if(better)
+                            {
+                                resolved_policy = policy.ID;
+                                resolved_days = policy.SLA_Business_Days;
+                                best_cycle_rank = cycle_rank;
+                                best_dimension_count = dimensions;
+                                best_priority = policy.Priority;
+                                best_effective = policy.Effective_From;
+                                best_id = policy.ID;
+                            }
+                        }
+                    }
+                    saved_doc = Content_Documents[ID == input.ID];
+                    if(saved_doc.count() > 0)
+                    {
+                        saved_doc.Assigned_Reviewer = resolved_reviewer;
+                        saved_doc.Selected_SLA_Policy = resolved_policy;
+                        saved_doc.Applied_SLA_Business_Days = resolved_days;
+                    }
+                }
+            )
+        }
+    }
+}

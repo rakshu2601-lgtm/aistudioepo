@@ -1,0 +1,17 @@
+list Active_Reviewers
+{
+    displayName = "Active Reviewers"
+    show all rows from Team_Members [Active == true && Member_Roles.contains("Content Reviewer")]
+    (
+        Display_Name
+        Email
+        Member_Roles
+        Product_Coverage
+        Reviewer_Capacity
+        Active
+    )
+    sort by
+    (
+        Display_Name ascending
+    )
+}

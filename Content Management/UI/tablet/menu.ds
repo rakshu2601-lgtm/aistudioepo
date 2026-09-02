@@ -1,0 +1,77 @@
+menu
+{
+    unused
+    {
+        form Application_Settings { icon = "files-settings-99" }
+        form Products { icon = "business-briefcase-24" }
+        form Session_Types { icon = "education-board-51" }
+        form Document_Types { icon = "files-single-content-03" }
+        form Team_Members { icon = "users-multiple-11" }
+        form Holidays { icon = "business-agenda" }
+        form Downstream_Routes { icon = "business-strategy" }
+        form SLA_Policies { icon = "business-money-time" }
+        form Sessions { icon = "education-chalkboard" }
+        form Content_Documents { icon = "files-folder-shared" }
+        form Review_Feedback { icon = "business-sign" }
+        form Audit_Log { icon = "files-time" }
+        report Configuration_Settings { icon = "files-settings-46" }
+        report All_Products { icon = "business-briefcase-25" }
+        report All_Session_Types { icon = "education-books-46" }
+        report All_Document_Types { icon = "files-paper" }
+        report All_Team_Members { icon = "users-multiple-19" }
+        report Active_Reviewers { icon = "users-badge-13" }
+        report All_Holidays { icon = "business-agenda" }
+        report Holiday_Calendar { icon = "business-board-27" }
+        report All_Downstream_Routes { icon = "business-strategy" }
+        report All_SLA_Policies { icon = "business-money-time" }
+        report All_Sessions { icon = "education-notepad" }
+        report Session_Calendar { icon = "education-agenda-bookmark" }
+        report All_Content_Documents { icon = "files-folder-14" }
+        report Review_Pipeline { icon = "business-hierarchy-54" }
+        report My_Submissions { icon = "files-user" }
+        report My_Reviews { icon = "business-signature" }
+        report Overdue_Reviews { icon = "files-exclamation" }
+        report Content_Due_Calendar { icon = "files-folder-time" }
+        report All_Feedback { icon = "business-notes" }
+        report Open_Feedback { icon = "files-edit" }
+        report Audit_Trail { icon = "files-archive-content" }
+    }
+    space Content_Hub
+    {
+        displayname = "Content Hub"
+        icon = "files-folder-shared"
+        section Home
+        {
+            displayname = "Home"
+            icon = "business-chart"
+            page Content_Hub_Home { icon = "business-chart-bar-33" }
+        }
+        section Workspaces
+        {
+            displayname = "Workspaces"
+            icon = "business-briefcase-26"
+            page Submission_Workspace { icon = "files-upload" }
+            page Review_Workspace { icon = "business-signature" }
+        }
+        section Administration
+        {
+            displayname = "Administration"
+            icon = "files-settings-99"
+            page Administration_Center { icon = "business-hierarchy-53" }
+        }
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space,section,component}
+        }
+    }
+}

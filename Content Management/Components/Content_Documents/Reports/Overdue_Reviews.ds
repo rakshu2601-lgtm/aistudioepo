@@ -1,0 +1,36 @@
+list Overdue_Reviews
+{
+    displayName = "Overdue Reviews"
+    show all rows from Content_Documents [SLA_Status == "Overdue" && (Stage == "Review Under Progress" || Stage == "Feedback Changes Completed")]
+    (
+        Document_ID
+        Document_Title
+        Product
+        Session
+        Resource_User
+        Assigned_Reviewer
+        Stage
+        Due_On
+        SLA_Status
+    )
+    filters
+    (
+        Product
+        Session
+        Assigned_Reviewer
+        Stage
+        SLA_Status
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Assigned_Reviewer ascending
+    )
+    sort by
+    (
+        Due_On ascending
+    )
+}

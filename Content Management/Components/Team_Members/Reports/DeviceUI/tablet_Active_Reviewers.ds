@@ -1,0 +1,14 @@
+report Active_Reviewers
+{
+ quickview
+ (
+  layout ( type = -1 datablock1 ( layout type = -1 fields ( Display_Name Email Product_Coverage Reviewer_Capacity Active ) ) )
+  menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) )
+  action ( on tap ( View Record ) on long press ( Edit Delete Duplicate View Record ) on left swipe ( Delete ) on right swipe ( Edit ) )
+ )
+ detailview
+ (
+  layout ( type = 1 datablock1 ( layout type = -2 fields ( Display_Name Email Member_Roles Product_Coverage Reviewer_Capacity Active ) ) )
+  menu ( header ( Edit Duplicate Delete ) )
+ )
+}

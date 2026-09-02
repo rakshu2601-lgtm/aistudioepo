@@ -1,0 +1,14 @@
+report My_Submissions
+{
+ quickview
+ (
+  layout ( type = -1 datablock1 ( layout type = -1 fields ( Document_ID Document_Title Product Session Document_Type Stage Assigned_Reviewer Due_On SLA_Status ) ) )
+  menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) )
+  action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) )
+ )
+ detailview
+ (
+  layout ( type = 1 datablock1 ( layout type = -2 fields ( Document_ID Document_Title Product Session Document_Type Source_Files Content_URL Version_Label Stage Assigned_Reviewer Due_On SLA_Status Review_Summary Downstream_Route Modified_Time ) ) )
+  menu ( header ( Edit Duplicate Delete ) )
+ )
+}

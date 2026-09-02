@@ -1,0 +1,19 @@
+<page linkname = "Submission_Workspace" parameters = "string tab" displayname = "Submission Workspace"/>
+<content>
+<zml mobileDeviceConfig='{"layout":{"displayType":"card","design":"onebyone","forcedOrientation":false}}' tabletDeviceConfig='{"layout":{"displayType":"plain","design":"onebyone","forcedOrientation":false}}'>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Submission_Workspace_Snippet' elementName='Submission Workspace'>
+          <![CDATA[htmlpage Submission_Workspace_Snippet()
+             content
+             <%{%>
+                 <file name:Submission_Workspace/Workspace.dshtml/>
+             <%}%>
+         ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

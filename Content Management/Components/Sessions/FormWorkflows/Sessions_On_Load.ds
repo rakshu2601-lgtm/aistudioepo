@@ -1,0 +1,30 @@
+Sessions_On_Load as "Load Session"
+{
+    type = form
+    form = Sessions
+    record event = on add or edit
+    description = "Locks closed sessions for non-administrators and keeps schedule input consistent."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                is_admin = thisapp.permissions.isUserInProfile("Content Administrator");
+                if(is_admin == false && (input.Status == "Completed" || input.Status == "Cancelled"))
+                {
+                    disable Session_Name;
+                    disable Product;
+                    disable Session_Type;
+                    disable Series_Name;
+                    disable Description;
+                    disable Start_Date_Time;
+                    disable End_Date_Time;
+                    disable Session_Owner;
+                    disable Status;
+                }
+            )
+        }
+    }
+}

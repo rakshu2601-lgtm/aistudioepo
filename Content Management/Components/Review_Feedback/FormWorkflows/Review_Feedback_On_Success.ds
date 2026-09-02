@@ -1,0 +1,50 @@
+Review_Feedback_On_Success as "Audit Feedback Resolution"
+{
+    type = form
+    form = Review_Feedback
+    record event = on add or edit
+    description = "Stamps feedback resolution milestones and writes an audit record."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                feedback_record = Review_Feedback[ID == input.ID];
+                action_name = "Feedback Saved";
+                from_state = "";
+                if(input.Feedback_Status == "Addressed")
+                {
+                    action_name = "Feedback Addressed";
+                    feedback_record.Addressed_On = zoho.currenttime;
+                }
+                if(input.Feedback_Status == "Closed")
+                {
+                    action_name = "Feedback Closed";
+                    feedback_record.Closed_On = zoho.currenttime;
+                }
+                document_record = Content_Documents[ID == input.Document];
+                reviewer_email = "";
+                due_on = null;
+                if(document_record.count() > 0)
+                {
+                    due_on = document_record.Due_On;
+                    if(document_record.Assigned_Reviewer != null) { reviewer_email = document_record.Assigned_Reviewer.email; }
+                }
+                insert into Audit_Log
+                [
+                    Document = input.Document
+                    Action_Name = action_name
+                    From_State = from_state
+                    To_State = input.Feedback_Status
+                    Performed_By = zoho.loginuserid
+                    Performed_On = zoho.currenttime
+                    Assigned_Reviewer = reviewer_email
+                    SLA_Due_On = due_on
+                    Details = input.Feedback_Comments + " Response: " + input.Resource_Response
+                ];
+            )
+        }
+    }
+}

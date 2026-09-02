@@ -1,0 +1,189 @@
+"Content Administrator"
+{
+    name = "Content Administrator"
+    type = Users_Permissions
+    permissions = {Chat:true,Predefined:false,ApiAccess:false,PIIAccess:false,ePHIAccess:false}
+    description = "Full configuration, operational oversight, and audit access for the content review application."
+
+    ModulePermissions
+    {
+        Application_Settings
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Configuration_Settings={"View","Edit","Delete"}
+            }
+        }
+        Products
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Products={"View","Edit","Delete"}
+            }
+        }
+        Session_Types
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Session_Types={"View","Edit","Delete"}
+            }
+        }
+        Document_Types
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Document_Types={"View","Edit","Delete"}
+            }
+        }
+        Team_Members
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Team_Members={"View","Edit","Delete"}
+                Active_Reviewers={"View","Edit","Delete"}
+            }
+        }
+        Holidays
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Holidays={"View","Edit","Delete"}
+                Holiday_Calendar={"View","Edit","Delete"}
+            }
+        }
+        Downstream_Routes
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Downstream_Routes={"View","Edit","Delete"}
+            }
+        }
+        SLA_Policies
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_SLA_Policies={"View","Edit","Delete"}
+            }
+        }
+        Sessions
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search,read_comm,write_comm
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Sessions={"View","Edit","Delete"}
+                Session_Calendar={"View","Edit","Delete"}
+            }
+        }
+        Content_Documents
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search,read_comm,write_comm
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                All_Content_Documents={"View","Edit","Delete"}
+                Review_Pipeline={"View","Edit","Delete"}
+                My_Submissions={"View","Edit","Delete"}
+                My_Reviews={"View","Edit","Delete"}
+                Overdue_Reviews={"View","Edit","Delete"}
+                Content_Due_Calendar={"View","Edit","Delete"}
+            }
+            FieldPermissions
+            {
+                Document_ID{visibility:true,readonly:true}
+                Document_Title{visibility:true,readonly:false}
+                Session{visibility:true,readonly:false}
+                Product{visibility:true,readonly:true}
+                Document_Type{visibility:true,readonly:false}
+                Version_Label{visibility:true,readonly:false}
+                Source_Files{visibility:true,readonly:false}
+                Content_URL{visibility:true,readonly:false}
+                Resource_User{visibility:true,readonly:false}
+                Assignment_Mode{visibility:true,readonly:false}
+                Assigned_Reviewer{visibility:true,readonly:false}
+                Stage{visibility:true,readonly:true}
+                Selected_SLA_Policy{visibility:true,readonly:true}
+                Applied_SLA_Business_Days{visibility:true,readonly:true}
+                Review_Cycle_Number{visibility:true,readonly:true}
+                Review_Cycle_Type{visibility:true,readonly:true}
+                Submitted_On{visibility:true,readonly:true}
+                Due_On{visibility:true,readonly:true}
+                Due_Soon_Reminder_On{visibility:true,readonly:true}
+                SLA_Status{visibility:true,readonly:true}
+                Review_Summary{visibility:true,readonly:false}
+                Review_Attachment{visibility:true,readonly:false}
+                Resource_Response{visibility:true,readonly:false}
+                Final_Reviewer_Comments{visibility:true,readonly:false}
+                Downstream_Route{visibility:true,readonly:false}
+                Handoff_Notes{visibility:true,readonly:false}
+                Final_Approved_On{visibility:true,readonly:true}
+                Routed_On{visibility:true,readonly:true}
+                Last_Status_Changed_On{visibility:true,readonly:true}
+            }
+        }
+        Review_Feedback
+        {
+            enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Feedback={"View","Edit","Delete"}
+                Open_Feedback={"View","Edit","Delete"}
+            }
+        }
+        Audit_Log
+        {
+            enabled = Viewall,Export,Tab,View,Search
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                Audit_Trail={"View"}
+            }
+            FieldPermissions
+            {
+                Audit_ID{visibility:true,readonly:true}
+                Document{visibility:true,readonly:true}
+                Action_Name{visibility:true,readonly:true}
+                From_State{visibility:true,readonly:true}
+                To_State{visibility:true,readonly:true}
+                Performed_By{visibility:true,readonly:true}
+                Performed_On{visibility:true,readonly:true}
+                Assigned_Reviewer{visibility:true,readonly:true}
+                SLA_Due_On{visibility:true,readonly:true}
+                Details{visibility:true,readonly:true}
+            }
+        }
+        Content_Hub_Home
+        {
+            enabled = tab
+        }
+        Submission_Workspace
+        {
+            enabled = tab
+        }
+        Review_Workspace
+        {
+            enabled = tab
+        }
+        Administration_Center
+        {
+            enabled = tab
+        }
+    }
+}

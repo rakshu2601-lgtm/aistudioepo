@@ -1,0 +1,25 @@
+Feedback_Status_On_User_Input as "Update Feedback Response Visibility"
+{
+    type = form
+    form = Review_Feedback
+    record event = on add or edit
+    description = "Keeps the resource response available while feedback is open or addressed."
+
+    on user input of Feedback_Status
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Feedback_Status == "Open" || input.Feedback_Status == "Addressed")
+                {
+                    show Resource_Response;
+                }
+                else
+                {
+                    hide Resource_Response;
+                }
+            )
+        }
+    }
+}

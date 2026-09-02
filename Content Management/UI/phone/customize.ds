@@ -1,0 +1,17 @@
+customize
+{
+    layout = bottombar
+    font = "lato"
+    style = "3"
+    color options
+    {
+        name = "Content Indigo"
+        brand color = "#4338CA"
+        type = "custom"
+        dark mode color = "#818CF8"
+    }
+    logo
+    {
+        preference = "app_icon"
+    }
+}

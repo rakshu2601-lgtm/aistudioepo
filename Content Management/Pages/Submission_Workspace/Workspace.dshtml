@@ -1,0 +1,114 @@
+<%
+activeTab = ifnull(input.tab,"");
+if(activeTab != "new" && activeTab != "sessions" && activeTab != "feedback")
+{
+    activeTab = "submissions";
+}
+isAdmin = thisapp.permissions.isUserInProfile("Content Administrator");
+isResource = thisapp.permissions.isUserInProfile("Content Resource");
+canCreateDocument = isAdmin || isResource;
+canCreateSession = isAdmin || isResource;
+slotName = "SubmissionWorkspaceSlot";
+if(activeTab == "new")
+{
+    componentUrl = "#Form:Content_Documents?Resource_User=" + encodeURL(zoho.loginuserid) + "&zc_Header=false&zc_Focus=false";
+}
+else if(activeTab == "sessions")
+{
+    componentUrl = "#Report:Session_Calendar?zc_Header=true&zc_Footer=true&zc_AddRec=false&zc_EditRec=true&zc_DelRec=false&zc_DuplRec=false&zc_Print=false&zc_Export=false&zc_Search=true&zc_EditBulkRec=false&zc_BulkDelete=false&zc_BulkDuplicate=false";
+}
+else if(activeTab == "feedback")
+{
+    componentUrl = "#Report:Open_Feedback?zc_Header=true&zc_Footer=true&zc_AddRec=false&zc_EditRec=true&zc_DelRec=false&zc_DuplRec=false&zc_Print=false&zc_Export=false&zc_Search=true&zc_EditBulkRec=false&zc_BulkDelete=false&zc_BulkDuplicate=false";
+}
+else
+{
+    componentUrl = "#Report:My_Submissions?zc_Header=true&zc_Footer=true&zc_AddRec=false&zc_EditRec=true&zc_DelRec=false&zc_DuplRec=false&zc_Print=false&zc_Export=false&zc_Search=true&zc_EditBulkRec=false&zc_BulkDelete=false&zc_BulkDuplicate=false";
+}
+openUrl(componentUrl + "&zc_LoadIn=embed-" + slotName,"same window");
+%>
+<style>
+/* zcs-global.css essentials, included once for Submission_Workspace */
+:root{--zcs-theme-brand-color:var(--zcs_brand_color);--zcs-page-bg-color:#f3f3f4;--zcs-primary-text-color:var(--zcs_primary_text_color);--zcs-secondary-text-color:var(--zcs_secondary_text_color);--zcs-teritiary-text-color:var(--zcs_tertiary_text_color);--zcs-border-color:var(--zcs_tertiary_border_color);--zcs-white-color:#fff;font-size:16px;line-height:1.5}.zcs-flex{display:flex}.zcs-inline-flex{display:inline-flex}.zcs-direction-column{flex-direction:column}.zcs-row-wrap{flex-wrap:wrap}.zcs-align-items-center{align-items:center}.zcs-align-items-start{align-items:flex-start}.zcs-justify-center{justify-content:center}.zcs-justify-space-between{justify-content:space-between}.zcs-col-common{flex:1 1 0}.zcs-gap-4{gap:.25rem}.zcs-gap-8{gap:.5rem}.zcs-gap-12{gap:.75rem}.zcs-gap-16{gap:1rem}.zcs-gap-20{gap:1.25rem}.zcs-w-full{width:100%}.zcs-wh-full{width:100%;height:100%}.zcs-p-0{padding:0}.zcs-px-10{padding-left:.625rem;padding-right:.625rem}.zcs-px-16{padding-left:1rem;padding-right:1rem}.zcs-px-20{padding-left:1.25rem;padding-right:1.25rem}.zcs-px-30{padding-left:1.875rem;padding-right:1.875rem}.zcs-py-8{padding-top:.5rem;padding-bottom:.5rem}.zcs-py-12{padding-top:.75rem;padding-bottom:.75rem}.zcs-py-16{padding-top:1rem;padding-bottom:1rem}.zcs-py-24{padding-top:1.5rem;padding-bottom:1.5rem}.zcs-m-0{margin:0}.zcs-mt-4{margin-top:.25rem}.zcs-mt-8{margin-top:.5rem}.zcs-mb-0{margin-bottom:0}.zcs-font-12{font-size:.75rem}.zcs-font-13{font-size:.8125rem}.zcs-font-14{font-size:.875rem}.zcs-font-15{font-size:.9375rem}.zcs-font-16{font-size:1rem}.zcs-font-18{font-size:1.125rem}.zcs-font-22{font-size:1.375rem}.zcs-font-normal{font-weight:400}.zcs-font-medium{font-weight:500}.zcs-font-semibold{font-weight:600}.zcs-font-bold{font-weight:700}.zcs-lh-body{line-height:1.5}.zcs-lh-heading{line-height:1.25}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-secondary{color:var(--zcs-secondary-text-color)}.zcs-color-tertiary{color:var(--zcs-teritiary-text-color)}.zcs-box-border{box-sizing:border-box}.zcs-rounded-md{border-radius:.375rem}.zcs-rounded-lg{border-radius:.5rem}.zcs-rounded-xl{border-radius:.75rem}.zcs-ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.zcs-card{background:var(--zcs-white-color);border:1px solid var(--zcs-border-color);border-radius:12px}.zcs-list-none{list-style:none}a{text-decoration:none}
+.sw-workspace,.sw-workspace *{box-sizing:border-box}.sw-workspace{min-height:100%;width:100%;padding:clamp(12px,2vw,28px);background:linear-gradient(180deg,#f4f7ff 0,#f8fafc 220px,#f8fafc 100%);color:var(--zcs-primary-text-color);font-family:inherit}.sw-workspace .sw-header{padding:clamp(18px,2.4vw,30px);border:1px solid #dbe3ff;border-radius:18px;background:linear-gradient(120deg,#fff 0%,#f5f7ff 72%,#eef2ff 100%);box-shadow:0 10px 30px rgba(30,41,59,.06)}.sw-workspace .sw-title-icon{width:44px;height:44px;flex:0 0 44px;border-radius:12px;background:#e0e7ff;color:#4338ca}.sw-workspace .sw-header-copy{min-width:0}.sw-workspace .sw-header-copy p{max-width:680px}.sw-workspace .sw-actions{justify-content:flex-end}.sw-workspace .zcs-button{width:auto;min-width:5rem;min-height:38px;border:0;transition:background .2s ease,border-color .2s ease,transform .2s ease}.sw-workspace .zcs-primary-button{background:var(--zcs_brand_color);color:var(--zcs_brand_foreground_color)}.sw-workspace .zcs-primary-button:hover{background:var(--zcs_brand_dark_color);transform:translateY(-1px)}.sw-workspace .zcs-primary-outline-button{border:1px solid var(--zcs_brand_color);background:#fff;color:var(--zcs_brand_color)}.sw-workspace .zcs-primary-outline-button:hover{background:var(--zcs_component_hover_color)}.sw-workspace a:focus-visible,.sw-workspace .zcs-button:focus-visible{outline:3px solid #60a5fa;outline-offset:3px}.sw-workspace .sw-shell{margin-top:18px;overflow:hidden;box-shadow:0 10px 28px rgba(30,41,59,.05)}
+.sw-workspace .zcs-horizontal-tabhead{box-shadow:0 -1px 0 var(--zcs_tertiary_border_color) inset;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;background:#fff}.sw-workspace .zcs-horizontal-tabhead::-webkit-scrollbar{display:none}.sw-workspace .zcs-horizontal-tabitem{list-style:none;border-bottom:3px solid transparent;letter-spacing:.1px}.sw-workspace .zcs-horizontal-tablink{min-height:48px;color:var(--zcs_teritiary_text_color);white-space:nowrap}.sw-workspace .zcs-horizontal-tabitem:hover .zcs-horizontal-tablink{color:var(--zcs_brand_color);background:var(--zcs_component_hover_color)}.sw-workspace .zcs-horizontal-tabitem.zcs-horizontal-tabactive{border-bottom-color:var(--zcs_brand_color)}.sw-workspace .zcs-horizontal-tabitem.zcs-horizontal-tabactive .zcs-horizontal-tablink{color:var(--zcs_brand_color);background:var(--zcs_brand_light_color)}.sw-workspace .zcs-horizontal-tabicon{width:16px;height:16px}.sw-workspace .sw-context{min-height:62px;border-bottom:1px solid var(--zcs-border-color);background:#fff}.sw-workspace .sw-context-copy{min-width:0}.sw-workspace .sw-context-action{white-space:nowrap}.sw-workspace .sw-slot-wrap{min-height:620px;background:#fff}.sw-workspace .sw-slot{display:block;width:100%;height:clamp(620px,72vh,920px);overflow:auto}.sw-workspace .sw-slot a[elname='zc-delete'],.sw-workspace .sw-slot a[elname='zc-bulk-delete'],.sw-workspace .sw-slot [data-zc-action='delete'],.sw-workspace .sw-slot .zc-bulk-delete{display:none!important}
+@media(max-width:820px){.sw-workspace .sw-header{align-items:flex-start;flex-direction:column}.sw-workspace .sw-actions{width:100%;justify-content:flex-start}.sw-workspace .sw-context{align-items:flex-start;flex-direction:column}.sw-workspace .sw-context-action{width:100%;justify-content:center}.sw-workspace .sw-slot{height:760px}}
+@media(max-width:560px){.sw-workspace{padding:10px}.sw-workspace .sw-header{border-radius:14px}.sw-workspace .sw-title-row{align-items:flex-start}.sw-workspace .sw-actions{flex-direction:column}.sw-workspace .sw-actions .zcs-button{width:100%}.sw-workspace .zcs-horizontal-tabhead{gap:4px;padding-left:4px;padding-right:4px}.sw-workspace .zcs-horizontal-tablink{padding-left:9px;padding-right:9px}.sw-workspace .sw-context{padding:14px}.sw-workspace .sw-slot-wrap{min-height:720px}.sw-workspace .sw-slot{height:820px}}
+</style>
+<div class='sw-workspace'>
+  <header class='sw-header zcs-w-full zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-20'>
+    <div class='sw-title-row zcs-flex zcs-align-items-center zcs-gap-12 sw-header-copy'>
+      <span class='sw-title-icon zcs-inline-flex zcs-align-items-center zcs-justify-center zcs-font-22'><i class='zc-li-outline files-2-doc' aria-hidden='true'></i></span>
+      <div class='sw-header-copy'>
+        <h1 class='zcs-font-22 zcs-font-bold zcs-lh-heading zcs-color-primary zcs-m-0'>Submission Workspace</h1>
+        <p class='zcs-font-14 zcs-color-secondary zcs-mt-4 zcs-mb-0'>Create content, monitor your submissions, check sessions, and respond to review feedback in one place.</p>
+      </div>
+    </div>
+    <% if(canCreateDocument || canCreateSession) { %>
+    <div class='sw-actions zcs-flex zcs-align-items-center zcs-gap-12'>
+      <% if(canCreateDocument) { %>
+      <a class='zcs-button zcs-primary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md zcs-box-border zcs-font-14 zcs-font-normal zcs-lh-body' href='#Page:Submission_Workspace?tab=new' target='_parent'>
+        <i class='zcs-button-icon zc-li-outline ui-1-simple-add' aria-hidden='true'></i><span class='zcs-button-text'>New Document</span>
+      </a>
+      <% } %>
+      <% if(canCreateSession) { %>
+      <a class='zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md zcs-box-border zcs-font-14 zcs-font-normal zcs-lh-body' href='#Form:Sessions?zc_LoadIn=dialog' target='_parent'>
+        <i class='zcs-button-icon zc-li-outline ui-2-calendar-date-2' aria-hidden='true'></i><span class='zcs-button-text'>New Session</span>
+      </a>
+      <% } %>
+    </div>
+    <% } %>
+  </header>
+
+  <main class='sw-shell zcs-card zcs-horizontal-tabpanel zcs-flex zcs-direction-column zcs-w-full'>
+    <nav aria-label='Submission workspace sections'>
+      <ul class='zcs-horizontal-tabhead zcs-flex zcs-gap-12 zcs-px-10 zcs-py-0 zcs-m-0 zcs-box-border' role='tablist'>
+        <li class='zcs-horizontal-tabitem <% if(activeTab == "submissions") { %>zcs-horizontal-tabactive<% } %>' role='presentation'>
+          <a class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body' href='#Page:Submission_Workspace?tab=submissions' target='_parent' role='tab' <% if(activeTab == "submissions") { %>aria-current='page' aria-selected='true'<% } else { %>aria-selected='false'<% } %>>
+            <i class='zcs-horizontal-tabicon zcs-font-16 zc-li-outline files-2-doc' aria-hidden='true'></i><span class='zcs-horizontal-tabtext zcs-font-15'>My Submissions</span>
+          </a>
+        </li>
+        <li class='zcs-horizontal-tabitem <% if(activeTab == "new") { %>zcs-horizontal-tabactive<% } %>' role='presentation'>
+          <a class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body' href='#Page:Submission_Workspace?tab=new' target='_parent' role='tab' <% if(activeTab == "new") { %>aria-current='page' aria-selected='true'<% } else { %>aria-selected='false'<% } %>>
+            <i class='zcs-horizontal-tabicon zcs-font-16 zc-li-outline ui-1-simple-add' aria-hidden='true'></i><span class='zcs-horizontal-tabtext zcs-font-15'>New Document</span>
+          </a>
+        </li>
+        <li class='zcs-horizontal-tabitem <% if(activeTab == "sessions") { %>zcs-horizontal-tabactive<% } %>' role='presentation'>
+          <a class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body' href='#Page:Submission_Workspace?tab=sessions' target='_parent' role='tab' <% if(activeTab == "sessions") { %>aria-current='page' aria-selected='true'<% } else { %>aria-selected='false'<% } %>>
+            <i class='zcs-horizontal-tabicon zcs-font-16 zc-li-outline ui-2-calendar-date-2' aria-hidden='true'></i><span class='zcs-horizontal-tabtext zcs-font-15'>Sessions</span>
+          </a>
+        </li>
+        <li class='zcs-horizontal-tabitem <% if(activeTab == "feedback") { %>zcs-horizontal-tabactive<% } %>' role='presentation'>
+          <a class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body' href='#Page:Submission_Workspace?tab=feedback' target='_parent' role='tab' <% if(activeTab == "feedback") { %>aria-current='page' aria-selected='true'<% } else { %>aria-selected='false'<% } %>>
+            <i class='zcs-horizontal-tabicon zcs-font-16 zc-li-outline ui-2-chat-round-content' aria-hidden='true'></i><span class='zcs-horizontal-tabtext zcs-font-15'>Feedback</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <section class='sw-context zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-16 zcs-px-20 zcs-py-16' aria-live='polite'>
+      <div class='sw-context-copy'>
+        <% if(activeTab == "new") { %>
+        <h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Create a content document</h2><p class='zcs-font-13 zcs-color-secondary zcs-mt-4 zcs-mb-0'>Your account is prefilled as the resource. Complete the asset and assignment details before submitting.</p>
+        <% } else if(activeTab == "sessions") { %>
+        <h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Session calendar</h2><p class='zcs-font-13 zcs-color-secondary zcs-mt-4 zcs-mb-0'>Check scheduled work before associating a document with a session.</p>
+        <% } else if(activeTab == "feedback") { %>
+        <h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>Open feedback</h2><p class='zcs-font-13 zcs-color-secondary zcs-mt-4 zcs-mb-0'>Choose an editable feedback row to open the Review Feedback form and record your response.</p>
+        <% } else { %>
+        <h2 class='zcs-font-18 zcs-font-semibold zcs-color-primary zcs-m-0'>My submissions</h2><p class='zcs-font-13 zcs-color-secondary zcs-mt-4 zcs-mb-0'>Search and filter your documents while retaining edit and blueprint actions allowed by your profile.</p>
+        <% } %>
+      </div>
+      <% if(canCreateSession && activeTab == "sessions") { %>
+      <a class='sw-context-action zcs-button zcs-primary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md zcs-font-14' href='#Form:Sessions?zc_LoadIn=dialog' target='_parent'><i class='zcs-button-icon zc-li-outline ui-1-simple-add' aria-hidden='true'></i><span>New Session</span></a>
+      <% } else if(activeTab == "feedback") { %>
+      <a class='sw-context-action zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md zcs-font-14' href='#Report:Open_Feedback' target='_parent'><i class='zcs-button-icon zc-li-outline ui-1-edit-72' aria-hidden='true'></i><span>Choose Feedback to Respond</span></a>
+      <% } else if(canCreateDocument && activeTab == "submissions") { %>
+      <a class='sw-context-action zcs-button zcs-primary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md zcs-font-14' href='#Page:Submission_Workspace?tab=new' target='_parent'><i class='zcs-button-icon zc-li-outline ui-1-simple-add' aria-hidden='true'></i><span>New Document</span></a>
+      <% } %>
+    </section>
+
+    <section class='sw-slot-wrap zcs-col-common' role='tabpanel' aria-label='<%=activeTab%> workspace content'>
+      <div elName='zc-component' name='SubmissionWorkspaceSlot' class='sw-slot zcs-w-full' pageLinkName=''></div>
+    </section>
+  </main>
+</div>

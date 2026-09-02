@@ -1,0 +1,87 @@
+form Document_Types
+{
+    displayname = "Document Types"
+    success message = "Document type saved successfully."
+
+        Document_Type_Details
+        (
+            type = section
+            displayname = "Document Type Details"
+            row = 1
+            column = 0
+        )
+        must have unique Document_Type_Name
+        (
+            type = text
+            displayname = "Document Type Name"
+            row = 1
+            column = 1
+            width = medium
+        )
+        Description
+        (
+            type = textarea
+            displayname = "Description"
+            height = 100px
+            row = 1
+            column = 2
+            width = medium
+        )
+        File_Expected
+        (
+            type = checkbox
+            displayname = "File Expected"
+            initial value = true
+            row = 1
+            column = 1
+            width = medium
+        )
+        URL_Allowed
+        (
+            type = checkbox
+            displayname = "URL Allowed"
+            initial value = true
+            row = 1
+            column = 2
+            width = medium
+        )
+        Active
+        (
+            type = checkbox
+            displayname = "Active"
+            initial value = true
+            row = 1
+            column = 1
+            width = medium
+        )
+
+    actions
+    {
+        on add
+        {
+            Save
+            (
+                type = submit
+                displayname = "Save Document Type"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Document Type"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

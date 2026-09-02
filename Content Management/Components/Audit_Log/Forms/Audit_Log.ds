@@ -1,0 +1,127 @@
+form Audit_Log
+{
+    displayname = "Audit Log"
+    success message = "Audit record saved."
+
+        Audit_Details
+        (
+            type = section
+            displayname = "Audit Details"
+            row = 1
+            column = 0
+        )
+        Audit_ID
+        (
+            type = autonumber
+            displayname = "Audit ID"
+            start index = 1
+            row = 1
+            column = 1
+        )
+        Document
+        (
+            type = picklist
+            displayname = "Document"
+            values = Content_Documents.ID
+            displayformat = [Document_Title]
+            searchable = true
+            row = 1
+            column = 1
+            width = medium
+        )
+        must have Action_Name
+        (
+            type = text
+            displayname = "Action"
+            row = 1
+            column = 2
+            width = medium
+        )
+        From_State
+        (
+            type = text
+            displayname = "From State"
+            row = 1
+            column = 1
+            width = medium
+        )
+        To_State
+        (
+            type = text
+            displayname = "To State"
+            row = 1
+            column = 2
+            width = medium
+        )
+        Performed_By
+        (
+            type = email
+            displayname = "Performed By"
+            row = 1
+            column = 1
+            width = medium
+        )
+        Performed_On
+        (
+            type = datetime
+            displayname = "Performed On"
+            row = 1
+            column = 2
+            width = medium
+        )
+        Assigned_Reviewer
+        (
+            type = email
+            displayname = "Assigned Reviewer"
+            row = 1
+            column = 1
+            width = medium
+        )
+        SLA_Due_On
+        (
+            type = datetime
+            displayname = "SLA Due On"
+            row = 1
+            column = 2
+            width = medium
+        )
+        Details
+        (
+            type = textarea
+            displayname = "Details"
+            height = 120px
+            row = 1
+            column = 1
+            width = medium
+        )
+
+    actions
+    {
+        on add
+        {
+            Save
+            (
+                type = submit
+                displayname = "Save"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

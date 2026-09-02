@@ -1,0 +1,43 @@
+Due_Soon_Reminder as "Due Soon Reminder"
+{
+    type = schedule
+    form = Content_Documents[(Stage == "Review Under Progress" || Stage == "Feedback Changes Completed")]
+    start = Due_Soon_Reminder_On
+    time zone = "UTC"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                settings = Application_Settings[Configuration_Key == "GLOBAL"];
+                if(settings.count() > 0 && settings.Reminders_Enabled == true && input.Due_On != null)
+                {
+                    input.SLA_Status = "Due Soon";
+                    record_link = zoho.appuri + "#Report:All_Content_Documents/" + input.ID;
+                    sendmail
+                    (
+                        from : zoho.adminuserid
+                        to : input.Assigned_Reviewer.email
+                        cc : input.Resource_User.email
+                        subject : "Content review due soon: " + input.Document_Title
+                        message : "Document: " + input.Document_Title + "<br>Stage: " + input.Stage + "<br>Session: " + input.Session.Session_Name + "<br>Due (UTC): " + input.Due_On + "<br><a href='" + record_link + "'>Open content record</a>"
+                    )
+                    insert into Audit_Log
+                    [
+                        Document = input.ID
+                        Action_Name = "Due Soon Reminder"
+                        From_State = input.Stage
+                        To_State = input.Stage
+                        Performed_By = zoho.adminuserid
+                        Performed_On = zoho.currenttime
+                        Assigned_Reviewer = input.Assigned_Reviewer.email
+                        SLA_Due_On = input.Due_On
+                        Details = "UTC due-soon reminder sent."
+                    ];
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,359 @@
+form Content_Documents
+{
+    displayname = "Content Documents"
+    success message = "Content document saved successfully."
+    record owner = Resource_User
+
+        Content_Details
+        (
+            type = section
+            displayname = "Content Details"
+            row = 1
+            column = 0
+        )
+        Document_ID
+        (
+            type = autonumber
+            displayname = "Document ID"
+            start index = 1
+            row = 1
+            column = 1
+        )
+        must have Document_Title
+        (
+            type = text
+            displayname = "Document Title"
+            row = 1
+            column = 1
+            width = medium
+        )
+        must have Session
+        (
+            type = picklist
+            displayname = "Session"
+            values = Sessions[Status != "Cancelled"].ID
+            displayformat = [Session_Name]
+            searchable = true
+            row = 1
+            column = 2
+            width = medium
+        )
+        must have Product
+        (
+            type = picklist
+            displayname = "Product"
+            values = Products[Active == true].ID
+            displayformat = [Product_Name]
+            searchable = true
+            row = 1
+            column = 1
+            width = medium
+        )
+        must have Document_Type
+        (
+            type = picklist
+            displayname = "Document Type"
+            values = Document_Types[Active == true].ID
+            displayformat = [Document_Type_Name]
+            searchable = true
+            row = 1
+            column = 2
+            width = medium
+        )
+        Version_Label
+        (
+            type = text
+            displayname = "Version Label"
+            initial value = "1.0"
+            row = 1
+            column = 1
+            width = medium
+        )
+        Asset
+        (
+            type = section
+            displayname = "Asset"
+            visibility = true
+            row = 2
+            column = 1
+        )
+        Source_Files
+        (
+            type = upload file
+            displayname = "Source Files"
+            file count = 10
+            browse = local_drive, google_docs, zoho_docs
+            row = 2
+            column = 1
+            width = medium
+        )
+        Content_URL
+        (
+            type = url
+            displayname = "Content URL"
+            enable = linkname, title
+            target = new window
+            row = 2
+            column = 2
+            width = medium
+        )
+        Assignment
+        (
+            type = section
+            displayname = "Assignment"
+            visibility = true
+            row = 3
+            column = 1
+        )
+        must have Resource_User
+        (
+            type = picklist
+            displayname = "Resource"
+            module = users
+            displayformat = [name]
+            row = 3
+            column = 1
+            width = medium
+        )
+        Assignment_Mode
+        (
+            type = radiobuttons
+            displayname = "Assignment Mode"
+            values = {"Auto","Manual"}
+            initial value = "Auto"
+            row = 3
+            column = 2
+            width = medium
+        )
+        Assigned_Reviewer
+        (
+            type = picklist
+            displayname = "Assigned Reviewer"
+            module = users
+            displayformat = [name]
+            row = 3
+            column = 1
+            width = medium
+        )
+        Stage
+        (
+            type = picklist
+            displayname = "Stage"
+            values = {"Draft","Review Under Progress","Feedback Fixes In Progress","Feedback Changes Completed","Review Completed","Ready for Downstream"}
+            initial value = "Draft"
+            row = 3
+            column = 2
+            width = medium
+        )
+        SLA_Tracking
+        (
+            type = section
+            displayname = "SLA Tracking"
+            visibility = true
+            row = 4
+            column = 1
+        )
+        Selected_SLA_Policy
+        (
+            type = picklist
+            displayname = "Selected SLA Policy"
+            values = SLA_Policies[Active == true].ID
+            displayformat = [Policy_Name]
+            row = 4
+            column = 1
+            width = medium
+        )
+        Applied_SLA_Business_Days
+        (
+            type = number
+            displayname = "Applied SLA Business Days"
+            row = 4
+            column = 2
+            width = medium
+        )
+        Review_Cycle_Number
+        (
+            type = number
+            displayname = "Review Cycle Number"
+            initial value = 1
+            row = 4
+            column = 1
+            width = medium
+        )
+        Review_Cycle_Type
+        (
+            type = picklist
+            displayname = "Review Cycle Type"
+            values = {"Initial Review","Fix Verification"}
+            initial value = "Initial Review"
+            row = 4
+            column = 2
+            width = medium
+        )
+        Submitted_On
+        (
+            type = datetime
+            displayname = "Submitted On"
+            row = 4
+            column = 1
+            width = medium
+        )
+        Due_On
+        (
+            type = datetime
+            displayname = "Due On"
+            row = 4
+            column = 2
+            width = medium
+        )
+        Due_Soon_Reminder_On
+        (
+            type = datetime
+            displayname = "Due Soon Reminder On"
+            row = 4
+            column = 1
+            width = medium
+        )
+        SLA_Status
+        (
+            type = picklist
+            displayname = "SLA Status"
+            values = {"Not Started","On Track","Due Soon","Overdue","Met","Breached"}
+            initial value = "Not Started"
+            row = 4
+            column = 2
+            width = medium
+        )
+        Review_Feedback
+        (
+            type = section
+            displayname = "Review Feedback"
+            visibility = true
+            row = 5
+            column = 1
+        )
+        Review_Summary
+        (
+            type = textarea
+            displayname = "Review Summary"
+            height = 100px
+            row = 5
+            column = 1
+            width = medium
+        )
+        Review_Attachment
+        (
+            type = upload file
+            displayname = "Review Attachment"
+            file count = 3
+            browse = local_drive, google_docs, zoho_docs
+            row = 5
+            column = 2
+            width = medium
+        )
+        Resource_Response
+        (
+            type = textarea
+            displayname = "Resource Response"
+            height = 100px
+            row = 5
+            column = 1
+            width = medium
+        )
+        Final_Reviewer_Comments
+        (
+            type = textarea
+            displayname = "Final Reviewer Comments"
+            height = 100px
+            row = 5
+            column = 2
+            width = medium
+        )
+        Downstream_Handoff
+        (
+            type = section
+            displayname = "Downstream Handoff"
+            visibility = true
+            row = 6
+            column = 1
+        )
+        Downstream_Route
+        (
+            type = picklist
+            displayname = "Downstream Route"
+            values = Downstream_Routes[Active == true].ID
+            displayformat = [Route_Name]
+            searchable = true
+            row = 6
+            column = 1
+            width = medium
+        )
+        Handoff_Notes
+        (
+            type = textarea
+            displayname = "Handoff Notes"
+            height = 100px
+            row = 6
+            column = 2
+            width = medium
+        )
+        Final_Approved_On
+        (
+            type = datetime
+            displayname = "Final Approved On"
+            row = 6
+            column = 1
+            width = medium
+        )
+        Routed_On
+        (
+            type = datetime
+            displayname = "Routed On"
+            row = 6
+            column = 2
+            width = medium
+        )
+        Last_Status_Changed_On
+        (
+            type = datetime
+            displayname = "Last Status Changed On"
+            row = 6
+            column = 1
+            width = medium
+        )
+
+    actions
+    {
+        on add
+        {
+            Save
+            (
+                type = submit
+                displayname = "Save Draft"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Document"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+
+    blueprint components
+    {
+        stages = {"Draft","Review Under Progress","Feedback Fixes In Progress","Feedback Changes Completed","Review Completed","Ready for Downstream"}
+    }
+}

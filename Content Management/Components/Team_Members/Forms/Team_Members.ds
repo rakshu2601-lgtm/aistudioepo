@@ -1,0 +1,118 @@
+form Team_Members
+{
+    displayname = "Team Members"
+    success message = "Team member saved successfully."
+
+        User_Details
+        (
+            type = section
+            displayname = "User Details"
+            row = 1
+            column = 0
+        )
+        must have Member_User
+        (
+            type = picklist
+            displayname = "Member User"
+            module = users
+            displayformat = [name]
+            row = 1
+            column = 1
+            width = medium
+        )
+        must have unique Email
+        (
+            type = email
+            displayname = "Email"
+            row = 1
+            column = 2
+            width = medium
+        )
+        must have Display_Name
+        (
+            type = text
+            displayname = "Display Name"
+            row = 1
+            column = 1
+            width = medium
+        )
+        must have Member_Roles
+        (
+            type = checkboxes
+            displayname = "Member Roles"
+            values = {"Content Resource","Content Reviewer"}
+            layout = 1
+            row = 1
+            column = 2
+            width = medium
+        )
+        Review_Capacity
+        (
+            type = section
+            displayname = "Review Capacity"
+            visibility = true
+            row = 2
+            column = 1
+        )
+        Product_Coverage
+        (
+            type = list
+            displayname = "Product Coverage"
+            values = Products.ID
+            displayformat = [Product_Name]
+            searchable = true
+            height = 120px
+            row = 2
+            column = 1
+            width = medium
+        )
+        Reviewer_Capacity
+        (
+            type = number
+            displayname = "Reviewer Capacity"
+            initial value = 0
+            description [ type = tooltip  message = "Enter 0 for unlimited review capacity." ]
+            row = 2
+            column = 2
+            width = medium
+        )
+        Active
+        (
+            type = checkbox
+            displayname = "Active"
+            initial value = true
+            row = 2
+            column = 1
+            width = medium
+        )
+
+    actions
+    {
+        on add
+        {
+            Save
+            (
+                type = submit
+                displayname = "Save Team Member"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Team Member"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

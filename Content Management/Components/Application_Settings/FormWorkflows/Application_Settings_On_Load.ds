@@ -1,0 +1,24 @@
+Application_Settings_On_Load as "Load Application Settings"
+{
+    type = form
+    form = Application_Settings
+    record event = on add or edit
+    description = "Locks fixed configuration choices and protects the system-managed seed timestamp."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Time_Zone;
+                disable Auto_Assignment_Strategy;
+                disable Last_Reference_Data_Seeded_On;
+                if(input.ID != null)
+                {
+                    disable Configuration_Key;
+                }
+            )
+        }
+    }
+}

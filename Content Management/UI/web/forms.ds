@@ -1,0 +1,15 @@
+forms
+{
+    form Application_Settings { label placement = left }
+    form Products { label placement = left }
+    form Session_Types { label placement = left }
+    form Document_Types { label placement = left }
+    form Team_Members { label placement = left }
+    form Holidays { label placement = left }
+    form Downstream_Routes { label placement = left }
+    form SLA_Policies { label placement = left }
+    form Sessions { label placement = left }
+    form Content_Documents { label placement = left }
+    form Review_Feedback { label placement = left }
+    form Audit_Log { label placement = left }
+}

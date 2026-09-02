@@ -1,0 +1,23 @@
+calendar Holiday_Calendar
+{
+    displayName = "Holiday Calendar"
+    show all rows from Holidays
+    (
+        Holiday_Name
+        Holiday_Date
+        Active
+    )
+    options
+    (
+        display type = month
+        week start day = monday
+        display field = Holiday_Name
+        start date = Holiday_Date
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+}

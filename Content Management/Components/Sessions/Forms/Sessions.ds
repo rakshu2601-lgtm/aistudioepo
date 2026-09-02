@@ -1,0 +1,151 @@
+form Sessions
+{
+    displayname = "Sessions"
+    success message = "Session saved successfully."
+    record owner = Session_Owner
+
+        Session_Details
+        (
+            type = section
+            displayname = "Session Details"
+            row = 1
+            column = 0
+        )
+        Session_ID
+        (
+            type = autonumber
+            displayname = "Session ID"
+            start index = 1
+            row = 1
+            column = 1
+        )
+        must have Session_Name
+        (
+            type = text
+            displayname = "Session Name"
+            row = 1
+            column = 1
+            width = medium
+        )
+        must have Product
+        (
+            type = picklist
+            displayname = "Product"
+            values = Products[Active == true].ID
+            displayformat = [Product_Name]
+            searchable = true
+            row = 1
+            column = 2
+            width = medium
+        )
+        must have Session_Type
+        (
+            type = picklist
+            displayname = "Session Type"
+            values = Session_Types[Active == true].ID
+            displayformat = [Session_Type_Name]
+            searchable = true
+            row = 1
+            column = 1
+            width = medium
+        )
+        Series_Name
+        (
+            type = text
+            displayname = "Series Name"
+            row = 1
+            column = 2
+            width = medium
+        )
+        Description
+        (
+            type = textarea
+            displayname = "Description"
+            height = 100px
+            row = 1
+            column = 1
+            width = medium
+        )
+        Schedule
+        (
+            type = section
+            displayname = "Schedule"
+            visibility = true
+            row = 2
+            column = 1
+        )
+        Start_Date_Time
+        (
+            type = datetime
+            displayname = "Start Date and Time"
+            row = 2
+            column = 1
+            width = medium
+        )
+        End_Date_Time
+        (
+            type = datetime
+            displayname = "End Date and Time"
+            row = 2
+            column = 2
+            width = medium
+        )
+        Ownership
+        (
+            type = section
+            displayname = "Ownership"
+            visibility = true
+            row = 3
+            column = 1
+        )
+        must have Session_Owner
+        (
+            type = picklist
+            displayname = "Session Owner"
+            module = users
+            displayformat = [name]
+            row = 3
+            column = 1
+            width = medium
+        )
+        must have Status
+        (
+            type = picklist
+            displayname = "Status"
+            values = {"Planned","Scheduled","Completed","Cancelled"}
+            initial value = "Planned"
+            row = 3
+            column = 2
+            width = medium
+        )
+
+    actions
+    {
+        on add
+        {
+            Save
+            (
+                type = submit
+                displayname = "Save Session"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Session"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

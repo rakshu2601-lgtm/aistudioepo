@@ -1,0 +1,79 @@
+Content_Documents_On_Load as "Load Content Document Workspace"
+{
+    type = form
+    form = Content_Documents
+    record event = on add or edit
+    description = "Applies role-aware field visibility and locks system-maintained values."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Product;
+                disable Stage;
+                disable Selected_SLA_Policy;
+                disable Applied_SLA_Business_Days;
+                disable Review_Cycle_Number;
+                disable Review_Cycle_Type;
+                disable Submitted_On;
+                disable Due_On;
+                disable Due_Soon_Reminder_On;
+                disable SLA_Status;
+                disable Final_Approved_On;
+                disable Routed_On;
+                disable Last_Status_Changed_On;
+                if(input.Assignment_Mode == "Manual")
+                {
+                    show Assigned_Reviewer;
+                }
+                else
+                {
+                    hide Assigned_Reviewer;
+                }
+                hide Review_Summary, Review_Attachment, Resource_Response, Final_Reviewer_Comments;
+                if(input.Stage == "Review Under Progress" || input.Stage == "Feedback Changes Completed")
+                {
+                    show Review_Summary, Review_Attachment;
+                }
+                if(input.Stage == "Feedback Fixes In Progress" || input.Stage == "Feedback Changes Completed")
+                {
+                    show Resource_Response;
+                }
+                if(input.Stage == "Review Completed" || input.Stage == "Ready for Downstream")
+                {
+                    show Final_Reviewer_Comments;
+                }
+                hide Downstream_Route, Handoff_Notes;
+                if(input.Stage == "Review Completed" || input.Stage == "Ready for Downstream")
+                {
+                    show Downstream_Route, Handoff_Notes;
+                }
+                is_admin = thisapp.permissions.isUserInProfile("Content Administrator");
+                is_resource = input.Resource_User == null || input.Resource_User.email == zoho.loginuserid;
+                if(is_admin == false && is_resource == false)
+                {
+                    disable Document_Title;
+                    disable Session;
+                    disable Document_Type;
+                    disable Version_Label;
+                    disable Source_Files;
+                    disable Content_URL;
+                    disable Resource_User;
+                    disable Assignment_Mode;
+                    disable Assigned_Reviewer;
+                    disable Resource_Response;
+                    disable Downstream_Route;
+                    disable Handoff_Notes;
+                }
+                if(is_admin == false && (input.Stage == "Review Under Progress" || input.Stage == "Feedback Changes Completed"))
+                {
+                    disable Review_Summary;
+                    disable Review_Attachment;
+                    disable Final_Reviewer_Comments;
+                }
+            )
+        }
+    }
+}

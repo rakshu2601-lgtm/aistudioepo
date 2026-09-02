@@ -1,0 +1,172 @@
+"Content Reviewer"
+{
+    name = "Content Reviewer"
+    type = Users_Permissions
+    permissions = {Chat:true,Predefined:false,ApiAccess:false,PIIAccess:false,ePHIAccess:false}
+    description = "Reviews assigned content, requests changes, verifies fixes, and provides final approval."
+
+    ModulePermissions
+    {
+        Products
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Products={"View"}
+            }
+        }
+        Session_Types
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Session_Types={"View"}
+            }
+        }
+        Document_Types
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Document_Types={"View"}
+            }
+        }
+        Team_Members
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                Active_Reviewers={"View"}
+            }
+            FieldPermissions
+            {
+                Member_User{visibility:true,readonly:true}
+                Email{visibility:true,readonly:true}
+                Display_Name{visibility:true,readonly:true}
+                Member_Roles{visibility:true,readonly:true}
+                Product_Coverage{visibility:true,readonly:true}
+                Reviewer_Capacity{visibility:true,readonly:true}
+                Active{visibility:true,readonly:true}
+            }
+        }
+        Holidays
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Holidays={"View"}
+                Holiday_Calendar={"View"}
+            }
+        }
+        Downstream_Routes
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Downstream_Routes={"View"}
+            }
+        }
+        SLA_Policies
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_SLA_Policies={"View"}
+            }
+        }
+        Sessions
+        {
+            enabled = Viewall,View,Search,read_comm
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Sessions={"View"}
+                Session_Calendar={"View"}
+            }
+        }
+        Content_Documents
+        {
+            enabled = Viewall,View,Edit,Search,read_comm,write_comm
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                My_Reviews={"View","Edit"}
+                Review_Pipeline={"View","Edit"}
+                Overdue_Reviews={"View","Edit"}
+                Content_Due_Calendar={"View","Edit"}
+                All_Content_Documents={"View"}
+            }
+            FieldPermissions
+            {
+                Document_ID{visibility:true,readonly:true}
+                Document_Title{visibility:true,readonly:true}
+                Session{visibility:true,readonly:true}
+                Product{visibility:true,readonly:true}
+                Document_Type{visibility:true,readonly:true}
+                Version_Label{visibility:true,readonly:true}
+                Source_Files{visibility:true,readonly:true}
+                Content_URL{visibility:true,readonly:true}
+                Resource_User{visibility:true,readonly:true}
+                Assignment_Mode{visibility:true,readonly:true}
+                Assigned_Reviewer{visibility:true,readonly:true}
+                Stage{visibility:true,readonly:true}
+                Selected_SLA_Policy{visibility:true,readonly:true}
+                Applied_SLA_Business_Days{visibility:true,readonly:true}
+                Review_Cycle_Number{visibility:true,readonly:true}
+                Review_Cycle_Type{visibility:true,readonly:true}
+                Submitted_On{visibility:true,readonly:true}
+                Due_On{visibility:true,readonly:true}
+                Due_Soon_Reminder_On{visibility:true,readonly:true}
+                SLA_Status{visibility:true,readonly:true}
+                Review_Summary{visibility:true,readonly:false}
+                Review_Attachment{visibility:true,readonly:false}
+                Resource_Response{visibility:true,readonly:true}
+                Final_Reviewer_Comments{visibility:true,readonly:false}
+                Downstream_Route{visibility:true,readonly:true}
+                Handoff_Notes{visibility:true,readonly:true}
+                Final_Approved_On{visibility:true,readonly:true}
+                Routed_On{visibility:true,readonly:true}
+                Last_Status_Changed_On{visibility:true,readonly:true}
+            }
+        }
+        Review_Feedback
+        {
+            enabled = Create,Viewall,View,Edit,Search
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                All_Feedback={"View","Edit"}
+                Open_Feedback={"View","Edit"}
+            }
+            FieldPermissions
+            {
+                Feedback_ID{visibility:true,readonly:true}
+                Document{visibility:true,readonly:false}
+                Review_Cycle_Number{visibility:true,readonly:false}
+                Reviewer_User{visibility:true,readonly:false}
+                Feedback_Category{visibility:true,readonly:false}
+                Feedback_Comments{visibility:true,readonly:false}
+                Reference_File{visibility:true,readonly:false}
+                Feedback_Status{visibility:true,readonly:false}
+                Resource_Response{visibility:true,readonly:true}
+                Addressed_On{visibility:true,readonly:true}
+                Closed_On{visibility:true,readonly:true}
+            }
+        }
+        Content_Hub_Home
+        {
+            enabled = tab
+        }
+        Review_Workspace
+        {
+            enabled = tab
+        }
+    }
+}

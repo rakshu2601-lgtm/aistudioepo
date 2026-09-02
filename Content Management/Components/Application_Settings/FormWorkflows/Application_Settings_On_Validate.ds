@@ -1,0 +1,38 @@
+Application_Settings_On_Validate as "Validate Application Settings"
+{
+    type = form
+    form = Application_Settings
+    record event = on add or edit
+    description = "Enforces the single global configuration and valid SLA reminder settings."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Configuration_Key != "GLOBAL")
+                {
+                    alert(Configuration_Key, "The configuration key must be GLOBAL.");
+                    cancel submit;
+                }
+                if(input.Default_SLA_Business_Days <= 0)
+                {
+                    alert(Default_SLA_Business_Days, "Default SLA business days must be greater than zero.");
+                    cancel submit;
+                }
+                if(input.Due_Soon_Lead_Business_Days < 0)
+                {
+                    alert(Due_Soon_Lead_Business_Days, "Due soon lead business days cannot be negative.");
+                    cancel submit;
+                }
+                duplicate_count = Application_Settings[Configuration_Key == "GLOBAL" && ID != input.ID].count();
+                if(duplicate_count > 0)
+                {
+                    alert "Only one GLOBAL application settings record is allowed.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

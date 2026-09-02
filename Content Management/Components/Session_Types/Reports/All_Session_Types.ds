@@ -1,0 +1,18 @@
+default list All_Session_Types
+{
+    displayName = "All Session Types"
+    show all rows from Session_Types
+    (
+        Session_Type_Name
+        Active
+        Description
+    )
+    filters
+    (
+        Active
+    )
+    sort by
+    (
+        Session_Type_Name ascending
+    )
+}

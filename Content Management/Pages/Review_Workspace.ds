@@ -1,0 +1,19 @@
+<page linkname = "Review_Workspace" parameters = "string view" displayname = "Review Workspace"/>
+<content>
+<zml mobileDeviceConfig='{"layout":{"displayType":"card","design":"onebyone","forcedOrientation":false}}' tabletDeviceConfig='{"layout":{"displayType":"plain","design":"onebyone","forcedOrientation":false}}'>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Review_Workspace_Snippet' elementName='Review Workspace'>
+          <![CDATA[htmlpage Review_Workspace_Snippet()
+             content
+             <%{%>
+                 <file name:Review_Workspace/Workspace.dshtml/>
+             <%}%>
+         ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

@@ -1,0 +1,342 @@
+<%
+section = ifnull(input.section,"Setup");
+validSections = {"Setup","Products","Session_Types","Document_Types","Team","SLA_Policies","Holidays","Downstream_Routes","Sessions","Documents","Feedback","Audit"};
+if(!validSections.contains(section))
+{
+    section = "Setup";
+}
+addForm = "";
+sectionTitle = "Setup";
+sectionDescription = "Define the application defaults used by reminders, assignment, and SLA calculations.";
+sectionIcon = "ui-1-settings-gear-63";
+reportLinks = {"Configuration_Settings"};
+reportTitles = {"Configuration settings"};
+recordCount = Application_Settings.count();
+if(section == "Products")
+{
+    addForm = "Products";
+    sectionTitle = "Products";
+    sectionDescription = "Maintain the product catalog used to classify content and route work.";
+    sectionIcon = "e-commerce-box-3d-50";
+    reportLinks = {"All_Products"};
+    reportTitles = {"All products"};
+    recordCount = Products.count();
+}
+else if(section == "Session_Types")
+{
+    addForm = "Session_Types";
+    sectionTitle = "Session Types";
+    sectionDescription = "Configure the types of working sessions available to content teams.";
+    sectionIcon = "ui-2-time";
+    reportLinks = {"All_Session_Types"};
+    reportTitles = {"All session types"};
+    recordCount = Session_Types.count();
+}
+else if(section == "Document_Types")
+{
+    addForm = "Document_Types";
+    sectionTitle = "Document Types";
+    sectionDescription = "Manage document classifications and the defaults associated with them.";
+    sectionIcon = "files-single-content-03";
+    reportLinks = {"All_Document_Types"};
+    reportTitles = {"All document types"};
+    recordCount = Document_Types.count();
+}
+else if(section == "Team")
+{
+    addForm = "Team_Members";
+    sectionTitle = "Team";
+    sectionDescription = "Manage membership, reviewer eligibility, and active review capacity.";
+    sectionIcon = "users-multiple-19";
+    reportLinks = {"All_Team_Members","Active_Reviewers"};
+    reportTitles = {"All team members","Active reviewers"};
+    recordCount = Team_Members.count();
+}
+else if(section == "SLA_Policies")
+{
+    addForm = "SLA_Policies";
+    sectionTitle = "SLA Policies";
+    sectionDescription = "Set business-day targets and escalation rules for content delivery.";
+    sectionIcon = "ui-1-check-circle-08";
+    reportLinks = {"All_SLA_Policies"};
+    reportTitles = {"All SLA policies"};
+    recordCount = SLA_Policies.count();
+}
+else if(section == "Holidays")
+{
+    addForm = "Holidays";
+    sectionTitle = "Holidays";
+    sectionDescription = "Maintain non-working dates used by business-day SLA calculations.";
+    sectionIcon = "ui-1-calendar-60";
+    reportLinks = {"All_Holidays","Holiday_Calendar"};
+    reportTitles = {"All holidays","Holiday calendar"};
+    recordCount = Holidays.count();
+}
+else if(section == "Downstream_Routes")
+{
+    addForm = "Downstream_Routes";
+    sectionTitle = "Downstream Routes";
+    sectionDescription = "Configure destinations and routing rules for approved content.";
+    sectionIcon = "arrows-1-share-91";
+    reportLinks = {"All_Downstream_Routes"};
+    reportTitles = {"All downstream routes"};
+    recordCount = Downstream_Routes.count();
+}
+else if(section == "Sessions")
+{
+    addForm = "Sessions";
+    sectionTitle = "Sessions";
+    sectionDescription = "Create and inspect operational sessions in list and calendar views.";
+    sectionIcon = "ui-1-calendar-57";
+    reportLinks = {"All_Sessions","Session_Calendar"};
+    reportTitles = {"All sessions","Session calendar"};
+    recordCount = Sessions.count();
+}
+else if(section == "Documents")
+{
+    addForm = "Content_Documents";
+    sectionTitle = "Documents";
+    sectionDescription = "Inspect the complete document inventory, review pipeline, and due calendar.";
+    sectionIcon = "files-single-content-02";
+    reportLinks = {"All_Content_Documents","Review_Pipeline","Content_Due_Calendar"};
+    reportTitles = {"All content documents","Review pipeline","Content due calendar"};
+    recordCount = Content_Documents.count();
+}
+else if(section == "Feedback")
+{
+    addForm = "Review_Feedback";
+    sectionTitle = "Feedback";
+    sectionDescription = "Review feedback records across documents, reviewers, and resolution states.";
+    sectionIcon = "ui-2-chat-round-content";
+    reportLinks = {"All_Feedback"};
+    reportTitles = {"All feedback"};
+    recordCount = Review_Feedback.count();
+}
+else if(section == "Audit")
+{
+    sectionTitle = "Audit";
+    sectionDescription = "Inspect immutable operational history and administrative changes.";
+    sectionIcon = "files-single-copy-04";
+    reportLinks = {"Audit_Trail"};
+    reportTitles = {"Audit trail"};
+    recordCount = Audit_Log.count();
+}
+else
+{
+    addForm = "Application_Settings";
+}
+addUrl = "";
+if(addForm != "")
+{
+    addUrl = "#Form:" + addForm + "?zc_LoadIn=dialog&zc_Header=true";
+}
+%>
+<style>
+/* zcs-global: page-scoped utility subset used by this workspace */
+.ac { --zcs-theme-brand-color:var(--zcs_brand_color); --zcs-page-bg-color:#f3f3f4; --zcs-white-color:#fff; --zcs-primary-text-color:var(--zcs_primary_text_color); --zcs-secondary-text-color:var(--zcs_secondary_text_color); --zcs-teritiary-text-color:var(--zcs_tertiary_text_color); --zcs-border-color:var(--zcs_tertiary_border_color); width:100%; min-height:100%; box-sizing:border-box; background:var(--zcs-page-bg-color); color:var(--zcs-primary-text-color); padding:18px; }
+.ac * { box-sizing:border-box; }
+.ac a { text-decoration:none; }
+.ac .zcs-flex { display:flex; }
+.ac .zcs-inline-flex { display:inline-flex; }
+.ac .zcs-direction-column { flex-direction:column; }
+.ac .zcs-align-items-center { align-items:center; }
+.ac .zcs-justify-center { justify-content:center; }
+.ac .zcs-justify-space-between { justify-content:space-between; }
+.ac .zcs-gap-8 { gap:8px; }
+.ac .zcs-gap-12 { gap:12px; }
+.ac .zcs-gap-16 { gap:16px; }
+.ac .zcs-w-full { width:100%; }
+.ac .zcs-wh-full { width:100%; height:100%; }
+.ac .zcs-px-10 { padding-left:10px; padding-right:10px; }
+.ac .zcs-px-16 { padding-left:16px; padding-right:16px; }
+.ac .zcs-px-30 { padding-left:30px; padding-right:30px; }
+.ac .zcs-py-0 { padding-top:0; padding-bottom:0; }
+.ac .zcs-py-2 { padding-top:2px; padding-bottom:2px; }
+.ac .zcs-py-8 { padding-top:8px; padding-bottom:8px; }
+.ac .zcs-py-12 { padding-top:12px; padding-bottom:12px; }
+.ac .zcs-py-24 { padding-top:24px; padding-bottom:24px; }
+.ac .zcs-p-20 { padding:20px; }
+.ac .zcs-m-0 { margin:0; }
+.ac .zcs-mt-10 { margin-top:10px; }
+.ac .zcs-mt-12 { margin-top:12px; }
+.ac .zcs-mt-20 { margin-top:20px; }
+.ac .zcs-mb-0 { margin-bottom:0; }
+.ac .zcs-mx-0 { margin-left:0; margin-right:0; }
+.ac .zcs-box-border { box-sizing:border-box; }
+.ac .zcs-rounded-sm { border-radius:4px; }
+.ac .zcs-rounded-md { border-radius:6px; }
+.ac .zcs-font-14 { font-size:14px; }
+.ac .zcs-font-15 { font-size:15px; }
+.ac .zcs-font-16 { font-size:16px; }
+.ac .zcs-font-18 { font-size:18px; }
+.ac .zcs-font-22 { font-size:22px; }
+.ac .zcs-font-normal { font-weight:400; }
+.ac .zcs-font-medium { font-weight:500; }
+.ac .zcs-font-semibold { font-weight:600; }
+.ac .zcs-lh-body { line-height:1.5; }
+.ac .zcs-lh-heading { line-height:1.25; }
+.ac .zcs-color-primary { color:var(--zcs-primary-text-color); }
+.ac .zcs-color-secondary { color:var(--zcs-secondary-text-color); }
+.ac .zcs-color-tertiary { color:var(--zcs-teritiary-text-color); }
+.ac .zcs-color-theme { color:var(--zcs_brand_color); }
+.ac .zcs-no-shrink { flex-shrink:0; }
+.ac .zcs-card { background:var(--zcs-white-color); border:1px solid var(--zcs-border-color); border-radius:12px; }
+/* header-heading-with-actions */
+.ac .zcs-page-header { background:var(--zcs-white-color); border:1px solid var(--zcs-border-color); border-radius:12px; }
+.ac .ac-title-wrap { min-width:0; }
+.ac .ac-title-icon { width:42px; height:42px; border-radius:10px; background:var(--zcs_component_hover_color); color:var(--zcs_brand_color); }
+.ac .ac-title-copy { min-width:0; }
+.ac .ac-title-copy h1 { font-size:22px; line-height:1.2; margin:0 0 4px; font-weight:600; }
+.ac .ac-title-copy p { margin:0; color:var(--zcs-secondary-text-color); font-size:14px; }
+/* button-primary-button and button-primary-outline-button */
+.ac .zcs-button { width:auto; min-width:5rem; min-height:36px; }
+.ac .zcs-primary-button { background:var(--zcs_brand_color); color:var(--zcs_brand_foreground_color); }
+.ac .zcs-primary-outline-button { border:1px solid var(--zcs_brand_color); background:var(--zcs-white-color); color:var(--zcs_brand_color); }
+.ac .zcs-primary-button:hover { background:var(--zcs_brand_dark_color); }
+.ac .zcs-primary-outline-button:hover { background:var(--zcs_component_hover_color); }
+.ac .zcs-button:focus { outline:2px solid var(--zcs_brand_color); outline-offset:2px; }
+.ac .zcs-button-icon { width:16px; max-height:16px; }
+/* horizontal-tab-horizontal-tab-with-icon */
+.ac .zcs-horizontal-tabpanel { margin-top:14px; background:var(--zcs-white-color); border:1px solid var(--zcs-border-color); border-radius:12px; overflow:hidden; }
+.ac .zcs-horizontal-tabhead { box-shadow:0 -1px 0 var(--zcs-border-color) inset; overflow-x:auto; overflow-y:hidden; scrollbar-width:none; }
+.ac .zcs-horizontal-tabhead::-webkit-scrollbar { display:none; }
+.ac .zcs-horizontal-tabitem { list-style:none; border-bottom:2px solid transparent; flex:0 0 auto; }
+.ac .zcs-horizontal-tablink { color:var(--zcs-teritiary-text-color); white-space:nowrap; }
+.ac .zcs-horizontal-tabitem:hover .zcs-horizontal-tablink,
+.ac .zcs-horizontal-tabactive .zcs-horizontal-tablink { color:var(--zcs_brand_color); }
+.ac .zcs-horizontal-tabactive { border-bottom-color:var(--zcs_brand_color); }
+.ac .zcs-horizontal-tabicon { width:16px; height:16px; }
+/* banner-outline-banner-with-icon */
+.ac .zcs-toast { border:1px solid; }
+.ac .zcs-warning-toast { background:#fef4e5; border-color:#ed6c03; color:#663c01; }
+.ac .zcs-theme-toast { background:var(--zcs_component_hover_color); border-color:var(--zcs_brand_color); }
+/* badge-outlined-badge */
+.ac .zcs-badge { width:auto; border:1px solid currentColor; }
+.ac .zcs-badge-theme { color:var(--zcs_brand_color); }
+/* no-data-no-data-with-button */
+.ac .zcs-nodata-wrapper { min-height:190px; }
+.ac .zcs-nodata-img { width:64px; height:64px; border-radius:50%; background:var(--zcs_component_hover_color); color:var(--zcs_brand_color); font-size:28px; }
+.ac .ac-section { padding:20px; }
+.ac .ac-section-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:14px; }
+.ac .ac-section-title { display:flex; gap:12px; align-items:flex-start; }
+.ac .ac-section-title > i { width:38px; height:38px; display:inline-flex; align-items:center; justify-content:center; border-radius:9px; background:var(--zcs_component_hover_color); color:var(--zcs_brand_color); font-size:18px; flex-shrink:0; }
+.ac .ac-section-title h2 { margin:0 0 3px; font-size:18px; font-weight:600; }
+.ac .ac-section-title p { margin:0; color:var(--zcs-secondary-text-color); font-size:14px; }
+.ac .ac-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:10px 12px; margin:12px 0; background:var(--zcs_component_hover_color); border-radius:8px; }
+.ac .ac-toolbar-copy { display:flex; align-items:center; gap:8px; color:var(--zcs-secondary-text-color); font-size:13px; }
+.ac .ac-report-card { margin-top:16px; overflow:hidden; }
+.ac .ac-report-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 16px; border-bottom:1px solid var(--zcs-border-color); }
+.ac .ac-report-head h3 { margin:0; font-size:15px; font-weight:600; }
+.ac .ac-report-embed { width:100%; min-height:520px; overflow:auto; background:var(--zcs-white-color); }
+.ac .ac-report-embed > div,
+.ac .ac-report-embed [elname='zc-component'] { width:100% !important; }
+.ac .ac-guidance { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:12px 0 4px; }
+.ac .ac-guide-step { padding:14px; border:1px solid var(--zcs-border-color); border-radius:9px; background:var(--zcs-white-color); }
+.ac .ac-guide-step i { color:var(--zcs_brand_color); font-size:18px; }
+.ac .ac-guide-step strong { display:block; margin:8px 0 3px; font-size:14px; }
+.ac .ac-guide-step span { color:var(--zcs-secondary-text-color); font-size:13px; line-height:1.45; }
+@media (max-width:900px) {
+    .ac { padding:12px; }
+    .ac .zcs-page-header { padding:18px; align-items:flex-start; }
+    .ac .ac-guidance { grid-template-columns:1fr; }
+    .ac .ac-report-embed { min-height:460px; }
+}
+@media (max-width:620px) {
+    .ac .zcs-page-header, .ac .ac-section-head { flex-direction:column; }
+    .ac .zcs-page-header .zcs-button, .ac .ac-section-head .zcs-button { width:100%; }
+    .ac .zcs-horizontal-tabtext { font-size:13px; }
+    .ac .ac-section { padding:14px; }
+    .ac .ac-report-embed { min-height:420px; }
+}
+</style>
+<div class='ac'>
+    <div class='zcs-page-header zcs-w-full zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-16 zcs-px-30 zcs-py-24 zcs-box-border'>
+        <div class='ac-title-wrap zcs-flex zcs-align-items-center zcs-gap-12'>
+            <span class='ac-title-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline ui-1-settings-gear-63 zcs-font-22'></i></span>
+            <div class='ac-title-copy'>
+                <h1>Administration Center</h1>
+                <p>Centralized setup, master data, policies, routes, sessions, and operational records.</p>
+            </div>
+        </div>
+        <a class='zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md zcs-box-border zcs-font-14 zcs-font-normal zcs-lh-body' href='#Report:Audit_Trail?zc_LoadIn=dialog&zc_Header=true'>
+            <i class='zcs-button-icon zc-li-outline files-single-copy-04'></i><span class='zcs-button-text'>View audit trail</span>
+        </a>
+    </div>
+
+    <div class='zcs-horizontal-tabpanel zcs-flex zcs-direction-column zcs-w-full'>
+        <ul class='zcs-horizontal-tabhead zcs-flex zcs-gap-12 zcs-px-10 zcs-py-0 zcs-m-0 zcs-box-border'>
+            <li class='zcs-horizontal-tabitem <%if(section == "Setup"){%>zcs-horizontal-tabactive<%}%>'><a class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body' href='#Page:Administration_Center?section=Setup'><i class='zcs-horizontal-tabicon zc-li-outline ui-1-settings-gear-63'></i><span class='zcs-horizontal-tabtext zcs-font-15'>Setup</span></a></li>
+            <li class='zcs-horizontal-tabitem <%if(section == "Products"){%>zcs-horizontal-tabactive<%}%>'><a class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body' href='#Page:Administration_Center?section=Products'><i class='zcs-horizontal-tabicon zc-li-outline e-commerce-box-3d-50'></i><span class='zcs-horizontal-tabtext zcs-font-15'>Products</span></a></li>
+            <li class='zcs-horizontal-tabitem <%if(section == "Session_Types"){%>zcs-horizontal-tabactive<%}%>'><a class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body' href='#Page:Administration_Center?section=Session_Types'><i class='zcs-horizontal-tabicon zc-li-outline ui-2-time'></i><span class='zcs-horizontal-tabtext zcs-font-15'>Session Types</span></a></li>
+            <li class='zcs-horizontal-tabitem <%if(section == "Document_Types"){%>zcs-horizontal-tabactive<%}%>'><a class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body' href='#Page:Administration_Center?section=Document_Types'><i class='zcs-horizontal-tabicon zc-li-outline files-single-content-03'></i><span class='zcs-horizontal-tabtext zcs-font-15'>Document Types</span></a></li>
+            <li class='zcs-horizontal-tabitem <%if(section == "Team"){%>zcs-horizontal-tabactive<%}%>'><a class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body' href='#Page:Administration_Center?section=Team'><i class='zcs-horizontal-tabicon zc-li-outline users-multiple-19'></i><span class='zcs-horizontal-tabtext zcs-font-15'>Team</span></a></li>
+            <li class='zcs-horizontal-tabitem <%if(section == "SLA_Policies"){%>zcs-horizontal-tabactive<%}%>'><a class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body' href='#Page:Administration_Center?section=SLA_Policies'><i class='zcs-horizontal-tabicon zc-li-outline ui-1-check-circle-08'></i><span class='zcs-horizontal-tabtext zcs-font-15'>SLA Policies</span></a></li>
+            <li class='zcs-horizontal-tabitem <%if(section == "Holidays"){%>zcs-horizontal-tabactive<%}%>'><a class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body' href='#Page:Administration_Center?section=Holidays'><i class='zcs-horizontal-tabicon zc-li-outline ui-1-calendar-60'></i><span class='zcs-horizontal-tabtext zcs-font-15'>Holidays</span></a></li>
+            <li class='zcs-horizontal-tabitem <%if(section == "Downstream_Routes"){%>zcs-horizontal-tabactive<%}%>'><a class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body' href='#Page:Administration_Center?section=Downstream_Routes'><i class='zcs-horizontal-tabicon zc-li-outline arrows-1-share-91'></i><span class='zcs-horizontal-tabtext zcs-font-15'>Downstream Routes</span></a></li>
+            <li class='zcs-horizontal-tabitem <%if(section == "Sessions"){%>zcs-horizontal-tabactive<%}%>'><a class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body' href='#Page:Administration_Center?section=Sessions'><i class='zcs-horizontal-tabicon zc-li-outline ui-1-calendar-57'></i><span class='zcs-horizontal-tabtext zcs-font-15'>Sessions</span></a></li>
+            <li class='zcs-horizontal-tabitem <%if(section == "Documents"){%>zcs-horizontal-tabactive<%}%>'><a class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body' href='#Page:Administration_Center?section=Documents'><i class='zcs-horizontal-tabicon zc-li-outline files-single-content-02'></i><span class='zcs-horizontal-tabtext zcs-font-15'>Documents</span></a></li>
+            <li class='zcs-horizontal-tabitem <%if(section == "Feedback"){%>zcs-horizontal-tabactive<%}%>'><a class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body' href='#Page:Administration_Center?section=Feedback'><i class='zcs-horizontal-tabicon zc-li-outline ui-2-chat-round-content'></i><span class='zcs-horizontal-tabtext zcs-font-15'>Feedback</span></a></li>
+            <li class='zcs-horizontal-tabitem <%if(section == "Audit"){%>zcs-horizontal-tabactive<%}%>'><a class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-10 zcs-py-12 zcs-box-border zcs-font-medium zcs-lh-body' href='#Page:Administration_Center?section=Audit'><i class='zcs-horizontal-tabicon zc-li-outline files-single-copy-04'></i><span class='zcs-horizontal-tabtext zcs-font-15'>Audit</span></a></li>
+        </ul>
+
+        <div class='ac-section'>
+            <div class='ac-section-head'>
+                <div class='ac-section-title'>
+                    <i class='zc-li-outline <%=sectionIcon%>'></i>
+                    <div><h2><%=sectionTitle%></h2><p><%=sectionDescription%></p></div>
+                </div>
+                <%if(addForm != ""){%>
+                <a class='zcs-button zcs-primary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md zcs-box-border zcs-font-14 zcs-font-normal zcs-lh-body' href='<%=addUrl%>'>
+                    <i class='zcs-button-icon zc-li-outline ui-1-simple-add'></i><span class='zcs-button-text'>Add <%=sectionTitle%></span>
+                </a>
+                <%}%>
+            </div>
+
+            <%if(section == "Setup" && recordCount == 0){%>
+            <div class='zcs-toast zcs-warning-toast zcs-w-full zcs-flex zcs-gap-8 zcs-px-16 zcs-py-12 zcs-rounded-sm zcs-box-border zcs-font-14 zcs-font-normal zcs-lh-body'>
+                <i class='zcs-toast-icon zcs-no-shrink zcs-lh-body zc-li-outline travel-info'></i>
+                <div><strong>Application setup is incomplete.</strong> Add the first Application Settings record before teams begin processing documents.</div>
+            </div>
+            <div class='ac-guidance'>
+                <div class='ac-guide-step'><i class='zc-li-outline ui-1-settings-gear-63'></i><strong>1. Define defaults</strong><span>Set the default SLA, due-soon lead time, reminder time, time zone, and assignment strategy.</span></div>
+                <div class='ac-guide-step'><i class='zc-li-outline users-multiple-19'></i><strong>2. Add master data</strong><span>Configure products, document types, session types, team eligibility, holidays, and routes.</span></div>
+                <div class='ac-guide-step'><i class='zc-li-outline ui-1-check-circle-08'></i><strong>3. Validate policies</strong><span>Confirm SLA policies and calendar exclusions before creating production sessions.</span></div>
+            </div>
+            <%}%>
+
+            <div class='ac-toolbar'>
+                <div class='ac-toolbar-copy'><i class='zc-li-outline ui-1-search-zoom-in'></i><span>Use each report toolbar for compact search, filters, sorting, and column controls.</span></div>
+                <div class='zcs-badge zcs-badge-outline zcs-inline-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-rounded-sm zcs-px-10 zcs-py-2 zcs-box-border zcs-badge-theme'><span class='zcs-badge-text zcs-font-14 zcs-font-normal zcs-lh-body'><%=recordCount%> records</span></div>
+            </div>
+
+            <%if(recordCount == 0){%>
+            <div class='zcs-nodata-wrapper zcs-w-full zcs-flex zcs-align-items-center zcs-justify-center zcs-card'>
+                <div class='zcs-nodata-content zcs-p-20 zcs-box-border' style='text-align:center;'>
+                    <span class='zcs-nodata-img zcs-inline-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline files-single-content-03'></i></span>
+                    <h5 class='zcs-nodata-header zcs-font-18 zcs-font-medium zcs-lh-heading zcs-color-primary zcs-mt-10 zcs-mx-0 zcs-mb-0'>No <%=sectionTitle%> records yet</h5>
+                    <p class='zcs-nodata-desc zcs-font-14 zcs-font-normal zcs-lh-body zcs-color-secondary zcs-mt-12 zcs-mx-0 zcs-mb-0'>The report below will populate after the first record is created.</p>
+                    <%if(addForm != ""){%><div class='zcs-nodata-btn-wrapper zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-16 zcs-mt-20'><a class='zcs-button zcs-primary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md zcs-box-border zcs-font-14 zcs-font-normal zcs-lh-body' href='<%=addUrl%>'><i class='zcs-button-icon zc-li-outline ui-1-simple-add'></i><span class='zcs-button-text'>Add first record</span></a></div><%}%>
+                </div>
+            </div>
+            <%}%>
+
+            <%for each index reportIndex in reportLinks
+            {
+                reportLink = reportLinks.get(reportIndex);
+                reportTitle = reportTitles.get(reportIndex);
+            %>
+            <div class='ac-report-card zcs-card'>
+                <div class='ac-report-head'>
+                    <h3><%=reportTitle%></h3>
+                    <a class='zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md zcs-box-border zcs-font-14 zcs-font-normal zcs-lh-body' href='#Report:<%=reportLink%>'>
+                        <i class='zcs-button-icon zc-li-outline arrows-1-launch-11'></i><span class='zcs-button-text'>Open full report</span>
+                    </a>
+                </div>
+                <div class='ac-report-embed'>
+                    <div elName='zc-component' viewLinkName='<%=reportLink%>' params='zc_Header=true&amp;zc_Footer=true&amp;zc_AddRec=false&amp;zc_Search=true&amp;zc_ColMenu=true&amp;zc_MoreAction=true' zc_mobileView='inline'></div>
+                </div>
+            </div>
+            <%}%>
+        </div>
+    </div>
+</div>

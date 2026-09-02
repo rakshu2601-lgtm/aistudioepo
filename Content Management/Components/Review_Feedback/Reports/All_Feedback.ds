@@ -1,0 +1,28 @@
+default list All_Feedback
+{
+    displayName = "All Feedback"
+    show all rows from Review_Feedback
+    (
+        Feedback_ID
+        Document
+        Review_Cycle_Number
+        Reviewer_User
+        Feedback_Category
+        Feedback_Status
+        Feedback_Comments
+        Resource_Response
+        Addressed_On
+        Closed_On
+        Added_Time
+    )
+    filters
+    (
+        Feedback_Category
+        Feedback_Status
+        Reviewer_User
+    )
+    sort by
+    (
+        Added_Time descending
+    )
+}

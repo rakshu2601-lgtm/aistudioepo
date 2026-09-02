@@ -1,0 +1,20 @@
+default list All_Holidays
+{
+    displayName = "All Holidays"
+    show all rows from Holidays
+    (
+        Holiday_Date
+        Holiday_Name
+        Active
+        Notes
+    )
+    filters
+    (
+        Active
+        Holiday_Date
+    )
+    sort by
+    (
+        Holiday_Date descending
+    )
+}

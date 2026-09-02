@@ -1,0 +1,22 @@
+default list All_Downstream_Routes
+{
+    displayName = "All Downstream Routes"
+    show all rows from Downstream_Routes
+    (
+        Route_Name
+        Route_Type
+        Destination_Team
+        Destination_Email
+        Active
+        Instructions
+    )
+    filters
+    (
+        Route_Type
+        Active
+    )
+    sort by
+    (
+        Route_Name ascending
+    )
+}

@@ -1,0 +1,62 @@
+Content_Documents_On_Validate as "Validate Content Document"
+{
+    type = form
+    form = Content_Documents
+    record event = on add or edit
+    description = "Validates assets, session availability, manual reviewer eligibility, and resource ownership."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Source_Files == null && input.Content_URL in {""," ","null"})
+                {
+                    alert "Upload at least one source file or provide a content URL.";
+                    cancel submit;
+                }
+                if(input.Session != null)
+                {
+                    selected_session = Sessions[ID == input.Session];
+                    if(selected_session.count() == 0 || selected_session.Status == "Cancelled")
+                    {
+                        alert "Select a session that has not been cancelled.";
+                        cancel submit;
+                    }
+                }
+                if(input.Assignment_Mode == "Manual" && input.Assigned_Reviewer != null)
+                {
+                    eligible_reviewer = Team_Members[Member_User == input.Assigned_Reviewer && Active == true && Member_Roles.contains("Content Reviewer")];
+                    reviewer_is_eligible = false;
+                    if(eligible_reviewer.count() > 0)
+                    {
+                        if(eligible_reviewer.Product_Coverage.isEmpty() || eligible_reviewer.Product_Coverage.contains(input.Product))
+                        {
+                            reviewer_is_eligible = true;
+                        }
+                    }
+                    if(reviewer_is_eligible == false)
+                    {
+                        alert "The manually selected reviewer is not active or is not eligible for this product.";
+                        cancel submit;
+                    }
+                }
+                is_admin = thisapp.permissions.isUserInProfile("Content Administrator");
+                if(is_admin == false && input.Resource_User != null && input.Resource_User.email != zoho.loginuserid)
+                {
+                    is_blueprint_reviewer = false;
+                    if(input.Assigned_Reviewer != null && input.Assigned_Reviewer.email == zoho.loginuserid && input.ID != null)
+                    {
+                        is_blueprint_reviewer = true;
+                    }
+                    if(is_blueprint_reviewer == false)
+                    {
+                        alert "Only the assigned resource may edit this content document directly.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

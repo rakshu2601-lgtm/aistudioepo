@@ -1,0 +1,34 @@
+list My_Submissions
+{
+    displayName = "My Submissions"
+    show all rows from Content_Documents [Resource_User == zoho.loginuser]
+    (
+        Document_ID
+        Document_Title
+        Product
+        Session
+        Document_Type
+        Source_Files
+        Content_URL
+        Version_Label
+        Stage
+        Assigned_Reviewer
+        Due_On
+        SLA_Status
+        Review_Summary
+        Downstream_Route
+        Modified_Time
+    )
+    filters
+    (
+        Product
+        Session
+        Document_Type
+        Stage
+        SLA_Status
+    )
+    sort by
+    (
+        Modified_Time descending
+    )
+}

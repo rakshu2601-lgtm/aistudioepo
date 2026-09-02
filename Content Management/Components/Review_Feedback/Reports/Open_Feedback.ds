@@ -1,0 +1,33 @@
+list Open_Feedback
+{
+    displayName = "Open Feedback"
+    show all rows from Review_Feedback [Feedback_Status != "Closed"]
+    (
+        Document
+        Review_Cycle_Number
+        Reviewer_User
+        Feedback_Category
+        Feedback_Comments
+        Resource_Response
+        Feedback_Status
+        Added_Time
+    )
+    filters
+    (
+        Feedback_Category
+        Feedback_Status
+        Reviewer_User
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Document ascending
+    )
+    sort by
+    (
+        Added_Time descending
+    )
+}

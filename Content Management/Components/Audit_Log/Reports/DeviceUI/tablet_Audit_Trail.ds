@@ -1,0 +1,14 @@
+report Audit_Trail
+{
+ quickview
+ (
+  layout ( type = -1 datablock1 ( layout type = -1 fields ( Audit_ID Document Action_Name From_State To_State Performed_By Performed_On ) ) )
+  menu ( header ( Print ) record ( Print ) )
+  action ( on tap ( View Record ) )
+ )
+ detailview
+ (
+  layout ( type = 1 datablock1 ( layout type = -2 fields ( Audit_ID Document Action_Name From_State To_State Performed_By Performed_On Assigned_Reviewer SLA_Due_On Details ) ) )
+  menu ( header ( Print ) )
+ )
+}
