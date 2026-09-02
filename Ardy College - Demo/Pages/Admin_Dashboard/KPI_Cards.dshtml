@@ -1,0 +1,160 @@
+<%
+  v_totalStudents = input.totalStudents;
+  v_currentlyTraining = input.currentlyTraining;
+  v_pendingApprovals = input.pendingApprovals;
+  v_completedStudents = input.completedStudents;
+  v_totalHoursCompleted = input.totalHoursCompleted;
+  v_hoursFormatted = v_totalHoursCompleted.round(1).toString();
+  v_pendingColor = "#f39c12";
+  if(v_pendingApprovals == 0)
+  {
+    v_pendingColor = "#95a5a6";
+  }
+%>
+<style>
+/* ===== zcs-global.css ===== */
+:root { --zcs-theme-brand-color: var(--zcs_brand_color); --zcs-light-bg-color: var(--zcs_brand_light_color); --zcs-app-header-color: #1c1c40; --zcs-page-bg-color: #F3F3F4; --zcs-primary-text-color: var(--zcs_primary_text_color); --zcs-secondary-text-color: var(--zcs_secondary_text_color); --zcs-teritiary-text-color: var(--zcs_tertiary_text_color); --zcs-border-color: var(--zcs_tertiary_border_color); --zcs-placeholder-color: #878895; --zcs-white-color: #FFFFFF; --zcs-black-color: #000000; }
+.zcs-flex { display: flex; }
+.zcs-direction-column { flex-direction: column; }
+.zcs-align-items-center { align-items: center; }
+.zcs-justify-space-between { justify-content: space-between; }
+.zcs-gap-8 { gap: 0.5rem; }
+.zcs-font-12 { font-size: 0.75rem; }
+.zcs-font-medium { font-weight: 500; }
+.zcs-lh-body { line-height: 1.5; }
+.zcs-m-0 { margin: 0; }
+.zcs-color-primary { color: var(--zcs_primary_text_color); }
+.zcs-rounded-sm { border-radius: 0.25rem; }
+.zcs-progress-bar { height: 8px; background-color: var(--zcs_component_hover_color, #e9ecef); }
+.zcs-progress-bar-indicator { height: inherit; border-radius: inherit; background-color: var(--zcs_brand_color, #3498db); }
+.zcs-gap-6 { gap: 0.375rem; }
+.zcs-progress-bar-wrapper { width: 100%; }
+
+/* KPI Cards */
+.kpi-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+.kpi-card {
+  flex: 1 1 160px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 140px;
+  box-sizing: border-box;
+}
+.kpi-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.kpi-icon-wrap i {
+  font-size: 22px;
+  color: #ffffff;
+}
+.kpi-number {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #1c1c40;
+}
+.kpi-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #6b7280;
+  line-height: 1.4;
+}
+.kpi-pulse-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.kpi-pulse {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #27ae60;
+  position: relative;
+  display: inline-block;
+}
+.kpi-pulse::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(39,174,96,0.3);
+  animation: pulse-ring 1.4s ease-out infinite;
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+</style>
+
+<div class="kpi-row">
+
+  <!-- Total Active Students -->
+  <div class="kpi-card">
+    <div class="kpi-icon-wrap" style="background:#3498db;">
+      <i class="zc-li-outline users-wm-man-woman"></i>
+    </div>
+    <div class="kpi-number"><%= v_totalStudents %></div>
+    <div class="kpi-label">Total Active Students</div>
+  </div>
+
+  <!-- Currently Training -->
+  <div class="kpi-card">
+    <div class="kpi-icon-wrap" style="background:#27ae60;">
+      <i class="zc-li-outline ui-2-time"></i>
+    </div>
+    <div class="kpi-number">
+      <span class="kpi-pulse-wrap">
+        <span class="kpi-pulse"></span>
+        <%= v_currentlyTraining %>
+      </span>
+    </div>
+    <div class="kpi-label">Currently Training</div>
+  </div>
+
+  <!-- Pending Approvals -->
+  <div class="kpi-card">
+    <div class="kpi-icon-wrap" style="background:<%= v_pendingColor %>;">
+      <i class="zc-li-outline ui-1-bell"></i>
+    </div>
+    <div class="kpi-number" style="color:<%= v_pendingColor %>;"><%= v_pendingApprovals %></div>
+    <div class="kpi-label">Pending Approvals</div>
+  </div>
+
+  <!-- Completed Programs -->
+  <div class="kpi-card">
+    <div class="kpi-icon-wrap" style="background:#9b59b6;">
+      <i class="zc-li-outline ui-1-check-circle-08"></i>
+    </div>
+    <div class="kpi-number"><%= v_completedStudents %></div>
+    <div class="kpi-label">Completed Programs</div>
+  </div>
+
+  <!-- Total Approved Hours -->
+  <div class="kpi-card">
+    <div class="kpi-icon-wrap" style="background:#1abc9c;">
+      <i class="zc-li-outline ui-2-hourglass"></i>
+    </div>
+    <div class="kpi-number"><%= v_hoursFormatted %></div>
+    <div class="kpi-label">Total Approved Hours</div>
+  </div>
+
+</div>

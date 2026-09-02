@@ -1,0 +1,34 @@
+Students_Enrollment_Init as "Initialize Student Component Progress"
+{
+    type = form
+    form = Students
+    record event = on add
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                programID = input.Program;
+                studentID = input.ID;
+                components = Program_Components[Program == programID];
+                for each comp in components
+                {
+                    existingProgress = Student_Component_Progress[Student == studentID && Component == comp.ID].count();
+                    if (existingProgress == 0)
+                    {
+                        insert into Student_Component_Progress
+                        [
+                            Student = studentID
+                            Component = comp.ID
+                            Required_Hours = comp.Required_Hours
+                            Accumulated_Hours = 0
+                            Is_Completed = false
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

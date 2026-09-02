@@ -1,0 +1,19 @@
+calendar Attendance_Calendar
+{
+    displayName = "Attendance Calendar"
+    show all rows from Attendance
+    (
+        Student
+        Attendance_Status
+        Check_In_Time
+        Check_Out_Time
+        Attendance_Date
+    )
+    options
+    (
+        display type = month
+        week start day = monday
+        display field = Student
+        start date = Attendance_Date
+    )
+}

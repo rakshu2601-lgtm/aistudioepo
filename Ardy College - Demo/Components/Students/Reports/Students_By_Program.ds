@@ -1,0 +1,25 @@
+list Students_By_Program
+{
+    displayName = "Students by Program"
+    show all rows from Students
+    (
+        Student_ID
+        Student_Name
+        Program
+        Enrollment_Date
+        Status
+        Total_Completed_Hours
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Program ascending
+    )
+    sort by
+    (
+        Student_Name ascending
+    )
+}

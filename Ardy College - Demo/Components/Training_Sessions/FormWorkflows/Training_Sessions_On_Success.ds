@@ -1,0 +1,32 @@
+Training_Sessions_Set_Start_Info as "Set Session Start Info"
+{
+    type = form
+    form = Training_Sessions
+    record event = on add
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                studRec = Students[ID == input.Student];
+                if (studRec.count() > 0 && studRec.Instructor_Email != null && studRec.Instructor_Email != "")
+                {
+                    update Training_Sessions[ID == input.ID]
+                    [
+                        Start_Time = zoho.currenttime
+                        Instructor_Email = studRec.Instructor_Email
+                    ];
+                }
+                else
+                {
+                    update Training_Sessions[ID == input.ID]
+                    [
+                        Start_Time = zoho.currenttime
+                    ];
+                }
+            )
+        }
+    }
+}

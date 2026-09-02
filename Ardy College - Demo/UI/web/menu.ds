@@ -1,0 +1,190 @@
+menu
+{
+    unused
+    {
+        form Programs {}
+        form Program_Components {}
+        form Training_Locations {}
+        form Students {}
+        form Attendance {}
+        form Training_Sessions {}
+        form Student_Component_Progress {}
+    }
+
+    space Administration_Space
+    {
+        displayname = "Administration"
+        icon = "business-briefcase-24"
+
+        section Dashboard_Section
+        {
+            displayname = "Dashboards"
+            icon = "business-chart-bar-33"
+
+            page Admin_Dashboard
+            {
+                icon = "business-chart-pie-36"
+            }
+            page Student_Progress
+            {
+                icon = "business-chart-bar-32"
+            }
+        }
+
+        section Programs_Section
+        {
+            displayname = "Programs & Setup"
+            icon = "education-book-open"
+
+            report Active_Programs
+            {
+                icon = "education-book-open"
+            }
+            report All_Programs
+            {
+                icon = "education-books-46"
+            }
+            report All_Components
+            {
+                icon = "files-paper"
+            }
+            report Components_By_Program
+            {
+                icon = "files-folder-14"
+            }
+            report All_Locations
+            {
+                icon = "location-pin"
+            }
+            report Active_Locations
+            {
+                icon = "location-map-pin"
+            }
+        }
+
+        section Students_Section
+        {
+            displayname = "Students"
+            icon = "users-multiple-11"
+
+            report Active_Students
+            {
+                icon = "users-single-body"
+            }
+            report All_Students
+            {
+                icon = "users-multiple-19"
+            }
+            report Students_By_Program
+            {
+                icon = "business-hierarchy-53"
+            }
+            report Completed_Students
+            {
+                icon = "business-award-48"
+            }
+        }
+
+        section Attendance_Section
+        {
+            displayname = "Attendance"
+            icon = "business-agenda"
+
+            report Today_Attendance
+            {
+                icon = "business-agenda"
+            }
+            report All_Attendance
+            {
+                icon = "files-notebook"
+            }
+            report Attendance_By_Student
+            {
+                icon = "users-single-01"
+            }
+            report Attendance_Calendar
+            {
+                icon = "location-appointment"
+            }
+        }
+
+        section Sessions_Section
+        {
+            displayname = "Training Sessions"
+            icon = "business-progress"
+
+            report Active_Sessions
+            {
+                icon = "business-progress"
+            }
+            report Pending_Approvals
+            {
+                icon = "files-exclamation"
+            }
+            report All_Sessions
+            {
+                icon = "files-paper"
+            }
+            report Approved_Sessions
+            {
+                icon = "files-check"
+            }
+            report My_Sessions
+            {
+                icon = "users-single-position"
+            }
+            report Sessions_By_Student
+            {
+                icon = "users-single-body"
+            }
+            report Sessions_Kanban
+            {
+                icon = "business-board-27"
+            }
+        }
+
+        section Progress_Section
+        {
+            displayname = "Progress Tracking"
+            icon = "business-chart-growth"
+
+            report Progress_By_Student
+            {
+                icon = "business-chart-growth"
+            }
+            report Incomplete_Components
+            {
+                icon = "files-exclamation"
+            }
+            report Completed_Components
+            {
+                icon = "files-archive-check"
+            }
+            report All_Progress
+            {
+                icon = "business-chart-bar-32"
+            }
+            report Progress_Pivot
+            {
+                icon = "business-board-30"
+            }
+        }
+
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+
+
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space,section,component}
+        }
+    }
+}

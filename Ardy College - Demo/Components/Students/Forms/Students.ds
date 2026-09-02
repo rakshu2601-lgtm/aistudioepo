@@ -1,0 +1,218 @@
+form Students
+{
+    displayname = "Students"
+    record owner = Added_User
+
+    Student_Info
+    (
+        type = section
+        displayname = "Student Information"
+        row = 1
+        column = 0
+    )
+    Student_ID
+    (
+        type = autonumber
+        displayname = "Student ID"
+        start index = 1001
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Student_Name
+    (
+        type = name
+        displayname = "Student Name"
+        prefix
+        (
+            type = prefix
+            displayname = "Title"
+            value = {"Mr.", "Mrs.", "Ms.", "Dr."}
+            visibility = false
+        )
+        first_name
+        (
+            type = first_name
+            displayname = "First Name"
+        )
+        last_name
+        (
+            type = last_name
+            displayname = "Last Name"
+        )
+        suffix
+        (
+            type = suffix
+            displayname = "Suffix"
+            visibility = false
+        )
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have unique Email
+    (
+        type = email
+        displayname = "Email"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Phone
+    (
+        type = phonenumber
+        displayname = "Phone"
+        defaultcountry = "us"
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    Program_Enrollment
+    (
+        type = section
+        displayname = "Program & Enrollment"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Program
+    (
+        type = picklist
+        displayname = "Program"
+        values = Programs.ID
+        displayformat = [Program_Name]
+        searchable = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Enrollment_Date
+    (
+        type = date
+        displayname = "Enrollment Date"
+        initial value = "${zoho.currentdate}"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Expected_Completion_Date
+    (
+        type = date
+        displayname = "Expected Completion Date"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"Active","Inactive","Completed"}
+        initial value = "Active"
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    Instructor_Info
+    (
+        type = section
+        displayname = "Instructor"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Instructor_Name
+    (
+        type = text
+        displayname = "Instructor Name"
+        maxchar = 100
+        row = 3
+        column = 1
+        width = medium
+    )
+    Instructor_Email
+    (
+        type = email
+        displayname = "Instructor Email"
+        row = 3
+        column = 2
+        width = medium
+    )
+
+    Progress_Summary
+    (
+        type = section
+        displayname = "Progress Summary"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    Total_Completed_Hours
+    (
+        type = decimal
+        displayname = "Total Completed Hours"
+        decimalplace = 2
+        initial value = 0
+        row = 4
+        column = 1
+        width = medium
+    )
+    Is_Program_Completed
+    (
+        type = checkbox
+        displayname = "Program Completed"
+        initial value = false
+        row = 4
+        column = 2
+        width = medium
+    )
+    Program_Completed_Date
+    (
+        type = date
+        displayname = "Completion Date"
+        row = 4
+        column = 1
+        width = medium
+    )
+    Notes
+    (
+        type = textarea
+        displayname = "Notes"
+        height = 80px
+        row = 4
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Enroll Student"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

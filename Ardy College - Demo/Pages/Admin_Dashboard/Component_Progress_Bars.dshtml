@@ -1,0 +1,123 @@
+<%
+  progressData = Student_Component_Progress[Required_Hours > 0];
+  compNames = list();
+  compRequired = map();
+  compAccumulated = map();
+  for each rec in progressData
+  {
+    cName = rec.Component.toString();
+    if(!compNames.contains(cName))
+    {
+      compNames.add(cName);
+      compRequired.put(cName, 0.0);
+      compAccumulated.put(cName, 0.0);
+    }
+    compRequired.put(cName, compRequired.get(cName) + rec.Required_Hours);
+    compAccumulated.put(cName, compAccumulated.get(cName) + rec.Accumulated_Hours);
+  }
+%>
+<style>
+.prog-section {
+  padding: 16px;
+  box-sizing: border-box;
+}
+.prog-section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1c1c40;
+  margin: 0 0 16px 0;
+}
+.prog-item {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  padding: 14px 18px;
+  margin-bottom: 10px;
+}
+.prog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.prog-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1c1c40;
+}
+.prog-hrs {
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+.prog-bar-bg {
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.prog-bar-fill {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--zcs_brand_color, #3498db);
+  transition: width 0.3s ease;
+}
+.prog-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: #e8f5e9;
+  color: #27ae60;
+  margin-left: 8px;
+}
+.prog-empty {
+  color: #6b7280;
+  font-size: 0.875rem;
+  padding: 12px 0;
+}
+</style>
+
+<div class="prog-section">
+  <p class="prog-section-title">Component Completion Progress</p>
+  <%
+    if(compNames.size() == 0)
+    {
+  %>
+  <div class="prog-empty">No progress data available.</div>
+  <%
+    }
+    for each cName in compNames
+    {
+      reqHrs = compRequired.get(cName);
+      accHrs = compAccumulated.get(cName);
+      pct = 0.0;
+      if(reqHrs > 0)
+      {
+        pct = (accHrs / reqHrs) * 100;
+      }
+      if(pct > 100)
+      {
+        pct = 100.0;
+      }
+      pctRounded = pct.round(1);
+      pctWidth = pctRounded.toString() + "%";
+      accDisplay = accHrs.round(1).toString();
+      reqDisplay = reqHrs.round(1).toString();
+  %>
+  <div class="prog-item">
+    <div class="prog-header">
+      <span class="prog-label"><%= cName %></span>
+      <span class="prog-hrs">
+        <%= accDisplay %> / <%= reqDisplay %> hrs
+        <span class="prog-badge"><%= pctRounded %>%</span>
+      </span>
+    </div>
+    <div class="prog-bar-bg">
+      <div class="prog-bar-fill" style="width:<%= pctWidth %>;"></div>
+    </div>
+  </div>
+  <%
+    }
+  %>
+</div>

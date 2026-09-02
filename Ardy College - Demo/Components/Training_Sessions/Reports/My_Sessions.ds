@@ -1,0 +1,18 @@
+list My_Sessions
+{
+    displayName = "My Sessions"
+    show all rows from Training_Sessions [Added_User == zoho.loginuserid]
+    (
+        Component
+        Session_Date
+        Session_Status
+        Start_Time
+        End_Time
+        Actual_Duration_Hours
+        Credited_Hours
+    )
+    sort by
+    (
+        Session_Date descending
+    )
+}

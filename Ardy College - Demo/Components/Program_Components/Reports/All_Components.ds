@@ -1,0 +1,16 @@
+list All_Components
+{
+    displayName = "All Components"
+    show all rows from Program_Components
+    (
+        Program
+        Component_Name
+        Required_Hours
+        Display_Order
+    )
+    sort by
+    (
+        Program ascending
+        Display_Order ascending
+    )
+}

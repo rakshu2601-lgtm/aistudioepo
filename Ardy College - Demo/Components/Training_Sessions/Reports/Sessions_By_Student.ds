@@ -1,0 +1,25 @@
+list Sessions_By_Student
+{
+    displayName = "Sessions by Student"
+    show all rows from Training_Sessions
+    (
+        Student
+        Component
+        Session_Date
+        Session_Status
+        Actual_Duration_Hours
+        Credited_Hours
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Student ascending
+    )
+    sort by
+    (
+        Session_Date descending
+    )
+}

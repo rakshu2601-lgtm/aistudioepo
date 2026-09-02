@@ -1,0 +1,26 @@
+list Progress_By_Student
+{
+    displayName = "Progress by Student"
+    show all rows from Student_Component_Progress
+    (
+        Student
+        Component
+        Required_Hours
+        Accumulated_Hours
+        Remaining_Hours
+        Completion_Percentage
+        Is_Completed
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Student ascending
+    )
+    sort by
+    (
+        Component ascending
+    )
+}

@@ -1,0 +1,19 @@
+list All_Students
+{
+    displayName = "All Students"
+    show all rows from Students
+    (
+        Student_ID
+        Student_Name
+        Program
+        Enrollment_Date
+        Status
+        Instructor_Name
+        Total_Completed_Hours
+        Is_Program_Completed
+    )
+    sort by
+    (
+        Student_Name ascending
+    )
+}

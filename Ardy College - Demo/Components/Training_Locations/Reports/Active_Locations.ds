@@ -1,0 +1,14 @@
+list Active_Locations
+{
+    displayName = "Active Locations"
+    show all rows from Training_Locations [Is_Active == true]
+    (
+        Location_Name
+        Address_Description
+        Radius_Meters
+    )
+    sort by
+    (
+        Location_Name ascending
+    )
+}

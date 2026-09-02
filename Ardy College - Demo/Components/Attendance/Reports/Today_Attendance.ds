@@ -1,0 +1,16 @@
+list Today_Attendance
+{
+    displayName = "Today's Attendance"
+    show all rows from Attendance [Attendance_Date == zoho.currentdate]
+    (
+        Student
+        Attendance_Status
+        Check_In_Time
+        Check_Out_Time
+        Duration_Hours
+    )
+    sort by
+    (
+        Check_In_Time ascending
+    )
+}

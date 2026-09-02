@@ -1,0 +1,24 @@
+list Components_By_Program
+{
+    displayName = "Components by Program"
+    show all rows from Program_Components
+    (
+        Program
+        Component_Name
+        Required_Hours
+        Display_Order
+        Description
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Program ascending
+    )
+    sort by
+    (
+        Display_Order ascending
+    )
+}

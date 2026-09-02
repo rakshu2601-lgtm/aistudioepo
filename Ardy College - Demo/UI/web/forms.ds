@@ -1,0 +1,31 @@
+forms
+{
+    form Programs
+    {
+        label placement = left
+    }
+    form Program_Components
+    {
+        label placement = left
+    }
+    form Training_Locations
+    {
+        label placement = left
+    }
+    form Students
+    {
+        label placement = top
+    }
+    form Attendance
+    {
+        label placement = top
+    }
+    form Training_Sessions
+    {
+        label placement = top
+    }
+    form Student_Component_Progress
+    {
+        label placement = left
+    }
+}

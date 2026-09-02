@@ -1,0 +1,19 @@
+list Progress_Pivot
+{
+    displayName = "Hours Summary"
+    show all rows from Student_Component_Progress
+    (
+        Student
+        Component
+        Accumulated_Hours
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Student ascending
+        Component ascending
+    )
+}

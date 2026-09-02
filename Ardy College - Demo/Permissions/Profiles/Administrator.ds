@@ -1,0 +1,110 @@
+"Administrator"
+{
+    name        = "Administrator"
+    type        = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:true, PIIAccess:true, ePHIAccess:false }
+    description = "Full access to all forms, reports, and pages."
+
+    ModulePermissions
+    {
+        Programs
+        {
+            enabled          = Create,View,Viewall,Edit,Modifyall,Delete,Search,Export,Import,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Programs={"View","Edit","Delete"}
+                Active_Programs={"View","Edit","Delete"}
+            }
+        }
+
+        Program_Components
+        {
+            enabled          = Create,View,Viewall,Edit,Modifyall,Delete,Search,Export,Import,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Components={"View","Edit","Delete"}
+                Components_By_Program={"View","Edit","Delete"}
+            }
+        }
+
+        Training_Locations
+        {
+            enabled          = Create,View,Viewall,Edit,Modifyall,Delete,Search,Export,Import,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Locations={"View","Edit","Delete"}
+                Active_Locations={"View","Edit","Delete"}
+            }
+        }
+
+        Students
+        {
+            enabled          = Create,View,Viewall,Edit,Modifyall,Delete,Search,Export,Import,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Students={"View","Edit","Delete"}
+                Active_Students={"View","Edit","Delete"}
+                Students_By_Program={"View","Edit","Delete"}
+                Completed_Students={"View","Edit","Delete"}
+            }
+        }
+
+        Attendance
+        {
+            enabled          = Create,View,Viewall,Edit,Modifyall,Delete,Search,Export,Import,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Attendance={"View","Edit","Delete"}
+                Attendance_By_Student={"View","Edit","Delete"}
+                Attendance_Calendar={"View","Edit","Delete"}
+                Today_Attendance={"View","Edit","Delete"}
+            }
+        }
+
+        Training_Sessions
+        {
+            enabled          = Create,View,Viewall,Edit,Modifyall,Delete,Search,Export,Import,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Sessions={"View","Edit","Delete"}
+                Active_Sessions={"View","Edit","Delete"}
+                Pending_Approvals={"View","Edit","Delete"}
+                Sessions_By_Student={"View","Edit","Delete"}
+                Approved_Sessions={"View","Edit","Delete"}
+                My_Sessions={"View","Edit","Delete"}
+                Sessions_Kanban={"View","Edit","Delete"}
+            }
+        }
+
+        Student_Component_Progress
+        {
+            enabled          = Create,View,Viewall,Edit,Modifyall,Delete,Search,Export,Import,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Progress={"View","Edit","Delete"}
+                Progress_By_Student={"View","Edit","Delete"}
+                Completed_Components={"View","Edit","Delete"}
+                Incomplete_Components={"View","Edit","Delete"}
+                Progress_Pivot={"View","Edit","Delete"}
+            }
+        }
+
+
+        Admin_Dashboard
+        {
+            enabled = tab
+        }
+
+        Student_Progress
+        {
+            enabled = tab
+        }
+    }
+}

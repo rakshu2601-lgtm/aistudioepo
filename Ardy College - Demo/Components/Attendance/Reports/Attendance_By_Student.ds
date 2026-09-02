@@ -1,0 +1,25 @@
+list Attendance_By_Student
+{
+    displayName = "Attendance by Student"
+    show all rows from Attendance
+    (
+        Student
+        Attendance_Date
+        Attendance_Status
+        Check_In_Time
+        Check_Out_Time
+        Duration_Hours
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Student ascending
+    )
+    sort by
+    (
+        Attendance_Date descending
+    )
+}

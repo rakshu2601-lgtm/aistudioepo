@@ -1,0 +1,201 @@
+Training_Session_Lifecycle as "Training Session Lifecycle"
+{
+    type = blueprint
+    form = Training_Sessions
+
+    start
+    {
+        start stage = "In Progress"
+    }
+
+    stages
+    {
+        "In Progress" { }
+        "Pending Approval" { }
+        "Approved" { }
+        "Rejected" { }
+    }
+
+    transitions
+    {
+        Submit_For_Approval as "Submit for Approval"
+        {
+            type = normal
+            from stage = "In Progress"
+            to stage = "Pending Approval"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Student","Instructor","Administrator"}
+                )
+                transition criteria = ( End_Time != null )
+                confirmation before execution
+                (
+                    message = "Submit this completed session for instructor approval?"
+                    confirm button text = "Submit"
+                    cancel button text = "Cancel"
+                )
+            }
+
+
+            after
+            {
+            }
+        }
+
+        Approve_Session as "Approve Session"
+        {
+            type = normal
+            from stage = "Pending Approval"
+            to stage = "Approved"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Instructor","Administrator"}
+                )
+                confirmation before execution
+                (
+                    message = "Approve this training session and credit the hours?"
+                    confirm button text = "Yes, Approve"
+                    cancel button text = "Cancel"
+                )
+            }
+
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        studentID = input.Student;
+                        componentID = input.Component;
+                        creditedHrs = ifnull(input.Credited_Hours, 0);
+                        progressRecs = Student_Component_Progress[Student == studentID && Component == componentID];
+                        if (progressRecs.count() > 0)
+                        {
+                            newAccumulated = ifnull(progressRecs.Accumulated_Hours, 0) + creditedHrs;
+                            reqHours = ifnull(progressRecs.Required_Hours, 0);
+                            if (newAccumulated > reqHours)
+                            {
+                                newAccumulated = reqHours;
+                            }
+                            update Student_Component_Progress[Student == studentID && Component == componentID]
+                            [
+                                Accumulated_Hours = newAccumulated
+                                Is_Completed = (newAccumulated >= reqHours)
+                                Completed_Date = if(newAccumulated >= reqHours, zoho.currentdate, null)
+                            ];
+                        }
+                        allProgress = Student_Component_Progress[Student == studentID];
+                        totalAccumulated = 0;
+                        allDone = true;
+                        for each p in allProgress
+                        {
+                            totalAccumulated = totalAccumulated + ifnull(p.Accumulated_Hours, 0);
+                            if (p.Is_Completed == false)
+                            {
+                                allDone = false;
+                            }
+                        }
+                        if (allProgress.count() > 0 && allDone)
+                        {
+                            update Students[ID == studentID]
+                            [
+                                Total_Completed_Hours = totalAccumulated
+                                Is_Program_Completed = true
+                                Program_Completed_Date = zoho.currentdate
+                                Status = "Completed"
+                            ];
+                        }
+                        else
+                        {
+                            update Students[ID == studentID]
+                            [
+                                Total_Completed_Hours = totalAccumulated
+                                Is_Program_Completed = false
+                            ];
+                        }
+                    )
+                }
+            }
+        }
+
+        Reject_Session as "Reject Session"
+        {
+            type = normal
+            from stage = "Pending Approval"
+            to stage = "Rejected"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Instructor","Administrator"}
+                )
+            }
+
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        studRec = Students[ID == input.Student];
+                        if (studRec.count() > 0 && studRec.Email != null && studRec.Email != "")
+                        {
+                            sendmail
+                            (
+                                from : zoho.adminuser
+                                to : studRec.Email
+                                subject : "Training Session Rejected"
+                                message : "Your training session on " + input.Session_Date.toString("dd-MMM-yyyy") + " for component '" + input.Component.toString() + "' has been rejected. Reason: " + input.Rejection_Reason
+                            );
+                        }
+                    )
+                }
+            }
+        }
+
+        Resubmit_Session as "Resubmit for Review"
+        {
+            type = normal
+            from stage = "Rejected"
+            to stage = "Pending Approval"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Student","Instructor","Administrator"}
+                )
+            }
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        // Notify instructor of resubmission
+                        if (input.Instructor_Email != null && input.Instructor_Email != "")
+                        {
+                            sendmail
+                            (
+                                from : zoho.adminuser
+                                to : input.Instructor_Email
+                                subject : "Training Session Resubmitted for Review"
+                                message : "A training session for student ID " + input.Student + " on " + input.Session_Date.toString("dd-MMM-yyyy") + " has been resubmitted for your review."
+                            );
+                        }
+                    )
+                }
+            }
+        }
+    }
+}

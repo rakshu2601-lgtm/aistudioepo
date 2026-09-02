@@ -1,0 +1,187 @@
+<style>
+/* ===== Component Progress Styles ===== */
+.sp-comp-section {
+    background-color: #ffffff;
+    border: 1px solid #e7e7ee;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-sizing: border-box;
+    width: 100%;
+}
+.sp-comp-section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--zcs_primary_text_color);
+    margin: 0 0 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.sp-comp-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.sp-comp-item {
+    border: 1px solid #e7e7ee;
+    border-radius: 8px;
+    padding: 14px 16px;
+    box-sizing: border-box;
+}
+.sp-comp-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.sp-comp-name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--zcs_primary_text_color);
+    margin: 0;
+}
+.sp-comp-badge-completed {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(22,173,120,0.12);
+    color: #007943;
+    border: 1px solid rgba(22,173,120,0.35);
+}
+.sp-comp-badge-inprogress {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(26,115,232,0.1);
+    color: #1a73e8;
+    border: 1px solid rgba(26,115,232,0.3);
+}
+.sp-comp-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.sp-comp-bar-track {
+    flex: 1;
+    height: 8px;
+    background-color: var(--zcs_component_hover_color, #e7e7ee);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.sp-comp-bar-fill-green {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #16ad78 0%, #007943 100%);
+}
+.sp-comp-bar-fill-blue {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #1a73e8 0%, #0d47a1 100%);
+}
+.sp-comp-bar-pct {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--zcs_primary_text_color);
+    min-width: 38px;
+    text-align: right;
+}
+.sp-comp-detail {
+    font-size: 0.8125rem;
+    color: var(--zcs_secondary_text_color);
+    margin: 6px 0 0 0;
+}
+.sp-no-components {
+    text-align: center;
+    padding: 32px;
+    color: var(--zcs_secondary_text_color);
+    font-size: 0.9375rem;
+}
+</style>
+
+<%
+  sIDval = input.studentIDval;
+  notFound = input.studentNotFound;
+%>
+
+<% if(notFound != "true") { %>
+<%
+  compRecs = Student_Component_Progress[Student == sIDval.toLong()];
+%>
+
+<div class="sp-comp-section">
+  <h3 class="sp-comp-section-title">
+    <i class="zc-li-outline ui-1-chart-bar-33" style="color:#1a73e8;"></i>
+    Component Progress
+  </h3>
+
+  <% if(compRecs.count() == 0) { %>
+  <div class="sp-no-components">
+    <i class="zc-li-outline ui-1-alert-circle-i" style="font-size:2rem;color:#d1d5db;display:block;margin-bottom:8px;"></i>
+    No component progress records found for this student.
+  </div>
+  <% } else { %>
+  <div class="sp-comp-list">
+    <% for each rec in compRecs { %>
+    <%
+      compName = rec.Component.Component_Name;
+      reqHrs   = rec.Required_Hours.toDecimal();
+      accHrs   = rec.Accumulated_Hours.toDecimal();
+      remHrs   = rec.Remaining_Hours.toDecimal();
+      compPct  = rec.Completion_Percentage.toDecimal();
+      isDone   = rec.Is_Completed;
+      if(compPct > 100) { compPct = 100.0; }
+      compPctR = compPct.round(1);
+      displayPct = compPctR;
+      if(isDone == true) { displayPct = 100.0; }
+    %>
+    <div class="sp-comp-item">
+      <div class="sp-comp-item-header">
+        <p class="sp-comp-name"><%= compName %></p>
+        <% if(isDone == true) { %>
+        <span class="sp-comp-badge-completed">
+          <i class="zc-li-solid ui-1-check-circle-08" style="font-size:10px;"></i>
+          Completed
+        </span>
+        <% } else { %>
+        <span class="sp-comp-badge-inprogress">
+          <i class="zc-li-solid ui-1-circle-bold" style="font-size:8px;"></i>
+          In Progress
+        </span>
+        <% } %>
+      </div>
+      <div class="sp-comp-bar-row">
+        <div class="sp-comp-bar-track">
+          <% if(isDone == true) { %>
+          <div class="sp-comp-bar-fill-green" style="width:100%;"></div>
+          <% } else { %>
+          <div class="sp-comp-bar-fill-blue" style="width:<%= displayPct %>%;"></div>
+          <% } %>
+        </div>
+        <span class="sp-comp-bar-pct"><%= displayPct %>%</span>
+      </div>
+      <p class="sp-comp-detail">
+        <%= accHrs.round(1) %> / <%= reqHrs.round(1) %> hrs &mdash; <%= displayPct %>% Complete
+        <% if(isDone != true && remHrs > 0) { %>
+        &nbsp;&bull;&nbsp;<%= remHrs.round(1) %> hrs remaining
+        <% } %>
+      </p>
+    </div>
+    <% } %>
+  </div>
+  <% } %>
+</div>
+<% } %>

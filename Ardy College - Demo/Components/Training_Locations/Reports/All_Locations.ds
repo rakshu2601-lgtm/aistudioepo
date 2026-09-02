@@ -1,0 +1,16 @@
+list All_Locations
+{
+    displayName = "All Training Locations"
+    show all rows from Training_Locations
+    (
+        Location_Name
+        Latitude
+        Longitude
+        Radius_Meters
+        Is_Active
+    )
+    sort by
+    (
+        Location_Name ascending
+    )
+}

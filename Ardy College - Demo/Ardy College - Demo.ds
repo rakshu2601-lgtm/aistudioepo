@@ -1,0 +1,4527 @@
+application "Ardy-College---Demo"
+{
+	date format = "dd-MMM-yyyy"
+	time zone = "Asia/Kolkata"
+	time format = "24-hr"
+
+
+
+	forms
+	{
+		form Attendance
+		{
+		    displayname = "Attendance"
+		    record owner = Added_User
+		
+		    Attendance_Record
+		    (
+		        type = section
+		        displayname = "Attendance Record"
+		        row = 1
+		        column = 0
+		    )
+		    must have Student
+		    (
+		        type = picklist
+		        displayname = "Student"
+		        values = Students.ID
+		        displayformat = [Student_Name.first_name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Attendance_Date
+		    (
+		        type = date
+		        displayname = "Date"
+		        initial value = "${zoho.currentdate}"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Attendance_Status
+		    (
+		        type = picklist
+		        displayname = "Status"
+		        values = {"Present","Absent","Late","Excused"}
+		        initial value = "Present"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		
+		    Check_In_Out
+		    (
+		        type = section
+		        displayname = "Check-In / Check-Out"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    Check_In_Time
+		    (
+		        type = datetime
+		        displayname = "Check-In Time"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Check_Out_Time
+		    (
+		        type = datetime
+		        displayname = "Check-Out Time"
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		    Duration_Hours
+		    (
+		        type = decimal
+		        displayname = "Duration (hrs)"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		
+		    Notes_Section
+		    (
+		        type = section
+		        displayname = "Notes"
+		        visibility = true
+		        row = 3
+		        column = 1
+		    )
+		    Notes
+		    (
+		        type = textarea
+		        displayname = "Notes"
+		        height = 80px
+		        row = 3
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Save Attendance"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Program_Components
+		{
+		    displayname = "Program Components"
+		
+		    Component_Info
+		    (
+		        type = section
+		        displayname = "Component Information"
+		        row = 1
+		        column = 0
+		    )
+		    must have Program
+		    (
+		        type = picklist
+		        displayname = "Program"
+		        values = Programs.ID
+		        displayformat = [Program_Name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Component_Name
+		    (
+		        type = text
+		        displayname = "Component Name"
+		        maxchar = 100
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Required_Hours
+		    (
+		        type = decimal
+		        displayname = "Required Hours"
+		        decimalplace = 2
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Display_Order
+		    (
+		        type = number
+		        displayname = "Display Order"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Description
+		    (
+		        type = textarea
+		        displayname = "Description"
+		        height = 60px
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Save Component"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Programs
+		{
+		    displayname = "Programs"
+		
+		    Program_Info
+		    (
+		        type = section
+		        displayname = "Program Information"
+		        row = 1
+		        column = 0
+		    )
+		    must have unique Program_Name
+		    (
+		        type = text
+		        displayname = "Program Name"
+		        maxchar = 150
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have unique Program_Code
+		    (
+		        type = text
+		        displayname = "Program Code"
+		        maxchar = 20
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Total_Required_Hours
+		    (
+		        type = decimal
+		        displayname = "Total Required Hours"
+		        decimalplace = 2
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Is_Active
+		    (
+		        type = checkbox
+		        displayname = "Is Active"
+		        initial value = true
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Description
+		    (
+		        type = textarea
+		        displayname = "Description"
+		        height = 80px
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Save Program"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Student_Component_Progress
+		{
+		    displayname = "Student Component Progress"
+		
+		    Progress_Info
+		    (
+		        type = section
+		        displayname = "Progress Information"
+		        row = 1
+		        column = 0
+		    )
+		    must have Student
+		    (
+		        type = picklist
+		        displayname = "Student"
+		        values = Students.ID
+		        displayformat = [Student_Name.first_name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Component
+		    (
+		        type = picklist
+		        displayname = "Component"
+		        values = Program_Components.ID
+		        displayformat = [Component_Name]
+		        searchable = true
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Required_Hours
+		    (
+		        type = decimal
+		        displayname = "Required Hours"
+		        decimalplace = 2
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Accumulated_Hours
+		    (
+		        type = decimal
+		        displayname = "Completed Hours"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		
+		    Completion_Status
+		    (
+		        type = section
+		        displayname = "Completion Status"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    Is_Completed
+		    (
+		        type = checkbox
+		        displayname = "Completed"
+		        initial value = false
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Completed_Date
+		    (
+		        type = date
+		        displayname = "Date Completed"
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		    Remaining_Hours
+		    (
+		        type = formula
+		        displayname = "Remaining Hours"
+		        value = if(Required_Hours == 0, 0, if(Accumulated_Hours >= Required_Hours, 0, Required_Hours - Accumulated_Hours))
+		        visibility = true
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Completion_Percentage
+		    (
+		        type = formula
+		        displayname = "% Complete"
+		        value = if(Required_Hours == 0, 0, if(Accumulated_Hours >= Required_Hours, 100, (Accumulated_Hours / Required_Hours) * 100))
+		        visibility = true
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Save Progress"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Students
+		{
+		    displayname = "Students"
+		    record owner = Added_User
+		
+		    Student_Info
+		    (
+		        type = section
+		        displayname = "Student Information"
+		        row = 1
+		        column = 0
+		    )
+		    Student_ID
+		    (
+		        type = autonumber
+		        displayname = "Student ID"
+		        start index = 1001
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Student_Name
+		    (
+		        type = name
+		        displayname = "Student Name"
+		        prefix
+		        (
+		            type = prefix
+		            displayname = "Title"
+		            value = {"Mr.", "Mrs.", "Ms.", "Dr."}
+		            visibility = false
+		        )
+		        first_name
+		        (
+		            type = first_name
+		            displayname = "First Name"
+		        )
+		        last_name
+		        (
+		            type = last_name
+		            displayname = "Last Name"
+		        )
+		        suffix
+		        (
+		            type = suffix
+		            displayname = "Suffix"
+		            visibility = false
+		        )
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have unique Email
+		    (
+		        type = email
+		        displayname = "Email"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Phone
+		    (
+		        type = phonenumber
+		        displayname = "Phone"
+		        defaultcountry = "us"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		
+		    Program_Enrollment
+		    (
+		        type = section
+		        displayname = "Program & Enrollment"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    must have Program
+		    (
+		        type = picklist
+		        displayname = "Program"
+		        values = Programs.ID
+		        displayformat = [Program_Name]
+		        searchable = true
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    must have Enrollment_Date
+		    (
+		        type = date
+		        displayname = "Enrollment Date"
+		        initial value = "${zoho.currentdate}"
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		    Expected_Completion_Date
+		    (
+		        type = date
+		        displayname = "Expected Completion Date"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Status
+		    (
+		        type = picklist
+		        displayname = "Status"
+		        values = {"Active","Inactive","Completed"}
+		        initial value = "Active"
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		
+		    Instructor_Info
+		    (
+		        type = section
+		        displayname = "Instructor"
+		        visibility = true
+		        row = 3
+		        column = 1
+		    )
+		    Instructor_Name
+		    (
+		        type = text
+		        displayname = "Instructor Name"
+		        maxchar = 100
+		        row = 3
+		        column = 1
+		        width = medium
+		    )
+		    Instructor_Email
+		    (
+		        type = email
+		        displayname = "Instructor Email"
+		        row = 3
+		        column = 2
+		        width = medium
+		    )
+		
+		    Progress_Summary
+		    (
+		        type = section
+		        displayname = "Progress Summary"
+		        visibility = true
+		        row = 4
+		        column = 1
+		    )
+		    Total_Completed_Hours
+		    (
+		        type = decimal
+		        displayname = "Total Completed Hours"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 4
+		        column = 1
+		        width = medium
+		    )
+		    Is_Program_Completed
+		    (
+		        type = checkbox
+		        displayname = "Program Completed"
+		        initial value = false
+		        row = 4
+		        column = 2
+		        width = medium
+		    )
+		    Program_Completed_Date
+		    (
+		        type = date
+		        displayname = "Completion Date"
+		        row = 4
+		        column = 1
+		        width = medium
+		    )
+		    Notes
+		    (
+		        type = textarea
+		        displayname = "Notes"
+		        height = 80px
+		        row = 4
+		        column = 2
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Enroll Student"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Training_Locations
+		{
+		    displayname = "Training Locations"
+		
+		    Location_Info
+		    (
+		        type = section
+		        displayname = "Location Information"
+		        row = 1
+		        column = 0
+		    )
+		    must have unique Location_Name
+		    (
+		        type = text
+		        displayname = "Location Name"
+		        maxchar = 100
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Is_Active
+		    (
+		        type = checkbox
+		        displayname = "Is Active"
+		        initial value = true
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Latitude
+		    (
+		        type = decimal
+		        displayname = "Latitude"
+		        decimalplace = 6
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Longitude
+		    (
+		        type = decimal
+		        displayname = "Longitude"
+		        decimalplace = 6
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Radius_Meters
+		    (
+		        type = number
+		        displayname = "Allowed Radius (meters)"
+		        initial value = 200
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Address_Description
+		    (
+		        type = textarea
+		        displayname = "Address / Description"
+		        height = 60px
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Save Location"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Training_Sessions
+		{
+		    displayname = "Training Sessions"
+		    record owner = Added_User
+		
+		    Session_Info
+		    (
+		        type = section
+		        displayname = "Session Info"
+		        row = 1
+		        column = 0
+		    )
+		    must have Student
+		    (
+		        type = picklist
+		        displayname = "Student"
+		        values = Students.ID
+		        displayformat = [Student_Name.first_name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Component
+		    (
+		        type = picklist
+		        displayname = "Training Component"
+		        values = Program_Components.ID
+		        displayformat = [Component_Name]
+		        searchable = true
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Session_Date
+		    (
+		        type = date
+		        displayname = "Session Date"
+		        initial value = "${zoho.currentdate}"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Session_Status
+		    (
+		        type = picklist
+		        displayname = "Status"
+		        values = {"In Progress","Pending Approval","Approved","Rejected"}
+		        initial value = "In Progress"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		
+		    Time_Duration
+		    (
+		        type = section
+		        displayname = "Time & Duration"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    Start_Time
+		    (
+		        type = datetime
+		        displayname = "Start Time"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    End_Time
+		    (
+		        type = datetime
+		        displayname = "End Time"
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		    Actual_Duration_Hours
+		    (
+		        type = decimal
+		        displayname = "Actual Duration (hrs)"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Credited_Hours
+		    (
+		        type = decimal
+		        displayname = "Credited Hours"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		
+		    Location_Instructor
+		    (
+		        type = section
+		        displayname = "Location & Instructor"
+		        visibility = true
+		        row = 3
+		        column = 1
+		    )
+		    Location_Name
+		    (
+		        type = text
+		        displayname = "Training Location"
+		        maxchar = 100
+		        row = 3
+		        column = 1
+		        width = medium
+		    )
+		    Instructor_Email
+		    (
+		        type = email
+		        displayname = "Instructor Email"
+		        row = 3
+		        column = 2
+		        width = medium
+		    )
+		    GPS_Latitude
+		    (
+		        type = decimal
+		        displayname = "GPS Latitude"
+		        decimalplace = 6
+		        row = 3
+		        column = 1
+		        width = medium
+		    )
+		    GPS_Longitude
+		    (
+		        type = decimal
+		        displayname = "GPS Longitude"
+		        decimalplace = 6
+		        row = 3
+		        column = 2
+		        width = medium
+		    )
+		
+		    Notes_Section
+		    (
+		        type = section
+		        displayname = "Notes"
+		        visibility = true
+		        row = 4
+		        column = 1
+		    )
+		    Instructor_Notes
+		    (
+		        type = textarea
+		        displayname = "Instructor Notes"
+		        height = 80px
+		        row = 4
+		        column = 1
+		        width = medium
+		    )
+		    Rejection_Reason
+		    (
+		        type = textarea
+		        displayname = "Rejection Reason"
+		        height = 60px
+		        row = 4
+		        column = 2
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Start Session"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		
+		    blueprint components
+		    {
+		        stages = {"In Progress","Pending Approval","Approved","Rejected"}
+		    }
+		}
+	}
+
+	reports
+	{
+		list All_Attendance
+		{
+		    displayName = "All Attendance"
+		    show all rows from Attendance
+		    (
+		        Student
+		        Attendance_Date
+		        Attendance_Status
+		        Check_In_Time
+		        Check_Out_Time
+		        Duration_Hours
+		    )
+		    sort by
+		    (
+		        Attendance_Date descending
+		    )
+		}
+
+		list Attendance_By_Student
+		{
+		    displayName = "Attendance by Student"
+		    show all rows from Attendance
+		    (
+		        Student
+		        Attendance_Date
+		        Attendance_Status
+		        Check_In_Time
+		        Check_Out_Time
+		        Duration_Hours
+		    )
+		    group by
+		    (
+		        properties
+		        (
+		            display record count = true
+		        )
+		        Student ascending
+		    )
+		    sort by
+		    (
+		        Attendance_Date descending
+		    )
+		}
+
+		calendar Attendance_Calendar
+		{
+		    displayName = "Attendance Calendar"
+		    show all rows from Attendance
+		    (
+		        Student
+		        Attendance_Status
+		        Check_In_Time
+		        Check_Out_Time
+		        Attendance_Date
+		    )
+		    options
+		    (
+		        display type = month
+		        week start day = monday
+		        display field = Student
+		        start date = Attendance_Date
+		    )
+		}
+
+		list Today_Attendance
+		{
+		    displayName = "Today's Attendance"
+		    show all rows from Attendance [Attendance_Date == zoho.currentdate]
+		    (
+		        Student
+		        Attendance_Status
+		        Check_In_Time
+		        Check_Out_Time
+		        Duration_Hours
+		    )
+		    sort by
+		    (
+		        Check_In_Time ascending
+		    )
+		}
+
+		list All_Components
+		{
+		    displayName = "All Components"
+		    show all rows from Program_Components
+		    (
+		        Program
+		        Component_Name
+		        Required_Hours
+		        Display_Order
+		    )
+		    sort by
+		    (
+		        Program ascending
+		        Display_Order ascending
+		    )
+		}
+
+		list Components_By_Program
+		{
+		    displayName = "Components by Program"
+		    show all rows from Program_Components
+		    (
+		        Program
+		        Component_Name
+		        Required_Hours
+		        Display_Order
+		        Description
+		    )
+		    group by
+		    (
+		        properties
+		        (
+		            display record count = true
+		        )
+		        Program ascending
+		    )
+		    sort by
+		    (
+		        Display_Order ascending
+		    )
+		}
+
+		list Active_Programs
+		{
+		    displayName = "Active Programs"
+		    show all rows from Programs [Is_Active == true]
+		    (
+		        Program_Name
+		        Program_Code
+		        Total_Required_Hours
+		    )
+		    sort by
+		    (
+		        Program_Name ascending
+		    )
+		}
+
+		list All_Programs
+		{
+		    displayName = "All Programs"
+		    show all rows from Programs
+		    (
+		        Program_Name
+		        Program_Code
+		        Total_Required_Hours
+		        Is_Active
+		    )
+		    sort by
+		    (
+		        Program_Name ascending
+		    )
+		}
+
+		list All_Progress
+		{
+		    displayName = "All Progress Records"
+		    show all rows from Student_Component_Progress
+		    (
+		        Student
+		        Component
+		        Required_Hours
+		        Accumulated_Hours
+		        Remaining_Hours
+		        Completion_Percentage
+		        Is_Completed
+		        Completed_Date
+		    )
+		    sort by
+		    (
+		        Student ascending
+		    )
+		}
+
+		list Completed_Components
+		{
+		    displayName = "Completed Components"
+		    show all rows from Student_Component_Progress [Is_Completed == true]
+		    (
+		        Student
+		        Component
+		        Required_Hours
+		        Accumulated_Hours
+		        Completed_Date
+		    )
+		    sort by
+		    (
+		        Completed_Date descending
+		    )
+		}
+
+		list Incomplete_Components
+		{
+		    displayName = "In-Progress Components"
+		    show all rows from Student_Component_Progress [Is_Completed == false]
+		    (
+		        Student
+		        Component
+		        Required_Hours
+		        Accumulated_Hours
+		        Remaining_Hours
+		        Completion_Percentage
+		    )
+		    sort by
+		    (
+		        Completion_Percentage descending
+		    )
+		}
+
+		list Progress_By_Student
+		{
+		    displayName = "Progress by Student"
+		    show all rows from Student_Component_Progress
+		    (
+		        Student
+		        Component
+		        Required_Hours
+		        Accumulated_Hours
+		        Remaining_Hours
+		        Completion_Percentage
+		        Is_Completed
+		    )
+		    group by
+		    (
+		        properties
+		        (
+		            display record count = true
+		        )
+		        Student ascending
+		    )
+		    sort by
+		    (
+		        Component ascending
+		    )
+		}
+
+		list Progress_Pivot
+		{
+		    displayName = "Hours Summary"
+		    show all rows from Student_Component_Progress
+		    (
+		        Student
+		        Component
+		        Accumulated_Hours
+		    )
+		    group by
+		    (
+		        properties
+		        (
+		            display record count = true
+		        )
+		        Student ascending
+		        Component ascending
+		    )
+		}
+
+		list Active_Students
+		{
+		    displayName = "Active Students"
+		    show all rows from Students [Status == "Active"]
+		    (
+		        Student_ID
+		        Student_Name
+		        Program
+		        Enrollment_Date
+		        Instructor_Name
+		        Total_Completed_Hours
+		    )
+		    sort by
+		    (
+		        Student_Name ascending
+		    )
+		}
+
+		list All_Students
+		{
+		    displayName = "All Students"
+		    show all rows from Students
+		    (
+		        Student_ID
+		        Student_Name
+		        Program
+		        Enrollment_Date
+		        Status
+		        Instructor_Name
+		        Total_Completed_Hours
+		        Is_Program_Completed
+		    )
+		    sort by
+		    (
+		        Student_Name ascending
+		    )
+		}
+
+		list Completed_Students
+		{
+		    displayName = "Completed Students"
+		    show all rows from Students [Is_Program_Completed == true]
+		    (
+		        Student_ID
+		        Student_Name
+		        Program
+		        Program_Completed_Date
+		        Total_Completed_Hours
+		    )
+		    sort by
+		    (
+		        Program_Completed_Date descending
+		    )
+		}
+
+		list Students_By_Program
+		{
+		    displayName = "Students by Program"
+		    show all rows from Students
+		    (
+		        Student_ID
+		        Student_Name
+		        Program
+		        Enrollment_Date
+		        Status
+		        Total_Completed_Hours
+		    )
+		    group by
+		    (
+		        properties
+		        (
+		            display record count = true
+		        )
+		        Program ascending
+		    )
+		    sort by
+		    (
+		        Student_Name ascending
+		    )
+		}
+
+		list Active_Locations
+		{
+		    displayName = "Active Locations"
+		    show all rows from Training_Locations [Is_Active == true]
+		    (
+		        Location_Name
+		        Address_Description
+		        Radius_Meters
+		    )
+		    sort by
+		    (
+		        Location_Name ascending
+		    )
+		}
+
+		list All_Locations
+		{
+		    displayName = "All Training Locations"
+		    show all rows from Training_Locations
+		    (
+		        Location_Name
+		        Latitude
+		        Longitude
+		        Radius_Meters
+		        Is_Active
+		    )
+		    sort by
+		    (
+		        Location_Name ascending
+		    )
+		}
+
+		list Active_Sessions
+		{
+		    displayName = "Active Sessions"
+		    show all rows from Training_Sessions [Session_Status == "In Progress"]
+		    (
+		        Student
+		        Component
+		        Session_Date
+		        Start_Time
+		        Location_Name
+		        GPS_Latitude
+		        GPS_Longitude
+		    )
+		    sort by
+		    (
+		        Start_Time descending
+		    )
+		}
+
+		list All_Sessions
+		{
+		    displayName = "All Training Sessions"
+		    show all rows from Training_Sessions
+		    (
+		        Student
+		        Component
+		        Session_Date
+		        Session_Status
+		        Start_Time
+		        End_Time
+		        Actual_Duration_Hours
+		        Credited_Hours
+		        Instructor_Email
+		    )
+		    sort by
+		    (
+		        Session_Date descending
+		    )
+		}
+
+		list Approved_Sessions
+		{
+		    displayName = "Approved Sessions"
+		    show all rows from Training_Sessions [Session_Status == "Approved"]
+		    (
+		        Student
+		        Component
+		        Session_Date
+		        Start_Time
+		        End_Time
+		        Actual_Duration_Hours
+		        Credited_Hours
+		        Instructor_Email
+		    )
+		    sort by
+		    (
+		        Session_Date descending
+		    )
+		}
+
+		list My_Sessions
+		{
+		    displayName = "My Sessions"
+		    show all rows from Training_Sessions [Added_User == zoho.loginuserid]
+		    (
+		        Component
+		        Session_Date
+		        Session_Status
+		        Start_Time
+		        End_Time
+		        Actual_Duration_Hours
+		        Credited_Hours
+		    )
+		    sort by
+		    (
+		        Session_Date descending
+		    )
+		}
+
+		list Pending_Approvals
+		{
+		    displayName = "Pending Approvals"
+		    show all rows from Training_Sessions [Session_Status == "Pending Approval"]
+		    (
+		        Student
+		        Component
+		        Session_Date
+		        Start_Time
+		        End_Time
+		        Actual_Duration_Hours
+		        Credited_Hours
+		        Location_Name
+		        Session_Status
+		    )
+		    sort by
+		    (
+		        Session_Date descending
+		    )
+		}
+
+		list Sessions_By_Student
+		{
+		    displayName = "Sessions by Student"
+		    show all rows from Training_Sessions
+		    (
+		        Student
+		        Component
+		        Session_Date
+		        Session_Status
+		        Actual_Duration_Hours
+		        Credited_Hours
+		    )
+		    group by
+		    (
+		        properties
+		        (
+		            display record count = true
+		        )
+		        Student ascending
+		    )
+		    sort by
+		    (
+		        Session_Date descending
+		    )
+		}
+
+		kanban Sessions_Kanban
+		{
+		    displayName = "Sessions by Stage"
+		    show all rows from Training_Sessions
+		    (
+		        Student
+		        Component
+		        Session_Date
+		        Start_Time
+		        End_Time
+		        Actual_Duration_Hours
+		        Credited_Hours
+		        Session_Status
+		    )
+		    sort by
+		    (
+		        Session_Date descending
+		    )
+		    options
+		    (
+		        display field = Session_Status
+		        sort order = ascending
+		        record count = enable
+		    )
+		}
+	}
+
+	pages
+	{
+		page Admin_Dashboard(int completedStudents, int currentlyTraining, int pendingApprovals, float totalHoursCompleted, int totalStudents)
+		{
+					displayname = "Admin Dashboard"
+					Content="<zml>\n\t<layout>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='KPI_Cards' elementName='KPI_Cards'>\n\t\t\t\t\t<![CDATA[htmlpage KPI_Cards()\ncontent\n&lt;%{%&gt;\n\t\t&lt;%\n\tv_totalStudents = input.totalStudents;\n\tv_currentlyTraining = input.currentlyTraining;\n\tv_pendingApprovals = input.pendingApprovals;\n\tv_completedStudents = input.completedStudents;\n\tv_totalHoursCompleted = input.totalHoursCompleted;\n\tv_hoursFormatted = v_totalHoursCompleted.round(1).toString();\n\tv_pendingColor = &quot;#f39c12&quot;;\n\tif(v_pendingApprovals == 0)\n\t{\n\t\tv_pendingColor = &quot;#95a5a6&quot;;\n\t}\n%&gt;\n&lt;style&gt;\n/* ===== zcs-global.css ===== */\n:root { --zcs-theme-brand-color: var(--zcs_brand_color); --zcs-light-bg-color: var(--zcs_brand_light_color); --zcs-app-header-color: #1c1c40; --zcs-page-bg-color: #F3F3F4; --zcs-primary-text-color: var(--zcs_primary_text_color); --zcs-secondary-text-color: var(--zcs_secondary_text_color); --zcs-teritiary-text-color: var(--zcs_tertiary_text_color); --zcs-border-color: var(--zcs_tertiary_border_color); --zcs-placeholder-color: #878895; --zcs-white-color: #FFFFFF; --zcs-black-color: #000000; }\n.zcs-flex { display: flex; }\n.zcs-direction-column { flex-direction: column; }\n.zcs-align-items-center { align-items: center; }\n.zcs-justify-space-between { justify-content: space-between; }\n.zcs-gap-8 { gap: 0.5rem; }\n.zcs-font-12 { font-size: 0.75rem; }\n.zcs-font-medium { font-weight: 500; }\n.zcs-lh-body { line-height: 1.5; }\n.zcs-m-0 { margin: 0; }\n.zcs-color-primary { color: var(--zcs_primary_text_color); }\n.zcs-rounded-sm { border-radius: 0.25rem; }\n.zcs-progress-bar { height: 8px; background-color: var(--zcs_component_hover_color, #e9ecef); }\n.zcs-progress-bar-indicator { height: inherit; border-radius: inherit; background-color: var(--zcs_brand_color, #3498db); }\n.zcs-gap-6 { gap: 0.375rem; }\n.zcs-progress-bar-wrapper { width: 100%; }\n\n/* KPI Cards */\n.kpi-row {\n\tdisplay: flex;\n\tflex-wrap: wrap;\n\tgap: 16px;\n\tpadding: 16px;\n\tbox-sizing: border-box;\n}\n.kpi-card {\n\tflex: 1 1 160px;\n\tbackground: #ffffff;\n\tborder-radius: 12px;\n\tbox-shadow: 0 2px 8px rgba(0,0,0,0.08);\n\tpadding: 20px 18px;\n\tdisplay: flex;\n\tflex-direction: column;\n\talign-items: flex-start;\n\tgap: 10px;\n\tmin-width: 140px;\n\tbox-sizing: border-box;\n}\n.kpi-icon-wrap {\n\twidth: 44px;\n\theight: 44px;\n\tborder-radius: 10px;\n\tdisplay: flex;\n\talign-items: center;\n\tjustify-content: center;\n}\n.kpi-icon-wrap i {\n\tfont-size: 22px;\n\tcolor: #ffffff;\n}\n.kpi-number {\n\tfont-size: 2rem;\n\tfont-weight: 700;\n\tline-height: 1.1;\n\tcolor: #1c1c40;\n}\n.kpi-label {\n\tfont-size: 0.8125rem;\n\tfont-weight: 500;\n\tcolor: #6b7280;\n\tline-height: 1.4;\n}\n.kpi-pulse-wrap {\n\tdisplay: flex;\n\talign-items: center;\n\tgap: 6px;\n}\n.kpi-pulse {\n\twidth: 10px;\n\theight: 10px;\n\tborder-radius: 50%;\n\tbackground: #27ae60;\n\tposition: relative;\n\tdisplay: inline-block;\n}\n.kpi-pulse::after {\n\tcontent: &apos;&apos;;\n\tposition: absolute;\n\ttop: -3px;\n\tleft: -3px;\n\twidth: 16px;\n\theight: 16px;\n\tborder-radius: 50%;\n\tbackground: rgba(39,174,96,0.3);\n\tanimation: pulse-ring 1.4s ease-out infinite;\n}\n@keyframes pulse-ring {\n\t0% { transform: scale(0.6); opacity: 1; }\n\t100% { transform: scale(1.4); opacity: 0; }\n}\n&lt;/style&gt;\n\n&lt;div class=&quot;kpi-row&quot;&gt;\n\n\t&lt;!-- Total Active Students --&gt;\n\t&lt;div class=&quot;kpi-card&quot;&gt;\n\t\t&lt;div class=&quot;kpi-icon-wrap&quot; style=&quot;background:#3498db;&quot;&gt;\n\t\t\t&lt;i class=&quot;zc-li-outline users-wm-man-woman&quot;&gt;&lt;/i&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;kpi-number&quot;&gt;&lt;%= v_totalStudents %&gt;&lt;/div&gt;\n\t\t&lt;div class=&quot;kpi-label&quot;&gt;Total Active Students&lt;/div&gt;\n\t&lt;/div&gt;\n\n\t&lt;!-- Currently Training --&gt;\n\t&lt;div class=&quot;kpi-card&quot;&gt;\n\t\t&lt;div class=&quot;kpi-icon-wrap&quot; style=&quot;background:#27ae60;&quot;&gt;\n\t\t\t&lt;i class=&quot;zc-li-outline ui-2-time&quot;&gt;&lt;/i&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;kpi-number&quot;&gt;\n\t\t\t&lt;span class=&quot;kpi-pulse-wrap&quot;&gt;\n\t\t\t\t&lt;span class=&quot;kpi-pulse&quot;&gt;&lt;/span&gt;\n\t\t\t\t&lt;%= v_currentlyTraining %&gt;\n\t\t\t&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;kpi-label&quot;&gt;Currently Training&lt;/div&gt;\n\t&lt;/div&gt;\n\n\t&lt;!-- Pending Approvals --&gt;\n\t&lt;div class=&quot;kpi-card&quot;&gt;\n\t\t&lt;div class=&quot;kpi-icon-wrap&quot; style=&quot;background:&lt;%= v_pendingColor %&gt;;&quot;&gt;\n\t\t\t&lt;i class=&quot;zc-li-outline ui-1-bell&quot;&gt;&lt;/i&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;kpi-number&quot; style=&quot;color:&lt;%= v_pendingColor %&gt;;&quot;&gt;&lt;%= v_pendingApprovals %&gt;&lt;/div&gt;\n\t\t&lt;div class=&quot;kpi-label&quot;&gt;Pending Approvals&lt;/div&gt;\n\t&lt;/div&gt;\n\n\t&lt;!-- Completed Programs --&gt;\n\t&lt;div class=&quot;kpi-card&quot;&gt;\n\t\t&lt;div class=&quot;kpi-icon-wrap&quot; style=&quot;background:#9b59b6;&quot;&gt;\n\t\t\t&lt;i class=&quot;zc-li-outline ui-1-check-circle-08&quot;&gt;&lt;/i&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;kpi-number&quot;&gt;&lt;%= v_completedStudents %&gt;&lt;/div&gt;\n\t\t&lt;div class=&quot;kpi-label&quot;&gt;Completed Programs&lt;/div&gt;\n\t&lt;/div&gt;\n\n\t&lt;!-- Total Approved Hours --&gt;\n\t&lt;div class=&quot;kpi-card&quot;&gt;\n\t\t&lt;div class=&quot;kpi-icon-wrap&quot; style=&quot;background:#1abc9c;&quot;&gt;\n\t\t\t&lt;i class=&quot;zc-li-outline ui-2-hourglass&quot;&gt;&lt;/i&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;kpi-number&quot;&gt;&lt;%= v_hoursFormatted %&gt;&lt;/div&gt;\n\t\t&lt;div class=&quot;kpi-label&quot;&gt;Total Approved Hours&lt;/div&gt;\n\t&lt;/div&gt;\n\n&lt;/div&gt;\n&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t\t<row>\n\t\t\t<column width='50%'>\n\t\t\t\t<chart elementName='Hours_By_Component_Chart'\n\t\t\t title='Training Hours by Component'\n\t\t\t titleColor='#222326'\n\t\t\t type='Bar'\n\t\t\t xtitle='Component'\n\t\t\t ytitle='Credited Hours'\n\t\t\t bgColor='#FFFFFF'\n\t\t\t theme='theme1'\n\t\t\t legendPos='none'\n\t\t\t heightType='custom'\n\t\t\t heightValue='300px'\n\t\t\t appLinkName='thisapp'\n\t\t\t formLinkName='Training_Sessions'\n\t\t\t xfield='Component'\n\t\t\t yfields='sum:Credited_Hours'\n\t\t\t showDataLabel='true'\n\t\t\t DelugeCriteria='Session_Status == &quot;Approved&quot;' />\n\t\t\t</column>\n\t\t\t<column width='50%'>\n\t\t\t\t<chart elementName='Student_Status_Chart'\n\t\t\t title='Students by Status'\n\t\t\t titleColor='#222326'\n\t\t\t type='Donut'\n\t\t\t bgColor='#FFFFFF'\n\t\t\t theme='theme1'\n\t\t\t legendPos='center.bottom'\n\t\t\t heightType='custom'\n\t\t\t heightValue='300px'\n\t\t\t appLinkName='thisapp'\n\t\t\t formLinkName='Students'\n\t\t\t xfield='Status'\n\t\t\t yfields='count:Status'\n\t\t\t showDataLabel='true' />\n\t\t\t</column>\n\t\t</row>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='Component_Progress_Bars' elementName='Component_Progress_Bars'>\n\t\t\t\t\t<![CDATA[htmlpage Component_Progress_Bars()\ncontent\n&lt;%{%&gt;\n\t\t&lt;%\n\tprogressData = Student_Component_Progress[Required_Hours &gt; 0];\n\tcompNames = list();\n\tcompRequired = map();\n\tcompAccumulated = map();\n\tfor each rec in progressData\n\t{\n\t\tcName = rec.Component.toString();\n\t\tif(!compNames.contains(cName))\n\t\t{\n\t\t\tcompNames.add(cName);\n\t\t\tcompRequired.put(cName, 0.0);\n\t\t\tcompAccumulated.put(cName, 0.0);\n\t\t}\n\t\tcompRequired.put(cName, compRequired.get(cName) + rec.Required_Hours);\n\t\tcompAccumulated.put(cName, compAccumulated.get(cName) + rec.Accumulated_Hours);\n\t}\n%&gt;\n&lt;style&gt;\n.prog-section {\n\tpadding: 16px;\n\tbox-sizing: border-box;\n}\n.prog-section-title {\n\tfont-size: 1rem;\n\tfont-weight: 600;\n\tcolor: #1c1c40;\n\tmargin: 0 0 16px 0;\n}\n.prog-item {\n\tbackground: #ffffff;\n\tborder-radius: 10px;\n\tbox-shadow: 0 1px 4px rgba(0,0,0,0.07);\n\tpadding: 14px 18px;\n\tmargin-bottom: 10px;\n}\n.prog-header {\n\tdisplay: flex;\n\tjustify-content: space-between;\n\talign-items: center;\n\tmargin-bottom: 8px;\n}\n.prog-label {\n\tfont-size: 0.875rem;\n\tfont-weight: 600;\n\tcolor: #1c1c40;\n}\n.prog-hrs {\n\tfont-size: 0.8125rem;\n\tcolor: #6b7280;\n}\n.prog-bar-bg {\n\theight: 8px;\n\tbackground: #e9ecef;\n\tborder-radius: 4px;\n\toverflow: hidden;\n}\n.prog-bar-fill {\n\theight: 8px;\n\tborder-radius: 4px;\n\tbackground: var(--zcs_brand_color, #3498db);\n\ttransition: width 0.3s ease;\n}\n.prog-badge {\n\tdisplay: inline-block;\n\tfont-size: 0.75rem;\n\tfont-weight: 600;\n\tpadding: 2px 8px;\n\tborder-radius: 12px;\n\tbackground: #e8f5e9;\n\tcolor: #27ae60;\n\tmargin-left: 8px;\n}\n.prog-empty {\n\tcolor: #6b7280;\n\tfont-size: 0.875rem;\n\tpadding: 12px 0;\n}\n&lt;/style&gt;\n\n&lt;div class=&quot;prog-section&quot;&gt;\n\t&lt;p class=&quot;prog-section-title&quot;&gt;Component Completion Progress&lt;/p&gt;\n\t&lt;%\n\t\tif(compNames.size() == 0)\n\t\t{\n\t%&gt;\n\t&lt;div class=&quot;prog-empty&quot;&gt;No progress data available.&lt;/div&gt;\n\t&lt;%\n\t\t}\n\t\tfor each cName in compNames\n\t\t{\n\t\t\treqHrs = compRequired.get(cName);\n\t\t\taccHrs = compAccumulated.get(cName);\n\t\t\tpct = 0.0;\n\t\t\tif(reqHrs &gt; 0)\n\t\t\t{\n\t\t\t\tpct = (accHrs / reqHrs) * 100;\n\t\t\t}\n\t\t\tif(pct &gt; 100)\n\t\t\t{\n\t\t\t\tpct = 100.0;\n\t\t\t}\n\t\t\tpctRounded = pct.round(1);\n\t\t\tpctWidth = pctRounded.toString() + &quot;%&quot;;\n\t\t\taccDisplay = accHrs.round(1).toString();\n\t\t\treqDisplay = reqHrs.round(1).toString();\n\t%&gt;\n\t&lt;div class=&quot;prog-item&quot;&gt;\n\t\t&lt;div class=&quot;prog-header&quot;&gt;\n\t\t\t&lt;span class=&quot;prog-label&quot;&gt;&lt;%= cName %&gt;&lt;/span&gt;\n\t\t\t&lt;span class=&quot;prog-hrs&quot;&gt;\n\t\t\t\t&lt;%= accDisplay %&gt; / &lt;%= reqDisplay %&gt; hrs\n\t\t\t\t&lt;span class=&quot;prog-badge&quot;&gt;&lt;%= pctRounded %&gt;%&lt;/span&gt;\n\t\t\t&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;prog-bar-bg&quot;&gt;\n\t\t\t&lt;div class=&quot;prog-bar-fill&quot; style=&quot;width:&lt;%= pctWidth %&gt;;&quot;&gt;&lt;/div&gt;\n\t\t&lt;/div&gt;\n\t&lt;/div&gt;\n\t&lt;%\n\t\t}\n\t%&gt;\n&lt;/div&gt;\n&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t\t<row>\n\t\t\t<column width='50%'>\n\t\t\t\t<report elementName='Active_Sessions_Embed'\n\t\t\t\ttitle='Currently Training'\n\t\t\t\ttitleColor='#222326'\n\t\t\t\tappLinkName='thisapp'\n\t\t\t\tlinkName='Active_Sessions'\n\t\t\t\tiszreport='false'\n\t\t\t\tzc_Footer='false'\n\t\t\t\tzc_AddRec='false'\n\t\t\t\tzc_EditRec='false'\n\t\t\t\tzc_DelRec='false'\n\t\t\t\tzc_DuplRec='false'\n\t\t\t\tzc_Print='false'\n\t\t\t\tzc_Export='false'\n\t\t\t\tzc_Search='false'\n\t\t\t\tzc_EditBulkRec='false'\n\t\t\t\tzc_BulkDelete='false'\n\t\t\t\tzc_BulkDuplicate='false'\n\t\t\t\theightType='custom'\n\t\t\t\theightValue='300' />\n\t\t\t</column>\n\t\t\t<column width='50%'>\n\t\t\t\t<report elementName='Pending_Approvals_Embed'\n\t\t\t\ttitle='Pending Approvals'\n\t\t\t\ttitleColor='#222326'\n\t\t\t\tappLinkName='thisapp'\n\t\t\t\tlinkName='Pending_Approvals'\n\t\t\t\tiszreport='false'\n\t\t\t\tzc_Footer='false'\n\t\t\t\tzc_AddRec='false'\n\t\t\t\tzc_EditRec='false'\n\t\t\t\tzc_DelRec='false'\n\t\t\t\tzc_DuplRec='false'\n\t\t\t\tzc_Print='false'\n\t\t\t\tzc_Export='false'\n\t\t\t\tzc_Search='false'\n\t\t\t\tzc_EditBulkRec='false'\n\t\t\t\tzc_BulkDelete='false'\n\t\t\t\tzc_BulkDuplicate='false'\n\t\t\t\theightType='custom'\n\t\t\t\theightValue='300' />\n\t\t\t</column>\n\t\t</row>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<chart elementName='Attendance_Trend_Chart'\n\t\t\t title='Attendance Trend (Last 30 Days)'\n\t\t\t titleColor='#222326'\n\t\t\t type='Line'\n\t\t\t xtitle='Date'\n\t\t\t ytitle='Attendance Count'\n\t\t\t bgColor='#FFFFFF'\n\t\t\t theme='theme1'\n\t\t\t legendPos='none'\n\t\t\t heightType='custom'\n\t\t\t heightValue='300px'\n\t\t\t appLinkName='thisapp'\n\t\t\t formLinkName='Attendance'\n\t\t\t xfield='Attendance_Date'\n\t\t\t yfields='count:Attendance_Date'\n\t\t\t dateGrouping='actual'\n\t\t\t showDataLabel='false'\n\t\t\t DelugeCriteria='Attendance_Date &gt;= zoho.currentdate.subMonth(1)' />\n\t\t\t</column>\n\t\t</row>\n\t</layout>\n</zml>"
+					script
+					{
+						totalStudents = Students[Status == "Active"].count();
+						currentlyTraining = Training_Sessions[Session_Status == "In Progress"].count();
+						pendingApprovals = Training_Sessions[Session_Status == "Pending Approval"].count();
+						completedStudents = Students[Is_Program_Completed == true].count();
+						approvedSessions = Training_Sessions[Session_Status == "Approved"];
+						totalHoursCompleted = ifnull(approvedSessions.sum(Credited_Hours), 0);
+					}
+		}
+
+		page Student_Progress(string Student_ID, string enrollmentDate, string isProgramComplete, string studentIDval, string studentName, string studentNotFound, string studentProgram, int studentRecordID, string studentStatus, string totalCompleted)
+		{
+					displayname = "Student Progress"
+					Content="<zml>\n\t<layout>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='Student_Header' elementName='Student_Header'>\n\t\t\t\t\t<![CDATA[htmlpage Student_Header()\ncontent\n&lt;%{%&gt;\n\t\t&lt;style&gt;\n/* ===== zcs-global.css ===== */\n:root { --zcs-theme-brand-color: var(--zcs_brand_color); --zcs-light-bg-color: var(--zcs_brand_light_color); --zcs-app-header-color: #1c1c40; --zcs-page-bg-color: #F3F3F4; --zcs-primary-text-color: var(--zcs_primary_text_color); --zcs-secondary-text-color: var(--zcs_secondary_text_color); --zcs-teritiary-text-color: var(--zcs_tertiary_text_color); --zcs-border-color: var(--zcs_tertiary_border_color); --zcs-placeholder-color: #878895; --zcs-white-color: #FFFFFF; --zcs-black-color: #000000; --zcs-primary-btn-color: var(--zcs_brand_color); --zcs-primary-btn-border-color: var(--zcs_brand_color); --zcs-primary-btn-text-color: var(--zcs_brand_foreground_color); --zcs-primary-btn-h-color: var(--zcs_brand_dark_color); --zcs-primary-btn-h-border-color: var(--zcs_brand_dark_color); --zcs-primary-btn-h-text-color: var(--zcs_brand_foreground_color); --zcs-secondary-btn-color: var(--zcs_light_grey_color); --zcs-secondary-btn-border-color: var(--zcs_primary_border_color); --zcs-secondary-btn-text-color: var(--zcs_primary_text_color); --zcs-secondary-btn-h-color: var(--zcs_dark_grey_color); --zcs-secondary-btn-h-border-color: var(--zcs_primary_border_color); --zcs-secondary-btn-h-text-color: var(--zcs_primary_text_color); --zcs-tooltip-bg-color: #363636; } :root { font-size: 16px; line-height: 1.5; --column-gap: 0px; } .zcs-col-1 { flex: 0 0 calc(8.3333333333% - var(--column-gap) * 0.9166666667); max-width: calc(8.3333333333% - var(--column-gap) * 0.9166666667); } .zcs-col-2 { flex: 0 0 calc(16.6666666667% - var(--column-gap) * 0.8333333333); max-width: calc(16.6666666667% - var(--column-gap) * 0.8333333333); } .zcs-col-3 { flex: 0 0 calc(25% - var(--column-gap) * 0.75); max-width: calc(25% - var(--column-gap) * 0.75); } .zcs-col-4 { flex: 0 0 calc(33.3333333333% - var(--column-gap) * 0.6666666667); max-width: calc(33.3333333333% - var(--column-gap) * 0.6666666667); } .zcs-col-5 { flex: 0 0 calc(41.6666666667% - var(--column-gap) * 0.5833333333); max-width: calc(41.6666666667% - var(--column-gap) * 0.5833333333); } .zcs-col-6 { flex: 0 0 calc(50% - var(--column-gap) * 0.5); max-width: calc(50% - var(--column-gap) * 0.5); } .zcs-col-7 { flex: 0 0 calc(58.3333333333% - var(--column-gap) * 0.4166666667); max-width: calc(58.3333333333% - var(--column-gap) * 0.4166666667); } .zcs-col-8 { flex: 0 0 calc(66.6666666667% - var(--column-gap) * 0.3333333333); max-width: calc(66.6666666667% - var(--column-gap) * 0.3333333333); } .zcs-col-9 { flex: 0 0 calc(75% - var(--column-gap) * 0.25); max-width: calc(75% - var(--column-gap) * 0.25); } .zcs-col-10 { flex: 0 0 calc(83.3333333333% - var(--column-gap) * 0.1666666667); max-width: calc(83.3333333333% - var(--column-gap) * 0.1666666667); } .zcs-col-11 { flex: 0 0 calc(91.6666666667% - var(--column-gap) * 0.0833333333); max-width: calc(91.6666666667% - var(--column-gap) * 0.0833333333); } .zcs-col-12 { flex: 0 0 calc(100% - var(--column-gap) * 0); max-width: calc(100% - var(--column-gap) * 0); } .zcs-row { display: flex; flex-wrap: wrap; } .zcs-col { flex-shrink: 0; width: 100%; max-width: 100%; } .zcs-flex { display: flex; } .zcs-direction-column { flex-direction: column; } .zcs-direction-row { flex-direction: row; } .zcs-align-items-center { align-items: center; } .zcs-justify-center { justify-content: center; } .zcs-justify-space-between { justify-content: space-between; } .zcs-gap-8 { gap: 0.5rem; } .zcs-gap-10 { gap: 0.625rem; } .zcs-gap-12 { gap: 0.75rem; } .zcs-gap-16 { gap: 1rem; } .zcs-gap-20 { gap: 1.25rem; } .zcs-p-20 { padding: 1.25rem; } .zcs-p-24 { padding: 1.5rem; } .zcs-px-24 { padding-left: 1.5rem; padding-right: 1.5rem; } .zcs-py-16 { padding-top: 1rem; padding-bottom: 1rem; } .zcs-m-0 { margin: 0; } .zcs-mt-4 { margin-top: 0.25rem; } .zcs-mt-8 { margin-top: 0.5rem; } .zcs-font-12 { font-size: 0.75rem; } .zcs-font-13 { font-size: 0.8125rem; } .zcs-font-14 { font-size: 0.875rem; } .zcs-font-16 { font-size: 1rem; } .zcs-font-18 { font-size: 1.125rem; } .zcs-font-20 { font-size: 1.25rem; } .zcs-font-24 { font-size: 1.5rem; } .zcs-font-28 { font-size: 1.75rem; } .zcs-font-normal { font-weight: 400; } .zcs-font-medium { font-weight: 500; } .zcs-font-semibold { font-weight: 600; } .zcs-font-bold { font-weight: 700; } .zcs-lh-body { line-height: 1.5; } .zcs-lh-heading { line-height: 1.25; } .zcs-color-primary { color: var(--zcs_primary_text_color); } .zcs-color-secondary { color: var(--zcs_secondary_text_color); } .zcs-color-white { color: #FFFFFF; } .zcs-rounded-lg { border-radius: 0.5rem; } .zcs-rounded-xl { border-radius: 0.75rem; } .zcs-rounded-2xl { border-radius: 1rem; } .zcs-w-full { width: 100%; } .zcs-box-border { box-sizing: border-box; } .zcs-ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .zcs-card { background-color: var(--zcs-white-color); border: 1px solid #e7e7ee; border-radius: 12px; } .zcs-uppercase { text-transform: uppercase; }\n\n/* ===== Student Header Styles ===== */\n.sp-header-card {\n\t\tbackground: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);\n\t\tborder-radius: 12px;\n\t\tpadding: 28px 32px;\n\t\tcolor: #ffffff;\n\t\tbox-sizing: border-box;\n\t\twidth: 100%;\n}\n.sp-header-name {\n\t\tfont-size: 2rem;\n\t\tfont-weight: 700;\n\t\tline-height: 1.2;\n\t\tmargin: 0 0 4px 0;\n\t\tcolor: #ffffff;\n}\n.sp-header-id {\n\t\tfont-size: 0.875rem;\n\t\tfont-weight: 400;\n\t\tcolor: rgba(255,255,255,0.75);\n\t\tmargin: 0 0 16px 0;\n}\n.sp-header-meta {\n\t\tdisplay: flex;\n\t\tflex-wrap: wrap;\n\t\tgap: 20px;\n\t\tmargin-bottom: 0;\n}\n.sp-header-meta-item {\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tgap: 6px;\n\t\tfont-size: 0.875rem;\n\t\tcolor: rgba(255,255,255,0.9);\n}\n.sp-header-meta-item i {\n\t\tfont-size: 1rem;\n\t\tcolor: rgba(255,255,255,0.75);\n}\n.sp-status-badge {\n\t\tdisplay: inline-flex;\n\t\talign-items: center;\n\t\tgap: 5px;\n\t\tpadding: 3px 10px;\n\t\tborder-radius: 20px;\n\t\tfont-size: 0.75rem;\n\t\tfont-weight: 600;\n\t\ttext-transform: uppercase;\n\t\tletter-spacing: 0.04em;\n}\n.sp-status-active {\n\t\tbackground: rgba(22, 173, 120, 0.25);\n\t\tcolor: #a7f3d0;\n\t\tborder: 1px solid rgba(22,173,120,0.4);\n}\n.sp-status-inactive {\n\t\tbackground: rgba(254, 69, 93, 0.2);\n\t\tcolor: #fca5a5;\n\t\tborder: 1px solid rgba(254,69,93,0.35);\n}\n.sp-status-other {\n\t\tbackground: rgba(255,255,255,0.15);\n\t\tcolor: rgba(255,255,255,0.9);\n\t\tborder: 1px solid rgba(255,255,255,0.3);\n}\n.sp-completed-banner {\n\t\tmargin-top: 16px;\n\t\tbackground: rgba(22, 173, 120, 0.2);\n\t\tborder: 1px solid rgba(22,173,120,0.5);\n\t\tborder-radius: 8px;\n\t\tpadding: 10px 16px;\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tgap: 10px;\n\t\tfont-size: 1rem;\n\t\tfont-weight: 700;\n\t\tcolor: #a7f3d0;\n\t\tletter-spacing: 0.03em;\n\t\ttext-transform: uppercase;\n}\n.sp-completed-banner i {\n\t\tfont-size: 1.25rem;\n\t\tcolor: #6ee7b7;\n}\n.sp-error-card {\n\t\tbackground: #fff3f4;\n\t\tborder: 1px solid #fca5a5;\n\t\tborder-radius: 12px;\n\t\tpadding: 32px;\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tgap: 16px;\n\t\tcolor: #b91c1c;\n}\n.sp-error-card i {\n\t\tfont-size: 2rem;\n\t\tcolor: #ef4444;\n\t\tflex-shrink: 0;\n}\n.sp-error-title {\n\t\tfont-size: 1.125rem;\n\t\tfont-weight: 700;\n\t\tmargin: 0 0 4px 0;\n}\n.sp-error-msg {\n\t\tfont-size: 0.875rem;\n\t\tmargin: 0;\n\t\tcolor: #7f1d1d;\n}\n&lt;/style&gt;\n\n&lt;%\n\tnotFound = input.studentNotFound;\n\tsName    = input.studentName;\n\tsProgram = input.studentProgram;\n\tsEnroll  = input.enrollmentDate;\n\tsStatus  = input.studentStatus;\n\tsIDval   = input.studentIDval;\n\tsCompleted = input.isProgramComplete;\n%&gt;\n\n&lt;% if(notFound == &quot;true&quot;) { %&gt;\n&lt;div class=&quot;sp-error-card&quot;&gt;\n\t&lt;i class=&quot;zc-li-outline ui-1-alert-circle-i&quot;&gt;&lt;/i&gt;\n\t&lt;div&gt;\n\t\t&lt;p class=&quot;sp-error-title&quot;&gt;Student Not Found&lt;/p&gt;\n\t\t&lt;p class=&quot;sp-error-msg&quot;&gt;No student record could be located for the provided identifier. Please verify the Student ID and try again.&lt;/p&gt;\n\t&lt;/div&gt;\n&lt;/div&gt;\n&lt;% } else { %&gt;\n&lt;div class=&quot;sp-header-card&quot;&gt;\n\t&lt;h1 class=&quot;sp-header-name&quot;&gt;&lt;%= sName %&gt;&lt;/h1&gt;\n\t&lt;p class=&quot;sp-header-id&quot;&gt;\n\t\t&lt;i class=&quot;zc-li-outline ui-1-id-card&quot; style=&quot;font-size:13px;vertical-align:middle;margin-right:4px;&quot;&gt;&lt;/i&gt;\n\t\tStudent ID: &lt;%= sIDval %&gt;\n\t&lt;/p&gt;\n\t&lt;div class=&quot;sp-header-meta&quot;&gt;\n\t\t&lt;div class=&quot;sp-header-meta-item&quot;&gt;\n\t\t\t&lt;i class=&quot;zc-li-outline education-graduation-hat&quot;&gt;&lt;/i&gt;\n\t\t\t&lt;span&gt;&lt;%= sProgram %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;sp-header-meta-item&quot;&gt;\n\t\t\t&lt;i class=&quot;zc-li-outline ui-2-calendar&quot;&gt;&lt;/i&gt;\n\t\t\t&lt;span&gt;Enrolled: &lt;%= sEnroll %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;sp-header-meta-item&quot;&gt;\n\t\t\t&lt;%\n\t\t\t\tstatusClass = &quot;sp-status-other&quot;;\n\t\t\t\tif(sStatus == &quot;Active&quot;) {\n\t\t\t\t\tstatusClass = &quot;sp-status-active&quot;;\n\t\t\t\t} else if(sStatus == &quot;Inactive&quot;) {\n\t\t\t\t\tstatusClass = &quot;sp-status-inactive&quot;;\n\t\t\t\t}\n\t\t\t%&gt;\n\t\t\t&lt;span class=&quot;sp-status-badge &lt;%= statusClass %&gt;&quot;&gt;\n\t\t\t\t&lt;i class=&quot;zc-li-solid ui-1-circle-bold&quot; style=&quot;font-size:8px;&quot;&gt;&lt;/i&gt;\n\t\t\t\t&lt;%= sStatus %&gt;\n\t\t\t&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t&lt;/div&gt;\n\t&lt;% if(sCompleted == &quot;true&quot;) { %&gt;\n\t&lt;div class=&quot;sp-completed-banner&quot;&gt;\n\t\t&lt;i class=&quot;zc-li-outline ui-1-check-circle-08&quot;&gt;&lt;/i&gt;\n\t\tProgram Completed\n\t&lt;/div&gt;\n\t&lt;% } %&gt;\n&lt;/div&gt;\n&lt;% } %&gt;\n&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='Overall_KPI' elementName='Overall_KPI'>\n\t\t\t\t\t<![CDATA[htmlpage Overall_KPI()\ncontent\n&lt;%{%&gt;\n\t\t&lt;style&gt;\n/* ===== Overall KPI Styles ===== */\n.sp-kpi-strip {\n\t\tdisplay: flex;\n\t\tflex-wrap: wrap;\n\t\tgap: 16px;\n\t\tmargin-bottom: 0;\n\t\twidth: 100%;\n\t\tbox-sizing: border-box;\n}\n.sp-kpi-card {\n\t\tflex: 1 1 200px;\n\t\tbackground-color: #ffffff;\n\t\tborder: 1px solid #e7e7ee;\n\t\tborder-radius: 12px;\n\t\tpadding: 20px 24px;\n\t\tbox-sizing: border-box;\n\t\tdisplay: flex;\n\t\tflex-direction: column;\n\t\tgap: 6px;\n}\n.sp-kpi-label {\n\t\tfont-size: 0.8125rem;\n\t\tfont-weight: 500;\n\t\tcolor: var(--zcs_secondary_text_color);\n\t\tmargin: 0;\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tgap: 6px;\n}\n.sp-kpi-label i {\n\t\tfont-size: 1rem;\n}\n.sp-kpi-value {\n\t\tfont-size: 1.75rem;\n\t\tfont-weight: 700;\n\t\tcolor: var(--zcs_primary_text_color);\n\t\tmargin: 0;\n\t\tline-height: 1.2;\n}\n.sp-kpi-unit {\n\t\tfont-size: 0.875rem;\n\t\tfont-weight: 400;\n\t\tcolor: var(--zcs_secondary_text_color);\n\t\tmargin-left: 4px;\n}\n.sp-overall-bar-wrap {\n\t\tbackground-color: #ffffff;\n\t\tborder: 1px solid #e7e7ee;\n\t\tborder-radius: 12px;\n\t\tpadding: 20px 24px;\n\t\tbox-sizing: border-box;\n\t\twidth: 100%;\n\t\tmargin-top: 0;\n}\n.sp-overall-bar-header {\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tjustify-content: space-between;\n\t\tmargin-bottom: 10px;\n}\n.sp-overall-bar-title {\n\t\tfont-size: 0.9375rem;\n\t\tfont-weight: 600;\n\t\tcolor: var(--zcs_primary_text_color);\n\t\tmargin: 0;\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tgap: 8px;\n}\n.sp-overall-bar-pct {\n\t\tfont-size: 1.25rem;\n\t\tfont-weight: 700;\n\t\tcolor: var(--zcs_brand_color);\n}\n.sp-overall-bar-track {\n\t\theight: 14px;\n\t\tbackground-color: var(--zcs_component_hover_color, #e7e7ee);\n\t\tborder-radius: 7px;\n\t\toverflow: hidden;\n}\n.sp-overall-bar-fill {\n\t\theight: 100%;\n\t\tborder-radius: 7px;\n\t\tbackground: linear-gradient(90deg, #1a73e8 0%, #0d47a1 100%);\n\t\ttransition: width 0.4s ease;\n}\n.sp-overall-bar-fill-complete {\n\t\tbackground: linear-gradient(90deg, #16ad78 0%, #007943 100%);\n}\n.sp-overall-bar-sub {\n\t\tfont-size: 0.8125rem;\n\t\tcolor: var(--zcs_secondary_text_color);\n\t\tmargin-top: 6px;\n}\n.sp-no-data {\n\t\ttext-align: center;\n\t\tpadding: 24px;\n\t\tcolor: var(--zcs_secondary_text_color);\n\t\tfont-size: 0.9375rem;\n}\n&lt;/style&gt;\n\n&lt;%\n\tsIDval = input.studentIDval;\n\tnotFound = input.studentNotFound;\n%&gt;\n\n&lt;% if(notFound != &quot;true&quot;) { %&gt;\n&lt;%\n\tcompRecs = Student_Component_Progress[Student == sIDval.toLong()];\n\ttotalRequired = 0.0;\n\ttotalAccumulated = 0.0;\n\tfor each rec in compRecs {\n\t\ttotalRequired = totalRequired + rec.Required_Hours.toDecimal();\n\t\ttotalAccumulated = totalAccumulated + rec.Accumulated_Hours.toDecimal();\n\t}\n\tremainingHrs = totalRequired - totalAccumulated;\n\tif(remainingHrs &lt; 0) {\n\t\tremainingHrs = 0.0;\n\t}\n\toverallPct = 0.0;\n\tif(totalRequired &gt; 0) {\n\t\toverallPct = (totalAccumulated / totalRequired) * 100;\n\t}\n\tif(overallPct &gt; 100) {\n\t\toverallPct = 100.0;\n\t}\n\toverallPctRounded = overallPct.round(1);\n\tisComplete = input.isProgramComplete;\n\tbarClass = &quot;sp-overall-bar-fill&quot;;\n\tif(isComplete == &quot;true&quot;) {\n\t\tbarClass = &quot;sp-overall-bar-fill sp-overall-bar-fill-complete&quot;;\n\t}\n%&gt;\n\n&lt;div class=&quot;sp-kpi-strip&quot;&gt;\n\t&lt;div class=&quot;sp-kpi-card&quot;&gt;\n\t\t&lt;p class=&quot;sp-kpi-label&quot;&gt;\n\t\t\t&lt;i class=&quot;zc-li-outline ui-2-time&quot; style=&quot;color:#1a73e8;&quot;&gt;&lt;/i&gt;\n\t\t\tTotal Required Hours\n\t\t&lt;/p&gt;\n\t\t&lt;p class=&quot;sp-kpi-value&quot;&gt;&lt;%= totalRequired.round(1) %&gt;&lt;span class=&quot;sp-kpi-unit&quot;&gt;hrs&lt;/span&gt;&lt;/p&gt;\n\t&lt;/div&gt;\n\t&lt;div class=&quot;sp-kpi-card&quot;&gt;\n\t\t&lt;p class=&quot;sp-kpi-label&quot;&gt;\n\t\t\t&lt;i class=&quot;zc-li-outline ui-1-check-circle-08&quot; style=&quot;color:#16ad78;&quot;&gt;&lt;/i&gt;\n\t\t\tCompleted Hours\n\t\t&lt;/p&gt;\n\t\t&lt;p class=&quot;sp-kpi-value&quot;&gt;&lt;%= totalAccumulated.round(1) %&gt;&lt;span class=&quot;sp-kpi-unit&quot;&gt;hrs&lt;/span&gt;&lt;/p&gt;\n\t&lt;/div&gt;\n\t&lt;div class=&quot;sp-kpi-card&quot;&gt;\n\t\t&lt;p class=&quot;sp-kpi-label&quot;&gt;\n\t\t\t&lt;i class=&quot;zc-li-outline ui-1-alert-circle-i&quot; style=&quot;color:#f59e0b;&quot;&gt;&lt;/i&gt;\n\t\t\tRemaining Hours\n\t\t&lt;/p&gt;\n\t\t&lt;p class=&quot;sp-kpi-value&quot;&gt;&lt;%= remainingHrs.round(1) %&gt;&lt;span class=&quot;sp-kpi-unit&quot;&gt;hrs&lt;/span&gt;&lt;/p&gt;\n\t&lt;/div&gt;\n&lt;/div&gt;\n\n&lt;div class=&quot;sp-overall-bar-wrap&quot; style=&quot;margin-top:16px;&quot;&gt;\n\t&lt;div class=&quot;sp-overall-bar-header&quot;&gt;\n\t\t&lt;p class=&quot;sp-overall-bar-title&quot;&gt;\n\t\t\t&lt;i class=&quot;zc-li-outline ui-1-chart-bar-33&quot; style=&quot;color:#1a73e8;&quot;&gt;&lt;/i&gt;\n\t\t\tOverall Program Progress\n\t\t&lt;/p&gt;\n\t\t&lt;span class=&quot;sp-overall-bar-pct&quot;&gt;&lt;%= overallPctRounded %&gt;%&lt;/span&gt;\n\t&lt;/div&gt;\n\t&lt;div class=&quot;sp-overall-bar-track&quot;&gt;\n\t\t&lt;div class=&quot;&lt;%= barClass %&gt;&quot; style=&quot;width:&lt;%= overallPctRounded %&gt;%;&quot;&gt;&lt;/div&gt;\n\t&lt;/div&gt;\n\t&lt;p class=&quot;sp-overall-bar-sub&quot;&gt;&lt;%= totalAccumulated.round(1) %&gt; of &lt;%= totalRequired.round(1) %&gt; hours completed&lt;/p&gt;\n&lt;/div&gt;\n&lt;% } %&gt;\n&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='Component_Progress' elementName='Component_Progress'>\n\t\t\t\t\t<![CDATA[htmlpage Component_Progress()\ncontent\n&lt;%{%&gt;\n\t\t&lt;style&gt;\n/* ===== Component Progress Styles ===== */\n.sp-comp-section {\n\t\tbackground-color: #ffffff;\n\t\tborder: 1px solid #e7e7ee;\n\t\tborder-radius: 12px;\n\t\tpadding: 20px 24px;\n\t\tbox-sizing: border-box;\n\t\twidth: 100%;\n}\n.sp-comp-section-title {\n\t\tfont-size: 1rem;\n\t\tfont-weight: 600;\n\t\tcolor: var(--zcs_primary_text_color);\n\t\tmargin: 0 0 16px 0;\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tgap: 8px;\n}\n.sp-comp-list {\n\t\tdisplay: flex;\n\t\tflex-direction: column;\n\t\tgap: 16px;\n}\n.sp-comp-item {\n\t\tborder: 1px solid #e7e7ee;\n\t\tborder-radius: 8px;\n\t\tpadding: 14px 16px;\n\t\tbox-sizing: border-box;\n}\n.sp-comp-item-header {\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tjustify-content: space-between;\n\t\tmargin-bottom: 8px;\n\t\tflex-wrap: wrap;\n\t\tgap: 6px;\n}\n.sp-comp-name {\n\t\tfont-size: 0.9375rem;\n\t\tfont-weight: 600;\n\t\tcolor: var(--zcs_primary_text_color);\n\t\tmargin: 0;\n}\n.sp-comp-badge-completed {\n\t\tdisplay: inline-flex;\n\t\talign-items: center;\n\t\tgap: 4px;\n\t\tpadding: 2px 10px;\n\t\tborder-radius: 20px;\n\t\tfont-size: 0.6875rem;\n\t\tfont-weight: 700;\n\t\ttext-transform: uppercase;\n\t\tletter-spacing: 0.05em;\n\t\tbackground: rgba(22,173,120,0.12);\n\t\tcolor: #007943;\n\t\tborder: 1px solid rgba(22,173,120,0.35);\n}\n.sp-comp-badge-inprogress {\n\t\tdisplay: inline-flex;\n\t\talign-items: center;\n\t\tgap: 4px;\n\t\tpadding: 2px 10px;\n\t\tborder-radius: 20px;\n\t\tfont-size: 0.6875rem;\n\t\tfont-weight: 700;\n\t\ttext-transform: uppercase;\n\t\tletter-spacing: 0.05em;\n\t\tbackground: rgba(26,115,232,0.1);\n\t\tcolor: #1a73e8;\n\t\tborder: 1px solid rgba(26,115,232,0.3);\n}\n.sp-comp-bar-row {\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tgap: 10px;\n}\n.sp-comp-bar-track {\n\t\tflex: 1;\n\t\theight: 8px;\n\t\tbackground-color: var(--zcs_component_hover_color, #e7e7ee);\n\t\tborder-radius: 4px;\n\t\toverflow: hidden;\n}\n.sp-comp-bar-fill-green {\n\t\theight: 100%;\n\t\tborder-radius: 4px;\n\t\tbackground: linear-gradient(90deg, #16ad78 0%, #007943 100%);\n}\n.sp-comp-bar-fill-blue {\n\t\theight: 100%;\n\t\tborder-radius: 4px;\n\t\tbackground: linear-gradient(90deg, #1a73e8 0%, #0d47a1 100%);\n}\n.sp-comp-bar-pct {\n\t\tfont-size: 0.8125rem;\n\t\tfont-weight: 600;\n\t\tcolor: var(--zcs_primary_text_color);\n\t\tmin-width: 38px;\n\t\ttext-align: right;\n}\n.sp-comp-detail {\n\t\tfont-size: 0.8125rem;\n\t\tcolor: var(--zcs_secondary_text_color);\n\t\tmargin: 6px 0 0 0;\n}\n.sp-no-components {\n\t\ttext-align: center;\n\t\tpadding: 32px;\n\t\tcolor: var(--zcs_secondary_text_color);\n\t\tfont-size: 0.9375rem;\n}\n&lt;/style&gt;\n\n&lt;%\n\tsIDval = input.studentIDval;\n\tnotFound = input.studentNotFound;\n%&gt;\n\n&lt;% if(notFound != &quot;true&quot;) { %&gt;\n&lt;%\n\tcompRecs = Student_Component_Progress[Student == sIDval.toLong()];\n%&gt;\n\n&lt;div class=&quot;sp-comp-section&quot;&gt;\n\t&lt;h3 class=&quot;sp-comp-section-title&quot;&gt;\n\t\t&lt;i class=&quot;zc-li-outline ui-1-chart-bar-33&quot; style=&quot;color:#1a73e8;&quot;&gt;&lt;/i&gt;\n\t\tComponent Progress\n\t&lt;/h3&gt;\n\n\t&lt;% if(compRecs.count() == 0) { %&gt;\n\t&lt;div class=&quot;sp-no-components&quot;&gt;\n\t\t&lt;i class=&quot;zc-li-outline ui-1-alert-circle-i&quot; style=&quot;font-size:2rem;color:#d1d5db;display:block;margin-bottom:8px;&quot;&gt;&lt;/i&gt;\n\t\tNo component progress records found for this student.\n\t&lt;/div&gt;\n\t&lt;% } else { %&gt;\n\t&lt;div class=&quot;sp-comp-list&quot;&gt;\n\t\t&lt;% for each rec in compRecs { %&gt;\n\t\t&lt;%\n\t\t\tcompName = rec.Component.Component_Name;\n\t\t\treqHrs   = rec.Required_Hours.toDecimal();\n\t\t\taccHrs   = rec.Accumulated_Hours.toDecimal();\n\t\t\tremHrs   = rec.Remaining_Hours.toDecimal();\n\t\t\tcompPct  = rec.Completion_Percentage.toDecimal();\n\t\t\tisDone   = rec.Is_Completed;\n\t\t\tif(compPct &gt; 100) { compPct = 100.0; }\n\t\t\tcompPctR = compPct.round(1);\n\t\t\tdisplayPct = compPctR;\n\t\t\tif(isDone == true) { displayPct = 100.0; }\n\t\t%&gt;\n\t\t&lt;div class=&quot;sp-comp-item&quot;&gt;\n\t\t\t&lt;div class=&quot;sp-comp-item-header&quot;&gt;\n\t\t\t\t&lt;p class=&quot;sp-comp-name&quot;&gt;&lt;%= compName %&gt;&lt;/p&gt;\n\t\t\t\t&lt;% if(isDone == true) { %&gt;\n\t\t\t\t&lt;span class=&quot;sp-comp-badge-completed&quot;&gt;\n\t\t\t\t\t&lt;i class=&quot;zc-li-solid ui-1-check-circle-08&quot; style=&quot;font-size:10px;&quot;&gt;&lt;/i&gt;\n\t\t\t\t\tCompleted\n\t\t\t\t&lt;/span&gt;\n\t\t\t\t&lt;% } else { %&gt;\n\t\t\t\t&lt;span class=&quot;sp-comp-badge-inprogress&quot;&gt;\n\t\t\t\t\t&lt;i class=&quot;zc-li-solid ui-1-circle-bold&quot; style=&quot;font-size:8px;&quot;&gt;&lt;/i&gt;\n\t\t\t\t\tIn Progress\n\t\t\t\t&lt;/span&gt;\n\t\t\t\t&lt;% } %&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;sp-comp-bar-row&quot;&gt;\n\t\t\t\t&lt;div class=&quot;sp-comp-bar-track&quot;&gt;\n\t\t\t\t\t&lt;% if(isDone == true) { %&gt;\n\t\t\t\t\t&lt;div class=&quot;sp-comp-bar-fill-green&quot; style=&quot;width:100%;&quot;&gt;&lt;/div&gt;\n\t\t\t\t\t&lt;% } else { %&gt;\n\t\t\t\t\t&lt;div class=&quot;sp-comp-bar-fill-blue&quot; style=&quot;width:&lt;%= displayPct %&gt;%;&quot;&gt;&lt;/div&gt;\n\t\t\t\t\t&lt;% } %&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;sp-comp-bar-pct&quot;&gt;&lt;%= displayPct %&gt;%&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;p class=&quot;sp-comp-detail&quot;&gt;\n\t\t\t\t&lt;%= accHrs.round(1) %&gt; / &lt;%= reqHrs.round(1) %&gt; hrs &amp;mdash; &lt;%= displayPct %&gt;% Complete\n\t\t\t\t&lt;% if(isDone != true &amp;&amp; remHrs &gt; 0) { %&gt;\n\t\t\t\t&amp;nbsp;&amp;bull;&amp;nbsp;&lt;%= remHrs.round(1) %&gt; hrs remaining\n\t\t\t\t&lt;% } %&gt;\n\t\t\t&lt;/p&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;% } %&gt;\n\t&lt;/div&gt;\n\t&lt;% } %&gt;\n&lt;/div&gt;\n&lt;% } %&gt;\n&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t\t<row>\n\t\t\t<column width='50%'>\n\t\t\t\t<report elementName='Recent_Sessions_Embed'\n\t\t\t\ttitle='Recent Training Sessions'\n\t\t\t\ttitleColor='#222326'\n\t\t\t\tboldTitle='true'\n\t\t\t\tappLinkName='thisapp'\n\t\t\t\tlinkName='Sessions_By_Student'\n\t\t\t\tcriteriaString='Student == input.studentRecordID'\n\t\t\t\tiszreport='false'\n\t\t\t\tzc_Footer='true'\n\t\t\t\tzc_AddRec='false'\n\t\t\t\tzc_EditRec='false'\n\t\t\t\tzc_DelRec='false'\n\t\t\t\tzc_DuplRec='false'\n\t\t\t\tzc_Print='false'\n\t\t\t\tzc_Export='false'\n\t\t\t\tzc_Search='false'\n\t\t\t\tzc_EditBulkRec='false'\n\t\t\t\tzc_BulkDelete='false'\n\t\t\t\tzc_BulkDuplicate='false'\n\t\t\t\theightType='custom'\n\t\t\t\theightValue='280' />\n\t\t\t</column>\n\t\t\t<column width='50%'>\n\t\t\t\t<report elementName='Attendance_Embed'\n\t\t\t\ttitle='Attendance Summary'\n\t\t\t\ttitleColor='#222326'\n\t\t\t\tboldTitle='true'\n\t\t\t\tappLinkName='thisapp'\n\t\t\t\tlinkName='Attendance_By_Student'\n\t\t\t\tcriteriaString='Student == input.studentRecordID'\n\t\t\t\tiszreport='false'\n\t\t\t\tzc_Footer='true'\n\t\t\t\tzc_AddRec='false'\n\t\t\t\tzc_EditRec='false'\n\t\t\t\tzc_DelRec='false'\n\t\t\t\tzc_DuplRec='false'\n\t\t\t\tzc_Print='false'\n\t\t\t\tzc_Export='false'\n\t\t\t\tzc_Search='false'\n\t\t\t\tzc_EditBulkRec='false'\n\t\t\t\tzc_BulkDelete='false'\n\t\t\t\tzc_BulkDuplicate='false'\n\t\t\t\theightType='custom'\n\t\t\t\theightValue='280' />\n\t\t\t</column>\n\t\t</row>\n\t</layout>\n</zml>"
+					script
+					{
+						studentNotFound = "true";
+						studentName = "";
+						studentProgram = "";
+						enrollmentDate = "";
+						studentStatus = "";
+						totalCompleted = "0";
+						isProgramComplete = "false";
+						studentIDval = "0";
+						studentRecordID = 0;
+						if(input.Student_ID != "")
+						{
+						  studentRecords = Students[Student_ID == input.Student_ID.toLong()];
+						}
+						else
+						{
+						  loginEmail = zoho.loginuser;
+						  studentRecords = Students[Email == loginEmail];
+						}
+						if(studentRecords.count() > 0)
+						{
+						  studentNotFound = "false";
+						  studentName = studentRecords.Student_Name.first_name + " " + studentRecords.Student_Name.last_name;
+						  programRecords = Programs[ID == studentRecords.Program];
+						  if(programRecords.count() > 0)
+						  {
+						    studentProgram = programRecords.Program_Name;
+						  }
+						  enrollmentDate = studentRecords.Enrollment_Date.toString("dd-MMM-yyyy");
+						  studentStatus = studentRecords.Status;
+						  totalCompleted = ifnull(studentRecords.Total_Completed_Hours, 0).toString();
+						  studentIDval = studentRecords.Student_ID.toString();
+						  studentRecordID = studentRecords.ID;
+						}
+					}
+		}
+	}
+
+	workflow
+	{
+		form
+		{
+			Attendance_Calculate_Duration as "Calculate Attendance Duration"
+			{
+			    type = form
+			    form = Attendance
+			    record event = on add or edit
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if (input.Check_In_Time != null && input.Check_Out_Time != null)
+			                {
+			                    // Creator datetime subtraction returns decimal days
+			                    diffDays = input.Check_Out_Time - input.Check_In_Time;
+			                    hrs = diffDays * 24;
+			                    if (hrs < 0) { hrs = 0; }
+			                    update Attendance[ID == input.ID]
+			                    [
+			                        Duration_Hours = hrs
+			                    ]
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Attendance_Duplicate_Check as "Attendance Duplicate Check"
+			{
+			    type = form
+			    form = Attendance
+			    record event = on add
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                dupCount = Attendance[Student == input.Student && Attendance_Date == input.Attendance_Date].count();
+			                if (dupCount > 0)
+			                {
+			                    alert "An attendance record already exists for this student on this date.";
+			                    cancel submit;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Students_Enrollment_Init as "Initialize Student Component Progress"
+			{
+			    type = form
+			    form = Students
+			    record event = on add
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                programID = input.Program;
+			                studentID = input.ID;
+			                components = Program_Components[Program == programID];
+			                for each comp in components
+			                {
+			                    existingProgress = Student_Component_Progress[Student == studentID && Component == comp.ID].count();
+			                    if (existingProgress == 0)
+			                    {
+			                        insert into Student_Component_Progress
+			                        [
+			                            Student = studentID
+			                            Component = comp.ID
+			                            Required_Hours = comp.Required_Hours
+			                            Accumulated_Hours = 0
+			                            Is_Completed = false
+			                        ];
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Training_Sessions_Compute_Duration as "Compute Session Duration on Stop"
+			{
+			    type = form
+			    form = Training_Sessions
+			    record event = on edit
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if (input.End_Time != null && input.Start_Time != null && input.Session_Status == "Pending Approval" && ifnull(input.Actual_Duration_Hours, 0) <= 0)
+			                {
+			                    diffDays = input.End_Time - input.Start_Time;
+			                    actualHrs = diffDays * 24;
+			                    if (actualHrs < 0)
+			                    {
+			                        actualHrs = 0;
+			                    }
+			                    progressRecs = Student_Component_Progress[Student == input.Student && Component == input.Component];
+			                    creditedHrs = actualHrs;
+			                    if (progressRecs.count() > 0)
+			                    {
+			                        remaining = ifnull(progressRecs.Required_Hours, 0) - ifnull(progressRecs.Accumulated_Hours, 0);
+			                        if (remaining < 0)
+			                        {
+			                            remaining = 0;
+			                        }
+			                        if (creditedHrs > remaining)
+			                        {
+			                            creditedHrs = remaining;
+			                        }
+			                    }
+			                    update Training_Sessions[ID == input.ID]
+			                    [
+			                        Actual_Duration_Hours = actualHrs
+			                        Credited_Hours = creditedHrs
+			                    ];
+			                    if (input.Instructor_Email != null && input.Instructor_Email != "")
+			                    {
+			                        sendmail
+			                        (
+			                            from : zoho.adminuser
+			                            to : input.Instructor_Email
+			                            subject : "Training Session Pending Your Approval"
+			                            message : "A training session for student ID " + input.Student.toString() + " on " + input.Session_Date.toString("dd-MMM-yyyy") + " is pending your approval. Duration: " + actualHrs.toString() + " hrs. Credited Hours: " + creditedHrs.toString() + " hrs."
+			                        );
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Training_Sessions_Set_Start_Info as "Set Session Start Info"
+			{
+			    type = form
+			    form = Training_Sessions
+			    record event = on add
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                studRec = Students[ID == input.Student];
+			                if (studRec.count() > 0 && studRec.Instructor_Email != null && studRec.Instructor_Email != "")
+			                {
+			                    update Training_Sessions[ID == input.ID]
+			                    [
+			                        Start_Time = zoho.currenttime
+			                        Instructor_Email = studRec.Instructor_Email
+			                    ];
+			                }
+			                else
+			                {
+			                    update Training_Sessions[ID == input.ID]
+			                    [
+			                        Start_Time = zoho.currenttime
+			                    ];
+			                }
+			            )
+			        }
+			    }
+			}
+		}
+
+		blueprint
+		{
+			Training_Session_Lifecycle as "Training Session Lifecycle"
+			{
+			    type = blueprint
+			    form = Training_Sessions
+			
+			    start
+			    {
+			        start stage = "In Progress"
+			    }
+			
+			    stages
+			    {
+			        "In Progress" { }
+			        "Pending Approval" { }
+			        "Approved" { }
+			        "Rejected" { }
+			    }
+			
+			    transitions
+			    {
+			        Submit_For_Approval as "Submit for Approval"
+			        {
+			            type = normal
+			            from stage = "In Progress"
+			            to stage = "Pending Approval"
+			
+			            before
+			            {
+			                transition owner
+			                (
+			                    permissions = {"Student","Instructor","Administrator"}
+			                )
+			                transition criteria = ( End_Time != null )
+			                confirmation before execution
+			                (
+			                    message = "Submit this completed session for instructor approval?"
+			                    confirm button text = "Submit"
+			                    cancel button text = "Cancel"
+			                )
+			            }
+			
+			
+			            after
+			            {
+			            }
+			        }
+			
+			        Approve_Session as "Approve Session"
+			        {
+			            type = normal
+			            from stage = "Pending Approval"
+			            to stage = "Approved"
+			
+			            before
+			            {
+			                transition owner
+			                (
+			                    permissions = {"Instructor","Administrator"}
+			                )
+			                confirmation before execution
+			                (
+			                    message = "Approve this training session and credit the hours?"
+			                    confirm button text = "Yes, Approve"
+			                    cancel button text = "Cancel"
+			                )
+			            }
+			
+			
+			            after
+			            {
+			                actions
+			                {
+			                    custom deluge script
+			                    (
+			                        studentID = input.Student;
+			                        componentID = input.Component;
+			                        creditedHrs = ifnull(input.Credited_Hours, 0);
+			                        progressRecs = Student_Component_Progress[Student == studentID && Component == componentID];
+			                        if (progressRecs.count() > 0)
+			                        {
+			                            newAccumulated = ifnull(progressRecs.Accumulated_Hours, 0) + creditedHrs;
+			                            reqHours = ifnull(progressRecs.Required_Hours, 0);
+			                            if (newAccumulated > reqHours)
+			                            {
+			                                newAccumulated = reqHours;
+			                            }
+			                            update Student_Component_Progress[Student == studentID && Component == componentID]
+			                            [
+			                                Accumulated_Hours = newAccumulated
+			                                Is_Completed = (newAccumulated >= reqHours)
+			                                Completed_Date = if(newAccumulated >= reqHours, zoho.currentdate, null)
+			                            ];
+			                        }
+			                        allProgress = Student_Component_Progress[Student == studentID];
+			                        totalAccumulated = 0;
+			                        allDone = true;
+			                        for each p in allProgress
+			                        {
+			                            totalAccumulated = totalAccumulated + ifnull(p.Accumulated_Hours, 0);
+			                            if (p.Is_Completed == false)
+			                            {
+			                                allDone = false;
+			                            }
+			                        }
+			                        if (allProgress.count() > 0 && allDone)
+			                        {
+			                            update Students[ID == studentID]
+			                            [
+			                                Total_Completed_Hours = totalAccumulated
+			                                Is_Program_Completed = true
+			                                Program_Completed_Date = zoho.currentdate
+			                                Status = "Completed"
+			                            ];
+			                        }
+			                        else
+			                        {
+			                            update Students[ID == studentID]
+			                            [
+			                                Total_Completed_Hours = totalAccumulated
+			                                Is_Program_Completed = false
+			                            ];
+			                        }
+			                    )
+			                }
+			            }
+			        }
+			
+			        Reject_Session as "Reject Session"
+			        {
+			            type = normal
+			            from stage = "Pending Approval"
+			            to stage = "Rejected"
+			
+			            before
+			            {
+			                transition owner
+			                (
+			                    permissions = {"Instructor","Administrator"}
+			                )
+			            }
+			
+			
+			            after
+			            {
+			                actions
+			                {
+			                    custom deluge script
+			                    (
+			                        studRec = Students[ID == input.Student];
+			                        if (studRec.count() > 0 && studRec.Email != null && studRec.Email != "")
+			                        {
+			                            sendmail
+			                            (
+			                                from : zoho.adminuser
+			                                to : studRec.Email
+			                                subject : "Training Session Rejected"
+			                                message : "Your training session on " + input.Session_Date.toString("dd-MMM-yyyy") + " for component '" + input.Component.toString() + "' has been rejected. Reason: " + input.Rejection_Reason
+			                            );
+			                        }
+			                    )
+			                }
+			            }
+			        }
+			
+			        Resubmit_Session as "Resubmit for Review"
+			        {
+			            type = normal
+			            from stage = "Rejected"
+			            to stage = "Pending Approval"
+			
+			            before
+			            {
+			                transition owner
+			                (
+			                    permissions = {"Student","Instructor","Administrator"}
+			                )
+			            }
+			
+			            after
+			            {
+			                actions
+			                {
+			                    custom deluge script
+			                    (
+			                        // Notify instructor of resubmission
+			                        if (input.Instructor_Email != null && input.Instructor_Email != "")
+			                        {
+			                            sendmail
+			                            (
+			                                from : zoho.adminuser
+			                                to : input.Instructor_Email
+			                                subject : "Training Session Resubmitted for Review"
+			                                message : "A training session for student ID " + input.Student + " on " + input.Session_Date.toString("dd-MMM-yyyy") + " has been resubmitted for your review."
+			                            );
+			                        }
+			                    )
+			                }
+			            }
+			        }
+			    }
+			}
+		}
+	}
+
+	share_settings
+	{
+	"Administrator"
+	{
+	    name        = "Administrator"
+	    type        = Users_Permissions
+	    permissions = { Chat:false, Predefined:false, ApiAccess:true, PIIAccess:true, ePHIAccess:false }
+	    description = "Full access to all forms, reports, and pages."
+	
+	    ModulePermissions
+	    {
+	        Programs
+	        {
+	            enabled          = Create,View,Viewall,Edit,Modifyall,Delete,Search,Export,Import,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Programs={"View","Edit","Delete"}
+	                Active_Programs={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Program_Components
+	        {
+	            enabled          = Create,View,Viewall,Edit,Modifyall,Delete,Search,Export,Import,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Components={"View","Edit","Delete"}
+	                Components_By_Program={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Training_Locations
+	        {
+	            enabled          = Create,View,Viewall,Edit,Modifyall,Delete,Search,Export,Import,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Locations={"View","Edit","Delete"}
+	                Active_Locations={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Students
+	        {
+	            enabled          = Create,View,Viewall,Edit,Modifyall,Delete,Search,Export,Import,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Students={"View","Edit","Delete"}
+	                Active_Students={"View","Edit","Delete"}
+	                Students_By_Program={"View","Edit","Delete"}
+	                Completed_Students={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Attendance
+	        {
+	            enabled          = Create,View,Viewall,Edit,Modifyall,Delete,Search,Export,Import,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Attendance={"View","Edit","Delete"}
+	                Attendance_By_Student={"View","Edit","Delete"}
+	                Attendance_Calendar={"View","Edit","Delete"}
+	                Today_Attendance={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Training_Sessions
+	        {
+	            enabled          = Create,View,Viewall,Edit,Modifyall,Delete,Search,Export,Import,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Sessions={"View","Edit","Delete"}
+	                Active_Sessions={"View","Edit","Delete"}
+	                Pending_Approvals={"View","Edit","Delete"}
+	                Sessions_By_Student={"View","Edit","Delete"}
+	                Approved_Sessions={"View","Edit","Delete"}
+	                My_Sessions={"View","Edit","Delete"}
+	                Sessions_Kanban={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Student_Component_Progress
+	        {
+	            enabled          = Create,View,Viewall,Edit,Modifyall,Delete,Search,Export,Import,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Progress={"View","Edit","Delete"}
+	                Progress_By_Student={"View","Edit","Delete"}
+	                Completed_Components={"View","Edit","Delete"}
+	                Incomplete_Components={"View","Edit","Delete"}
+	                Progress_Pivot={"View","Edit","Delete"}
+	            }
+	        }
+	
+	
+	        Admin_Dashboard
+	        {
+	            enabled = tab
+	        }
+	
+	        Student_Progress
+	        {
+	            enabled = tab
+	        }
+	    }
+	}
+	"Instructor"
+	{
+	    name        = "Instructor"
+	    type        = Users_Permissions
+	    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false }
+	    description = "Manages students, approves training sessions, records attendance."
+	
+	    ModulePermissions
+	    {
+	        Programs
+	        {
+	            enabled          = View,Viewall,Search,Export,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Programs={"View"}
+	                Active_Programs={"View"}
+	            }
+	        }
+	
+	        Program_Components
+	        {
+	            enabled          = View,Viewall,Search,Export,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Components={"View"}
+	                Components_By_Program={"View"}
+	            }
+	        }
+	
+	        Training_Locations
+	        {
+	            enabled          = View,Viewall,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Locations={"View"}
+	                Active_Locations={"View"}
+	            }
+	        }
+	
+	        Students
+	        {
+	            enabled          = Create,View,Viewall,Edit,Modifyall,Search,Export,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Students={"View","Edit"}
+	                Active_Students={"View","Edit"}
+	                Students_By_Program={"View"}
+	                Completed_Students={"View"}
+	            }
+	        }
+	
+	        Attendance
+	        {
+	            enabled          = Create,View,Viewall,Edit,Modifyall,Search,Export,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Attendance={"View","Edit"}
+	                Attendance_By_Student={"View","Edit"}
+	                Attendance_Calendar={"View"}
+	                Today_Attendance={"View","Edit"}
+	            }
+	        }
+	
+	        Training_Sessions
+	        {
+	            enabled          = View,Viewall,Edit,Modifyall,Search,Export,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Sessions={"View","Edit"}
+	                Active_Sessions={"View"}
+	                Pending_Approvals={"View","Edit"}
+	                Sessions_By_Student={"View"}
+	                Approved_Sessions={"View"}
+	                My_Sessions={"View"}
+	                Sessions_Kanban={"View","Edit"}
+	            }
+	        }
+	
+	        Student_Component_Progress
+	        {
+	            enabled          = View,Viewall,Search,Export,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Progress={"View"}
+	                Progress_By_Student={"View"}
+	                Completed_Components={"View"}
+	                Incomplete_Components={"View"}
+	                Progress_Pivot={"View"}
+	            }
+	        }
+	
+	
+	        Admin_Dashboard
+	        {
+	            enabled = tab
+	        }
+	
+	        Student_Progress
+	        {
+	            enabled = tab
+	        }
+	    }
+	}
+	"Student"
+	{
+	    name        = "Student"
+	    type        = Users_Permissions
+	    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false }
+	    description = "Views own profile and progress."
+	
+	    ModulePermissions
+	    {
+	        Programs
+	        {
+	            enabled          = View,Viewall,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                Active_Programs={"View"}
+	            }
+	        }
+	
+	        Program_Components
+	        {
+	            enabled          = View,Viewall,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                Components_By_Program={"View"}
+	            }
+	        }
+	
+	        Training_Locations
+	        {
+	            enabled          = View,Viewall,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                Active_Locations={"View"}
+	            }
+	        }
+	
+	        Students
+	        {
+	            enabled          = View,Search,Tab
+	            allFieldsVisible = false
+	            ReportPermissions
+	            {
+	                Active_Students={"View"}
+	            }
+	            FieldPermissions
+	            {
+	                Instructor_Email{visibility:false}
+	            }
+	        }
+	
+	        Attendance
+	        {
+	            enabled          = View,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                Attendance_By_Student={"View"}
+	            }
+	        }
+	
+	        Training_Sessions
+	        {
+	            enabled          = Create,View,Search,Tab
+	            allFieldsVisible = false
+	            ReportPermissions
+	            {
+	                My_Sessions={"View"}
+	            }
+	            FieldPermissions
+	            {
+	                Session_Status{visibility:true,readonly:true}
+	                Credited_Hours{visibility:true,readonly:true}
+	                Instructor_Notes{visibility:true,readonly:true}
+	                Rejection_Reason{visibility:true,readonly:true}
+	                GPS_Latitude{visibility:false}
+	                GPS_Longitude{visibility:false}
+	                Instructor_Email{visibility:false}
+	            }
+	        }
+	
+	        Student_Component_Progress
+	        {
+	            enabled          = View,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                Progress_By_Student={"View"}
+	            }
+	        }
+	
+	
+	        Student_Progress
+	        {
+	            enabled = tab
+	        }
+	    }
+	}
+	}
+
+	web
+	{
+	forms
+	{
+	    form Programs
+	    {
+	        label placement = left
+	    }
+	    form Program_Components
+	    {
+	        label placement = left
+	    }
+	    form Training_Locations
+	    {
+	        label placement = left
+	    }
+	    form Students
+	    {
+	        label placement = top
+	    }
+	    form Attendance
+	    {
+	        label placement = top
+	    }
+	    form Training_Sessions
+	    {
+	        label placement = top
+	    }
+	    form Student_Component_Progress
+	    {
+	        label placement = left
+	    }
+	}
+	reports
+	{
+		report All_Attendance
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student
+		                    Attendance_Date
+		                    Attendance_Status
+		                    Duration_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student
+		                    Attendance_Date
+		                    Attendance_Status
+		                    Check_In_Time
+		                    Check_Out_Time
+		                    Duration_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Attendance_By_Student
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student
+		                    Attendance_Date
+		                    Attendance_Status
+		                    Check_In_Time
+		                    Check_Out_Time
+		                    Duration_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student
+		                    Attendance_Date
+		                    Attendance_Status
+		                    Check_In_Time
+		                    Check_Out_Time
+		                    Duration_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Attendance_Calendar
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student
+		                    Attendance_Status
+		                    Check_In_Time
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student
+		                    Attendance_Date
+		                    Attendance_Status
+		                    Check_In_Time
+		                    Check_Out_Time
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Today_Attendance
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student
+		                    Attendance_Status
+		                    Check_In_Time
+		                    Check_Out_Time
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student
+		                    Attendance_Status
+		                    Check_In_Time
+		                    Check_Out_Time
+		                    Duration_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report All_Components
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Component_Name
+		                    Program
+		                    Required_Hours
+		                    Display_Order
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Program
+		                    Component_Name
+		                    Required_Hours
+		                    Display_Order
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Components_By_Program
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Component_Name
+		                    Program
+		                    Required_Hours
+		                    Display_Order
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Program
+		                    Component_Name
+		                    Required_Hours
+		                    Display_Order
+		                    Description
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Active_Programs
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Program_Name
+		                    Program_Code
+		                    Total_Required_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Program_Name
+		                    Program_Code
+		                    Total_Required_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report All_Programs
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Program_Name
+		                    Program_Code
+		                    Total_Required_Hours
+		                    Is_Active
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Program_Name
+		                    Program_Code
+		                    Total_Required_Hours
+		                    Is_Active
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report All_Progress
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Accumulated_Hours
+		                    Remaining_Hours
+		                    Completion_Percentage
+		                    Is_Completed
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Required_Hours
+		                    Accumulated_Hours
+		                    Remaining_Hours
+		                    Completion_Percentage
+		                    Is_Completed
+		                    Completed_Date
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Completed_Components
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Accumulated_Hours
+		                    Completed_Date
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Required_Hours
+		                    Accumulated_Hours
+		                    Completed_Date
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Incomplete_Components
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Accumulated_Hours
+		                    Remaining_Hours
+		                    Completion_Percentage
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Required_Hours
+		                    Accumulated_Hours
+		                    Remaining_Hours
+		                    Completion_Percentage
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Progress_By_Student
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Accumulated_Hours
+		                    Completion_Percentage
+		                    Is_Completed
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Required_Hours
+		                    Accumulated_Hours
+		                    Remaining_Hours
+		                    Completion_Percentage
+		                    Is_Completed
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Progress_Pivot
+		{
+		    layout = 4
+		}
+	
+		report Active_Students
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student_ID
+		                    Student_Name
+		                    Program
+		                    Instructor_Name
+		                    Total_Completed_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student_ID
+		                    Student_Name
+		                    Program
+		                    Enrollment_Date
+		                    Instructor_Name
+		                    Total_Completed_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report All_Students
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student_ID
+		                    Student_Name
+		                    Program
+		                    Status
+		                    Total_Completed_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student_ID
+		                    Student_Name
+		                    Program
+		                    Enrollment_Date
+		                    Status
+		                    Instructor_Name
+		                    Total_Completed_Hours
+		                    Is_Program_Completed
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Completed_Students
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student_ID
+		                    Student_Name
+		                    Program
+		                    Program_Completed_Date
+		                    Total_Completed_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student_ID
+		                    Student_Name
+		                    Program
+		                    Program_Completed_Date
+		                    Total_Completed_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Students_By_Program
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student_ID
+		                    Student_Name
+		                    Program
+		                    Status
+		                    Total_Completed_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student_ID
+		                    Student_Name
+		                    Program
+		                    Enrollment_Date
+		                    Status
+		                    Total_Completed_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Active_Locations
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Location_Name
+		                    Address_Description
+		                    Radius_Meters
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Location_Name
+		                    Address_Description
+		                    Radius_Meters
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report All_Locations
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Location_Name
+		                    Radius_Meters
+		                    Is_Active
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Location_Name
+		                    Latitude
+		                    Longitude
+		                    Radius_Meters
+		                    Is_Active
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Active_Sessions
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Start_Time
+		                    Location_Name
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Session_Date
+		                    Start_Time
+		                    Location_Name
+		                    GPS_Latitude
+		                    GPS_Longitude
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report All_Sessions
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Session_Date
+		                    Session_Status
+		                    Credited_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Session_Date
+		                    Session_Status
+		                    Start_Time
+		                    End_Time
+		                    Actual_Duration_Hours
+		                    Credited_Hours
+		                    Instructor_Email
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Approved_Sessions
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Session_Date
+		                    Credited_Hours
+		                    Instructor_Email
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Session_Date
+		                    Start_Time
+		                    End_Time
+		                    Actual_Duration_Hours
+		                    Credited_Hours
+		                    Instructor_Email
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report My_Sessions
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Component
+		                    Session_Date
+		                    Session_Status
+		                    Actual_Duration_Hours
+		                    Credited_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Component
+		                    Session_Date
+		                    Session_Status
+		                    Start_Time
+		                    End_Time
+		                    Actual_Duration_Hours
+		                    Credited_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Pending_Approvals
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Session_Date
+		                    Actual_Duration_Hours
+		                    Credited_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Session_Date
+		                    Session_Status
+		                    Start_Time
+		                    End_Time
+		                    Actual_Duration_Hours
+		                    Credited_Hours
+		                    Location_Name
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Sessions_By_Student
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Session_Date
+		                    Session_Status
+		                    Credited_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Session_Date
+		                    Session_Status
+		                    Actual_Duration_Hours
+		                    Credited_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Sessions_Kanban
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Start_Time
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Student
+		                    Component
+		                    Session_Date
+		                    Session_Status
+		                    Start_Time
+		                    End_Time
+		                    Actual_Duration_Hours
+		                    Credited_Hours
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	}
+	menu
+	{
+	    unused
+	    {
+	        form Programs {}
+	        form Program_Components {}
+	        form Training_Locations {}
+	        form Students {}
+	        form Attendance {}
+	        form Training_Sessions {}
+	        form Student_Component_Progress {}
+	    }
+	
+	    space Administration_Space
+	    {
+	        displayname = "Administration"
+	        icon = "business-briefcase-24"
+	
+	        section Dashboard_Section
+	        {
+	            displayname = "Dashboards"
+	            icon = "business-chart-bar-33"
+	
+	            page Admin_Dashboard
+	            {
+	                icon = "business-chart-pie-36"
+	            }
+	            page Student_Progress
+	            {
+	                icon = "business-chart-bar-32"
+	            }
+	        }
+	
+	        section Programs_Section
+	        {
+	            displayname = "Programs & Setup"
+	            icon = "education-book-open"
+	
+	            report Active_Programs
+	            {
+	                icon = "education-book-open"
+	            }
+	            report All_Programs
+	            {
+	                icon = "education-books-46"
+	            }
+	            report All_Components
+	            {
+	                icon = "files-paper"
+	            }
+	            report Components_By_Program
+	            {
+	                icon = "files-folder-14"
+	            }
+	            report All_Locations
+	            {
+	                icon = "location-pin"
+	            }
+	            report Active_Locations
+	            {
+	                icon = "location-map-pin"
+	            }
+	        }
+	
+	        section Students_Section
+	        {
+	            displayname = "Students"
+	            icon = "users-multiple-11"
+	
+	            report Active_Students
+	            {
+	                icon = "users-single-body"
+	            }
+	            report All_Students
+	            {
+	                icon = "users-multiple-19"
+	            }
+	            report Students_By_Program
+	            {
+	                icon = "business-hierarchy-53"
+	            }
+	            report Completed_Students
+	            {
+	                icon = "business-award-48"
+	            }
+	        }
+	
+	        section Attendance_Section
+	        {
+	            displayname = "Attendance"
+	            icon = "business-agenda"
+	
+	            report Today_Attendance
+	            {
+	                icon = "business-agenda"
+	            }
+	            report All_Attendance
+	            {
+	                icon = "files-notebook"
+	            }
+	            report Attendance_By_Student
+	            {
+	                icon = "users-single-01"
+	            }
+	            report Attendance_Calendar
+	            {
+	                icon = "location-appointment"
+	            }
+	        }
+	
+	        section Sessions_Section
+	        {
+	            displayname = "Training Sessions"
+	            icon = "business-progress"
+	
+	            report Active_Sessions
+	            {
+	                icon = "business-progress"
+	            }
+	            report Pending_Approvals
+	            {
+	                icon = "files-exclamation"
+	            }
+	            report All_Sessions
+	            {
+	                icon = "files-paper"
+	            }
+	            report Approved_Sessions
+	            {
+	                icon = "files-check"
+	            }
+	            report My_Sessions
+	            {
+	                icon = "users-single-position"
+	            }
+	            report Sessions_By_Student
+	            {
+	                icon = "users-single-body"
+	            }
+	            report Sessions_Kanban
+	            {
+	                icon = "business-board-27"
+	            }
+	        }
+	
+	        section Progress_Section
+	        {
+	            displayname = "Progress Tracking"
+	            icon = "business-chart-growth"
+	
+	            report Progress_By_Student
+	            {
+	                icon = "business-chart-growth"
+	            }
+	            report Incomplete_Components
+	            {
+	                icon = "files-exclamation"
+	            }
+	            report Completed_Components
+	            {
+	                icon = "files-archive-check"
+	            }
+	            report All_Progress
+	            {
+	                icon = "business-chart-bar-32"
+	            }
+	            report Progress_Pivot
+	            {
+	                icon = "business-board-30"
+	            }
+	        }
+	
+	        section SharedAnalytics_Section
+	        {
+	            type = shared_user_report_section
+	            displayname = "Reports"
+	            icon = "business-chart-bar-33"
+	        }
+	    }
+	
+	
+	    preference
+	    {
+	        icon
+	        {
+	            style = outline
+	            show = {space,section,component}
+	        }
+	    }
+	}
+	customize
+	{
+	    layout
+	    {
+	        theme = "theme_2"
+	        variant = "variant_1"
+	    }
+	
+	    font = "lato"
+	
+	    color options
+	    {
+	        name = "Training Blue"
+	        brand color = "#1a73e8"
+	        type = "custom"
+	        dark mode color = "#0d47a1"
+	    }
+	
+	    logo
+	    {
+	        preference = "app_icon"
+	        placement = "left"
+	    }
+	}
+	}
+}

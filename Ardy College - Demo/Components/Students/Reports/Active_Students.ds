@@ -1,0 +1,17 @@
+list Active_Students
+{
+    displayName = "Active Students"
+    show all rows from Students [Status == "Active"]
+    (
+        Student_ID
+        Student_Name
+        Program
+        Enrollment_Date
+        Instructor_Name
+        Total_Completed_Hours
+    )
+    sort by
+    (
+        Student_Name ascending
+    )
+}

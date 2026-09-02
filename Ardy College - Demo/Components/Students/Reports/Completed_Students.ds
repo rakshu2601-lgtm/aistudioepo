@@ -1,0 +1,16 @@
+list Completed_Students
+{
+    displayName = "Completed Students"
+    show all rows from Students [Is_Program_Completed == true]
+    (
+        Student_ID
+        Student_Name
+        Program
+        Program_Completed_Date
+        Total_Completed_Hours
+    )
+    sort by
+    (
+        Program_Completed_Date descending
+    )
+}

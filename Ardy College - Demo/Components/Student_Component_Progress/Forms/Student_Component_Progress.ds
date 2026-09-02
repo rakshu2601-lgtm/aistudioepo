@@ -1,0 +1,129 @@
+form Student_Component_Progress
+{
+    displayname = "Student Component Progress"
+
+    Progress_Info
+    (
+        type = section
+        displayname = "Progress Information"
+        row = 1
+        column = 0
+    )
+    must have Student
+    (
+        type = picklist
+        displayname = "Student"
+        values = Students.ID
+        displayformat = [Student_Name.first_name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Component
+    (
+        type = picklist
+        displayname = "Component"
+        values = Program_Components.ID
+        displayformat = [Component_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Required_Hours
+    (
+        type = decimal
+        displayname = "Required Hours"
+        decimalplace = 2
+        row = 1
+        column = 1
+        width = medium
+    )
+    Accumulated_Hours
+    (
+        type = decimal
+        displayname = "Completed Hours"
+        decimalplace = 2
+        initial value = 0
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    Completion_Status
+    (
+        type = section
+        displayname = "Completion Status"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Is_Completed
+    (
+        type = checkbox
+        displayname = "Completed"
+        initial value = false
+        row = 2
+        column = 1
+        width = medium
+    )
+    Completed_Date
+    (
+        type = date
+        displayname = "Date Completed"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Remaining_Hours
+    (
+        type = formula
+        displayname = "Remaining Hours"
+        value = if(Required_Hours == 0, 0, if(Accumulated_Hours >= Required_Hours, 0, Required_Hours - Accumulated_Hours))
+        visibility = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Completion_Percentage
+    (
+        type = formula
+        displayname = "% Complete"
+        value = if(Required_Hours == 0, 0, if(Accumulated_Hours >= Required_Hours, 100, (Accumulated_Hours / Required_Hours) * 100))
+        visibility = true
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Progress"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

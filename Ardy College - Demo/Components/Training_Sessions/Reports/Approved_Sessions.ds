@@ -1,0 +1,19 @@
+list Approved_Sessions
+{
+    displayName = "Approved Sessions"
+    show all rows from Training_Sessions [Session_Status == "Approved"]
+    (
+        Student
+        Component
+        Session_Date
+        Start_Time
+        End_Time
+        Actual_Duration_Hours
+        Credited_Hours
+        Instructor_Email
+    )
+    sort by
+    (
+        Session_Date descending
+    )
+}

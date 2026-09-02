@@ -1,0 +1,16 @@
+list Completed_Components
+{
+    displayName = "Completed Components"
+    show all rows from Student_Component_Progress [Is_Completed == true]
+    (
+        Student
+        Component
+        Required_Hours
+        Accumulated_Hours
+        Completed_Date
+    )
+    sort by
+    (
+        Completed_Date descending
+    )
+}

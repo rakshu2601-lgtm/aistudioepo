@@ -1,0 +1,174 @@
+<style>
+/* ===== Overall KPI Styles ===== */
+.sp-kpi-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+.sp-kpi-card {
+    flex: 1 1 200px;
+    background-color: #ffffff;
+    border: 1px solid #e7e7ee;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.sp-kpi-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--zcs_secondary_text_color);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.sp-kpi-label i {
+    font-size: 1rem;
+}
+.sp-kpi-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--zcs_primary_text_color);
+    margin: 0;
+    line-height: 1.2;
+}
+.sp-kpi-unit {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--zcs_secondary_text_color);
+    margin-left: 4px;
+}
+.sp-overall-bar-wrap {
+    background-color: #ffffff;
+    border: 1px solid #e7e7ee;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: 0;
+}
+.sp-overall-bar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.sp-overall-bar-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--zcs_primary_text_color);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.sp-overall-bar-pct {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--zcs_brand_color);
+}
+.sp-overall-bar-track {
+    height: 14px;
+    background-color: var(--zcs_component_hover_color, #e7e7ee);
+    border-radius: 7px;
+    overflow: hidden;
+}
+.sp-overall-bar-fill {
+    height: 100%;
+    border-radius: 7px;
+    background: linear-gradient(90deg, #1a73e8 0%, #0d47a1 100%);
+    transition: width 0.4s ease;
+}
+.sp-overall-bar-fill-complete {
+    background: linear-gradient(90deg, #16ad78 0%, #007943 100%);
+}
+.sp-overall-bar-sub {
+    font-size: 0.8125rem;
+    color: var(--zcs_secondary_text_color);
+    margin-top: 6px;
+}
+.sp-no-data {
+    text-align: center;
+    padding: 24px;
+    color: var(--zcs_secondary_text_color);
+    font-size: 0.9375rem;
+}
+</style>
+
+<%
+  sIDval = input.studentIDval;
+  notFound = input.studentNotFound;
+%>
+
+<% if(notFound != "true") { %>
+<%
+  compRecs = Student_Component_Progress[Student == sIDval.toLong()];
+  totalRequired = 0.0;
+  totalAccumulated = 0.0;
+  for each rec in compRecs {
+    totalRequired = totalRequired + rec.Required_Hours.toDecimal();
+    totalAccumulated = totalAccumulated + rec.Accumulated_Hours.toDecimal();
+  }
+  remainingHrs = totalRequired - totalAccumulated;
+  if(remainingHrs < 0) {
+    remainingHrs = 0.0;
+  }
+  overallPct = 0.0;
+  if(totalRequired > 0) {
+    overallPct = (totalAccumulated / totalRequired) * 100;
+  }
+  if(overallPct > 100) {
+    overallPct = 100.0;
+  }
+  overallPctRounded = overallPct.round(1);
+  isComplete = input.isProgramComplete;
+  barClass = "sp-overall-bar-fill";
+  if(isComplete == "true") {
+    barClass = "sp-overall-bar-fill sp-overall-bar-fill-complete";
+  }
+%>
+
+<div class="sp-kpi-strip">
+  <div class="sp-kpi-card">
+    <p class="sp-kpi-label">
+      <i class="zc-li-outline ui-2-time" style="color:#1a73e8;"></i>
+      Total Required Hours
+    </p>
+    <p class="sp-kpi-value"><%= totalRequired.round(1) %><span class="sp-kpi-unit">hrs</span></p>
+  </div>
+  <div class="sp-kpi-card">
+    <p class="sp-kpi-label">
+      <i class="zc-li-outline ui-1-check-circle-08" style="color:#16ad78;"></i>
+      Completed Hours
+    </p>
+    <p class="sp-kpi-value"><%= totalAccumulated.round(1) %><span class="sp-kpi-unit">hrs</span></p>
+  </div>
+  <div class="sp-kpi-card">
+    <p class="sp-kpi-label">
+      <i class="zc-li-outline ui-1-alert-circle-i" style="color:#f59e0b;"></i>
+      Remaining Hours
+    </p>
+    <p class="sp-kpi-value"><%= remainingHrs.round(1) %><span class="sp-kpi-unit">hrs</span></p>
+  </div>
+</div>
+
+<div class="sp-overall-bar-wrap" style="margin-top:16px;">
+  <div class="sp-overall-bar-header">
+    <p class="sp-overall-bar-title">
+      <i class="zc-li-outline ui-1-chart-bar-33" style="color:#1a73e8;"></i>
+      Overall Program Progress
+    </p>
+    <span class="sp-overall-bar-pct"><%= overallPctRounded %>%</span>
+  </div>
+  <div class="sp-overall-bar-track">
+    <div class="<%= barClass %>" style="width:<%= overallPctRounded %>%;"></div>
+  </div>
+  <p class="sp-overall-bar-sub"><%= totalAccumulated.round(1) %> of <%= totalRequired.round(1) %> hours completed</p>
+</div>
+<% } %>

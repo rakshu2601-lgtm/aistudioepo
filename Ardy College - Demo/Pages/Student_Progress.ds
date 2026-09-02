@@ -1,0 +1,86 @@
+<page linkname = "Student_Progress" parameters = "string Student_ID, string enrollmentDate, string isProgramComplete, string studentIDval, string studentName, string studentNotFound, string studentProgram, int studentRecordID, string studentStatus, string totalCompleted" displayname = "Student Progress"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Student_Header' elementName='Student_Header'>
+          <![CDATA[htmlpage Student_Header()
+content
+<%{%>
+    <file name:Student_Header.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+    <row>
+      <column width='100%'>
+        <dsp id='Overall_KPI' elementName='Overall_KPI'>
+          <![CDATA[htmlpage Overall_KPI()
+content
+<%{%>
+    <file name:Overall_KPI.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+    <row>
+      <column width='100%'>
+        <dsp id='Component_Progress' elementName='Component_Progress'>
+          <![CDATA[htmlpage Component_Progress()
+content
+<%{%>
+    <file name:Component_Progress.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+    <row>
+      <column width='50%'>
+        <file name:Recent_Sessions_Embed.ds/>
+      </column>
+      <column width='50%'>
+        <file name:Attendance_Embed.ds/>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>
+<script>
+studentNotFound = "true";
+studentName = "";
+studentProgram = "";
+enrollmentDate = "";
+studentStatus = "";
+totalCompleted = "0";
+isProgramComplete = "false";
+studentIDval = "0";
+studentRecordID = 0;
+if(input.Student_ID != "")
+{
+  studentRecords = Students[Student_ID == input.Student_ID.toLong()];
+}
+else
+{
+  loginEmail = zoho.loginuser;
+  studentRecords = Students[Email == loginEmail];
+}
+if(studentRecords.count() > 0)
+{
+  studentNotFound = "false";
+  studentName = studentRecords.Student_Name.first_name + " " + studentRecords.Student_Name.last_name;
+  programRecords = Programs[ID == studentRecords.Program];
+  if(programRecords.count() > 0)
+  {
+    studentProgram = programRecords.Program_Name;
+  }
+  enrollmentDate = studentRecords.Enrollment_Date.toString("dd-MMM-yyyy");
+  studentStatus = studentRecords.Status;
+  totalCompleted = ifnull(studentRecords.Total_Completed_Hours, 0).toString();
+  studentIDval = studentRecords.Student_ID.toString();
+  studentRecordID = studentRecords.ID;
+}
+</script>

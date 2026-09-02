@@ -1,0 +1,54 @@
+Training_Sessions_Compute_Duration as "Compute Session Duration on Stop"
+{
+    type = form
+    form = Training_Sessions
+    record event = on edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if (input.End_Time != null && input.Start_Time != null && input.Session_Status == "Pending Approval" && ifnull(input.Actual_Duration_Hours, 0) <= 0)
+                {
+                    diffDays = input.End_Time - input.Start_Time;
+                    actualHrs = diffDays * 24;
+                    if (actualHrs < 0)
+                    {
+                        actualHrs = 0;
+                    }
+                    progressRecs = Student_Component_Progress[Student == input.Student && Component == input.Component];
+                    creditedHrs = actualHrs;
+                    if (progressRecs.count() > 0)
+                    {
+                        remaining = ifnull(progressRecs.Required_Hours, 0) - ifnull(progressRecs.Accumulated_Hours, 0);
+                        if (remaining < 0)
+                        {
+                            remaining = 0;
+                        }
+                        if (creditedHrs > remaining)
+                        {
+                            creditedHrs = remaining;
+                        }
+                    }
+                    update Training_Sessions[ID == input.ID]
+                    [
+                        Actual_Duration_Hours = actualHrs
+                        Credited_Hours = creditedHrs
+                    ];
+                    if (input.Instructor_Email != null && input.Instructor_Email != "")
+                    {
+                        sendmail
+                        (
+                            from : zoho.adminuser
+                            to : input.Instructor_Email
+                            subject : "Training Session Pending Your Approval"
+                            message : "A training session for student ID " + input.Student.toString() + " on " + input.Session_Date.toString("dd-MMM-yyyy") + " is pending your approval. Duration: " + actualHrs.toString() + " hrs. Credited Hours: " + creditedHrs.toString() + " hrs."
+                        );
+                    }
+                }
+            )
+        }
+    }
+}

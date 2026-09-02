@@ -1,0 +1,27 @@
+Attendance_Calculate_Duration as "Calculate Attendance Duration"
+{
+    type = form
+    form = Attendance
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if (input.Check_In_Time != null && input.Check_Out_Time != null)
+                {
+                    // Creator datetime subtraction returns decimal days
+                    diffDays = input.Check_Out_Time - input.Check_In_Time;
+                    hrs = diffDays * 24;
+                    if (hrs < 0) { hrs = 0; }
+                    update Attendance[ID == input.ID]
+                    [
+                        Duration_Hours = hrs
+                    ]
+                }
+            )
+        }
+    }
+}

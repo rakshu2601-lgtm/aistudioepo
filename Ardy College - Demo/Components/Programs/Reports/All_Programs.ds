@@ -1,0 +1,15 @@
+list All_Programs
+{
+    displayName = "All Programs"
+    show all rows from Programs
+    (
+        Program_Name
+        Program_Code
+        Total_Required_Hours
+        Is_Active
+    )
+    sort by
+    (
+        Program_Name ascending
+    )
+}

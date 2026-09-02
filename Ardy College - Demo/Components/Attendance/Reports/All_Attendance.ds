@@ -1,0 +1,17 @@
+list All_Attendance
+{
+    displayName = "All Attendance"
+    show all rows from Attendance
+    (
+        Student
+        Attendance_Date
+        Attendance_Status
+        Check_In_Time
+        Check_Out_Time
+        Duration_Hours
+    )
+    sort by
+    (
+        Attendance_Date descending
+    )
+}

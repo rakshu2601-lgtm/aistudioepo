@@ -1,0 +1,20 @@
+list All_Sessions
+{
+    displayName = "All Training Sessions"
+    show all rows from Training_Sessions
+    (
+        Student
+        Component
+        Session_Date
+        Session_Status
+        Start_Time
+        End_Time
+        Actual_Duration_Hours
+        Credited_Hours
+        Instructor_Email
+    )
+    sort by
+    (
+        Session_Date descending
+    )
+}

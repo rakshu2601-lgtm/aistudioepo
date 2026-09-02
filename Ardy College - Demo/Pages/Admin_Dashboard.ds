@@ -1,0 +1,60 @@
+<page linkname = "Admin_Dashboard" parameters = "int completedStudents, int currentlyTraining, int pendingApprovals, float totalHoursCompleted, int totalStudents" displayname = "Admin Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='KPI_Cards' elementName='KPI_Cards'>
+          <![CDATA[htmlpage KPI_Cards()
+content
+<%{%>
+    <file name:KPI_Cards.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+    <row>
+      <column width='50%'>
+        <file name:Hours_By_Component_Chart.ds/>
+      </column>
+      <column width='50%'>
+        <file name:Student_Status_Chart.ds/>
+      </column>
+    </row>
+    <row>
+      <column width='100%'>
+        <dsp id='Component_Progress_Bars' elementName='Component_Progress_Bars'>
+          <![CDATA[htmlpage Component_Progress_Bars()
+content
+<%{%>
+    <file name:Component_Progress_Bars.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+    <row>
+      <column width='50%'>
+        <file name:Active_Sessions_Embed.ds/>
+      </column>
+      <column width='50%'>
+        <file name:Pending_Approvals_Embed.ds/>
+      </column>
+    </row>
+    <row>
+      <column width='100%'>
+        <file name:Attendance_Trend_Chart.ds/>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>
+<script>
+totalStudents = Students[Status == "Active"].count();
+currentlyTraining = Training_Sessions[Session_Status == "In Progress"].count();
+pendingApprovals = Training_Sessions[Session_Status == "Pending Approval"].count();
+completedStudents = Students[Is_Program_Completed == true].count();
+approvedSessions = Training_Sessions[Session_Status == "Approved"];
+totalHoursCompleted = ifnull(approvedSessions.sum(Credited_Hours), 0);
+</script>

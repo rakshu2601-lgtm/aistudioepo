@@ -1,0 +1,18 @@
+list Active_Sessions
+{
+    displayName = "Active Sessions"
+    show all rows from Training_Sessions [Session_Status == "In Progress"]
+    (
+        Student
+        Component
+        Session_Date
+        Start_Time
+        Location_Name
+        GPS_Latitude
+        GPS_Longitude
+    )
+    sort by
+    (
+        Start_Time descending
+    )
+}

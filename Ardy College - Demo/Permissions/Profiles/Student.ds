@@ -1,0 +1,100 @@
+"Student"
+{
+    name        = "Student"
+    type        = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false }
+    description = "Views own profile and progress."
+
+    ModulePermissions
+    {
+        Programs
+        {
+            enabled          = View,Viewall,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Active_Programs={"View"}
+            }
+        }
+
+        Program_Components
+        {
+            enabled          = View,Viewall,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Components_By_Program={"View"}
+            }
+        }
+
+        Training_Locations
+        {
+            enabled          = View,Viewall,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Active_Locations={"View"}
+            }
+        }
+
+        Students
+        {
+            enabled          = View,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                Active_Students={"View"}
+            }
+            FieldPermissions
+            {
+                Instructor_Email{visibility:false}
+            }
+        }
+
+        Attendance
+        {
+            enabled          = View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Attendance_By_Student={"View"}
+            }
+        }
+
+        Training_Sessions
+        {
+            enabled          = Create,View,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                My_Sessions={"View"}
+            }
+            FieldPermissions
+            {
+                Session_Status{visibility:true,readonly:true}
+                Credited_Hours{visibility:true,readonly:true}
+                Instructor_Notes{visibility:true,readonly:true}
+                Rejection_Reason{visibility:true,readonly:true}
+                GPS_Latitude{visibility:false}
+                GPS_Longitude{visibility:false}
+                Instructor_Email{visibility:false}
+            }
+        }
+
+        Student_Component_Progress
+        {
+            enabled          = View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Progress_By_Student={"View"}
+            }
+        }
+
+
+        Student_Progress
+        {
+            enabled = tab
+        }
+    }
+}

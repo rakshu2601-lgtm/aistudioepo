@@ -1,0 +1,14 @@
+list Active_Programs
+{
+    displayName = "Active Programs"
+    show all rows from Programs [Is_Active == true]
+    (
+        Program_Name
+        Program_Code
+        Total_Required_Hours
+    )
+    sort by
+    (
+        Program_Name ascending
+    )
+}

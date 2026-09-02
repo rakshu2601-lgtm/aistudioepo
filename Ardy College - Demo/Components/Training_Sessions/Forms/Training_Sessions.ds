@@ -1,0 +1,205 @@
+form Training_Sessions
+{
+    displayname = "Training Sessions"
+    record owner = Added_User
+
+    Session_Info
+    (
+        type = section
+        displayname = "Session Info"
+        row = 1
+        column = 0
+    )
+    must have Student
+    (
+        type = picklist
+        displayname = "Student"
+        values = Students.ID
+        displayformat = [Student_Name.first_name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Component
+    (
+        type = picklist
+        displayname = "Training Component"
+        values = Program_Components.ID
+        displayformat = [Component_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Session_Date
+    (
+        type = date
+        displayname = "Session Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Session_Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"In Progress","Pending Approval","Approved","Rejected"}
+        initial value = "In Progress"
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    Time_Duration
+    (
+        type = section
+        displayname = "Time & Duration"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Start_Time
+    (
+        type = datetime
+        displayname = "Start Time"
+        row = 2
+        column = 1
+        width = medium
+    )
+    End_Time
+    (
+        type = datetime
+        displayname = "End Time"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Actual_Duration_Hours
+    (
+        type = decimal
+        displayname = "Actual Duration (hrs)"
+        decimalplace = 2
+        initial value = 0
+        row = 2
+        column = 1
+        width = medium
+    )
+    Credited_Hours
+    (
+        type = decimal
+        displayname = "Credited Hours"
+        decimalplace = 2
+        initial value = 0
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    Location_Instructor
+    (
+        type = section
+        displayname = "Location & Instructor"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Location_Name
+    (
+        type = text
+        displayname = "Training Location"
+        maxchar = 100
+        row = 3
+        column = 1
+        width = medium
+    )
+    Instructor_Email
+    (
+        type = email
+        displayname = "Instructor Email"
+        row = 3
+        column = 2
+        width = medium
+    )
+    GPS_Latitude
+    (
+        type = decimal
+        displayname = "GPS Latitude"
+        decimalplace = 6
+        row = 3
+        column = 1
+        width = medium
+    )
+    GPS_Longitude
+    (
+        type = decimal
+        displayname = "GPS Longitude"
+        decimalplace = 6
+        row = 3
+        column = 2
+        width = medium
+    )
+
+    Notes_Section
+    (
+        type = section
+        displayname = "Notes"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    Instructor_Notes
+    (
+        type = textarea
+        displayname = "Instructor Notes"
+        height = 80px
+        row = 4
+        column = 1
+        width = medium
+    )
+    Rejection_Reason
+    (
+        type = textarea
+        displayname = "Rejection Reason"
+        height = 60px
+        row = 4
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Start Session"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+
+    blueprint components
+    {
+        stages = {"In Progress","Pending Approval","Approved","Rejected"}
+    }
+}

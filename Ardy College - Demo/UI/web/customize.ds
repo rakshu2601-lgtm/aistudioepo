@@ -1,0 +1,24 @@
+customize
+{
+    layout
+    {
+        theme = "theme_2"
+        variant = "variant_1"
+    }
+
+    font = "lato"
+
+    color options
+    {
+        name = "Training Blue"
+        brand color = "#1a73e8"
+        type = "custom"
+        dark mode color = "#0d47a1"
+    }
+
+    logo
+    {
+        preference = "app_icon"
+        placement = "left"
+    }
+}

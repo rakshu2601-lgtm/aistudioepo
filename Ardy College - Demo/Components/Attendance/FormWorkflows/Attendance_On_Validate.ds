@@ -1,0 +1,22 @@
+Attendance_Duplicate_Check as "Attendance Duplicate Check"
+{
+    type = form
+    form = Attendance
+    record event = on add
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                dupCount = Attendance[Student == input.Student && Attendance_Date == input.Attendance_Date].count();
+                if (dupCount > 0)
+                {
+                    alert "An attendance record already exists for this student on this date.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

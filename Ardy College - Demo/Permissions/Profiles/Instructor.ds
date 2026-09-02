@@ -1,0 +1,110 @@
+"Instructor"
+{
+    name        = "Instructor"
+    type        = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false }
+    description = "Manages students, approves training sessions, records attendance."
+
+    ModulePermissions
+    {
+        Programs
+        {
+            enabled          = View,Viewall,Search,Export,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Programs={"View"}
+                Active_Programs={"View"}
+            }
+        }
+
+        Program_Components
+        {
+            enabled          = View,Viewall,Search,Export,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Components={"View"}
+                Components_By_Program={"View"}
+            }
+        }
+
+        Training_Locations
+        {
+            enabled          = View,Viewall,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Locations={"View"}
+                Active_Locations={"View"}
+            }
+        }
+
+        Students
+        {
+            enabled          = Create,View,Viewall,Edit,Modifyall,Search,Export,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Students={"View","Edit"}
+                Active_Students={"View","Edit"}
+                Students_By_Program={"View"}
+                Completed_Students={"View"}
+            }
+        }
+
+        Attendance
+        {
+            enabled          = Create,View,Viewall,Edit,Modifyall,Search,Export,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Attendance={"View","Edit"}
+                Attendance_By_Student={"View","Edit"}
+                Attendance_Calendar={"View"}
+                Today_Attendance={"View","Edit"}
+            }
+        }
+
+        Training_Sessions
+        {
+            enabled          = View,Viewall,Edit,Modifyall,Search,Export,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Sessions={"View","Edit"}
+                Active_Sessions={"View"}
+                Pending_Approvals={"View","Edit"}
+                Sessions_By_Student={"View"}
+                Approved_Sessions={"View"}
+                My_Sessions={"View"}
+                Sessions_Kanban={"View","Edit"}
+            }
+        }
+
+        Student_Component_Progress
+        {
+            enabled          = View,Viewall,Search,Export,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Progress={"View"}
+                Progress_By_Student={"View"}
+                Completed_Components={"View"}
+                Incomplete_Components={"View"}
+                Progress_Pivot={"View"}
+            }
+        }
+
+
+        Admin_Dashboard
+        {
+            enabled = tab
+        }
+
+        Student_Progress
+        {
+            enabled = tab
+        }
+    }
+}
