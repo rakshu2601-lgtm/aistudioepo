@@ -1,0 +1,27 @@
+list My_Invoice_Requests
+{
+    displayName = "My Invoice Requests"
+    show all rows from Manual_Invoice [Requester.Email == zoho.loginuserid]
+    (
+        Ticket_ID
+        Product
+        Event
+        Company_Name
+        Total_Amount_USD
+        Converted_Currency
+        Total_Invoice_Amount
+        Status
+        Invoice_Date
+        Invoice_Number
+    )
+    filters
+    (
+        Product
+        Status
+        Invoice_Date
+    )
+    sort by
+    (
+        Invoice_Date descending
+    )
+}

@@ -1,0 +1,33 @@
+list Certification_Events
+{
+    displayName = "Certification Events"
+    show all rows from Events [Event_Type == "Certification"]
+    (
+        Event_Name
+        Product
+        Certification_Name
+        Certification_Year
+        Certification_Month
+        Status
+        Trainers
+    )
+    filters
+    (
+        Certification_Year
+        Certification_Month
+        Status
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Certification_Year descending
+        Certification_Month ascending
+    )
+    sort by
+    (
+        Certification_Year descending
+    )
+}

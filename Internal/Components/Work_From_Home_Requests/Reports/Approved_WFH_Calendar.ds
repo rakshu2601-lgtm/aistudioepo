@@ -1,0 +1,30 @@
+calendar Approved_WFH_Calendar
+{
+    displayName = "Approved WFH Calendar"
+    show all rows from Work_From_Home_Requests [Status == "Approved"]
+    (
+        Requester
+        WFH_Date
+        Reason
+        Status
+    )
+    filters
+    (
+        Requester
+        WFH_Date
+        Status
+    )
+    options
+    (
+        display type = month
+        week start day = monday
+        display field = Requester
+        start date = WFH_Date
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+}

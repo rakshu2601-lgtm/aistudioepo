@@ -1,0 +1,26 @@
+Set_Discount_Approver_User as "Set Discount Approver User"
+{
+    type = form
+    form = Discount_Requests
+    record event = on add or edit
+    description = "Copies the deliberately selected team approver's Creator user into the approval routing field."
+
+    on user input of Approver
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Approver != null)
+                {
+                    selected_approver = Team_Members[ID == input.Approver];
+                    input.Approver_User = selected_approver.Creator_User;
+                }
+                else
+                {
+                    input.Approver_User = null;
+                }
+            )
+        }
+    }
+}

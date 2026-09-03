@@ -1,0 +1,33 @@
+kanban Task_Status_Board
+{
+    displayName = "Task Status Board"
+    show all rows from Task_Assignments
+    (
+        Event
+        Task_Work_Item
+        Assigned_Trainer
+        Assigned_Date
+        Deadline
+        Completion_Date
+        Progress_Status
+        Delivery_Status
+        Delay_Reason_Notes
+    )
+    filters
+    (
+        Assigned_Trainer
+        Delivery_Status
+        Deadline
+    )
+    sort by
+    (
+        Deadline ascending
+    )
+    options
+    (
+        display field = Progress_Status
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

@@ -1,0 +1,44 @@
+Configure_Event_Type as "Configure Event Type"
+{
+    type = form
+    form = Events
+    record event = on add or edit
+
+    on user input of Event_Type
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Event_Type == "Webinar")
+                {
+                    show QA_Trainer;
+                }
+                else
+                {
+                    hide QA_Trainer;
+                }
+                if(input.Event_Type == "Certification")
+                {
+                    show Certification_Name;
+                    show Certification_Year;
+                    show Certification_Month;
+                    hide Start_Date;
+                    hide End_Date;
+                    disable Start_Date;
+                    disable End_Date;
+                }
+                else
+                {
+                    hide Certification_Name;
+                    hide Certification_Year;
+                    hide Certification_Month;
+                    show Start_Date;
+                    show End_Date;
+                    enable Start_Date;
+                    enable End_Date;
+                }
+            )
+        }
+    }
+}

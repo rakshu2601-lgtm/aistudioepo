@@ -1,0 +1,266 @@
+form Discount_Requests
+{
+    displayname = "Discount Requests"
+    success message = "Discount request submitted successfully."
+
+    Event_Details
+    (
+        type = section
+        displayname = "Event Details"
+        row = 1
+        column = 0
+    )
+    must have Product
+    (
+        type = picklist
+        values = Products.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Event
+    (
+        type = picklist
+        values = Events.ID
+        displayformat = [Event_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Ticket_ID
+    (
+        type = text
+        displayname = "Ticket ID"
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    Request_Details
+    (
+        type = section
+        displayname = "Request Details"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Requester
+    (
+        type = picklist
+        values = Team_Members.ID
+        displayformat = [Name.first_name]
+        searchable = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Customer_Company
+    (
+        type = text
+        displayname = "Customer Company"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Customer_Email
+    (
+        type = email
+        displayname = "Customer Email"
+        personal data = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Discount_Type
+    (
+        type = picklist
+        displayname = "Discount Type"
+        values = {"Partner","Customer","Prospect","Other"}
+        others option = true
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Number_of_Tickets
+    (
+        type = number
+        displayname = "Number of Tickets"
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Unit_Amount_USD
+    (
+        type = USD
+        displayname = "Unit Amount (USD)"
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 2
+        width = medium
+    )
+    Total_Amount_USD
+    (
+        type = formula
+        displayname = "Total Amount (USD)"
+        value = Number_of_Tickets * Unit_Amount_USD
+        visibility = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Discount_Percentage
+    (
+        type = percentage
+        displayname = "Discount Percentage"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Discounted_Amount_USD
+    (
+        type = formula
+        displayname = "Discounted Amount (USD)"
+        value = (Number_of_Tickets * Unit_Amount_USD) - ((Number_of_Tickets * Unit_Amount_USD) * Discount_Percentage / 100)
+        visibility = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Reason_for_Request
+    (
+        type = textarea
+        displayname = "Reason for Request"
+        height = 100px
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    Approval_Details
+    (
+        type = section
+        displayname = "Approval Details"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Approver
+    (
+        type = picklist
+        values = Team_Members.ID
+        displayformat = [Name.first_name]
+        searchable = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Approver_User
+    (
+        type = users
+        displayname = "Approver User"
+        personal data = true
+        row = 3
+        column = 2
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        values = {"Requested","Approved","Rejected"}
+        initial value = "Requested"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Reason_for_Rejection
+    (
+        type = textarea
+        displayname = "Reason for Rejection"
+        height = 100px
+        row = 3
+        column = 2
+        width = medium
+    )
+
+    Promo_Code_Fulfilment
+    (
+        type = section
+        displayname = "Promo Code Fulfilment"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    Assigned_Promo_Owner
+    (
+        type = picklist
+        displayname = "Assigned Promo Owner"
+        values = Team_Members.ID
+        displayformat = [Name.first_name]
+        searchable = true
+        row = 4
+        column = 1
+        width = medium
+    )
+    Promo_Code
+    (
+        type = text
+        displayname = "Promo Code"
+        row = 4
+        column = 2
+        width = medium
+    )
+    Registration_URL
+    (
+        type = url
+        displayname = "Registration URL"
+        target = new window
+        enable = linkname, title
+        row = 4
+        column = 1
+        width = medium
+    )
+    Promo_Code_Status
+    (
+        type = picklist
+        displayname = "Promo Code Status"
+        values = {"Yet to Add","Added"}
+        initial value = "Yet to Add"
+        row = 4
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit Request"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Request"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

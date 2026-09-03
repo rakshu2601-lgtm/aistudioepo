@@ -1,0 +1,126 @@
+form Team_Members
+{
+    displayname = "Team Members"
+
+    Team_Details
+    (
+        type = section
+        displayname = "Team Details"
+        row = 1
+        column = 0
+    )
+    must have Name
+    (
+        type = name
+        prefix
+        (
+            type = prefix
+            displayname = "Prefix"
+            value = {"Mr.", "Mrs.", "Ms.", "Dr."}
+        )
+        first_name
+        (
+            type = first_name
+            displayname = "First Name"
+        )
+        last_name
+        (
+            type = last_name
+            displayname = "Last Name"
+        )
+        suffix
+        (
+            type = suffix
+            displayname = "Suffix"
+        )
+        personal data = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have unique Email
+    (
+        type = email
+        personal data = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Creator_User
+    (
+        type = picklist
+        displayname = "Creator User"
+        module = users
+        personal data = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Reporting_To
+    (
+        type = picklist
+        displayname = "Reporting To"
+        values = Team_Members.ID
+        displayformat = [Name.first_name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Role
+    (
+        type = picklist
+        values = {"Trainer", "Lead", "Manager"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    Availability
+    (
+        type = picklist
+        values = {"Available", "Partially Available", "Unavailable"}
+        initial value = "Available"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        values = {"Active", "Inactive"}
+        initial value = "Active"
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

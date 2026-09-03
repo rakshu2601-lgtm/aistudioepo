@@ -1,0 +1,30 @@
+Configure_Statistics_On_Load as "Configure Statistics On Load"
+{
+    type = form
+    form = Post_Event_Statistics
+    record event = on add or edit
+    description = "Shows only the post-event insight fields relevant to the selected event type."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                hide Revenue_USD, Survey_Report_URL, Feedback_Insights_URL, Debrief_URL;
+                if(input.Event_Type == "Online Training")
+                {
+                    show Revenue_USD, Survey_Report_URL;
+                }
+                else if(input.Event_Type == "In-person" || input.Event_Type == "Customized Training")
+                {
+                    show Revenue_USD, Feedback_Insights_URL, Debrief_URL;
+                }
+                else if(input.Event_Type == "Certification")
+                {
+                    show Revenue_USD;
+                }
+            )
+        }
+    }
+}

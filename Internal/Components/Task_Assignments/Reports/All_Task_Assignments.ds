@@ -1,0 +1,35 @@
+default list All_Task_Assignments
+{
+    displayName = "All Task Assignments"
+    show all rows from Task_Assignments
+    (
+        Event
+        Task_Work_Item
+        Assigned_Trainer
+        Assigned_Date
+        Deadline
+        Completion_Date
+        Progress_Status
+        Delivery_Status
+        Delay_Reason_Notes
+    )
+    filters
+    (
+        Progress_Status
+        Delivery_Status
+        Assigned_Date
+        Deadline
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Event ascending
+    )
+    sort by
+    (
+        Deadline ascending
+    )
+}

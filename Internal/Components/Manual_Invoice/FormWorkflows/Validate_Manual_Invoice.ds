@@ -1,0 +1,49 @@
+Validate_Manual_Invoice as "Validate Manual Invoice"
+{
+    type = form
+    form = Manual_Invoice
+    record event = on add or edit
+    description = "Validates references and paid details and recalculates the invoice conversion from the maintained rate server-side."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Event.Product != input.Product)
+                {
+                    alert "The selected event does not belong to the selected product.";
+                    cancel submit;
+                }
+                if(input.Total_Tickets <= 0)
+                {
+                    alert "Total Tickets must be greater than zero.";
+                    cancel submit;
+                }
+                if(input.Amount_Per_Ticket_USD <= 0)
+                {
+                    alert "Amount Per Ticket (USD) must be greater than zero.";
+                    cancel submit;
+                }
+                applicable_rates = Exchange_Rates[Currency_Code == input.Converted_Currency && Status == "Active" && Effective_Date <= zoho.currentdate] sort by Effective_Date desc range from 0 to 0;
+                if(applicable_rates.count() == 0)
+                {
+                    alert "No active exchange rate effective on or before today is available for the selected currency.";
+                    cancel submit;
+                }
+                else
+                {
+                    input.Exchange_Rate = applicable_rates.ID;
+                    input.Rate_Used = applicable_rates.Units_Per_USD;
+                    input.Total_Invoice_Amount = (input.Total_Tickets * input.Amount_Per_Ticket_USD) * input.Rate_Used;
+                }
+                if(input.Status == "Invoice Paid" && (input.Invoice_Number == null || input.Invoice_Ticket_ID == null || input.Invoice_Paid_On == null))
+                {
+                    alert "Invoice Number, Invoice Ticket ID, and Invoice Paid On are required when status is Invoice Paid.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,33 @@
+Validate_Country_Wise_Statistics as "Validate Country Wise Statistics"
+{
+    type = form
+    form = Country_Wise_Statistics
+    record event = on add or edit
+    description = "Allows only webinar statistics and validates nonnegative registration and attendance totals."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                parent_statistics = Post_Event_Statistics[ID == input.Post_Event_Statistics];
+                if(parent_statistics.Event_Type != "Webinar")
+                {
+                    alert "Country-wise statistics can only be recorded for Webinar events.";
+                    cancel submit;
+                }
+                if(input.Registrations < 0 || input.Attendees < 0)
+                {
+                    alert "Registrations and Attendees cannot be negative.";
+                    cancel submit;
+                }
+                if(input.Attendees > input.Registrations)
+                {
+                    alert "Attendees cannot exceed Registrations.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

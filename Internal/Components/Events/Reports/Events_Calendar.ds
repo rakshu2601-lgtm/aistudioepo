@@ -1,0 +1,33 @@
+calendar Events_Calendar
+{
+    displayName = "Events Calendar"
+    show all rows from Events [Event_Type != "Certification" && Event_Type != "Adhoc" && Start_Date is not null]
+    (
+        Event_Name
+        Product
+        Event_Type
+        Start_Date
+        End_Date
+        Status
+        Trainers
+    )
+    filters
+    (
+        Event_Type
+        Status
+    )
+    options
+    (
+        display type = month
+        week start day = monday
+        display field = Event_Name
+        start date = Start_Date
+        end date = End_Date
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+}

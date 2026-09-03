@@ -1,0 +1,26 @@
+Email_Invoice_Team as "Email Invoice Team"
+{
+    type = functions
+    form = Manual_Invoice
+    execution type = for each record
+    description = "Emails the complete manual invoice request to the selected invoice team and marks the request as raised."
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                sendmail
+                [
+                    from: zoho.adminuserid
+                    to: input.Invoice_Email
+                    reply to: input.Requester.Email
+                    subject: "Manual invoice request - " + input.Ticket_ID + " - " + input.Company_Name
+                    message: "<h3>Manual Invoice Request</h3><p><b>Ticket ID:</b> " + input.Ticket_ID + "<br><b>Product:</b> " + input.Product.Product_Name + "<br><b>Event:</b> " + input.Event.Event_Name + "<br><b>Certification / Training:</b> " + input.Certification_Training_Name + "</p><h4>Billing</h4><p><b>Company:</b> " + input.Company_Name + "<br><b>Billing Name:</b> " + input.Billing_Name + "<br><b>Billing Address:</b> " + input.Billing_Address + "<br><b>Billing Email:</b> " + input.Billing_Email + "<br><b>Contact Person:</b> " + input.Contact_Person + "<br><b>Region / Country:</b> " + input.Region_Country + "</p><h4>Amounts and Currency</h4><p><b>Total Tickets:</b> " + input.Total_Tickets + "<br><b>Amount Per Ticket USD:</b> " + input.Amount_Per_Ticket_USD + "<br><b>Total USD:</b> " + input.Total_Amount_USD + "<br><b>Converted Currency:</b> " + input.Converted_Currency + "<br><b>Rate Used:</b> " + input.Rate_Used + "<br><b>Total Invoice Amount:</b> " + input.Total_Invoice_Amount + "</p><h4>Tax</h4><p><b>GST Number:</b> " + input.GST_Number + "<br><b>VAT ID:</b> " + input.VAT_ID + "<br><b>Tax Exemption Certificate:</b> " + input.Tax_Exemption_Certificate_URL + "</p><p><b>Comments:</b> " + input.Comments + "</p>"
+                ];
+                input.Status = "Invoice Raised";
+            )
+        }
+    }
+}

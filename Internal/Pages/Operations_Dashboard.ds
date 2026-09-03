@@ -1,0 +1,19 @@
+<page linkname = "Operations_Dashboard" displayname = "Operations Dashboard"/>
+<content>
+<zml mobileDeviceConfig='{"layout":{"displayType":"card","design":"onebyone","forcedOrientation":false}}' tabletDeviceConfig='{"layout":{"displayType":"plain","design":"actual","forcedOrientation":false}}'>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Operations_Overview' elementName='Operations_Overview'>
+          <![CDATA[htmlpage Operations_Overview()
+content
+<%{%>
+<file name:Operations_Overview.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

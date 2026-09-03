@@ -1,0 +1,40 @@
+Initialize_Leave_Request as "Initialize Leave Request"
+{
+    type = form
+    form = Leave_Requests
+    record event = on add or edit
+    description = "Identifies the logged-in requester, assigns the reporting manager as approver, and protects routing fields."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Requester == null)
+                {
+                    login_member = Team_Members[Email == zoho.loginuserid && Status == "Active"];
+                    if(login_member.count() > 0)
+                    {
+                        input.Requester = login_member.ID;
+                    }
+                }
+                if(input.Requester != null)
+                {
+                    requester_record = Team_Members[ID == input.Requester];
+                    if(requester_record.Reporting_To != null)
+                    {
+                        input.Approver = requester_record.Reporting_To.Creator_User;
+                    }
+                    else
+                    {
+                        input.Approver = requester_record.Creator_User;
+                    }
+                }
+                disable Requester;
+                disable Approver;
+                disable Status;
+            )
+        }
+    }
+}

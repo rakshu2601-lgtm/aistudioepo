@@ -1,0 +1,148 @@
+form Events
+{
+    Event_Details
+    (
+        type = section
+        displayname = "Event Details"
+        row = 1
+        column = 0
+    )
+    must have Product
+    (
+        type = picklist
+        values = Products.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Event_Name
+    (
+        type = text
+        displayname = "Event Name"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Event_Type
+    (
+        type = picklist
+        displayname = "Event Type"
+        values = {"Webinar","Online Training","In-person","Customized Training","Adhoc","Certification"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    Start_Date
+    (
+        type = date
+        displayname = "Start Date"
+        row = 1
+        column = 2
+        width = medium
+    )
+    End_Date
+    (
+        type = date
+        displayname = "End Date"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Duration_Days
+    (
+        type = formula
+        displayname = "Duration Days"
+        value = if(Start_Date != null && End_Date != null, Start_Date.daysBetween(End_Date) + 1, 0)
+        visibility = false
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Status
+    (
+        type = picklist
+        values = {"Tentative","Open","In Progress","Completed","Hold","Cancelled"}
+        initial value = "Tentative"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Trainers
+    (
+        type = list
+        values = Team_Members[Status == "Active" && Role == "Trainer"].ID
+        displayformat = [Name.first_name]
+        searchable = true
+        height = 120px
+        row = 1
+        column = 1
+        width = medium
+    )
+    QA_Trainer
+    (
+        type = picklist
+        displayname = "QA Trainer"
+        values = Team_Members[Status == "Active" && Role == "Trainer"].ID
+        displayformat = [Name.first_name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Certification_Name
+    (
+        type = text
+        displayname = "Certification Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Certification_Year
+    (
+        type = number
+        displayname = "Certification Year"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Certification_Month
+    (
+        type = picklist
+        displayname = "Certification Month"
+        values = {"January","February","March","April","May","June","July","August","September","October","November","December"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    Survey_Report_URL
+    (
+        type = url
+        displayname = "Survey Report URL"
+        target = new window
+        enable = linkname, title
+        row = 1
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+        }
+    }
+}

@@ -1,0 +1,124 @@
+form Task_Assignments
+{
+    displayname = "Task Assignments"
+
+    Assignment_Details
+    (
+        type = section
+        displayname = "Assignment Details"
+        row = 1
+        column = 0
+    )
+    must have Event
+    (
+        type = picklist
+        values = Events.ID
+        displayformat = [Event_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Task_Work_Item
+    (
+        type = text
+        displayname = "Task / Work Item"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Assigned_Trainer
+    (
+        type = picklist
+        displayname = "Assigned Trainer"
+        values = Team_Members.ID
+        displayformat = [Name.first_name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Assigned_Date
+    (
+        type = date
+        displayname = "Assigned Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Deadline
+    (
+        type = date
+        row = 1
+        column = 1
+        width = medium
+    )
+    Completion_Date
+    (
+        type = date
+        displayname = "Completion Date"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Progress_Status
+    (
+        type = picklist
+        displayname = "Progress Status"
+        values = {"Assigned", "In Progress", "Completed"}
+        initial value = "Assigned"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Delivery_Status
+    (
+        type = picklist
+        displayname = "Delivery Status"
+        values = {"On Time", "Delayed"}
+        initial value = "On Time"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Delay_Reason_Notes
+    (
+        type = textarea
+        displayname = "Delay Reason / Notes"
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

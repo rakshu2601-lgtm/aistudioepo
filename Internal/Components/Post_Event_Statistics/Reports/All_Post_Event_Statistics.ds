@@ -1,0 +1,35 @@
+default list All_Post_Event_Statistics
+{
+    displayName = "All Post Event Statistics"
+    show all rows from Post_Event_Statistics
+    (
+        Event
+        Product
+        Event_Type
+        Total_Registrations
+        (
+            display = total
+        )
+        Total_Attendees
+        (
+            display = total
+        )
+        Revenue_USD
+        (
+            display = total
+        )
+        Survey_Report_URL
+        Feedback_Insights_URL
+        Debrief_URL
+        Statistics_Month
+        Statistics_Year
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Product ascending
+    )
+}

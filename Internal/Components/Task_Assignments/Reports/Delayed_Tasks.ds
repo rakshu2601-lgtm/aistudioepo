@@ -1,0 +1,26 @@
+list Delayed_Tasks
+{
+    displayName = "Delayed Tasks"
+    show all rows from Task_Assignments [Delivery_Status == "Delayed"]
+    (
+        Event
+        Task_Work_Item
+        Assigned_Trainer
+        Assigned_Date
+        Deadline
+        Completion_Date
+        Progress_Status
+        Delivery_Status
+        Delay_Reason_Notes
+    )
+    filters
+    (
+        Assigned_Trainer
+        Progress_Status
+        Deadline
+    )
+    sort by
+    (
+        Deadline ascending
+    )
+}

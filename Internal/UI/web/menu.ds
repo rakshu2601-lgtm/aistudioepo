@@ -1,0 +1,133 @@
+menu
+{
+    unused
+    {
+        form Daily_Work_Items { icon = "business-briefcase-24" }
+        form Source_Wise_Statistics { icon = "business-chart-bar-32" }
+        form Country_Wise_Statistics { icon = "business-chart-pie-35" }
+        report Daily_Work_Items_Report { icon = "files-notebook" }
+        report All_Source_Wise_Statistics { icon = "business-chart-growth" }
+        report All_Country_Wise_Statistics { icon = "business-chart-pie-36" }
+        report All_Task_Assignments { icon = "files-folder-14" }
+        report Approved_Leave_Calendar { icon = "business-agenda" }
+        report Trainer_Events { icon = "business-notes" }
+        report Online_Training_Pre_Event_Stats { icon = "education-paper-diploma" }
+        report Daily_Update_Calendar { icon = "business-agenda" }
+        report During_Event_Calendar { icon = "business-agenda" }
+        report Approved_WFH_Calendar { icon = "business-agenda" }
+    }
+    space Operations_Space
+    {
+        displayname = "Operations"
+        icon = "business-briefcase-25"
+        section Dashboard_Section
+        {
+            displayname = "Dashboard"
+            icon = "business-chart"
+            page Operations_Dashboard { icon = "business-chart-bar-33" }
+        }
+        section Team_Section
+        {
+            displayname = "Team"
+            icon = "users-multiple-11"
+            form Team_Members { icon = "users-add-29" }
+            report All_Team_Members { icon = "users-contacts" }
+            report Available_Team_Members { icon = "users-network" }
+        }
+        section Requests_Approvals_Section
+        {
+            displayname = "Requests & Approvals"
+            icon = "business-signature"
+            form Leave_Requests { icon = "files-edit" }
+            report My_Leave_Requests { icon = "files-user" }
+            report All_Leave_Requests { icon = "files-folder-shared" }
+            form Work_From_Home_Requests { icon = "business-building" }
+            report My_WFH_Requests { icon = "files-user" }
+            report All_WFH_Requests { icon = "files-folder-shared" }
+        }
+        section Products_Section
+        {
+            displayname = "Products"
+            icon = "objects-puzzle-09"
+            form Products { icon = "objects-puzzle-10" }
+            report All_Products { icon = "files-folder-14" }
+            report Active_Products { icon = "files-check" }
+        }
+        section Events_Section
+        {
+            displayname = "Events"
+            icon = "business-agenda"
+            form Events { icon = "business-board-27" }
+            report All_Events { icon = "business-notes" }
+            report Events_Calendar { icon = "business-agenda" }
+            report Event_Status_Board { icon = "business-progress" }
+            report Certification_Events { icon = "education-paper-diploma" }
+        }
+        section Event_Execution_Section
+        {
+            displayname = "Event Execution"
+            icon = "business-strategy"
+            form Pre_Event_Activities { icon = "files-notebook" }
+            report All_Pre_Event_Activities { icon = "files-single-content-03" }
+            report Content_Review_Board { icon = "files-check" }
+            form During_Event_Updates { icon = "business-notes" }
+            report All_During_Event_Updates { icon = "files-shared" }
+            form Post_Event_Statistics { icon = "business-chart-bar-32" }
+            report All_Post_Event_Statistics { icon = "business-chart-pie-35" }
+        }
+        section Daily_Work_Section
+        {
+            displayname = "Daily Work"
+            icon = "business-briefcase-24"
+            form Task_Assignments { icon = "business-agenda" }
+            report Task_Status_Board { icon = "business-progress" }
+            report My_Assigned_Tasks { icon = "files-user" }
+            report Delayed_Tasks { icon = "files-exclamation" }
+            form Daily_Work_Updates { icon = "education-notepad" }
+            report My_Daily_Work_Updates { icon = "files-notebook" }
+            report All_Daily_Work_Updates { icon = "files-folder-shared" }
+        }
+        section Discounts_Section
+        {
+            displayname = "Discounts"
+            icon = "business-percentage-38"
+            form Discount_Requests { icon = "business-percentage-39" }
+            report Discount_Requests_Tracker { icon = "business-progress" }
+            report My_Discount_Requests { icon = "files-user" }
+            report Approved_Discounts { icon = "files-check" }
+        }
+        section Invoices_Section
+        {
+            displayname = "Invoices"
+            icon = "files-money"
+            form Manual_Invoice { icon = "business-cheque" }
+            report All_Manual_Invoices { icon = "files-folder-money" }
+            report My_Invoice_Requests { icon = "files-user" }
+            report Outstanding_Invoices { icon = "business-money-time" }
+        }
+        section Administration_Section
+        {
+            displayname = "Administration"
+            icon = "business-hierarchy-53"
+            form Exchange_Rates { icon = "business-currency-dollar" }
+            report All_Exchange_Rates { icon = "business-math" }
+            report Active_Exchange_Rates { icon = "business-money-growth" }
+            report Monthly_Revenue_Statistics { icon = "business-chart-growth" }
+            report Yearly_Event_Statistics { icon = "business-chart-bar-33" }
+        }
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space,section,component}
+        }
+    }
+}

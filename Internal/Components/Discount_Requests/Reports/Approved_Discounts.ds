@@ -1,0 +1,35 @@
+list Approved_Discounts
+{
+    displayName = "Approved Discounts"
+    show all rows from Discount_Requests [Status == "Approved"]
+    (
+        Product
+        Event
+        Ticket_ID
+        Requester
+        Customer_Company
+        Customer_Email
+        Discount_Type
+        Number_of_Tickets
+        Total_Amount_USD
+        Discount_Percentage
+        Discounted_Amount_USD
+        Approver
+        Status
+        Assigned_Promo_Owner
+        Promo_Code
+        Registration_URL
+        Promo_Code_Status
+    )
+    filters
+    (
+        Product
+        Event
+        Discount_Type
+        Promo_Code_Status
+    )
+    options
+    (
+        show approval process = true
+    )
+}

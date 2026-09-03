@@ -1,0 +1,19 @@
+forms
+{
+    form Team_Members { label placement = left }
+    form Products { label placement = left }
+    form Leave_Requests { label placement = left }
+    form Work_From_Home_Requests { label placement = left }
+    form Events { label placement = left }
+    form Pre_Event_Activities { label placement = left }
+    form During_Event_Updates { label placement = left }
+    form Post_Event_Statistics { label placement = left }
+    form Source_Wise_Statistics { label placement = left }
+    form Country_Wise_Statistics { label placement = left }
+    form Task_Assignments { label placement = left }
+    form Daily_Work_Items { label placement = left }
+    form Daily_Work_Updates { label placement = left }
+    form Exchange_Rates { label placement = left }
+    form Discount_Requests { label placement = left }
+    form Manual_Invoice { label placement = left }
+}

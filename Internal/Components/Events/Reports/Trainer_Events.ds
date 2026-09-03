@@ -1,0 +1,24 @@
+list Trainer_Events
+{
+    displayName = "Trainer Events"
+    show all rows from Events
+    (
+        Event_Name
+        Product
+        Event_Type
+        Start_Date
+        End_Date
+        Status
+        Trainers
+    )
+    filters
+    (
+        Event_Type
+        Status
+        Start_Date
+    )
+    sort by
+    (
+        Start_Date descending
+    )
+}

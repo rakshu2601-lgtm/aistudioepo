@@ -1,0 +1,22 @@
+Mark_Overdue_Tasks_Delayed as "Mark Overdue Tasks Delayed"
+{
+    type = schedule
+    form = Task_Assignments[Progress_Status != "Completed"]
+    start = after 1 days from Deadline at "00:05:00"
+    frequency = daily
+    time zone = "Asia/Kolkata"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                if(input.Progress_Status != "Completed" && zoho.currentdate > input.Deadline)
+                {
+                    input.Delivery_Status = "Delayed";
+                }
+            )
+        }
+    }
+}

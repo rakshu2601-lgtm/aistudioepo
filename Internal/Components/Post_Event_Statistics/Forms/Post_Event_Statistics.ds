@@ -1,0 +1,126 @@
+form Post_Event_Statistics
+{
+    Statistics
+    (
+        type = section
+        row = 1
+        column = 0
+    )
+    must have Event
+    (
+        type = picklist
+        values = Events.ID
+        displayformat = [Event_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Product
+    (
+        type = picklist
+        values = Products.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Event_Type
+    (
+        type = picklist
+        displayname = "Event Type"
+        values = {"Webinar","Online Training","In-person","Customized Training","Adhoc","Certification"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Total_Registrations
+    (
+        type = number
+        displayname = "Total Registrations"
+        initial value = 0
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Total_Attendees
+    (
+        type = number
+        displayname = "Total Attendees"
+        initial value = 0
+        row = 1
+        column = 1
+        width = medium
+    )
+    Revenue_USD
+    (
+        type = USD
+        displayname = "Revenue USD"
+        initial value = 0
+        decimalplace = 2
+        row = 1
+        column = 2
+        width = medium
+    )
+    Survey_Report_URL
+    (
+        type = url
+        displayname = "Survey Report URL"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Feedback_Insights_URL
+    (
+        type = url
+        displayname = "Feedback Insights URL"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Debrief_URL
+    (
+        type = url
+        displayname = "Debrief URL"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Statistics_Month
+    (
+        type = picklist
+        displayname = "Statistics Month"
+        values = {"January","February","March","April","May","June","July","August","September","October","November","December"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    Statistics_Year
+    (
+        type = number
+        displayname = "Statistics Year"
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+        }
+    }
+}

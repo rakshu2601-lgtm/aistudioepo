@@ -1,0 +1,50 @@
+default list All_Leave_Requests
+{
+    displayName = "All Leave Requests"
+    show all rows from Leave_Requests
+    (
+        Requester
+        Leave_Type
+        Start_Date
+        End_Date
+        Reason
+        Approver
+        Status
+        Rejection_Reason
+    )
+    filters
+    (
+        Leave_Type
+        Start_Date
+        Status
+    )
+    sort by
+    (
+        Start_Date descending
+    )
+    options
+    (
+        show approval process = true
+    )
+    conditional formatting
+    (
+        "Pending Requests"
+        {
+            condition = (Status == "Pending")
+            fields = [Status]
+            format = "background-color:#FFF4CC;color:#8A5A00;font-weight:bold"
+        }
+        "Approved Requests"
+        {
+            condition = (Status == "Approved")
+            fields = [Status]
+            format = "background-color:#E2F5E9;color:#176B3A;font-weight:bold"
+        }
+        "Rejected Requests"
+        {
+            condition = (Status == "Rejected")
+            fields = [Status]
+            format = "background-color:#FDE7E7;color:#A61B1B;font-weight:bold"
+        }
+    )
+}

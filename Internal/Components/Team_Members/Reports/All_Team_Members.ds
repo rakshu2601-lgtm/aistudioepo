@@ -1,0 +1,22 @@
+default list All_Team_Members
+{
+    displayName = "All Team Members"
+    show all rows from Team_Members
+    (
+        Name
+        Email
+        Creator_User
+        Reporting_To
+        Role
+        Availability
+        Status
+    )
+    group by
+    (
+        Role ascending
+    )
+    sort by
+    (
+        Name ascending
+    )
+}

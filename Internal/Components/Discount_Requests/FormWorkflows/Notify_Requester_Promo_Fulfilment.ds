@@ -1,0 +1,24 @@
+Notify_Requester_Promo_Fulfilment as "Notify Requester of Promo Fulfilment"
+{
+    type = form
+    form = Discount_Requests[Promo_Code_Status == "Added"]
+    record event = on edit
+    description = "Notifies the requester after promo-code or registration fulfilment details are supplied."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                sendmail
+                [
+                    from: zoho.adminuserid
+                    to: input.Requester.Email
+                    subject: "Promo code fulfilment updated"
+                    message: "Promo fulfilment details for " + input.Event.Event_Name + " are now available. Promo code: " + input.Promo_Code + ". Registration URL: " + input.Registration_URL
+                ]
+            )
+        }
+    }
+}

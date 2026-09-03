@@ -1,0 +1,31 @@
+kanban Event_Status_Board
+{
+    displayName = "Event Status Board"
+    show all rows from Events
+    (
+        Event_Name
+        Product
+        Event_Type
+        Start_Date
+        End_Date
+        Status
+        Trainers
+    )
+    filters
+    (
+        Event_Type
+        Status
+    )
+    sort by
+    (
+        Start_Date descending
+    )
+    options
+    (
+        display field = Status
+        othercolumn = "Other"
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

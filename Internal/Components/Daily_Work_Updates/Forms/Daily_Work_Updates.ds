@@ -1,0 +1,92 @@
+form Daily_Work_Updates
+{
+    displayname = "Daily Work Updates"
+
+    Daily_Update
+    (
+        type = section
+        displayname = "Daily Update"
+        row = 1
+        column = 0
+    )
+    must have Team_Member
+    (
+        type = picklist
+        displayname = "Team Member"
+        values = Team_Members.ID
+        displayformat = [Name.first_name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Update_Date
+    (
+        type = date
+        displayname = "Update Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Consolidated_Update
+    (
+        type = richtext
+        displayname = "Consolidated Update"
+        height = 240px
+        toolbar = disable
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    Work_Items_Section
+    (
+        type = section
+        displayname = "Work Items"
+        visibility = false
+        row = 2
+        column = 1
+    )
+    must have Work_Items
+    (
+        type = grid
+        displayname = "Work Items"
+        values = Daily_Work_Items.ID
+        bidirectional = Daily_Update
+        defaultrow = 0
+        row = 2
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

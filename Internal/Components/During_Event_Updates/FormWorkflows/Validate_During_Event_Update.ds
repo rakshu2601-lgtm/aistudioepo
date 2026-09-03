@@ -1,0 +1,41 @@
+Validate_During_Event_Update as "Validate During Event Update"
+{
+    type = form
+    form = During_Event_Updates
+    record event = on add or edit
+    description = "Validates event eligibility, date range, and Event-Date-Trainer uniqueness."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                selected_event = Events[ID == input.Event];
+                if(selected_event.Event_Type == "Webinar")
+                {
+                    alert "During-event updates cannot be created for Webinar events.";
+                    cancel submit;
+                }
+                if(selected_event.Start_Date == null || selected_event.End_Date == null || input.Update_Date < selected_event.Start_Date || input.Update_Date > selected_event.End_Date)
+                {
+                    alert "Update Date must fall within the selected event's Start Date and End Date.";
+                    cancel submit;
+                }
+                if(input.ID == null)
+                {
+                    duplicate_count = During_Event_Updates[Event == input.Event && Update_Date == input.Update_Date && Trainer == input.Trainer].count();
+                }
+                else
+                {
+                    duplicate_count = During_Event_Updates[Event == input.Event && Update_Date == input.Update_Date && Trainer == input.Trainer && ID != input.ID].count();
+                }
+                if(duplicate_count > 0)
+                {
+                    alert "An update already exists for this Event, Update Date, and Trainer.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

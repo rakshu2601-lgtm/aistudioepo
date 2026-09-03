@@ -1,0 +1,37 @@
+default list All_Source_Wise_Statistics
+{
+    displayName = "All Source Wise Statistics"
+    show all rows from Source_Wise_Statistics
+    (
+        Post_Event_Statistics
+        Region
+        Source_Name
+        Registrations
+        (
+            display = total
+        )
+        Attendees
+        (
+            display = total
+        )
+    )
+    filters
+    (
+        Post_Event_Statistics
+        Region
+        Source_Name
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Post_Event_Statistics ascending
+        Region ascending
+    )
+    sort by
+    (
+        Source_Name ascending
+    )
+}

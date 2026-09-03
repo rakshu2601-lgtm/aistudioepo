@@ -1,0 +1,38 @@
+default list All_Pre_Event_Activities
+{
+    displayName = "All Pre Event Activities"
+    show all rows from Pre_Event_Activities
+    (
+        Event
+        Activity_Type
+        Content_Name
+        Created_By
+        Review_Lead
+        Review_Status
+        Topic_or_Session
+        Assigned_Trainer
+        Target_Date
+        Total_Registrations
+        Revenue_USD
+    )
+    filters
+    (
+        Event
+        Activity_Type
+        Review_Status
+        Target_Date
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Event ascending
+        Activity_Type ascending
+    )
+    sort by
+    (
+        Target_Date ascending
+    )
+}

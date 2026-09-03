@@ -1,0 +1,25 @@
+list Online_Training_Pre_Event_Stats
+{
+    displayName = "Online Training Pre Event Stats"
+    show all rows from Pre_Event_Activities [Activity_Type == "Statistics Update" && Event.Event_Type == "Online Training"]
+    (
+        Event
+        Content_Name
+        Target_Date
+        Total_Registrations
+        Revenue_USD
+        Statistics_Message
+        Survey_Link
+        Recording_Link
+        Materials_Link
+    )
+    filters
+    (
+        Event
+        Target_Date
+    )
+    sort by
+    (
+        Target_Date descending
+    )
+}

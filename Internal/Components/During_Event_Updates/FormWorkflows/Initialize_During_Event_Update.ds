@@ -1,0 +1,26 @@
+Initialize_During_Event_Update as "Initialize During Event Update"
+{
+    type = form
+    form = During_Event_Updates
+    record event = on add or edit
+    description = "Sets the trainer from the logged-in active team member and protects ownership."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Trainer == null)
+                {
+                    login_member = Team_Members[Email == zoho.loginuserid && Status == "Active"];
+                    if(login_member.count() > 0)
+                    {
+                        input.Trainer = login_member.ID;
+                    }
+                }
+                disable Trainer;
+            )
+        }
+    }
+}

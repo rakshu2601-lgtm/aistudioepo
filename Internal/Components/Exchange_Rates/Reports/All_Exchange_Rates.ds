@@ -1,0 +1,22 @@
+default list All_Exchange_Rates
+{
+    displayName = "All Exchange Rates"
+    show all rows from Exchange_Rates
+    (
+        Currency_Code
+        Units_Per_USD
+        Effective_Date
+        Status
+        Notes
+    )
+    filters
+    (
+        Currency_Code
+        Effective_Date
+        Status
+    )
+    sort by
+    (
+        Effective_Date descending
+    )
+}

@@ -1,0 +1,24 @@
+list Monthly_Revenue_Statistics
+{
+    displayName = "Monthly Revenue Statistics"
+    show all rows from Post_Event_Statistics
+    (
+        Statistics_Year
+        Statistics_Month
+        Product
+        Event_Type
+        Revenue_USD
+        (
+            display = total
+        )
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Statistics_Year descending
+        Statistics_Month ascending
+    )
+}

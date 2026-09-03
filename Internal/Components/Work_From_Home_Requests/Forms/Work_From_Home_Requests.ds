@@ -1,0 +1,95 @@
+form Work_From_Home_Requests
+{
+    displayname = "Work From Home Requests"
+    success message = "Work from home request submitted successfully."
+
+    Request_Details
+    (
+        type = section
+        displayname = "Request Details"
+        row = 1
+        column = 0
+    )
+    must have Requester
+    (
+        type = picklist
+        values = Team_Members.ID
+        displayformat = [Name.first_name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have WFH_Date
+    (
+        type = date
+        displayname = "WFH Date"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Reason
+    (
+        type = textarea
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Approver
+    (
+        type = users
+        personal data = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        values = {"Pending", "Approved", "Rejected"}
+        initial value = "Pending"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Rejection_Reason
+    (
+        type = textarea
+        displayname = "Rejection Reason"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

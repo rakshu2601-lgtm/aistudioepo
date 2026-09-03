@@ -1,0 +1,26 @@
+Notify_Trainers_On_Reassignment as "Notify Trainers On Reassignment"
+{
+    type = form
+    form = Events
+    record event = on edit
+
+    on update of Trainers
+    {
+        actions
+        {
+            custom deluge script
+            (
+                for each trainer in Team_Members[ID in input.Trainers]
+                {
+                    sendmail
+                    [
+                        from: zoho.adminuserid
+                        to: trainer.Email
+                        subject: "Event assignment updated: " + input.Event_Name
+                        message: "Your assignment for " + input.Event_Name + " has been added or updated."
+                    ]
+                }
+            )
+        }
+    }
+}

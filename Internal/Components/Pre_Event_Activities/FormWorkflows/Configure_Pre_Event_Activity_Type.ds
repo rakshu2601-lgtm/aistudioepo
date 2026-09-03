@@ -1,0 +1,50 @@
+Configure_Pre_Event_Activity_Type as "Configure Pre Event Activity Type"
+{
+    type = form
+    form = Pre_Event_Activities
+    record event = on add or edit
+
+    on user input of Activity_Type
+    {
+        actions
+        {
+            custom deluge script
+            (
+                event_type = "";
+                if(input.Event != null)
+                {
+                    event_type = Events[ID == input.Event].Event_Type;
+                }
+                hide Topic_or_Session;
+                hide Assigned_Trainer;
+                hide Review_Lead;
+                hide Review_Status;
+                hide Total_Registrations;
+                hide Revenue_USD;
+                hide Statistics_Message;
+                hide Survey_Link;
+                hide Recording_Link;
+                hide Materials_Link;
+                if(input.Activity_Type == "Agenda Topic")
+                {
+                    show Topic_or_Session;
+                    show Assigned_Trainer;
+                }
+                if(input.Activity_Type == "Promotional Content" || input.Activity_Type == "Connect Post" || input.Activity_Type == "Email Invite" || input.Activity_Type == "Presentation" || input.Activity_Type == "Dry Run" || input.Activity_Type == "Follow-up Content")
+                {
+                    show Review_Lead;
+                    show Review_Status;
+                }
+                if(input.Activity_Type == "Statistics Update" && event_type == "Online Training")
+                {
+                    show Total_Registrations;
+                    show Revenue_USD;
+                    show Statistics_Message;
+                    show Survey_Link;
+                    show Recording_Link;
+                    show Materials_Link;
+                }
+            )
+        }
+    }
+}

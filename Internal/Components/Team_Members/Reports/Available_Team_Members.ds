@@ -1,0 +1,14 @@
+list Available_Team_Members
+{
+    displayName = "Available Team Members"
+    show all rows from Team_Members [Status == "Active" && Availability != "Unavailable"]
+    (
+        Name
+        Email
+        Creator_User
+        Reporting_To
+        Role
+        Availability
+        Status
+    )
+}

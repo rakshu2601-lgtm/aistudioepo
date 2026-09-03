@@ -1,0 +1,64 @@
+default list Discount_Requests_Tracker
+{
+    displayName = "Discount Requests Tracker"
+    show all rows from Discount_Requests
+    (
+        Product
+        Event
+        Ticket_ID
+        Requester
+        Customer_Company
+        Discount_Type
+        Number_of_Tickets
+        Unit_Amount_USD
+        Total_Amount_USD
+        Discount_Percentage
+        Discounted_Amount_USD
+        Approver
+        Status
+        Assigned_Promo_Owner
+        Promo_Code
+        Registration_URL
+        Promo_Code_Status
+        custom action "Add Promo Code"
+        (
+            workflow = Open_Add_Promo_Code
+            show action for each record = true
+            column header = "Add Promo Code"
+            condition = (Status == "Approved" && Promo_Code_Status == "Yet to Add")
+        )
+    )
+    filters
+    (
+        Product
+        Event
+        Status
+        Promo_Code_Status
+        Discount_Type
+    )
+    options
+    (
+        show approval process = true
+    )
+    conditional formatting
+    (
+        "Approved"
+        {
+            condition = (Status == "Approved")
+            fields = [Status]
+            format = "background-color:#E6F4EA;color:#137333;font-weight:bold"
+        }
+        "Rejected"
+        {
+            condition = (Status == "Rejected")
+            fields = [Status]
+            format = "background-color:#FCE8E6;color:#C5221F;font-weight:bold"
+        }
+        "Requested"
+        {
+            condition = (Status == "Requested")
+            fields = [Status]
+            format = "background-color:#FEF7E0;color:#B06000;font-weight:bold"
+        }
+    )
+}

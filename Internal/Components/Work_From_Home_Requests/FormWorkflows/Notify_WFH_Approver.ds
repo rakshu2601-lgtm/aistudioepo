@@ -1,0 +1,24 @@
+Notify_WFH_Approver as "Notify WFH Approver"
+{
+    type = form
+    form = Work_From_Home_Requests[Status == "Pending"]
+    record event = on add
+    description = "Notifies the reporting manager when a new work-from-home request is submitted."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                sendmail
+                [
+                    from: zoho.adminuserid
+                    to: input.Approver
+                    subject: "Work from home request awaiting approval"
+                    message: "A work from home request for " + input.WFH_Date + " is awaiting your approval. Reason: " + input.Reason
+                ]
+            )
+        }
+    }
+}

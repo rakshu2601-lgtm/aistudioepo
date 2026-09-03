@@ -1,0 +1,29 @@
+list My_Leave_Requests
+{
+    displayName = "My Leave Requests"
+    show all rows from Leave_Requests [Requester.Email == zoho.loginuserid]
+    (
+        Requester
+        Leave_Type
+        Start_Date
+        End_Date
+        Reason
+        Approver
+        Status
+        Rejection_Reason
+    )
+    filters
+    (
+        Leave_Type
+        Start_Date
+        Status
+    )
+    sort by
+    (
+        Start_Date descending
+    )
+    options
+    (
+        show approval process = true
+    )
+}

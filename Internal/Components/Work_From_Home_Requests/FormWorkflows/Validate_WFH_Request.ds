@@ -1,0 +1,27 @@
+Validate_WFH_Request as "Validate WFH Request"
+{
+    type = form
+    form = Work_From_Home_Requests
+    record event = on add or edit
+    description = "Rejects past work-from-home dates and requires a reason for rejected requests."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.WFH_Date < zoho.currentdate)
+                {
+                    alert(WFH_Date, "WFH Date must be today or a future date.");
+                    cancel submit;
+                }
+                if(input.Status == "Rejected" && (input.Rejection_Reason == null || input.Rejection_Reason.trim() == ""))
+                {
+                    alert(Rejection_Reason, "Rejection Reason is required when rejecting a request.");
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

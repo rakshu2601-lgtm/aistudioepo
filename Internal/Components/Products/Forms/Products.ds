@@ -1,0 +1,45 @@
+form Products
+{
+    Product_Details
+    (
+        type = section
+        displayname = "Product Details"
+        row = 1
+        column = 0
+    )
+    unique Product_Name
+    (
+        type = text
+        displayname = "Product Name"
+        row = 1
+        column = 1
+    )
+    Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"Active","Inactive"}
+        initial value = "Active"
+        row = 1
+        column = 1
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+        }
+    }
+}

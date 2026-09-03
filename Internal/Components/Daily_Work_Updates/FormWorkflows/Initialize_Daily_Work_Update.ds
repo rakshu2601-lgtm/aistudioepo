@@ -1,0 +1,63 @@
+Initialize_Daily_Work_Update as "Initialize Daily Work Update"
+{
+    type = form
+    form = Daily_Work_Updates
+    record event = on add or edit
+    description = "Defaults the logged-in member and date, protects generated fields, and preloads incomplete assigned tasks on new entries."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Team_Member == null)
+                {
+                    login_member = Team_Members[Email == zoho.loginuserid && Status == "Active"];
+                    if(login_member.count() > 0)
+                    {
+                        input.Team_Member = login_member.ID;
+                    }
+                }
+                if(input.Update_Date == null)
+                {
+                    input.Update_Date = zoho.currentdate;
+                }
+                if(input.ID == null && input.Team_Member != null)
+                {
+                    existing_task_ids = List();
+                    for each existing_row in input.Work_Items
+                    {
+                        if(existing_row.Assigned_Task != null)
+                        {
+                            existing_task_ids.add(existing_row.Assigned_Task);
+                        }
+                    }
+                    preload_rows = Collection();
+                    for each assigned_task in Task_Assignments[Assigned_Trainer == input.Team_Member && Progress_Status != "Completed"]
+                    {
+                        if(!existing_task_ids.contains(assigned_task.ID))
+                        {
+                            preload_row = Daily_Work_Updates.Work_Items();
+                            preload_row.Assigned_Task = assigned_task.ID;
+                            preload_row.Event_Work_Category = assigned_task.Event;
+                            preload_row.Work_Done_Description = assigned_task.Task_Work_Item;
+                            preload_row.Status = if(assigned_task.Progress_Status == "Assigned", "No Progress", assigned_task.Progress_Status);
+                            preload_row.Hours_Worked = 0;
+                            preload_rows.insert(preload_row);
+                            existing_task_ids.add(assigned_task.ID);
+                        }
+                    }
+                    if(preload_rows.size() > 0)
+                    {
+                        input.Work_Items.insert(preload_rows);
+                    }
+                }
+                disable Team_Member;
+                disable Update_Date;
+                disable Consolidated_Update;
+                hide Consolidated_Update;
+            )
+        }
+    }
+}

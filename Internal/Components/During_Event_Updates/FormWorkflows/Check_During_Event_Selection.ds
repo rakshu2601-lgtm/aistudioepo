@@ -1,0 +1,30 @@
+Check_During_Event_Selection as "Check During Event Selection"
+{
+    type = form
+    form = During_Event_Updates
+    record event = on add or edit
+    description = "Prevents webinar updates and warns when the update date is outside the selected event."
+
+    on user input of Event
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Event != null)
+                {
+                    selected_event = Events[ID == input.Event];
+                    if(selected_event.Event_Type == "Webinar")
+                    {
+                        input.Event = null;
+                        alert "During-event updates cannot be created for Webinar events.";
+                    }
+                    else if(input.Update_Date != null && (selected_event.Start_Date == null || selected_event.End_Date == null || input.Update_Date < selected_event.Start_Date || input.Update_Date > selected_event.End_Date))
+                    {
+                        alert "Update Date must fall within the selected event's Start Date and End Date.";
+                    }
+                }
+            )
+        }
+    }
+}

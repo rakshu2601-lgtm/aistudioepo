@@ -1,0 +1,28 @@
+calendar Daily_Update_Calendar
+{
+    displayName = "Daily Update Calendar"
+    show all rows from Daily_Work_Updates
+    (
+        Team_Member
+        Update_Date
+        Consolidated_Update
+    )
+    filters
+    (
+        Team_Member
+        Update_Date
+    )
+    options
+    (
+        display type = month
+        week start day = monday
+        display field = Team_Member
+        start date = Update_Date
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+}

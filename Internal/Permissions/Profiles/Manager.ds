@@ -1,0 +1,58 @@
+"Manager"
+{
+    name        = "Manager"
+    type        = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+    description = "Full operational CRUD, approvals, exchange-rate maintenance, financial oversight, reports, and dashboard access."
+
+    ModulePermissions
+    {
+        Team_Members { enabled = Create,View,Edit,Delete,Viewall,Modifyall,Search,Tab allFieldsVisible = true ReportPermissions { All_Team_Members={"View","Edit","Delete"} Available_Team_Members={"View","Edit","Delete"} } }
+        Products { enabled = Create,View,Edit,Delete,Viewall,Modifyall,Search,Tab allFieldsVisible = true ReportPermissions { All_Products={"View","Edit","Delete"} Active_Products={"View","Edit","Delete"} } }
+        Leave_Requests { enabled = Create,View,Edit,Delete,Viewall,Modifyall,Search,Tab allFieldsVisible = true ReportPermissions { All_Leave_Requests={"View","Edit","Delete"} My_Leave_Requests={"View","Edit","Delete"} Approved_Leave_Calendar={"View","Edit","Delete"} } }
+        Work_From_Home_Requests { enabled = Create,View,Edit,Delete,Viewall,Modifyall,Search,Tab allFieldsVisible = true ReportPermissions { All_WFH_Requests={"View","Edit","Delete"} My_WFH_Requests={"View","Edit","Delete"} Approved_WFH_Calendar={"View","Edit","Delete"} } }
+        Events
+        {
+            enabled = Create,View,Edit,Delete,Viewall,Modifyall,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions { All_Events={"View","Edit","Delete"} Trainer_Events={"View","Edit","Delete"} Events_Calendar={"View","Edit","Delete"} Event_Status_Board={"View","Edit","Delete"} Certification_Events={"View","Edit","Delete"} }
+            FieldPermissions { Duration_Days{visibility:true,readonly:true} }
+        }
+        Pre_Event_Activities { enabled = Create,View,Edit,Delete,Viewall,Modifyall,Search,Tab allFieldsVisible = true ReportPermissions { All_Pre_Event_Activities={"View","Edit","Delete"} Content_Review_Board={"View","Edit","Delete"} Online_Training_Pre_Event_Stats={"View","Edit","Delete"} } }
+        During_Event_Updates { enabled = Create,View,Edit,Delete,Viewall,Modifyall,Search,Tab allFieldsVisible = true ReportPermissions { All_During_Event_Updates={"View","Edit","Delete"} During_Event_Calendar={"View","Edit","Delete"} } }
+        Post_Event_Statistics { enabled = Create,View,Edit,Delete,Viewall,Modifyall,Search,Tab allFieldsVisible = true ReportPermissions { All_Post_Event_Statistics={"View","Edit","Delete"} Monthly_Revenue_Statistics={"View","Edit","Delete"} Yearly_Event_Statistics={"View","Edit","Delete"} } }
+        Source_Wise_Statistics { enabled = Create,View,Edit,Delete,Viewall,Modifyall,Search allFieldsVisible = true ReportPermissions { All_Source_Wise_Statistics={"View","Edit","Delete"} } }
+        Country_Wise_Statistics { enabled = Create,View,Edit,Delete,Viewall,Modifyall,Search allFieldsVisible = true ReportPermissions { All_Country_Wise_Statistics={"View","Edit","Delete"} } }
+        Task_Assignments
+        {
+            enabled = Create,View,Edit,Delete,Viewall,Modifyall,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions { All_Task_Assignments={"View","Edit","Delete"} My_Assigned_Tasks={"View","Edit","Delete"} Task_Status_Board={"View","Edit","Delete"} Delayed_Tasks={"View","Edit","Delete"} }
+            FieldPermissions { Assigned_Date{visibility:true,readonly:true} Delivery_Status{visibility:true,readonly:true} }
+        }
+        Daily_Work_Updates
+        {
+            enabled = Create,View,Edit,Delete,Viewall,Modifyall,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions { All_Daily_Work_Updates={"View","Edit","Delete"} My_Daily_Work_Updates={"View","Edit","Delete"} Daily_Update_Calendar={"View","Edit","Delete"} }
+            FieldPermissions { Consolidated_Update{visibility:true,readonly:true} }
+        }
+        Daily_Work_Items { enabled = Create,View,Edit,Delete,Viewall,Modifyall,Search allFieldsVisible = true ReportPermissions { Daily_Work_Items_Report={"View","Edit","Delete"} } }
+        Exchange_Rates { enabled = Create,View,Edit,Delete,Viewall,Modifyall,Search,Tab allFieldsVisible = true ReportPermissions { All_Exchange_Rates={"View","Edit","Delete"} Active_Exchange_Rates={"View","Edit","Delete"} } }
+        Discount_Requests
+        {
+            enabled = Create,View,Edit,Delete,Viewall,Modifyall,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions { Discount_Requests_Tracker={"View","Edit","Delete"} My_Discount_Requests={"View","Edit","Delete"} Approved_Discounts={"View","Edit","Delete"} }
+            FieldPermissions { Ticket_ID{visibility:true,readonly:true} Requester{visibility:true,readonly:true} Total_Amount_USD{visibility:true,readonly:true} Discounted_Amount_USD{visibility:true,readonly:true} Approver_User{visibility:false} Status{visibility:true,readonly:true} Promo_Code_Status{visibility:true,readonly:true} }
+        }
+        Manual_Invoice
+        {
+            enabled = Create,View,Edit,Delete,Viewall,Modifyall,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions { All_Manual_Invoices={"View","Edit","Delete"} My_Invoice_Requests={"View","Edit","Delete"} Outstanding_Invoices={"View","Edit","Delete"} }
+            FieldPermissions { Requester{visibility:true,readonly:true} Total_Amount_USD{visibility:true,readonly:true} Exchange_Rate{visibility:true,readonly:true} Rate_Used{visibility:true,readonly:true} Total_Invoice_Amount{visibility:true,readonly:true} }
+        }
+        Operations_Dashboard { enabled = tab }
+    }
+}

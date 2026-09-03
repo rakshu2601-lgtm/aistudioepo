@@ -1,0 +1,49 @@
+default list All_WFH_Requests
+{
+    displayName = "All WFH Requests"
+    show all rows from Work_From_Home_Requests
+    (
+        Requester
+        WFH_Date
+        Reason
+        Approver
+        Status
+        Rejection_Reason
+    )
+    filters
+    (
+        Requester
+        WFH_Date
+        Status
+        Approver
+    )
+    sort by
+    (
+        WFH_Date descending
+    )
+    options
+    (
+        show approval process = true
+    )
+    conditional formatting
+    (
+        "Approved"
+        {
+            condition = (Status == "Approved")
+            fields = [Status]
+            format = "background-color:#E0F2E9;color:#176B3A;font-weight:bold"
+        }
+        "Rejected"
+        {
+            condition = (Status == "Rejected")
+            fields = [Status]
+            format = "background-color:#FDE8E8;color:#B42318;font-weight:bold"
+        }
+        "Pending"
+        {
+            condition = (Status == "Pending")
+            fields = [Status]
+            format = "background-color:#FFF4D6;color:#8A5A00;font-weight:bold"
+        }
+    )
+}

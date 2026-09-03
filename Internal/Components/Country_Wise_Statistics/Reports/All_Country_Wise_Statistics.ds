@@ -1,0 +1,37 @@
+default list All_Country_Wise_Statistics
+{
+    displayName = "All Country Wise Statistics"
+    show all rows from Country_Wise_Statistics
+    (
+        Post_Event_Statistics
+        Region
+        Country
+        Registrations
+        (
+            display = total
+        )
+        Attendees
+        (
+            display = total
+        )
+    )
+    filters
+    (
+        Post_Event_Statistics
+        Region
+        Country
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Post_Event_Statistics ascending
+        Region ascending
+    )
+    sort by
+    (
+        Country ascending
+    )
+}

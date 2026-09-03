@@ -1,0 +1,81 @@
+report Daily_Work_Items_Report
+{
+    quickview
+    (
+        layout
+        (
+            type = -1
+            datablock1
+            (
+                layout type = -1
+                fields
+                (
+                    Daily_Update
+                    Event_Work_Category
+                    Assigned_Task
+                    Work_Done_Description
+                    Status
+                    Hours_Worked
+                )
+            )
+        )
+        menu
+        (
+            header
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+            record
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+        )
+        action
+        (
+            on click
+            (
+                View Record
+            )
+            on right click
+            (
+                Edit
+                Delete
+                Duplicate
+                View Record
+            )
+        )
+    )
+    detailview
+    (
+        layout
+        (
+            type = 1
+            datablock1
+            (
+                layout type = -2
+                fields
+                (
+                    Daily_Update
+                    Event_Work_Category
+                    Assigned_Task
+                    Work_Done_Description
+                    Status
+                    Hours_Worked
+                )
+            )
+        )
+        menu
+        (
+            header
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+        )
+    )
+}

@@ -1,0 +1,113 @@
+form During_Event_Updates
+{
+    displayname = "During Event Updates"
+
+    Daily_Event_Update
+    (
+        type = section
+        displayname = "Daily Event Update"
+        row = 1
+        column = 0
+    )
+    must have Event
+    (
+        type = picklist
+        values = Events.ID
+        displayformat = [Event_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Update_Date
+    (
+        type = date
+        displayname = "Update Date"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Trainer
+    (
+        type = picklist
+        values = Team_Members.ID
+        displayformat = [Name.first_name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Daily_Summary
+    (
+        type = textarea
+        displayname = "Daily Summary"
+        height = 120px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Registration_Details
+    (
+        type = textarea
+        displayname = "Registration Details"
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Attendee_Details
+    (
+        type = textarea
+        displayname = "Attendee Details"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Recording_URL
+    (
+        type = url
+        displayname = "Recording URL"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Materials_URL
+    (
+        type = url
+        displayname = "Materials URL"
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

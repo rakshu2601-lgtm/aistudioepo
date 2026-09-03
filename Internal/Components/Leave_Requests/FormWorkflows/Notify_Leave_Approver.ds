@@ -1,0 +1,24 @@
+Notify_Leave_Approver as "Notify Leave Approver"
+{
+    type = form
+    form = Leave_Requests[Status == "Pending"]
+    record event = on add
+    description = "Notifies the assigned approver after a new pending leave request is submitted."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                sendmail
+                [
+                    from: zoho.adminuserid
+                    to: input.Approver.email
+                    subject: "New leave request awaiting approval"
+                    message: "A new " + input.Leave_Type + " request from " + input.Requester.Name.first_name + " for " + input.Start_Date + " through " + input.End_Date + " is awaiting your approval."
+                ]
+            )
+        }
+    }
+}

@@ -1,0 +1,39 @@
+Leave_Request_Approval as "Leave Request Approval"
+{
+    type = approval
+    form = Leave_Requests[Status == "Pending"]
+    display fields = [Requester, Leave_Type, Start_Date, End_Date, Reason, Rejection_Reason, Status]
+    recall request = true
+
+    on start
+    {
+        actions
+        {
+            Status = "Pending";
+        }
+    }
+
+    on level 1
+    {
+        approvers
+        (
+            field = Approver
+        )
+
+        on approve
+        {
+            actions
+            {
+                Status = "Approved";
+            }
+        }
+
+        on reject
+        {
+            actions
+            {
+                Status = "Rejected";
+            }
+        }
+    }
+}

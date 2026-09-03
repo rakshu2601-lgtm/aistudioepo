@@ -1,0 +1,25 @@
+default list Daily_Work_Items_Report
+{
+    displayName = "Daily Work Items"
+    show all rows from Daily_Work_Items
+    (
+        Daily_Update
+        Event_Work_Category
+        Assigned_Task
+        Work_Done_Description
+        Status
+        Hours_Worked
+        (
+            display = total
+        )
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Daily_Update descending
+        Event_Work_Category ascending
+    )
+}

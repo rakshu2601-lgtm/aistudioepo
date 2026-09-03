@@ -1,0 +1,90 @@
+Finalize_Daily_Work_Update as "Finalize Daily Work Update"
+{
+    type = form
+    form = Daily_Work_Updates
+    record event = on add or edit
+    description = "Synchronizes assigned-task progress and deterministically rebuilds the consolidated BRD status message."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                category_names = List();
+                for each work_row in input.Work_Items
+                {
+                    category_name = "General Work";
+                    if(work_row.Event_Work_Category != null)
+                    {
+                        category_event = Events[ID == work_row.Event_Work_Category];
+                        if(category_event.count() > 0)
+                        {
+                            category_name = category_event.Event_Name;
+                        }
+                    }
+                    if(!category_names.contains(category_name))
+                    {
+                        category_names.add(category_name);
+                    }
+                    if(work_row.Assigned_Task != null)
+                    {
+                        mapped_progress = work_row.Status;
+                        if(mapped_progress == "No Progress")
+                        {
+                            mapped_progress = "Assigned";
+                        }
+                        if(mapped_progress == "Completed")
+                        {
+                            update Task_Assignments[ID == work_row.Assigned_Task]
+                            [
+                                Progress_Status = mapped_progress
+                                Completion_Date = input.Update_Date
+                            ];
+                        }
+                        else
+                        {
+                            update Task_Assignments[ID == work_row.Assigned_Task]
+                            [
+                                Progress_Status = mapped_progress
+                                Completion_Date = null
+                            ];
+                        }
+                    }
+                }
+                consolidated_html = "<h2>Daily Work Update - " + input.Update_Date.toString("dd-MMM-yyyy") + "</h2>";
+                consolidated_html = consolidated_html + "<h3>Overall Categories</h3><ul>";
+                for each overall_category in category_names
+                {
+                    consolidated_html = consolidated_html + "<li>" + overall_category + "</li>";
+                }
+                consolidated_html = consolidated_html + "</ul>";
+                for each category_heading in category_names
+                {
+                    consolidated_html = consolidated_html + "<h3>" + category_heading + "</h3><ul>";
+                    for each detail_row in input.Work_Items
+                    {
+                        detail_category = "General Work";
+                        if(detail_row.Event_Work_Category != null)
+                        {
+                            detail_event = Events[ID == detail_row.Event_Work_Category];
+                            if(detail_event.count() > 0)
+                            {
+                                detail_category = detail_event.Event_Name;
+                            }
+                        }
+                        if(detail_category == category_heading)
+                        {
+                            consolidated_html = consolidated_html + "<li>" + detail_row.Work_Done_Description + " <strong>Status:</strong> " + detail_row.Status + "</li>";
+                        }
+                    }
+                    consolidated_html = consolidated_html + "</ul>";
+                }
+                update Daily_Work_Updates[ID == input.ID]
+                [
+                    Consolidated_Update = consolidated_html
+                ];
+            )
+        }
+    }
+}

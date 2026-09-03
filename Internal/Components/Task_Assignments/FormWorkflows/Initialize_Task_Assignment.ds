@@ -1,0 +1,22 @@
+Initialize_Task_Assignment as "Initialize Task Assignment"
+{
+    type = form
+    form = Task_Assignments
+    record event = on add or edit
+    description = "Defaults the assigned date for new tasks and keeps it read-only."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Assigned_Date == null)
+                {
+                    input.Assigned_Date = zoho.currentdate;
+                }
+                disable Assigned_Date;
+            )
+        }
+    }
+}

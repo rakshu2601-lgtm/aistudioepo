@@ -1,0 +1,32 @@
+kanban Content_Review_Board
+{
+    displayName = "Content Review Board"
+    show all rows from Pre_Event_Activities [Activity_Type == "Promotional Content" || Activity_Type == "Connect Post" || Activity_Type == "Email Invite" || Activity_Type == "Presentation" || Activity_Type == "Dry Run" || Activity_Type == "Follow-up Content"]
+    (
+        Event
+        Activity_Type
+        Content_Name
+        Document_URL
+        Review_Lead
+        Review_Status
+        Target_Date
+    )
+    filters
+    (
+        Event
+        Activity_Type
+        Review_Lead
+        Target_Date
+    )
+    sort by
+    (
+        Target_Date ascending
+    )
+    options
+    (
+        display field = Review_Status
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

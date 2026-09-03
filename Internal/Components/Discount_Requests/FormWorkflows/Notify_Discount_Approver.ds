@@ -1,0 +1,24 @@
+Notify_Discount_Approver as "Notify Discount Approver"
+{
+    type = form
+    form = Discount_Requests[Status == "Requested"]
+    record event = on add
+    description = "Notifies the selected approver when a discount request is submitted."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                sendmail
+                [
+                    from: zoho.adminuserid
+                    to: input.Approver_User.email
+                    subject: "Discount request awaiting your approval"
+                    message: "A discount request for " + input.Event.Event_Name + " from " + input.Requester.Name.first_name + " is awaiting your approval. Requested discount: " + input.Discount_Percentage + "% on USD " + input.Total_Amount_USD + "."
+                ]
+            )
+        }
+    }
+}

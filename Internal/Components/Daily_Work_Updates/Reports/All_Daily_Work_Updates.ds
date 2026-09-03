@@ -1,0 +1,15 @@
+default list All_Daily_Work_Updates
+{
+    displayName = "All Daily Work Updates"
+    show all rows from Daily_Work_Updates
+    (
+        Team_Member
+        Update_Date
+        Work_Items
+        Consolidated_Update
+    )
+    sort by
+    (
+        Update_Date descending
+    )
+}

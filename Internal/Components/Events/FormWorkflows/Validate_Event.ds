@@ -1,0 +1,44 @@
+Validate_Event as "Validate Event"
+{
+    type = form
+    form = Events
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Trainers == null || input.Trainers.size() == 0)
+                {
+                    alert "Assign at least one trainer.";
+                    cancel submit;
+                }
+                if(input.Event_Type != "Certification")
+                {
+                    if(input.Start_Date == null || input.End_Date == null)
+                    {
+                        alert "Start Date and End Date are required for non-certification events.";
+                        cancel submit;
+                    }
+                    else if(input.End_Date < input.Start_Date)
+                    {
+                        alert "End Date must be on or after Start Date.";
+                        cancel submit;
+                    }
+                }
+                if(input.Event_Type == "Certification" && (input.Certification_Name == null || input.Certification_Year == null))
+                {
+                    alert "Certification Name and Certification Year are required for certification events.";
+                    cancel submit;
+                }
+                if(input.Event_Type == "Webinar" && input.QA_Trainer == null)
+                {
+                    alert "QA Trainer is required for webinars.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

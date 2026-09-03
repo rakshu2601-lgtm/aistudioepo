@@ -1,0 +1,33 @@
+default list All_During_Event_Updates
+{
+    displayName = "All During Event Updates"
+    show all rows from During_Event_Updates
+    (
+        Event
+        Update_Date
+        Trainer
+        Daily_Summary
+        Registration_Details
+        Attendee_Details
+        Recording_URL
+        Materials_URL
+    )
+    filters
+    (
+        Event
+        Update_Date
+        Trainer
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Event ascending
+    )
+    sort by
+    (
+        Update_Date descending
+    )
+}

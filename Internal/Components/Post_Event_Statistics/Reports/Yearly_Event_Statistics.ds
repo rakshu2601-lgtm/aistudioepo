@@ -1,0 +1,30 @@
+list Yearly_Event_Statistics
+{
+    displayName = "Yearly Event Statistics"
+    show all rows from Post_Event_Statistics
+    (
+        Statistics_Year
+        Event_Type
+        Total_Registrations
+        (
+            display = total
+        )
+        Total_Attendees
+        (
+            display = total
+        )
+        Revenue_USD
+        (
+            display = total
+        )
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Statistics_Year descending
+        Event_Type ascending
+    )
+}

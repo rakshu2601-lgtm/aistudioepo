@@ -1,0 +1,317 @@
+form Manual_Invoice
+{
+    displayname = "Manual Invoice"
+
+    References
+    (
+        type = section
+        displayname = "References"
+        row = 1
+        column = 0
+    )
+    must have Ticket_ID
+    (
+        type = text
+        displayname = "Ticket ID"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Product
+    (
+        type = picklist
+        values = Products.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Event
+    (
+        type = picklist
+        values = Events.ID
+        displayformat = [Event_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Certification_Training_Name
+    (
+        type = text
+        displayname = "Certification / Training Name"
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    Requester_and_Billing
+    (
+        type = section
+        displayname = "Requester and Billing"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Requester
+    (
+        type = picklist
+        values = Team_Members.ID
+        displayformat = [Name.first_name]
+        searchable = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Company_Name
+    (
+        type = text
+        displayname = "Company Name"
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Billing_Name
+    (
+        type = text
+        displayname = "Billing Name"
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Billing_Address
+    (
+        type = textarea
+        displayname = "Billing Address"
+        height = 100px
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Billing_Email
+    (
+        type = email
+        displayname = "Billing Email"
+        personal data = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Region_Country
+    (
+        type = text
+        displayname = "Region / Country"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Contact_Person
+    (
+        type = email
+        displayname = "Contact Person"
+        personal data = true
+        row = 2
+        column = 1
+        width = medium
+    )
+
+    Amounts
+    (
+        type = section
+        displayname = "Amounts"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Total_Tickets
+    (
+        type = number
+        displayname = "Total Tickets"
+        row = 3
+        column = 1
+        width = medium
+    )
+    must have Amount_Per_Ticket_USD
+    (
+        type = USD
+        displayname = "Amount Per Ticket (USD)"
+        decimalplace = 2
+        maxchar = 16
+        row = 3
+        column = 2
+        width = medium
+    )
+    Total_Amount_USD
+    (
+        type = formula
+        displayname = "Total Amount (USD)"
+        value = Total_Tickets * Amount_Per_Ticket_USD
+        visibility = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    must have Converted_Currency
+    (
+        type = picklist
+        displayname = "Converted Currency"
+        values = {"USD", "INR", "CAD", "AED", "EUR", "NZD", "ZAR", "AUD", "EGP", "MYR"}
+        row = 3
+        column = 2
+        width = medium
+    )
+    must have Exchange_Rate
+    (
+        type = picklist
+        displayname = "Exchange Rate"
+        values = Exchange_Rates.ID
+        displayformat = [Currency_Code]
+        searchable = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    must have Rate_Used
+    (
+        type = decimal
+        displayname = "Rate Used"
+        decimalplace = 6
+        row = 3
+        column = 2
+        width = medium
+    )
+    must have Total_Invoice_Amount
+    (
+        type = decimal
+        displayname = "Total Invoice Amount"
+        decimalplace = 2
+        row = 3
+        column = 1
+        width = medium
+    )
+
+    Invoice_Processing
+    (
+        type = section
+        displayname = "Invoice Processing"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    GST_Number
+    (
+        type = text
+        displayname = "GST Number"
+        row = 4
+        column = 1
+        width = medium
+    )
+    VAT_ID
+    (
+        type = text
+        displayname = "VAT ID"
+        row = 4
+        column = 2
+        width = medium
+    )
+    Tax_Exemption_Certificate_URL
+    (
+        type = url
+        displayname = "Tax Exemption Certificate URL"
+        target = new window
+        enable = linkname, title
+        row = 4
+        column = 1
+        width = medium
+    )
+    Comments
+    (
+        type = textarea
+        height = 100px
+        row = 4
+        column = 2
+        width = medium
+    )
+    Invoice_Email
+    (
+        type = picklist
+        displayname = "Invoice Email"
+        values = {"inv.zstoreind@zohocorp.com", "invoice@zohocorp.com"}
+        row = 4
+        column = 1
+        width = medium
+    )
+    must have Status
+    (
+        type = picklist
+        values = {"Draft", "Invoice Raised", "Invoice Sent", "Invoice Paid", "Invoice Cancelled"}
+        initial value = "Draft"
+        row = 4
+        column = 2
+        width = medium
+    )
+    Invoice_Date
+    (
+        type = date
+        displayname = "Invoice Date"
+        initial value = "${zoho.currentdate}"
+        row = 4
+        column = 1
+        width = medium
+    )
+    Invoice_Number
+    (
+        type = text
+        displayname = "Invoice Number"
+        row = 4
+        column = 2
+        width = medium
+    )
+    Invoice_Ticket_ID
+    (
+        type = text
+        displayname = "Invoice Ticket ID"
+        row = 4
+        column = 1
+        width = medium
+    )
+    Invoice_Paid_On
+    (
+        type = date
+        displayname = "Invoice Paid On"
+        row = 4
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

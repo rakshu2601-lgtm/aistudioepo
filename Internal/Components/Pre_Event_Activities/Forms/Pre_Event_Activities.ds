@@ -1,0 +1,193 @@
+form Pre_Event_Activities
+{
+    displayname = "Pre Event Activities"
+    Activity_Details
+    (
+        type = section
+        displayname = "Activity Details"
+        row = 1
+        column = 0
+    )
+    must have Event
+    (
+        type = picklist
+        values = Events.ID
+        displayformat = [Event_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Activity_Type
+    (
+        type = picklist
+        displayname = "Activity Type"
+        values = {"Promotional Content","Connect Post","Email Invite","Presentation","Dry Run","Follow-up Content","Agenda Topic","Statistics Update"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Content_Name
+    (
+        type = text
+        displayname = "Content Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Document_URL
+    (
+        type = url
+        displayname = "Document URL"
+        target = new window
+        enable = linkname, title
+        row = 1
+        column = 2
+        width = medium
+    )
+    Created_By
+    (
+        type = picklist
+        displayname = "Created By"
+        values = Team_Members.ID
+        displayformat = [Name.first_name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Review_Lead
+    (
+        type = picklist
+        displayname = "Review Lead"
+        values = Team_Members[Status == "Active" && (Role == "Lead" || Role == "Manager")].ID
+        displayformat = [Name.first_name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Review_Status
+    (
+        type = picklist
+        displayname = "Review Status"
+        values = {"Not Submitted","Pending Review","Changes Requested","Approved"}
+        initial value = "Not Submitted"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Topic_or_Session
+    (
+        type = text
+        displayname = "Topic or Session"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Assigned_Trainer
+    (
+        type = picklist
+        displayname = "Assigned Trainer"
+        values = Team_Members[Status == "Active" && Role == "Trainer"].ID
+        displayformat = [Name.first_name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Total_Registrations
+    (
+        type = number
+        displayname = "Total Registrations"
+        initial value = 0
+        row = 1
+        column = 2
+        width = medium
+    )
+    Revenue_USD
+    (
+        type = USD
+        displayname = "Revenue USD"
+        initial value = 0
+        decimalplace = 2
+        row = 1
+        column = 1
+        width = medium
+    )
+    Statistics_Message
+    (
+        type = textarea
+        displayname = "Statistics Message"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Survey_Link
+    (
+        type = url
+        displayname = "Survey Link"
+        target = new window
+        enable = linkname, title
+        row = 1
+        column = 1
+        width = medium
+    )
+    Recording_Link
+    (
+        type = url
+        displayname = "Recording Link"
+        target = new window
+        enable = linkname, title
+        row = 1
+        column = 2
+        width = medium
+    )
+    Materials_Link
+    (
+        type = url
+        displayname = "Materials Link"
+        target = new window
+        enable = linkname, title
+        row = 1
+        column = 1
+        width = medium
+    )
+    Target_Date
+    (
+        type = date
+        displayname = "Target Date"
+        row = 1
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

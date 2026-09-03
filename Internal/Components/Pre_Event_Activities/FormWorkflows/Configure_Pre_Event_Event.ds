@@ -1,0 +1,54 @@
+Configure_Pre_Event_Event as "Configure Pre Event Event"
+{
+    type = form
+    form = Pre_Event_Activities
+    record event = on add or edit
+
+    on user input of Event
+    {
+        actions
+        {
+            custom deluge script
+            (
+                event_type = "";
+                if(input.Event != null)
+                {
+                    event_type = Events[ID == input.Event].Event_Type;
+                }
+                clear Activity_Type;
+                if(event_type == "Webinar")
+                {
+                    Activity_Type:ui.add({"Promotional Content","Connect Post","Email Invite","Presentation","Dry Run","Follow-up Content","Statistics Update"});
+                    if(input.Activity_Type == "Agenda Topic")
+                    {
+                        input.Activity_Type = null;
+                        hide Topic_or_Session;
+                        hide Assigned_Trainer;
+                    }
+                }
+                else
+                {
+                    Activity_Type:ui.add({"Promotional Content","Connect Post","Email Invite","Presentation","Dry Run","Follow-up Content","Agenda Topic","Statistics Update"});
+                }
+                if(input.Activity_Type == "Statistics Update" && event_type == "Online Training")
+                {
+                    show Total_Registrations;
+                    show Revenue_USD;
+                    show Statistics_Message;
+                    show Survey_Link;
+                    show Recording_Link;
+                    show Materials_Link;
+                }
+                else
+                {
+                    hide Total_Registrations;
+                    hide Revenue_USD;
+                    hide Statistics_Message;
+                    hide Survey_Link;
+                    hide Recording_Link;
+                    hide Materials_Link;
+                }
+            )
+        }
+    }
+}

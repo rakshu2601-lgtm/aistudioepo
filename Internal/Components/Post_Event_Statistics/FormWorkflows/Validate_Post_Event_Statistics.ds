@@ -1,0 +1,27 @@
+Validate_Post_Event_Statistics as "Validate Post Event Statistics"
+{
+    type = form
+    form = Post_Event_Statistics
+    record event = on add or edit
+    description = "Rejects negative totals and attendance greater than registrations."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Total_Registrations < 0 || input.Total_Attendees < 0 || input.Revenue_USD < 0)
+                {
+                    alert "Registrations, attendees, and revenue cannot be negative.";
+                    cancel submit;
+                }
+                if(input.Total_Attendees > input.Total_Registrations)
+                {
+                    alert "Total Attendees cannot exceed Total Registrations.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

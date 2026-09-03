@@ -1,0 +1,82 @@
+"Lead"
+{
+    name        = "Lead"
+    type        = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+    description = "Operational lead access for events, assignments, reviews, approvals, updates, discounts, and invoices."
+
+    ModulePermissions
+    {
+        Team_Members { enabled = View,Search,Tab allFieldsVisible = true ReportPermissions { All_Team_Members={"View"} Available_Team_Members={"View"} } }
+        Products { enabled = View,Search,Tab allFieldsVisible = true ReportPermissions { All_Products={"View"} Active_Products={"View"} } }
+        Leave_Requests
+        {
+            enabled = Create,View,Edit,Viewall,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions { All_Leave_Requests={"View"} My_Leave_Requests={"View"} Approved_Leave_Calendar={"View"} }
+            FieldPermissions { Requester{visibility:true,readonly:true} Approver{visibility:true,readonly:true} Status{visibility:true,readonly:true} Rejection_Reason{visibility:true,readonly:true} }
+        }
+        Work_From_Home_Requests
+        {
+            enabled = Create,View,Edit,Viewall,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions { All_WFH_Requests={"View"} My_WFH_Requests={"View"} Approved_WFH_Calendar={"View"} }
+            FieldPermissions { Requester{visibility:true,readonly:true} Approver{visibility:true,readonly:true} Status{visibility:true,readonly:true} Rejection_Reason{visibility:true,readonly:true} }
+        }
+        Events
+        {
+            enabled = Create,View,Edit,Viewall,Modifyall,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions { All_Events={"View"} Trainer_Events={"View"} Events_Calendar={"View"} Event_Status_Board={"View"} Certification_Events={"View"} }
+            FieldPermissions { Duration_Days{visibility:true,readonly:true} }
+        }
+        Pre_Event_Activities
+        {
+            enabled = Create,View,Edit,Viewall,Modifyall,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions { All_Pre_Event_Activities={"View"} Content_Review_Board={"View"} Online_Training_Pre_Event_Stats={"View"} }
+            FieldPermissions { Created_By{visibility:true,readonly:true} Revenue_USD{visibility:true,readonly:true} }
+        }
+        During_Event_Updates { enabled = Create,View,Edit,Viewall,Modifyall,Search,Tab allFieldsVisible = true ReportPermissions { All_During_Event_Updates={"View"} During_Event_Calendar={"View"} } }
+        Post_Event_Statistics
+        {
+            enabled = Create,View,Edit,Viewall,Modifyall,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions { All_Post_Event_Statistics={"View"} Monthly_Revenue_Statistics={"View"} Yearly_Event_Statistics={"View"} }
+            FieldPermissions { Product{visibility:true,readonly:true} Event_Type{visibility:true,readonly:true} Revenue_USD{visibility:true,readonly:true} Statistics_Month{visibility:true,readonly:true} Statistics_Year{visibility:true,readonly:true} }
+        }
+        Source_Wise_Statistics { enabled = Create,View,Edit,Viewall,Modifyall,Search allFieldsVisible = true ReportPermissions { All_Source_Wise_Statistics={"View"} } }
+        Country_Wise_Statistics { enabled = Create,View,Edit,Viewall,Modifyall,Search allFieldsVisible = true ReportPermissions { All_Country_Wise_Statistics={"View"} } }
+        Task_Assignments
+        {
+            enabled = Create,View,Edit,Viewall,Modifyall,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions { All_Task_Assignments={"View"} My_Assigned_Tasks={"View"} Task_Status_Board={"View"} Delayed_Tasks={"View"} }
+            FieldPermissions { Assigned_Date{visibility:true,readonly:true} Delivery_Status{visibility:true,readonly:true} }
+        }
+        Daily_Work_Updates
+        {
+            enabled = Create,View,Edit,Viewall,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions { All_Daily_Work_Updates={"View"} My_Daily_Work_Updates={"View"} Daily_Update_Calendar={"View"} }
+            FieldPermissions { Team_Member{visibility:true,readonly:true} Update_Date{visibility:true,readonly:true} Consolidated_Update{visibility:true,readonly:true} }
+        }
+        Daily_Work_Items { enabled = Create,View,Edit,Viewall,Search allFieldsVisible = true ReportPermissions { Daily_Work_Items_Report={"View"} } }
+        Exchange_Rates { enabled = View,Search,Tab allFieldsVisible = true ReportPermissions { All_Exchange_Rates={"View"} Active_Exchange_Rates={"View"} } }
+        Discount_Requests
+        {
+            enabled = Create,View,Edit,Viewall,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions { Discount_Requests_Tracker={"View"} My_Discount_Requests={"View"} Approved_Discounts={"View"} }
+            FieldPermissions { Ticket_ID{visibility:true,readonly:true} Requester{visibility:true,readonly:true} Total_Amount_USD{visibility:true,readonly:true} Discounted_Amount_USD{visibility:true,readonly:true} Approver_User{visibility:false} Status{visibility:true,readonly:true} Reason_for_Rejection{visibility:true,readonly:true} Promo_Code_Status{visibility:true,readonly:true} }
+        }
+        Manual_Invoice
+        {
+            enabled = Create,View,Edit,Viewall,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions { All_Manual_Invoices={"View"} My_Invoice_Requests={"View"} Outstanding_Invoices={"View"} }
+            FieldPermissions { Requester{visibility:true,readonly:true} Total_Amount_USD{visibility:true,readonly:true} Exchange_Rate{visibility:true,readonly:true} Rate_Used{visibility:true,readonly:true} Total_Invoice_Amount{visibility:true,readonly:true} Status{visibility:true,readonly:true} Invoice_Date{visibility:true,readonly:true} Invoice_Number{visibility:false} Invoice_Ticket_ID{visibility:false} Invoice_Paid_On{visibility:false} }
+        }
+        Operations_Dashboard { enabled = tab }
+    }
+}

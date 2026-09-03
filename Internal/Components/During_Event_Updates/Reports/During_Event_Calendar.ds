@@ -1,0 +1,32 @@
+calendar During_Event_Calendar
+{
+    displayName = "During Event Calendar"
+    show all rows from During_Event_Updates
+    (
+        Event
+        Update_Date
+        Trainer
+        Daily_Summary
+        Recording_URL
+        Materials_URL
+    )
+    filters
+    (
+        Event
+        Trainer
+        Update_Date
+    )
+    options
+    (
+        display type = month
+        week start day = monday
+        display field = Event
+        start date = Update_Date
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+}

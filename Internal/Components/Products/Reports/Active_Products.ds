@@ -1,0 +1,9 @@
+list Active_Products
+{
+    displayName = "Active Products"
+    show all rows from Products [Status == "Active"]
+    (
+        Product_Name
+        Status
+    )
+}

@@ -1,0 +1,26 @@
+list My_WFH_Requests
+{
+    displayName = "My WFH Requests"
+    show all rows from Work_From_Home_Requests [Requester.Creator_User == zoho.loginuser]
+    (
+        Requester
+        WFH_Date
+        Reason
+        Approver
+        Status
+        Rejection_Reason
+    )
+    filters
+    (
+        WFH_Date
+        Status
+    )
+    sort by
+    (
+        WFH_Date descending
+    )
+    options
+    (
+        show approval process = true
+    )
+}

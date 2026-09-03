@@ -1,0 +1,15 @@
+list My_Daily_Work_Updates
+{
+    displayName = "My Daily Work Updates"
+    show all rows from Daily_Work_Updates [Team_Member.Creator_User == zoho.loginuser]
+    (
+        Team_Member
+        Update_Date
+        Work_Items
+        Consolidated_Update
+    )
+    sort by
+    (
+        Update_Date descending
+    )
+}

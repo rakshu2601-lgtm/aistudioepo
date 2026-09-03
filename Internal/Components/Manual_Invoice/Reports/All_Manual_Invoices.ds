@@ -1,0 +1,82 @@
+default list All_Manual_Invoices
+{
+    displayName = "All Manual Invoices"
+    show all rows from Manual_Invoice
+    (
+        Ticket_ID
+        Product
+        Event
+        Requester
+        Company_Name
+        Billing_Email
+        Total_Tickets
+        Total_Amount_USD
+        Converted_Currency
+        Rate_Used
+        Total_Invoice_Amount
+        Invoice_Email
+        Status
+        Invoice_Date
+        Invoice_Number
+        Invoice_Ticket_ID
+        Invoice_Paid_On
+        custom action "Email Invoice Team"
+        (
+            workflow = Email_Invoice_Team
+            show action for each record = true
+            column header = "Email Invoice Team"
+            success message = "Invoice request handed off to the invoice team."
+            condition = (Status == "Draft" && Invoice_Email != null)
+            confirmation before execution
+            (
+                message for individual record = "Email this request to the selected invoice team and mark it Invoice Raised?"
+                confirm button text = "Email Invoice Team"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Product
+        Converted_Currency
+        Status
+        Invoice_Date
+    )
+    sort by
+    (
+        Invoice_Date descending
+    )
+    conditional formatting
+    (
+        "Draft"
+        {
+            condition = (Status == "Draft")
+            fields = [Status]
+            format = "background-color:#F2F4F7;color:#344054;font-weight:bold"
+        }
+        "Raised"
+        {
+            condition = (Status == "Invoice Raised")
+            fields = [Status]
+            format = "background-color:#FFF4CC;color:#8A5A00;font-weight:bold"
+        }
+        "Sent"
+        {
+            condition = (Status == "Invoice Sent")
+            fields = [Status]
+            format = "background-color:#E8F1FF;color:#175CD3;font-weight:bold"
+        }
+        "Paid"
+        {
+            condition = (Status == "Invoice Paid")
+            fields = [Status]
+            format = "background-color:#E2F5E9;color:#176B3A;font-weight:bold"
+        }
+        "Cancelled"
+        {
+            condition = (Status == "Invoice Cancelled")
+            fields = [Status]
+            format = "background-color:#FDE7E7;color:#A61B1B;font-weight:bold"
+        }
+    )
+}

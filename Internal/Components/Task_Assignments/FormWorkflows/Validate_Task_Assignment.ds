@@ -1,0 +1,49 @@
+Validate_Task_Assignment as "Validate Task Assignment"
+{
+    type = form
+    form = Task_Assignments
+    record event = on add or edit
+    description = "Validates task dates, completion requirements, and delayed-task notes."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Deadline < input.Assigned_Date)
+                {
+                    alert "Deadline must be on or after the assigned date.";
+                    cancel submit;
+                }
+                if(input.Progress_Status == "Completed" && input.Completion_Date == null)
+                {
+                    alert "Completion Date is required when progress is Completed.";
+                    cancel submit;
+                }
+                is_delayed = false;
+                if(input.Completion_Date != null && input.Completion_Date > input.Deadline)
+                {
+                    is_delayed = true;
+                }
+                if(input.Progress_Status != "Completed" && zoho.currentdate > input.Deadline)
+                {
+                    is_delayed = true;
+                }
+                if(is_delayed)
+                {
+                    input.Delivery_Status = "Delayed";
+                }
+                else
+                {
+                    input.Delivery_Status = "On Time";
+                }
+                if(input.Delivery_Status == "Delayed" && (input.Delay_Reason_Notes == null || input.Delay_Reason_Notes.trim() == ""))
+                {
+                    alert "Delay Reason / Notes is required for delayed tasks.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

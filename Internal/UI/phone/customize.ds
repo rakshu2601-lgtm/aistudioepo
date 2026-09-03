@@ -1,0 +1,17 @@
+customize
+{
+    layout = slidingpane
+    font = "lato"
+    style = "3"
+    color options
+    {
+        name = "Operations Navy"
+        brand color = "#234E70"
+        type = "custom"
+        dark mode color = "#8CB4D8"
+    }
+    logo
+    {
+        preference = "app_icon"
+    }
+}

@@ -1,0 +1,36 @@
+Load_WFH_Request as "Load WFH Request"
+{
+    type = form
+    form = Work_From_Home_Requests
+    record event = on add or edit
+    description = "Populates the requester and reporting manager approver and protects routing fields."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.ID == null)
+                {
+                    member = Team_Members[Email == zoho.loginuserid && Status == "Active"];
+                    if(member.ID != null)
+                    {
+                        input.Requester = member.ID;
+                        if(member.Reporting_To != null)
+                        {
+                            input.Approver = member.Reporting_To.Creator_User;
+                        }
+                        else
+                        {
+                            input.Approver = member.Creator_User;
+                        }
+                    }
+                }
+                disable Requester;
+                disable Approver;
+                disable Status;
+            )
+        }
+    }
+}

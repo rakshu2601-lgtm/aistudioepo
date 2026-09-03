@@ -1,0 +1,53 @@
+Populate_Event_Statistics as "Populate Event Statistics"
+{
+    type = form
+    form = Post_Event_Statistics
+    record event = on add or edit
+    description = "Mirrors the selected event's product, type, month, and year and applies event-type field visibility."
+
+    on user input of Event
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Event != null)
+                {
+                    input.Product = Events[ID == input.Event].Product;
+                    input.Event_Type = Events[ID == input.Event].Event_Type;
+                    event_date = Events[ID == input.Event].Start_Date;
+                    if(event_date != null)
+                    {
+                        month_number = event_date.getMonth();
+                        if(month_number == 1) { input.Statistics_Month = "January"; }
+                        else if(month_number == 2) { input.Statistics_Month = "February"; }
+                        else if(month_number == 3) { input.Statistics_Month = "March"; }
+                        else if(month_number == 4) { input.Statistics_Month = "April"; }
+                        else if(month_number == 5) { input.Statistics_Month = "May"; }
+                        else if(month_number == 6) { input.Statistics_Month = "June"; }
+                        else if(month_number == 7) { input.Statistics_Month = "July"; }
+                        else if(month_number == 8) { input.Statistics_Month = "August"; }
+                        else if(month_number == 9) { input.Statistics_Month = "September"; }
+                        else if(month_number == 10) { input.Statistics_Month = "October"; }
+                        else if(month_number == 11) { input.Statistics_Month = "November"; }
+                        else if(month_number == 12) { input.Statistics_Month = "December"; }
+                        input.Statistics_Year = event_date.getYear();
+                    }
+                }
+                hide Revenue_USD, Survey_Report_URL, Feedback_Insights_URL, Debrief_URL;
+                if(input.Event_Type == "Online Training")
+                {
+                    show Revenue_USD, Survey_Report_URL;
+                }
+                else if(input.Event_Type == "In-person" || input.Event_Type == "Customized Training")
+                {
+                    show Revenue_USD, Feedback_Insights_URL, Debrief_URL;
+                }
+                else if(input.Event_Type == "Certification")
+                {
+                    show Revenue_USD;
+                }
+            )
+        }
+    }
+}

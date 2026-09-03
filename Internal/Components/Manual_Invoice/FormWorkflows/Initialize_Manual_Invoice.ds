@@ -1,0 +1,33 @@
+Initialize_Manual_Invoice as "Initialize Manual Invoice"
+{
+    type = form
+    form = Manual_Invoice
+    record event = on add or edit
+    description = "Defaults the requester and invoice date and protects calculated conversion fields."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Requester == null)
+                {
+                    login_member = Team_Members[Email == zoho.loginuserid && Status == "Active"];
+                    if(login_member.count() > 0)
+                    {
+                        input.Requester = login_member.ID;
+                    }
+                }
+                if(input.Invoice_Date == null)
+                {
+                    input.Invoice_Date = zoho.currentdate;
+                }
+                disable Requester;
+                disable Exchange_Rate;
+                disable Rate_Used;
+                disable Total_Invoice_Amount;
+            )
+        }
+    }
+}

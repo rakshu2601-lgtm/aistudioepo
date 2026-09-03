@@ -1,0 +1,40 @@
+Validate_Pre_Event_Activity as "Validate Pre Event Activity"
+{
+    type = form
+    form = Pre_Event_Activities
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                event_record = Events[ID == input.Event];
+                if(input.Activity_Type == "Agenda Topic" && event_record.Event_Type == "Webinar")
+                {
+                    alert "Agenda Topic activities are not allowed for webinars.";
+                    cancel submit;
+                }
+                if(input.Activity_Type == "Statistics Update")
+                {
+                    if(event_record.Event_Type != "Online Training")
+                    {
+                        alert "Statistics Update activities are allowed only for Online Training events.";
+                        cancel submit;
+                    }
+                    if(input.Target_Date == null)
+                    {
+                        alert "Target Date is required for an Online Training statistics update.";
+                        cancel submit;
+                    }
+                    else if(input.Target_Date < event_record.Start_Date.addDay(-7))
+                    {
+                        alert "Statistics updates cannot be dated earlier than one week before the session start date.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

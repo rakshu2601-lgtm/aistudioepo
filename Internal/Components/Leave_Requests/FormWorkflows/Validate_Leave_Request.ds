@@ -1,0 +1,32 @@
+Validate_Leave_Request as "Validate Leave Request"
+{
+    type = form
+    form = Leave_Requests
+    record event = on add or edit
+    description = "Validates leave dates, advance notice, and rejection details."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.End_Date < input.Start_Date)
+                {
+                    alert "End Date must be on or after Start Date.";
+                    cancel submit;
+                }
+                if(input.Leave_Type != "Sick Leave" && input.Start_Date < zoho.currentdate.addDay(7))
+                {
+                    alert "Casual and planned leave must start at least 7 days after today.";
+                    cancel submit;
+                }
+                if(input.Status == "Rejected" && (input.Rejection_Reason == null || input.Rejection_Reason.trim() == ""))
+                {
+                    alert "Rejection Reason is required when a request is rejected.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

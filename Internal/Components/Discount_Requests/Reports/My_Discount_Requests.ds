@@ -1,0 +1,34 @@
+list My_Discount_Requests
+{
+    displayName = "My Discount Requests"
+    show all rows from Discount_Requests [Requester.Email == zoho.loginuserid]
+    (
+        Product
+        Event
+        Ticket_ID
+        Customer_Company
+        Customer_Email
+        Discount_Type
+        Number_of_Tickets
+        Total_Amount_USD
+        Discount_Percentage
+        Discounted_Amount_USD
+        Approver
+        Status
+        Reason_for_Rejection
+        Promo_Code
+        Registration_URL
+        Promo_Code_Status
+    )
+    filters
+    (
+        Product
+        Event
+        Status
+        Promo_Code_Status
+    )
+    options
+    (
+        show approval process = true
+    )
+}

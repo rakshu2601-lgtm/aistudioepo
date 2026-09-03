@@ -1,0 +1,31 @@
+calendar Approved_Leave_Calendar
+{
+    displayName = "Approved Leave Calendar"
+    show all rows from Leave_Requests [Status == "Approved"]
+    (
+        Requester
+        Leave_Type
+        Start_Date
+        End_Date
+        Status
+    )
+    filters
+    (
+        Requester
+        Leave_Type
+    )
+    options
+    (
+        display type = month
+        week start day = monday
+        display field = Requester
+        start date = Start_Date
+        end date = End_Date
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+}

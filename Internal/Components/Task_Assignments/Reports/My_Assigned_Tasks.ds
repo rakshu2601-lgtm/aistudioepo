@@ -1,0 +1,26 @@
+list My_Assigned_Tasks
+{
+    displayName = "My Assigned Tasks"
+    show all rows from Task_Assignments [Assigned_Trainer.Creator_User == zoho.loginuser]
+    (
+        Event
+        Task_Work_Item
+        Assigned_Trainer
+        Assigned_Date
+        Deadline
+        Completion_Date
+        Progress_Status
+        Delivery_Status
+        Delay_Reason_Notes
+    )
+    filters
+    (
+        Progress_Status
+        Delivery_Status
+        Deadline
+    )
+    sort by
+    (
+        Deadline ascending
+    )
+}

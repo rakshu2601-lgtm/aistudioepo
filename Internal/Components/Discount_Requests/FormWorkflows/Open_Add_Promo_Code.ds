@@ -1,0 +1,18 @@
+Open_Add_Promo_Code as "Open Add Promo Code"
+{
+    type = functions
+    form = Discount_Requests
+    execution type = for each record
+    description = "Opens the selected approved discount request in an edit popup for promo-code fulfilment."
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                openUrl("#Form:Discount_Requests?recLinkID=" + input.ID + "&viewLinkName=Discount_Requests_Tracker", "popup window", "height=650px,width=760px");
+            )
+        }
+    }
+}

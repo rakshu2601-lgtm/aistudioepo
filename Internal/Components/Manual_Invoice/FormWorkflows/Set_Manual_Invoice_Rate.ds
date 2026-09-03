@@ -1,0 +1,31 @@
+Set_Manual_Invoice_Rate as "Set Manual Invoice Rate"
+{
+    type = form
+    form = Manual_Invoice
+    record event = on add or edit
+    description = "Selects the latest active applicable maintained exchange rate and calculates the converted invoice amount."
+
+    on user input of Converted_Currency
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Exchange_Rate = null;
+                input.Rate_Used = null;
+                input.Total_Invoice_Amount = null;
+                applicable_rates = Exchange_Rates[Currency_Code == input.Converted_Currency && Status == "Active" && Effective_Date <= zoho.currentdate] sort by Effective_Date desc range from 0 to 0;
+                if(applicable_rates.count() > 0)
+                {
+                    input.Exchange_Rate = applicable_rates.ID;
+                    input.Rate_Used = applicable_rates.Units_Per_USD;
+                    input.Total_Invoice_Amount = (input.Total_Tickets * input.Amount_Per_Ticket_USD) * input.Rate_Used;
+                }
+                else
+                {
+                    alert "No active exchange rate effective on or before today is available for the selected currency.";
+                }
+            )
+        }
+    }
+}

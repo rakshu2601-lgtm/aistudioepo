@@ -1,0 +1,36 @@
+Validate_Exchange_Rate as "Validate Exchange Rate"
+{
+    type = form
+    form = Exchange_Rates
+    record event = on add or edit
+    description = "Validates positive USD-based rates and prevents duplicate active rates for the same currency and effective date."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Units_Per_USD <= 0)
+                {
+                    alert "Units Per USD must be greater than zero.";
+                    cancel submit;
+                }
+                if(input.Currency_Code == "USD" && input.Units_Per_USD != 1)
+                {
+                    alert "The USD rate must equal 1.";
+                    cancel submit;
+                }
+                if(input.Status == "Active")
+                {
+                    duplicate_count = Exchange_Rates[Currency_Code == input.Currency_Code && Effective_Date == input.Effective_Date && Status == "Active" && ID != input.ID].count();
+                    if(duplicate_count > 0)
+                    {
+                        alert "An active exchange rate already exists for this currency and effective date.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

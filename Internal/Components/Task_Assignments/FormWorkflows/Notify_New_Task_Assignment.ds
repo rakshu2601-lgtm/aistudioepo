@@ -1,0 +1,24 @@
+Notify_New_Task_Assignment as "Notify New Task Assignment"
+{
+    type = form
+    form = Task_Assignments
+    record event = on add
+    description = "Notifies the assigned trainer after a new task is created."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                sendmail
+                [
+                    from: zoho.adminuserid
+                    to: input.Assigned_Trainer.Email
+                    subject: "New task assigned: " + input.Task_Work_Item
+                    message: "You have been assigned work for " + input.Event.Event_Name + ". Deadline: " + input.Deadline + "."
+                ]
+            )
+        }
+    }
+}

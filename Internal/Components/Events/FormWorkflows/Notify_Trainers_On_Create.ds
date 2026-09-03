@@ -1,0 +1,26 @@
+Notify_Trainers_On_Create as "Notify Trainers On Create"
+{
+    type = form
+    form = Events
+    record event = on add
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                for each trainer in Team_Members[ID in input.Trainers]
+                {
+                    sendmail
+                    [
+                        from: zoho.adminuserid
+                        to: trainer.Email
+                        subject: "Event assigned: " + input.Event_Name
+                        message: "You have been assigned to " + input.Event_Name + "."
+                    ]
+                }
+            )
+        }
+    }
+}

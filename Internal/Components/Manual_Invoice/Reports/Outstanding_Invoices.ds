@@ -1,0 +1,30 @@
+list Outstanding_Invoices
+{
+    displayName = "Outstanding Invoices"
+    show all rows from Manual_Invoice [Status == "Invoice Raised" || Status == "Invoice Sent"]
+    (
+        Ticket_ID
+        Product
+        Event
+        Requester
+        Company_Name
+        Billing_Email
+        Converted_Currency
+        Total_Invoice_Amount
+        Status
+        Invoice_Date
+        Invoice_Number
+        Invoice_Ticket_ID
+    )
+    filters
+    (
+        Product
+        Converted_Currency
+        Status
+        Invoice_Date
+    )
+    sort by
+    (
+        Invoice_Date ascending
+    )
+}

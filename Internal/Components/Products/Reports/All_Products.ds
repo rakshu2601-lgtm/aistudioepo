@@ -1,0 +1,9 @@
+default list All_Products
+{
+    displayName = "All Products"
+    show all rows from Products
+    (
+        Product_Name
+        Status
+    )
+}

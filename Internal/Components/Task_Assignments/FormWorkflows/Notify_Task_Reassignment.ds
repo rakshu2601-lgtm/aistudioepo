@@ -1,0 +1,24 @@
+Notify_Task_Reassignment as "Notify Task Reassignment"
+{
+    type = form
+    form = Task_Assignments
+    record event = on edit
+    description = "Notifies the newly assigned trainer when a task is reassigned."
+
+    on update of Assigned_Trainer
+    {
+        actions
+        {
+            custom deluge script
+            (
+                sendmail
+                [
+                    from: zoho.adminuserid
+                    to: input.Assigned_Trainer.Email
+                    subject: "Task reassigned to you: " + input.Task_Work_Item
+                    message: "This task for " + input.Event.Event_Name + " has been reassigned to you. Deadline: " + input.Deadline + "."
+                ]
+            )
+        }
+    }
+}

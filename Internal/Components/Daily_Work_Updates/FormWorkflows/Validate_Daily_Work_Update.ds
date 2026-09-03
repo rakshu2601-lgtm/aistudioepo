@@ -1,0 +1,35 @@
+Validate_Daily_Work_Update as "Validate Daily Work Update"
+{
+    type = form
+    form = Daily_Work_Updates
+    record event = on add or edit
+    description = "Requires work items and enforces one daily update per member and date."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Work_Items == null || input.Work_Items.isEmpty())
+                {
+                    alert "Add at least one work item before submitting the daily update.";
+                    cancel submit;
+                }
+                if(input.ID == null)
+                {
+                    duplicate_count = Daily_Work_Updates[Team_Member == input.Team_Member && Update_Date == input.Update_Date].count();
+                }
+                else
+                {
+                    duplicate_count = Daily_Work_Updates[Team_Member == input.Team_Member && Update_Date == input.Update_Date && ID != input.ID].count();
+                }
+                if(duplicate_count > 0)
+                {
+                    alert "A daily work update already exists for this team member and date.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

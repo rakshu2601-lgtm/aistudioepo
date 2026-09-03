@@ -1,0 +1,28 @@
+Initialize_Discount_Request as "Initialize Discount Request"
+{
+    type = form
+    form = Discount_Requests
+    record event = on add or edit
+    description = "Sets the logged-in requester and protects routing, status, and calculated fields."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Requester == null)
+                {
+                    login_member = Team_Members[Email == zoho.loginuserid && Status == "Active"];
+                    if(login_member.count() > 0)
+                    {
+                        input.Requester = login_member.ID;
+                    }
+                }
+                hide Approver_User;
+                disable Requester;
+                disable Status;
+            )
+        }
+    }
+}

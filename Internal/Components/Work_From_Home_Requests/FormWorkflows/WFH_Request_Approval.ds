@@ -1,0 +1,39 @@
+WFH_Request_Approval as "WFH Request Approval"
+{
+    type = approval
+    form = Work_From_Home_Requests[Status == "Pending"]
+    display fields = [Requester, WFH_Date, Reason, Status, Rejection_Reason]
+    recall request = true
+
+    on start
+    {
+        actions
+        {
+            Status = "Pending";
+        }
+    }
+
+    on level 1
+    {
+        approvers
+        (
+            field = Approver
+        )
+
+        on approve
+        {
+            actions
+            {
+                Status = "Approved";
+            }
+        }
+
+        on reject
+        {
+            actions
+            {
+                Status = "Rejected";
+            }
+        }
+    }
+}

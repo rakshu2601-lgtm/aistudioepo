@@ -1,0 +1,23 @@
+Notify_Review_Lead_On_Create as "Notify Review Lead On Create"
+{
+    type = form
+    form = Pre_Event_Activities[Review_Status == "Pending Review"]
+    record event = on add
+
+    on success
+    {
+        actions ( Review_Lead != null )
+        {
+            custom deluge script
+            (
+                sendmail
+                [
+                    from: zoho.adminuserid
+                    to: input.Review_Lead.Email
+                    subject: "Content awaiting review: " + input.Content_Name
+                    message: input.Content_Name + " for " + input.Event.Event_Name + " has been submitted for your review."
+                ]
+            )
+        }
+    }
+}

@@ -1,0 +1,21 @@
+list Active_Exchange_Rates
+{
+    displayName = "Active Exchange Rates"
+    show all rows from Exchange_Rates [Status == "Active"]
+    (
+        Currency_Code
+        Units_Per_USD
+        Effective_Date
+        Status
+        Notes
+    )
+    filters
+    (
+        Currency_Code
+        Effective_Date
+    )
+    sort by
+    (
+        Effective_Date descending
+    )
+}

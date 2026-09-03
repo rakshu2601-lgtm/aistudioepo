@@ -1,0 +1,71 @@
+form Country_Wise_Statistics
+{
+    Country_Statistics
+    (
+        type = section
+        displayname = "Country Statistics"
+        row = 1
+        column = 0
+    )
+    must have Post_Event_Statistics
+    (
+        type = picklist
+        displayname = "Post Event Statistics"
+        values = Post_Event_Statistics.ID
+        displayformat = [Event_Type]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Region
+    (
+        type = picklist
+        values = {"APAC & ANZ","EMEA","Americas"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Country
+    (
+        type = text
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Registrations
+    (
+        type = number
+        initial value = 0
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Attendees
+    (
+        type = number
+        initial value = 0
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+        }
+    }
+}

@@ -1,0 +1,108 @@
+form Daily_Work_Items
+{
+    displayname = "Daily Work Items"
+
+    Work_Item
+    (
+        type = section
+        displayname = "Work Item"
+        row = 1
+        column = 0
+    )
+    Daily_Update
+    (
+        type = picklist
+        displayname = "Daily Update"
+        values = Daily_Work_Updates.ID
+        bidirectional = Work_Items
+        displayformat = [Update_Date]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Event_Work_Category
+    (
+        type = picklist
+        displayname = "Event / Work Category"
+        values = Events.ID
+        displayformat = [Event_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Assigned_Task
+    (
+        type = picklist
+        displayname = "Assigned Task"
+        values = Task_Assignments.ID
+        displayformat = [Task_Work_Item]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Work_Done_Description
+    (
+        type = richtext
+        displayname = "Work Done Description"
+        height = 160px
+        toolbar = enable
+        [
+            style, bullets-and-numbering, link, remove-formatting
+        ]
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"No Progress", "In Progress", "Completed"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    Hours_Worked
+    (
+        type = decimal
+        displayname = "Hours Worked"
+        initial value = 0
+        decimalplace = 2
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

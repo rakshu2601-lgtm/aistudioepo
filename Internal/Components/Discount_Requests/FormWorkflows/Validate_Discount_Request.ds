@@ -1,0 +1,58 @@
+Validate_Discount_Request as "Validate Discount Request"
+{
+    type = form
+    form = Discount_Requests
+    record event = on add or edit
+    description = "Validates amounts, discount range, event-product consistency, active approver selection, and rejection details."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Number_of_Tickets <= 0)
+                {
+                    alert "Number of Tickets must be greater than zero.";
+                    cancel submit;
+                }
+                if(input.Unit_Amount_USD <= 0)
+                {
+                    alert "Unit Amount (USD) must be greater than zero.";
+                    cancel submit;
+                }
+                if(input.Discount_Percentage < 0 || input.Discount_Percentage > 100)
+                {
+                    alert "Discount Percentage must be between 0 and 100.";
+                    cancel submit;
+                }
+                selected_event = Events[ID == input.Event];
+                if(selected_event.count() == 0 || selected_event.Product != input.Product)
+                {
+                    alert "The selected Event must belong to the selected Product.";
+                    cancel submit;
+                }
+                selected_approver = Team_Members[ID == input.Approver];
+                if(selected_approver.count() == 0 || selected_approver.Status != "Active" || selected_approver.Creator_User == null)
+                {
+                    alert "Approver must be an active team member linked to a Creator user.";
+                    cancel submit;
+                }
+                input.Approver_User = selected_approver.Creator_User;
+                if(input.Status == "Rejected" && (input.Reason_for_Rejection == null || input.Reason_for_Rejection.trim() == ""))
+                {
+                    alert "Reason for Rejection is required when a request is rejected.";
+                    cancel submit;
+                }
+                if((input.Promo_Code != null && input.Promo_Code.trim() != "") || input.Registration_URL != null)
+                {
+                    input.Promo_Code_Status = "Added";
+                }
+                else
+                {
+                    input.Promo_Code_Status = "Yet to Add";
+                }
+            )
+        }
+    }
+}
