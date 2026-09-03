@@ -1,0 +1,166 @@
+<%
+windowStart = zoho.currentdate.addDay(-30);
+ordersLast30 = Sales_Orders[Order_Date >= windowStart].count();
+revenueLast30 = Sales_Orders[Order_Date >= windowStart].sum(Total_Amount);
+pendingCount = Sales_Orders[Status in {"Pending","Confirmed"}].count();
+shippedCount = Sales_Orders[Status == "Shipped"].count();
+deliveredCount = Sales_Orders[Status == "Delivered"].count();
+cancelledCount = Sales_Orders[Status == "Cancelled"].count();
+retailCount = Customers[Customer_Type == "Retail Store" && Status == "Active"].count();
+distributorCount = Customers[Customer_Type == "Distributor" && Status == "Active"].count();
+wholesalerCount = Customers[Customer_Type == "Wholesaler" && Status == "Active"].count();
+cafeCount = Customers[Customer_Type == "Cafe & Restaurant" && Status == "Active"].count();
+directCount = Customers[Customer_Type == "Direct Consumer" && Status == "Active"].count();
+ordersUrl = zoho.appuri + "#Report:All_Sales_Orders";
+pendingUrl = zoho.appuri + "#Report:Pending_Sales_Orders";
+deliveryCalendarUrl = zoho.appuri + "#Report:Delivery_Calendar";
+customersUrl = zoho.appuri + "#Report:All_Customers";
+%>
+<style>
+<file name:zcs-global.css/>
+
+/* ---- Ice Cream Management brand accents + tokens the fetched ZCS components expect ---- */
+:root {
+  --sd-berry-dark: #8e1f4b;
+  --sd-berry: #d1477a;
+  --sd-berry-light: #f3b6cd;
+  --sd-cream: #fff6f9;
+  --zcs-surface: var(--zcs_white_color, #ffffff);
+  --zcs-radius: 10px;
+  --zcs-shadow: 0 1px 3px rgba(142, 31, 75, 0.12);
+  --zcs-text-1: var(--zcs_primary_text_color, #3a1424);
+  --zcs-text-2: var(--zcs_secondary_text_color, #7a3a53);
+  --zcs-text-3: var(--zcs_tertiary_text_color, #b97e94);
+  --zcs-border: var(--zcs_tertiary_border_color, #f4e2ea);
+  --zcs-blue: var(--zcs_brand_color, #09598e);
+  --zcs-green: #179E6C;
+  --zcs-green-bg: #E5F6EF;
+  --zcs-red: #FE455D;
+  --zcs-red-bg: #FDEAEC;
+  --zcs-orange: #B8770D;
+  --zcs-orange-bg: #FBF1E1;
+}
+
+.zcs-page-header { margin-bottom: 24px; }
+.zcs-page-header__title { font-size: 22px; font-weight: 700; color: var(--zcs-text-1); margin: 0 0 4px; }
+.zcs-page-header__sub { font-size: 14px; color: var(--zcs-text-2); margin: 0; }
+
+.zcs-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.zcs-kpi-card { background: var(--zcs-surface); border-radius: var(--zcs-radius); box-shadow: var(--zcs-shadow); padding: 20px 24px; border-top: 3px solid var(--sd-berry-light); }
+.zcs-kpi-card__label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--zcs-text-2); }
+.zcs-kpi-card__value { font-size: 32px; font-weight: 700; margin: 6px 0 4px; line-height: 1; }
+.zcs-kpi-card__sub { font-size: 12px; color: var(--zcs-text-3); }
+
+.zcs-section { background: var(--zcs-surface); border-radius: var(--zcs-radius); box-shadow: var(--zcs-shadow); padding: 20px 24px; margin-bottom: 16px; }
+.zcs-section__heading { font-size: 15px; font-weight: 600; color: var(--zcs-text-1); margin: 0 0 14px; }
+.zcs-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--zcs-border); font-size: 14px; color: var(--zcs-text-1); }
+.zcs-stat-row:last-child { border-bottom: none; }
+.zcs-badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; line-height: 1.4; }
+.zcs-badge--success { background: var(--zcs-green-bg); color: var(--zcs-green); }
+.zcs-badge--danger  { background: var(--zcs-red-bg);   color: var(--zcs-red); }
+.zcs-badge--warning { background: var(--zcs-orange-bg); color: var(--zcs-orange); }
+.zcs-badge--info    { background: #EAF1FB; color: var(--zcs-blue); }
+.zcs-badge--neutral { background: #f3f4f6; color: var(--zcs-text-2); }
+
+.zcs-action-list { background: var(--zcs-surface); border-radius: var(--zcs-radius); box-shadow: var(--zcs-shadow); padding: 20px 24px; margin-bottom: 16px; }
+.zcs-action-list__heading { font-size: 15px; font-weight: 600; color: var(--zcs-text-1); margin: 0 0 12px; }
+.zcs-action-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--zcs-border); font-size: 14px; color: var(--zcs-blue); text-decoration: none; cursor: pointer; }
+.zcs-action-row:last-child { border-bottom: none; }
+.zcs-action-row:hover { color: var(--sd-berry-dark); }
+.zcs-action-row__arrow { color: var(--zcs-text-3); }
+
+.sd-page { background: var(--sd-cream); padding: 24px; border-radius: var(--zcs-radius); }
+</style>
+<div class="sd-page">
+  <div class="zcs-page-header">
+    <h1 class="zcs-page-header__title">Sales Dashboard</h1>
+    <p class="zcs-page-header__sub">Orders, revenue, and customer snapshot</p>
+  </div>
+
+  <div class="zcs-kpi-grid">
+    <div class="zcs-kpi-card">
+      <div class="zcs-kpi-card__label">Orders (Last 30 Days)</div>
+      <div class="zcs-kpi-card__value zcs-color-blue"><%= ordersLast30 %></div>
+      <div class="zcs-kpi-card__sub">Orders placed in the last 30 days</div>
+    </div>
+    <div class="zcs-kpi-card">
+      <div class="zcs-kpi-card__label">Revenue (Last 30 Days)</div>
+      <div class="zcs-kpi-card__value zcs-color-green">$<%= revenueLast30 %></div>
+      <div class="zcs-kpi-card__sub">Total order value in the last 30 days</div>
+    </div>
+    <div class="zcs-kpi-card">
+      <div class="zcs-kpi-card__label">Pending Orders</div>
+      <div class="zcs-kpi-card__value zcs-color-yellow"><%= pendingCount %></div>
+      <div class="zcs-kpi-card__sub">Awaiting confirmation or shipment</div>
+    </div>
+    <div class="zcs-kpi-card">
+      <div class="zcs-kpi-card__label">Shipped Orders</div>
+      <div class="zcs-kpi-card__value zcs-color-blue"><%= shippedCount %></div>
+      <div class="zcs-kpi-card__sub">In transit to customers</div>
+    </div>
+  </div>
+
+  <div class="zcs-section">
+    <h2 class="zcs-section__heading">Orders by Status</h2>
+    <div class="zcs-stat-row">
+      <span>Pending / Confirmed</span>
+      <span class="zcs-badge zcs-badge--warning"><%= pendingCount %></span>
+    </div>
+    <div class="zcs-stat-row">
+      <span>Shipped</span>
+      <span class="zcs-badge zcs-badge--info"><%= shippedCount %></span>
+    </div>
+    <div class="zcs-stat-row">
+      <span>Delivered</span>
+      <span class="zcs-badge zcs-badge--success"><%= deliveredCount %></span>
+    </div>
+    <div class="zcs-stat-row">
+      <span>Cancelled</span>
+      <span class="zcs-badge zcs-badge--danger"><%= cancelledCount %></span>
+    </div>
+  </div>
+
+  <div class="zcs-section">
+    <h2 class="zcs-section__heading">Active Customers by Type</h2>
+    <div class="zcs-stat-row">
+      <span>Retail Store</span>
+      <span class="zcs-badge zcs-badge--neutral"><%= retailCount %></span>
+    </div>
+    <div class="zcs-stat-row">
+      <span>Distributor</span>
+      <span class="zcs-badge zcs-badge--neutral"><%= distributorCount %></span>
+    </div>
+    <div class="zcs-stat-row">
+      <span>Wholesaler</span>
+      <span class="zcs-badge zcs-badge--neutral"><%= wholesalerCount %></span>
+    </div>
+    <div class="zcs-stat-row">
+      <span>Cafe & Restaurant</span>
+      <span class="zcs-badge zcs-badge--neutral"><%= cafeCount %></span>
+    </div>
+    <div class="zcs-stat-row">
+      <span>Direct Consumer</span>
+      <span class="zcs-badge zcs-badge--neutral"><%= directCount %></span>
+    </div>
+  </div>
+
+  <div class="zcs-action-list">
+    <h2 class="zcs-action-list__heading">Quick Actions</h2>
+    <a class="zcs-action-row" href="<%= ordersUrl %>">
+      <span>All Sales Orders</span>
+      <span class="zcs-action-row__arrow">&#8250;</span>
+    </a>
+    <a class="zcs-action-row" href="<%= pendingUrl %>">
+      <span>Pending Sales Orders</span>
+      <span class="zcs-action-row__arrow">&#8250;</span>
+    </a>
+    <a class="zcs-action-row" href="<%= deliveryCalendarUrl %>">
+      <span>Delivery Calendar</span>
+      <span class="zcs-action-row__arrow">&#8250;</span>
+    </a>
+    <a class="zcs-action-row" href="<%= customersUrl %>">
+      <span>All Customers</span>
+      <span class="zcs-action-row__arrow">&#8250;</span>
+    </a>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+kanban Batch_Status_Board
+{
+    displayName = "Batch Status Board"
+    show all rows from Production_Batches
+    (
+        Batch_Number
+        Product
+        Batch_Date
+        Planned_Quantity
+        Actual_Quantity_Produced
+        Stage
+    )
+    options
+    (
+        display field = Stage
+        emptycolumn = "Unassigned"
+    )
+}

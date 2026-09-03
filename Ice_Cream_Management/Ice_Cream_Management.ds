@@ -1,0 +1,5425 @@
+application "Ice-Cream-Management"
+{
+	date format = "dd-MMM-yyyy"
+	time zone = "Asia/Kolkata"
+	time format = "24-hr"
+
+
+
+	forms
+	{
+		form Cold_Storage_Units
+		{
+		    success message = "Cold storage unit saved"
+		
+		    Unit_Details
+		    (
+		        type = section
+		        displayname = "Unit Details"
+		        row = 1
+		        column = 0
+		    )
+		    must have unique Unit_Name
+		    (
+		        type = text
+		        displayname = "Unit Name"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Unit_Type
+		    (
+		        type = picklist
+		        displayname = "Unit Type"
+		        values = {"Deep Freezer","Walk-in Cold Room","Display Freezer","Blast Freezer","Refrigerated Van","Other"}
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Location
+		    (
+		        type = text
+		        displayname = "Location"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Operating_Parameters
+		    (
+		        type = section
+		        displayname = "Operating Parameters"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    Target_Temperature_C
+		    (
+		        type = decimal
+		        displayname = "Target Temperature (C)"
+		        initial value = -18
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Capacity
+		    (
+		        type = text
+		        displayname = "Capacity"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Installation_Date
+		    (
+		        type = date
+		        displayname = "Installation Date"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Status
+		    (
+		        type = picklist
+		        displayname = "Status"
+		        values = {"Operational","Needs Attention","Under Maintenance","Retired"}
+		        initial value = "Operational"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Customers
+		{
+		    success message = "Customer saved successfully"
+		
+		    Identity_Details
+		    (
+		        type = section
+		        displayname = "Identity Details"
+		        row = 1
+		        column = 0
+		    )
+		    must have Customer_Name
+		    (
+		        type = name
+		        displayname = "Customer Name"
+		        prefix
+		        (
+		            type = prefix
+		            displayname = "Title"
+		            value = {"Mr.", "Mrs.", "Ms.", "Dr."}
+		        )
+		        first_name
+		        (
+		            type = first_name
+		            displayname = "First Name"
+		        )
+		        last_name
+		        (
+		            type = last_name
+		            displayname = "Last Name"
+		        )
+		        suffix
+		        (
+		            type = suffix
+		            displayname = "Suffix"
+		            visibility = false
+		        )
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Company_Name
+		    (
+		        type = text
+		        displayname = "Company Name"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Contact_Details
+		    (
+		        type = section
+		        displayname = "Contact Details"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    Phone
+		    (
+		        type = phonenumber
+		        displayname = "Phone"
+		        defaultcountry = "in"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Email
+		    (
+		        type = email
+		        displayname = "Email"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Address
+		    (
+		        type = address
+		        displayname = "Address"
+		        row = 2
+		        column = 1
+		        width = medium
+		        address_line_1
+		        (
+		            type = address_line_1
+		            displayname = "Address Line 1"
+		        )
+		        address_line_2
+		        (
+		            type = address_line_2
+		            displayname = "Address Line 2"
+		        )
+		        district_city
+		        (
+		            type = district_city
+		            displayname = "City"
+		        )
+		        state_province
+		        (
+		            type = state_province
+		            displayname = "State"
+		        )
+		        postal_Code
+		        (
+		            type = postal_Code
+		            displayname = "Postal Code"
+		        )
+		        country
+		        (
+		            type = country
+		            displayname = "Country"
+		        )
+		        latitude
+		        (
+		            type = latitude
+		            displayname = "Latitude"
+		            visibility = false
+		        )
+		        longitude
+		        (
+		            type = longitude
+		            displayname = "Longitude"
+		            visibility = false
+		        )
+		    )
+		    Customer_Type
+		    (
+		        type = picklist
+		        displayname = "Customer Type"
+		        values = {"Retail Store","Distributor","Wholesaler","Cafe & Restaurant","Direct Consumer"}
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Status
+		    (
+		        type = picklist
+		        displayname = "Status"
+		        values = {"Active","Inactive"}
+		        initial value = "Active"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Finished_Goods_Inventory
+		{
+		    success message = "Inventory lot saved"
+		
+		    Lot_Information
+		    (
+		        type = section
+		        displayname = "Lot Information"
+		        row = 1
+		        column = 0
+		    )
+		    Lot_Number
+		    (
+		        type = autonumber
+		        displayname = "Lot Number"
+		        start index = 1
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Product
+		    (
+		        type = picklist
+		        displayname = "Product"
+		        values = Products.ID
+		        displayformat = [Product_Name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Production_Batch
+		    (
+		        type = picklist
+		        displayname = "Production Batch"
+		        values = Production_Batches.ID
+		        displayformat = [Batch_Number]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Stock_Details
+		    (
+		        type = section
+		        displayname = "Stock Details"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    Quantity_On_Hand
+		    (
+		        type = decimal
+		        displayname = "Quantity On Hand"
+		        initial value = 0
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Manufacture_Date
+		    (
+		        type = date
+		        displayname = "Manufacture Date"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Expiry_Date
+		    (
+		        type = date
+		        displayname = "Expiry Date"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Storage_Unit
+		    (
+		        type = picklist
+		        displayname = "Storage Unit"
+		        values = Cold_Storage_Units.ID
+		        displayformat = [Unit_Name]
+		        searchable = true
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Status
+		    (
+		        type = picklist
+		        displayname = "Status"
+		        values = {"In Stock","Sold Out","Expired","Disposed"}
+		        initial value = "In Stock"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Last_Updated
+		    (
+		        type = date
+		        displayname = "Last Updated"
+		        initial value = "${zoho.currentdate}"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Production_Batches
+		{
+		    success message = "Production batch created"
+		
+		    Batch_Information
+		    (
+		        type = section
+		        displayname = "Batch Information"
+		        row = 1
+		        column = 0
+		    )
+		    Batch_Number
+		    (
+		        type = autonumber
+		        displayname = "Batch Number"
+		        start index = 1
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Product
+		    (
+		        type = picklist
+		        displayname = "Product"
+		        values = Products.ID
+		        displayformat = [Product_Name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Batch_Date
+		    (
+		        type = date
+		        displayname = "Batch Date"
+		        initial value = "${zoho.currentdate}"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Production_Details
+		    (
+		        type = section
+		        displayname = "Production Details"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    Cold_Storage_Unit
+		    (
+		        type = picklist
+		        displayname = "Cold Storage Unit"
+		        values = Cold_Storage_Units.ID
+		        displayformat = [Unit_Name]
+		        searchable = true
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    must have Planned_Quantity
+		    (
+		        type = decimal
+		        displayname = "Planned Quantity"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Actual_Quantity_Produced
+		    (
+		        type = decimal
+		        displayname = "Actual Quantity Produced"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Rejected_Quantity
+		    (
+		        type = decimal
+		        displayname = "Rejected Quantity"
+		        initial value = 0
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Shelf_Life_Tracking
+		    (
+		        type = section
+		        displayname = "Shelf Life Tracking"
+		        visibility = true
+		        row = 3
+		        column = 1
+		    )
+		    Manufacture_Date
+		    (
+		        type = date
+		        displayname = "Manufacture Date"
+		        initial value = "${zoho.currentdate}"
+		        row = 3
+		        column = 1
+		        width = medium
+		    )
+		    Expiry_Date
+		    (
+		        type = date
+		        displayname = "Expiry Date"
+		        row = 3
+		        column = 1
+		        width = medium
+		    )
+		    Additional_Information
+		    (
+		        type = section
+		        displayname = "Additional Information"
+		        visibility = true
+		        row = 4
+		        column = 1
+		    )
+		    Supervisor_Name
+		    (
+		        type = text
+		        displayname = "Supervisor Name"
+		        row = 4
+		        column = 1
+		        width = medium
+		    )
+		    Notes
+		    (
+		        type = textarea
+		        displayname = "Notes"
+		        row = 4
+		        column = 1
+		        width = medium
+		    )
+		    Stage
+		    (
+		        type = picklist
+		        displayname = "Stage"
+		        values = {"Planned","In Production","Quality Check","Approved","Rejected","Packaged"}
+		        initial value = "Planned"
+		        row = 4
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		
+		    blueprint components
+		    {
+		        stages = {"Planned","In Production","Quality Check","Approved","Rejected","Packaged"}
+		    }
+		}
+
+		form Products
+		{
+		    success message = "Product saved"
+		
+		    Product_Information
+		    (
+		        type = section
+		        displayname = "Product Information"
+		        row = 1
+		        column = 0
+		    )
+		    must have unique Product_Name
+		    (
+		        type = text
+		        displayname = "Product Name"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    SKU
+		    (
+		        type = autonumber
+		        displayname = "SKU"
+		        start index = 6001
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Flavor_Category
+		    (
+		        type = picklist
+		        displayname = "Flavor Category"
+		        values = {"Classic","Chocolate-Based","Fruit-Based","Nut-Based","Sugar-Free / Diet","Sorbet / Sherbet","Specialty / Seasonal"}
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Packaging_Pricing
+		    (
+		        type = section
+		        displayname = "Packaging & Pricing"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    Pack_Type
+		    (
+		        type = picklist
+		        displayname = "Pack Type"
+		        values = {"Cone","Cup","Tub - Small (500ml)","Tub - Large (1L+)","Stick / Bar","Family Pack","Bulk / Catering"}
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Size
+		    (
+		        type = text
+		        displayname = "Size"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Unit_Price
+		    (
+		        type = USD
+		        displayname = "Unit Price"
+		        decimalplace = 2
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Shelf_Life_Days
+		    (
+		        type = number
+		        displayname = "Shelf Life Days"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Storage_Temperature_C
+		    (
+		        type = decimal
+		        displayname = "Storage Temperature (C)"
+		        initial value = -18
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Status
+		    (
+		        type = picklist
+		        displayname = "Status"
+		        values = {"Active","Seasonal","Discontinued"}
+		        initial value = "Active"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Recipe_Section
+		    (
+		        type = section
+		        displayname = "Recipe Items"
+		        visibility = false
+		        row = 3
+		        column = 1
+		    )
+		    Recipe_Items
+		    (
+		        type = grid
+		        displayname = "Recipe Items"
+		        defaultrow = 1
+		        Raw_Material
+		        (
+		            type = picklist
+		            displayname = "Raw Material"
+		            values = Raw_Materials.ID
+		            displayformat = [Material_Name]
+		        )
+		        Quantity_Required
+		        (
+		            type = decimal
+		            displayname = "Quantity Required"
+		        )
+		        Unit_Of_Measure
+		        (
+		            type = text
+		            displayname = "Unit Of Measure"
+		        )
+		        row = 3
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Quality_Checks
+		{
+		    success message = "Quality check recorded"
+		
+		    Batch_Reference
+		    (
+		        type = section
+		        displayname = "Batch Reference"
+		        row = 1
+		        column = 0
+		    )
+		    QC_Number
+		    (
+		        type = autonumber
+		        displayname = "QC Number"
+		        start index = 1
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Production_Batch
+		    (
+		        type = picklist
+		        displayname = "Production Batch"
+		        values = Production_Batches.ID
+		        displayformat = [Batch_Number]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Check_Date
+		    (
+		        type = date
+		        displayname = "Check Date"
+		        initial value = "${zoho.currentdate}"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Inspection_Details
+		    (
+		        type = section
+		        displayname = "Inspection Details"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    must have Inspector_Name
+		    (
+		        type = text
+		        displayname = "Inspector Name"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Taste_Rating
+		    (
+		        type = picklist
+		        displayname = "Taste Rating"
+		        values = {"Excellent","Good","Average","Poor"}
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Texture_Rating
+		    (
+		        type = picklist
+		        displayname = "Texture Rating"
+		        values = {"Excellent","Good","Average","Poor"}
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Overrun_Percentage
+		    (
+		        type = decimal
+		        displayname = "Overrun Percentage"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Melting_Time_Minutes
+		    (
+		        type = decimal
+		        displayname = "Melting Time Minutes"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    must have Test_Result
+		    (
+		        type = picklist
+		        displayname = "Test Result"
+		        values = {"Pass","Fail"}
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Remarks
+		    (
+		        type = textarea
+		        displayname = "Remarks"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Raw_Material_Purchases
+		{
+		    success message = "Purchase order saved"
+		
+		    Purchase_Order_Details
+		    (
+		        type = section
+		        displayname = "Purchase Order Details"
+		        row = 1
+		        column = 0
+		    )
+		    PO_Number
+		    (
+		        type = autonumber
+		        displayname = "PO Number"
+		        start index = 1001
+		        row = 1
+		        column = 1
+		    )
+		    must have Supplier
+		    (
+		        type = picklist
+		        displayname = "Supplier"
+		        values = Suppliers.ID
+		        displayformat = [Supplier_Name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Purchase_Date
+		    (
+		        type = date
+		        displayname = "Purchase Date"
+		        initial value = "${zoho.currentdate}"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Order_Items_Section
+		    (
+		        type = section
+		        displayname = "Order Items"
+		        visibility = false
+		        row = 2
+		        column = 1
+		    )
+		    PO_Items
+		    (
+		        type = grid
+		        displayname = "Purchase Order Items"
+		        defaultrow = 1
+		        Material
+		        (
+		            type = picklist
+		            displayname = "Material"
+		            values = Raw_Materials.ID
+		            displayformat = [Material_Name]
+		        )
+		        Quantity
+		        (
+		            type = decimal
+		            displayname = "Quantity"
+		        )
+		        Unit_Price
+		        (
+		            type = USD
+		            displayname = "Unit Price"
+		        )
+		        Amount
+		        (
+		            type = decimal
+		            displayname = "Amount"
+		            initial value = 0
+		        )
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Order_Summary
+		    (
+		        type = section
+		        displayname = "Order Summary"
+		        visibility = true
+		        row = 3
+		        column = 1
+		    )
+		    Total_Amount
+		    (
+		        type = decimal
+		        displayname = "Total Amount"
+		        initial value = 0
+		        row = 3
+		        column = 1
+		        width = medium
+		    )
+		    Status
+		    (
+		        type = picklist
+		        displayname = "Status"
+		        values = {"Ordered","Received","Cancelled"}
+		        initial value = "Ordered"
+		        row = 3
+		        column = 1
+		        width = medium
+		    )
+		    Received_Date
+		    (
+		        type = date
+		        displayname = "Received Date"
+		        row = 3
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Raw_Materials
+		{
+		    success message = "Raw material saved"
+		
+		    Material_Information
+		    (
+		        type = section
+		        displayname = "Material Information"
+		        row = 1
+		        column = 0
+		    )
+		    must have unique Material_Name
+		    (
+		        type = text
+		        displayname = "Material Name"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Category
+		    (
+		        type = picklist
+		        displayname = "Category"
+		        values = {"Dairy & Cream","Sugar & Sweeteners","Flavoring & Essence","Fruits, Nuts & Toppings","Stabilizers & Emulsifiers","Packaging - Cones","Packaging - Cups","Packaging - Tubs","Packaging - Sticks & Wrappers","Other"}
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Unit_Of_Measure
+		    (
+		        type = picklist
+		        displayname = "Unit Of Measure"
+		        values = {"Liters","Kilograms","Grams","Units","Packs"}
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Primary_Supplier
+		    (
+		        type = picklist
+		        displayname = "Primary Supplier"
+		        values = Suppliers.ID
+		        displayformat = [Supplier_Name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Inventory_Details
+		    (
+		        type = section
+		        displayname = "Inventory Details"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    Unit_Cost
+		    (
+		        type = USD
+		        displayname = "Unit Cost"
+		        decimalplace = 2
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Current_Stock
+		    (
+		        type = decimal
+		        displayname = "Current Stock"
+		        initial value = 0
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Reorder_Level
+		    (
+		        type = decimal
+		        displayname = "Reorder Level"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Expiry_Date
+		    (
+		        type = date
+		        displayname = "Expiry Date"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Storage_Unit
+		    (
+		        type = picklist
+		        displayname = "Storage Unit"
+		        values = Cold_Storage_Units.ID
+		        displayformat = [Unit_Name]
+		        searchable = true
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Status
+		    (
+		        type = picklist
+		        displayname = "Status"
+		        values = {"Active","Discontinued"}
+		        initial value = "Active"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Sales_Orders
+		{
+		    success message = "Sales order saved"
+		
+		    Order_Details
+		    (
+		        type = section
+		        displayname = "Order Details"
+		        row = 1
+		        column = 0
+		    )
+		    Order_Number
+		    (
+		        type = autonumber
+		        displayname = "Order Number"
+		        start index = 2001
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Customer
+		    (
+		        type = picklist
+		        displayname = "Customer"
+		        values = Customers.ID
+		        displayformat = [Company_Name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Order_Date
+		    (
+		        type = date
+		        displayname = "Order Date"
+		        initial value = "${zoho.currentdate}"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Delivery_Details
+		    (
+		        type = section
+		        displayname = "Delivery Details"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    Delivery_Date
+		    (
+		        type = date
+		        displayname = "Delivery Date"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Delivery_Type
+		    (
+		        type = picklist
+		        displayname = "Delivery Type"
+		        values = {"Store Pickup","Refrigerated Delivery"}
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Order_Items_Section
+		    (
+		        type = section
+		        displayname = "Order Items"
+		        visibility = false
+		        row = 3
+		        column = 1
+		    )
+		    Order_Items
+		    (
+		        type = grid
+		        displayname = "Order Items"
+		        defaultrow = 1
+		        Product
+		        (
+		            type = picklist
+		            displayname = "Product"
+		            values = Products.ID
+		            displayformat = [Product_Name]
+		        )
+		        Quantity
+		        (
+		            type = decimal
+		            displayname = "Quantity"
+		        )
+		        Unit_Price
+		        (
+		            type = USD
+		            displayname = "Unit Price"
+		        )
+		        Amount
+		        (
+		            type = decimal
+		            displayname = "Amount"
+		            initial value = 0
+		        )
+		        row = 3
+		        column = 1
+		        width = medium
+		    )
+		    Order_Summary
+		    (
+		        type = section
+		        displayname = "Order Summary"
+		        visibility = true
+		        row = 4
+		        column = 1
+		    )
+		    Total_Amount
+		    (
+		        type = decimal
+		        displayname = "Total Amount"
+		        initial value = 0
+		        row = 4
+		        column = 1
+		        width = medium
+		    )
+		    Status
+		    (
+		        type = picklist
+		        displayname = "Status"
+		        values = {"Pending","Confirmed","Shipped","Delivered","Cancelled"}
+		        initial value = "Pending"
+		        row = 4
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Suppliers
+		{
+		    success message = "Supplier saved successfully"
+		
+		    Basic_Information
+		    (
+		        type = section
+		        displayname = "Basic Information"
+		        row = 1
+		        column = 0
+		    )
+		    must have unique Supplier_Name
+		    (
+		        type = text
+		        displayname = "Supplier Name"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Contact_Person
+		    (
+		        type = text
+		        displayname = "Contact Person"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Phone
+		    (
+		        type = phonenumber
+		        displayname = "Phone"
+		        defaultcountry = "in"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Email
+		    (
+		        type = email
+		        displayname = "Email"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Address_Classification
+		    (
+		        type = section
+		        displayname = "Address & Classification"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    Address
+		    (
+		        type = address
+		        displayname = "Address"
+		        row = 2
+		        column = 1
+		        width = medium
+		        address_line_1
+		        (
+		            type = address_line_1
+		            displayname = "Address Line 1"
+		        )
+		        address_line_2
+		        (
+		            type = address_line_2
+		            displayname = "Address Line 2"
+		        )
+		        district_city
+		        (
+		            type = district_city
+		            displayname = "City"
+		        )
+		        state_province
+		        (
+		            type = state_province
+		            displayname = "State"
+		        )
+		        postal_Code
+		        (
+		            type = postal_Code
+		            displayname = "Postal Code"
+		        )
+		        country
+		        (
+		            type = country
+		            displayname = "Country"
+		        )
+		        latitude
+		        (
+		            type = latitude
+		            displayname = "Latitude"
+		            visibility = false
+		        )
+		        longitude
+		        (
+		            type = longitude
+		            displayname = "Longitude"
+		            visibility = false
+		        )
+		    )
+		    Material_Category_Supplied
+		    (
+		        type = picklist
+		        displayname = "Material Category Supplied"
+		        values = {"Dairy & Cream","Sugar & Sweeteners","Flavoring & Essence","Fruits, Nuts & Toppings","Stabilizers & Emulsifiers","Packaging","Other"}
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Status
+		    (
+		        type = picklist
+		        displayname = "Status"
+		        values = {"Active","Inactive"}
+		        initial value = "Active"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Temperature_Logs
+		{
+		    success message = "Temperature log recorded"
+		
+		    Log_Details
+		    (
+		        type = section
+		        displayname = "Log Details"
+		        row = 1
+		        column = 0
+		    )
+		    Log_Number
+		    (
+		        type = autonumber
+		        displayname = "Log Number"
+		        start index = 1
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Cold_Storage_Unit
+		    (
+		        type = picklist
+		        displayname = "Cold Storage Unit"
+		        values = Cold_Storage_Units.ID
+		        displayformat = [Unit_Name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Recorded_DateTime
+		    (
+		        type = datetime
+		        displayname = "Recorded Date Time"
+		        initial value = "${zoho.currentdate}"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Reading_Details
+		    (
+		        type = section
+		        displayname = "Reading Details"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    must have Recorded_Temperature_C
+		    (
+		        type = decimal
+		        displayname = "Recorded Temperature (C)"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Recorded_By
+		    (
+		        type = text
+		        displayname = "Recorded By"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Within_Range
+		    (
+		        type = checkbox
+		        displayname = "Within Range"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Remarks
+		    (
+		        type = textarea
+		        displayname = "Remarks"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+	}
+
+	reports
+	{
+		default list All_Cold_Storage_Units
+		{
+		    displayName = "All Cold Storage Units"
+		    show all rows from Cold_Storage_Units
+		    (
+		        Unit_Name
+		        Unit_Type
+		        Location
+		        Target_Temperature_C
+		        Capacity
+		        Installation_Date
+		        Status
+		    )
+		    filters ( Unit_Type  Status )
+		    sort by ( Unit_Name ascending )
+		}
+
+		list Units_Needing_Attention
+		{
+		    displayName = "Units Needing Attention"
+		    show all rows from Cold_Storage_Units [Status in {"Needs Attention","Under Maintenance"}]
+		    (
+		        Unit_Name
+		        Unit_Type
+		        Location
+		        Target_Temperature_C
+		        Status
+		    )
+		    sort by ( Unit_Name ascending )
+		}
+
+		list Active_Customers
+		{
+		    displayName = "Active Customers"
+		    show all rows from Customers [Status == "Active"]
+		    (
+		        Customer_Name
+		        Company_Name
+		        Phone
+		        Email
+		        Customer_Type
+		    )
+		    filters ( Customer_Type )
+		    sort by ( Company_Name ascending )
+		}
+
+		default list All_Customers
+		{
+		    displayName = "All Customers"
+		    show all rows from Customers
+		    (
+		        Customer_Name
+		        Company_Name
+		        Phone
+		        Email
+		        Address
+		        Customer_Type
+		        Status
+		    )
+		    filters ( Customer_Type  Status )
+		    sort by ( Company_Name ascending )
+		}
+
+		default list All_Finished_Goods
+		{
+		    displayName = "All Finished Goods"
+		    show all rows from Finished_Goods_Inventory
+		    (
+		        Lot_Number
+		        Product
+		        Production_Batch
+		        Quantity_On_Hand
+		        (
+		            display = total
+		        )
+		        Manufacture_Date
+		        Expiry_Date
+		        Storage_Unit
+		        Status
+		    )
+		    filters ( Product  Status )
+		    group by ( Product ascending )
+		    sort by ( Expiry_Date ascending )
+		}
+
+		list Expired_Stock
+		{
+		    displayName = "Expired Stock"
+		    show all rows from Finished_Goods_Inventory [Status == "Expired"]
+		    (
+		        Lot_Number
+		        Product
+		        Quantity_On_Hand
+		        Manufacture_Date
+		        Expiry_Date
+		        Storage_Unit
+		    )
+		    sort by ( Expiry_Date descending )
+		}
+
+		list Expiring_Soon
+		{
+		    displayName = "Expiring Soon"
+		    show all rows from Finished_Goods_Inventory [Status == "In Stock"]
+		    (
+		        Lot_Number
+		        Product
+		        Quantity_On_Hand
+		        Manufacture_Date
+		        Expiry_Date
+		        Storage_Unit
+		    )
+		    sort by ( Expiry_Date ascending )
+		}
+
+		default list All_Production_Batches
+		{
+		    displayName = "All Production Batches"
+		    show all rows from Production_Batches
+		    (
+		        Batch_Number
+		        Product
+		        Batch_Date
+		        Cold_Storage_Unit
+		        Planned_Quantity
+		        Actual_Quantity_Produced
+		        Rejected_Quantity
+		        Manufacture_Date
+		        Expiry_Date
+		        Supervisor_Name
+		        Notes
+		        Stage
+		    )
+		    filters ( Product  Stage )
+		    sort by ( Batch_Date descending )
+		}
+
+		kanban Batch_Status_Board
+		{
+		    displayName = "Batch Status Board"
+		    show all rows from Production_Batches
+		    (
+		        Batch_Number
+		        Product
+		        Batch_Date
+		        Planned_Quantity
+		        Actual_Quantity_Produced
+		        Stage
+		    )
+		    options
+		    (
+		        display field = Stage
+		        emptycolumn = "Unassigned"
+		    )
+		}
+
+		calendar Production_Calendar
+		{
+		    displayName = "Production Calendar"
+		    show all rows from Production_Batches
+		    (
+		        Batch_Number
+		        Product
+		        Batch_Date
+		        Stage
+		    )
+		    filters ( Product  Stage )
+		    options
+		    (
+		        display type = month
+		        display field = Product
+		        start date = Batch_Date
+		    )
+		}
+
+		list Active_Products
+		{
+		    displayName = "Active Products"
+		    show all rows from Products [Status == "Active"]
+		    (
+		        Product_Name
+		        SKU
+		        Flavor_Category
+		        Pack_Type
+		        Size
+		        Unit_Price
+		    )
+		    filters ( Flavor_Category  Pack_Type )
+		    sort by ( Product_Name ascending )
+		}
+
+		default list All_Products
+		{
+		    displayName = "All Products"
+		    show all rows from Products
+		    (
+		        Product_Name
+		        SKU
+		        Flavor_Category
+		        Pack_Type
+		        Size
+		        Unit_Price
+		        Shelf_Life_Days
+		        Storage_Temperature_C
+		        Status
+		    )
+		    filters ( Flavor_Category  Pack_Type  Status )
+		    group by ( Flavor_Category ascending )
+		    sort by ( Product_Name ascending )
+		}
+
+		kanban Products_Board
+		{
+		    displayName = "Products Board"
+		    show all rows from Products
+		    (
+		        Product_Name
+		        Flavor_Category
+		        Pack_Type
+		        Unit_Price
+		        Status
+		    )
+		    options
+		    (
+		        display field = Status
+		        emptycolumn = "Unassigned"
+		    )
+		}
+
+		default list All_Quality_Checks
+		{
+		    displayName = "All Quality Checks"
+		    show all rows from Quality_Checks
+		    (
+		        QC_Number
+		        Production_Batch
+		        Check_Date
+		        Inspector_Name
+		        Taste_Rating
+		        Texture_Rating
+		        Overrun_Percentage
+		        Melting_Time_Minutes
+		        Test_Result
+		        Remarks
+		    )
+		    filters ( Production_Batch  Test_Result )
+		    sort by ( Check_Date descending )
+		}
+
+		list Failed_Checks
+		{
+		    displayName = "Failed Checks"
+		    show all rows from Quality_Checks [Test_Result == "Fail"]
+		    (
+		        QC_Number
+		        Production_Batch
+		        Check_Date
+		        Inspector_Name
+		        Overrun_Percentage
+		        Remarks
+		    )
+		    sort by ( Check_Date descending )
+		}
+
+		default list All_Purchase_Orders
+		{
+		    displayName = "All Purchase Orders"
+		    show all rows from Raw_Material_Purchases
+		    (
+		        PO_Number
+		        Supplier
+		        Purchase_Date
+		        Total_Amount
+		        (
+		            display = total
+		        )
+		        Status
+		        Received_Date
+		    )
+		    filters ( Supplier  Status )
+		    sort by ( Purchase_Date descending )
+		}
+
+		list Pending_Purchase_Orders
+		{
+		    displayName = "Pending Purchase Orders"
+		    show all rows from Raw_Material_Purchases [Status == "Ordered"]
+		    (
+		        PO_Number
+		        Supplier
+		        Purchase_Date
+		        Total_Amount
+		    )
+		    sort by ( Purchase_Date ascending )
+		}
+
+		default list All_Raw_Materials
+		{
+		    displayName = "All Raw Materials"
+		    show all rows from Raw_Materials
+		    (
+		        Material_Name
+		        Category
+		        Unit_Of_Measure
+		        Primary_Supplier
+		        Unit_Cost
+		        Current_Stock
+		        (
+		            display = total
+		        )
+		        Reorder_Level
+		        Expiry_Date
+		        Storage_Unit
+		        Status
+		    )
+		    filters ( Category  Status )
+		    group by ( Category ascending )
+		    sort by ( Material_Name ascending )
+		}
+
+		list Expiring_Raw_Materials
+		{
+		    displayName = "Expiring Raw Materials"
+		    show all rows from Raw_Materials [Expiry_Date is not null && Status == "Active"]
+		    (
+		        Material_Name
+		        Category
+		        Current_Stock
+		        Expiry_Date
+		        Storage_Unit
+		    )
+		    sort by ( Expiry_Date ascending )
+		}
+
+		list Low_Stock_Materials
+		{
+		    displayName = "Low Stock Materials"
+		    show all rows from Raw_Materials [Current_Stock <= Reorder_Level]
+		    (
+		        Material_Name
+		        Category
+		        Unit_Of_Measure
+		        Primary_Supplier
+		        Current_Stock
+		        (
+		            display = total
+		        )
+		        Reorder_Level
+		    )
+		}
+
+		default list All_Sales_Orders
+		{
+		    displayName = "All Sales Orders"
+		    show all rows from Sales_Orders
+		    (
+		        Order_Number
+		        Customer
+		        Order_Date
+		        Delivery_Date
+		        Delivery_Type
+		        Total_Amount
+		        (
+		            display = total
+		        )
+		        Status
+		    )
+		    filters ( Customer  Status  Delivery_Type )
+		    sort by ( Order_Date descending )
+		}
+
+		calendar Delivery_Calendar
+		{
+		    displayName = "Delivery Calendar"
+		    show all rows from Sales_Orders [Delivery_Date is not null]
+		    (
+		        Order_Number
+		        Customer
+		        Delivery_Date
+		        Status
+		    )
+		    filters ( Customer  Status )
+		    options
+		    (
+		        display type = month
+		        display field = Customer
+		        start date = Delivery_Date
+		    )
+		}
+
+		list Pending_Sales_Orders
+		{
+		    displayName = "Pending Sales Orders"
+		    show all rows from Sales_Orders [Status in {"Pending","Confirmed"}]
+		    (
+		        Order_Number
+		        Customer
+		        Order_Date
+		        Delivery_Date
+		        Total_Amount
+		        Status
+		    )
+		    sort by ( Delivery_Date ascending )
+		}
+
+		list Active_Suppliers
+		{
+		    displayName = "Active Suppliers"
+		    show all rows from Suppliers [Status == "Active"]
+		    (
+		        Supplier_Name
+		        Contact_Person
+		        Phone
+		        Email
+		        Material_Category_Supplied
+		    )
+		    filters ( Material_Category_Supplied )
+		    sort by ( Supplier_Name ascending )
+		}
+
+		default list All_Suppliers
+		{
+		    displayName = "All Suppliers"
+		    show all rows from Suppliers
+		    (
+		        Supplier_Name
+		        Contact_Person
+		        Phone
+		        Email
+		        Address
+		        Material_Category_Supplied
+		        Status
+		    )
+		    filters ( Material_Category_Supplied  Status )
+		    sort by ( Supplier_Name ascending )
+		}
+
+		default list All_Temperature_Logs
+		{
+		    displayName = "All Temperature Logs"
+		    show all rows from Temperature_Logs
+		    (
+		        Log_Number
+		        Cold_Storage_Unit
+		        Recorded_DateTime
+		        Recorded_Temperature_C
+		        Recorded_By
+		        Within_Range
+		        Remarks
+		    )
+		    filters ( Cold_Storage_Unit )
+		    sort by ( Recorded_DateTime descending )
+		}
+
+		list Out_Of_Range_Logs
+		{
+		    displayName = "Out Of Range Logs"
+		    show all rows from Temperature_Logs [Within_Range == false]
+		    (
+		        Log_Number
+		        Cold_Storage_Unit
+		        Recorded_DateTime
+		        Recorded_Temperature_C
+		        Recorded_By
+		        Remarks
+		    )
+		    sort by ( Recorded_DateTime descending )
+		}
+	}
+
+	pages
+	{
+		page Operations_Dashboard
+		{
+					displayname = "Operations Dashboard"
+					Content="<zml>\n\t<layout>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='Operations_Dashboard_Content' elementName='Operations_Dashboard_Content'>\n\t\t\t\t\t<![CDATA[htmlpage Operations_Dashboard_Content()\ncontent\n&lt;%{%&gt;\n&lt;%\nlowStockCount = Raw_Materials[Current_Stock &lt;= Reorder_Level].count();\nbatchesInProduction = Production_Batches[Stage == &quot;In Production&quot;].count();\nbatchesAwaitingQC = Production_Batches[Stage == &quot;Quality Check&quot;].count();\nexpiringSoonCount = Finished_Goods_Inventory[Status == &quot;In Stock&quot; &amp;&amp; Expiry_Date &lt;= zoho.currentdate.addDay(7)].count();\nunitsNeedingAttention = Cold_Storage_Units[Status in {&quot;Needs Attention&quot;,&quot;Under Maintenance&quot;}].count();\nplannedCount = Production_Batches[Stage == &quot;Planned&quot;].count();\napprovedCount = Production_Batches[Stage == &quot;Approved&quot;].count();\nrejectedCount = Production_Batches[Stage == &quot;Rejected&quot;].count();\npackagedCount = Production_Batches[Stage == &quot;Packaged&quot;].count();\ntotalChecks = Quality_Checks[ID != 0].count();\npassedChecks = Quality_Checks[Test_Result == &quot;Pass&quot;].count();\npassRate = if (totalChecks &gt; 0, (passedChecks * 100) / totalChecks, 0);\nbatchBoardUrl = zoho.appuri + &quot;#Report:Batch_Status_Board&quot;;\nlowStockReportUrl = zoho.appuri + &quot;#Report:Low_Stock_Materials&quot;;\nexpiringSoonUrl = zoho.appuri + &quot;#Report:Expiring_Soon&quot;;\nunitsAttentionUrl = zoho.appuri + &quot;#Report:Units_Needing_Attention&quot;;\nfailedChecksUrl = zoho.appuri + &quot;#Report:Failed_Checks&quot;;\n%&gt;\n&lt;style&gt;\n&lt;file name:zcs-global.css/&gt;\n\n/* ---- Ice Cream Management brand accents + tokens the fetched ZCS components expect ---- */\n:root {\n\t--od-mint-dark: #0f6b5c;\n\t--od-mint: #2a9d8f;\n\t--od-mint-light: #8fd9cc;\n\t--od-cream: #fbf6ef;\n\t--zcs-surface: var(--zcs_white_color, #ffffff);\n\t--zcs-radius: 10px;\n\t--zcs-shadow: 0 1px 3px rgba(15, 107, 92, 0.12);\n\t--zcs-text-1: var(--zcs_primary_text_color, #17332e);\n\t--zcs-text-2: var(--zcs_secondary_text_color, #3c6b62);\n\t--zcs-text-3: var(--zcs_tertiary_text_color, #7aa89e);\n\t--zcs-border: var(--zcs_tertiary_border_color, #e3efec);\n\t--zcs-blue: var(--zcs_brand_color, #09598e);\n\t--zcs-green: #179E6C;\n\t--zcs-green-bg: #E5F6EF;\n\t--zcs-red: #FE455D;\n\t--zcs-red-bg: #FDEAEC;\n\t--zcs-orange: #B8770D;\n\t--zcs-orange-bg: #FBF1E1;\n}\n\n.zcs-page-header { margin-bottom: 24px; }\n.zcs-page-header__title { font-size: 22px; font-weight: 700; color: var(--zcs-text-1); margin: 0 0 4px; }\n.zcs-page-header__sub { font-size: 14px; color: var(--zcs-text-2); margin: 0; }\n\n.zcs-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 24px; }\n.zcs-kpi-card { background: var(--zcs-surface); border-radius: var(--zcs-radius); box-shadow: var(--zcs-shadow); padding: 20px 24px; border-top: 3px solid var(--od-mint-light); }\n.zcs-kpi-card__label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--zcs-text-2); }\n.zcs-kpi-card__value { font-size: 32px; font-weight: 700; margin: 6px 0 4px; line-height: 1; }\n.zcs-kpi-card__sub { font-size: 12px; color: var(--zcs-text-3); }\n\n.zcs-section { background: var(--zcs-surface); border-radius: var(--zcs-radius); box-shadow: var(--zcs-shadow); padding: 20px 24px; margin-bottom: 16px; }\n.zcs-section__heading { font-size: 15px; font-weight: 600; color: var(--zcs-text-1); margin: 0 0 14px; }\n.zcs-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--zcs-border); font-size: 14px; color: var(--zcs-text-1); }\n.zcs-stat-row:last-child { border-bottom: none; }\n.zcs-badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; line-height: 1.4; }\n.zcs-badge--success { background: var(--zcs-green-bg); color: var(--zcs-green); }\n.zcs-badge--danger  { background: var(--zcs-red-bg);   color: var(--zcs-red); }\n.zcs-badge--warning { background: var(--zcs-orange-bg); color: var(--zcs-orange); }\n.zcs-badge--info    { background: #EAF1FB; color: var(--zcs-blue); }\n.zcs-badge--neutral { background: #f3f4f6; color: var(--zcs-text-2); }\n\n.zcs-action-list { background: var(--zcs-surface); border-radius: var(--zcs-radius); box-shadow: var(--zcs-shadow); padding: 20px 24px; margin-bottom: 16px; }\n.zcs-action-list__heading { font-size: 15px; font-weight: 600; color: var(--zcs-text-1); margin: 0 0 12px; }\n.zcs-action-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--zcs-border); font-size: 14px; color: var(--zcs-blue); text-decoration: none; cursor: pointer; }\n.zcs-action-row:last-child { border-bottom: none; }\n.zcs-action-row:hover { color: var(--od-mint-dark); }\n.zcs-action-row__arrow { color: var(--zcs-text-3); }\n\n.od-page { background: var(--od-cream); padding: 24px; border-radius: var(--zcs-radius); }\n&lt;/style&gt;\n&lt;div class=&quot;od-page&quot;&gt;\n\t&lt;div class=&quot;zcs-page-header&quot;&gt;\n\t\t&lt;h1 class=&quot;zcs-page-header__title&quot;&gt;Operations Dashboard&lt;/h1&gt;\n\t\t&lt;p class=&quot;zcs-page-header__sub&quot;&gt;Production, quality, inventory, and cold-storage snapshot&lt;/p&gt;\n\t&lt;/div&gt;\n\n\t&lt;div class=&quot;zcs-kpi-grid&quot;&gt;\n\t\t&lt;div class=&quot;zcs-kpi-card&quot;&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__label&quot;&gt;Low Stock Materials&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__value zcs-color-red&quot;&gt;&lt;%= lowStockCount %&gt;&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__sub&quot;&gt;Raw materials at or below reorder level&lt;/div&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-kpi-card&quot;&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__label&quot;&gt;Batches In Production&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__value zcs-color-blue&quot;&gt;&lt;%= batchesInProduction %&gt;&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__sub&quot;&gt;Currently churning / freezing&lt;/div&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-kpi-card&quot;&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__label&quot;&gt;Lots Expiring Soon&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__value zcs-color-yellow&quot;&gt;&lt;%= expiringSoonCount %&gt;&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__sub&quot;&gt;Finished-goods lots expiring within 7 days&lt;/div&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-kpi-card&quot;&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__label&quot;&gt;Cold Storage Needing Attention&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__value zcs-color-red&quot;&gt;&lt;%= unitsNeedingAttention %&gt;&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__sub&quot;&gt;Units out of target temperature range&lt;/div&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-kpi-card&quot;&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__label&quot;&gt;QC Pass Rate&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__value zcs-color-green&quot;&gt;&lt;%= passRate %&gt;%&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__sub&quot;&gt;&lt;%= passedChecks %&gt; of &lt;%= totalChecks %&gt; checks passed&lt;/div&gt;\n\t\t&lt;/div&gt;\n\t&lt;/div&gt;\n\n\t&lt;div class=&quot;zcs-section&quot;&gt;\n\t\t&lt;h2 class=&quot;zcs-section__heading&quot;&gt;Batches by Stage&lt;/h2&gt;\n\t\t&lt;div class=&quot;zcs-stat-row&quot;&gt;\n\t\t\t&lt;span&gt;Planned&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-badge zcs-badge--neutral&quot;&gt;&lt;%= plannedCount %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-stat-row&quot;&gt;\n\t\t\t&lt;span&gt;In Production&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-badge zcs-badge--info&quot;&gt;&lt;%= batchesInProduction %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-stat-row&quot;&gt;\n\t\t\t&lt;span&gt;Quality Check&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-badge zcs-badge--warning&quot;&gt;&lt;%= batchesAwaitingQC %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-stat-row&quot;&gt;\n\t\t\t&lt;span&gt;Approved&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-badge zcs-badge--success&quot;&gt;&lt;%= approvedCount %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-stat-row&quot;&gt;\n\t\t\t&lt;span&gt;Rejected&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-badge zcs-badge--danger&quot;&gt;&lt;%= rejectedCount %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-stat-row&quot;&gt;\n\t\t\t&lt;span&gt;Packaged&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-badge zcs-badge--success&quot;&gt;&lt;%= packagedCount %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t&lt;/div&gt;\n\n\t&lt;div class=&quot;zcs-action-list&quot;&gt;\n\t\t&lt;h2 class=&quot;zcs-action-list__heading&quot;&gt;Quick Actions&lt;/h2&gt;\n\t\t&lt;a class=&quot;zcs-action-row&quot; href=&quot;&lt;%= batchBoardUrl %&gt;&quot;&gt;\n\t\t\t&lt;span&gt;Batch Status Board&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-action-row__arrow&quot;&gt;&amp;#8250;&lt;/span&gt;\n\t\t&lt;/a&gt;\n\t\t&lt;a class=&quot;zcs-action-row&quot; href=&quot;&lt;%= lowStockReportUrl %&gt;&quot;&gt;\n\t\t\t&lt;span&gt;Low Stock Materials&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-action-row__arrow&quot;&gt;&amp;#8250;&lt;/span&gt;\n\t\t&lt;/a&gt;\n\t\t&lt;a class=&quot;zcs-action-row&quot; href=&quot;&lt;%= expiringSoonUrl %&gt;&quot;&gt;\n\t\t\t&lt;span&gt;Expiring Soon (Finished Goods)&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-action-row__arrow&quot;&gt;&amp;#8250;&lt;/span&gt;\n\t\t&lt;/a&gt;\n\t\t&lt;a class=&quot;zcs-action-row&quot; href=&quot;&lt;%= unitsAttentionUrl %&gt;&quot;&gt;\n\t\t\t&lt;span&gt;Cold Storage Units Needing Attention&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-action-row__arrow&quot;&gt;&amp;#8250;&lt;/span&gt;\n\t\t&lt;/a&gt;\n\t\t&lt;a class=&quot;zcs-action-row&quot; href=&quot;&lt;%= failedChecksUrl %&gt;&quot;&gt;\n\t\t\t&lt;span&gt;Failed Quality Checks&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-action-row__arrow&quot;&gt;&amp;#8250;&lt;/span&gt;\n\t\t&lt;/a&gt;\n\t&lt;/div&gt;\n&lt;/div&gt;\n&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t</layout>\n</zml>"
+		}
+
+		page Sales_Dashboard
+		{
+					displayname = "Sales Dashboard"
+					Content="<zml>\n\t<layout>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='Sales_Dashboard_Content' elementName='Sales_Dashboard_Content'>\n\t\t\t\t\t<![CDATA[htmlpage Sales_Dashboard_Content()\ncontent\n&lt;%{%&gt;\n&lt;%\nwindowStart = zoho.currentdate.addDay(-30);\nordersLast30 = Sales_Orders[Order_Date &gt;= windowStart].count();\nrevenueLast30 = Sales_Orders[Order_Date &gt;= windowStart].sum(Total_Amount);\npendingCount = Sales_Orders[Status in {&quot;Pending&quot;,&quot;Confirmed&quot;}].count();\nshippedCount = Sales_Orders[Status == &quot;Shipped&quot;].count();\ndeliveredCount = Sales_Orders[Status == &quot;Delivered&quot;].count();\ncancelledCount = Sales_Orders[Status == &quot;Cancelled&quot;].count();\nretailCount = Customers[Customer_Type == &quot;Retail Store&quot; &amp;&amp; Status == &quot;Active&quot;].count();\ndistributorCount = Customers[Customer_Type == &quot;Distributor&quot; &amp;&amp; Status == &quot;Active&quot;].count();\nwholesalerCount = Customers[Customer_Type == &quot;Wholesaler&quot; &amp;&amp; Status == &quot;Active&quot;].count();\ncafeCount = Customers[Customer_Type == &quot;Cafe &amp; Restaurant&quot; &amp;&amp; Status == &quot;Active&quot;].count();\ndirectCount = Customers[Customer_Type == &quot;Direct Consumer&quot; &amp;&amp; Status == &quot;Active&quot;].count();\nordersUrl = zoho.appuri + &quot;#Report:All_Sales_Orders&quot;;\npendingUrl = zoho.appuri + &quot;#Report:Pending_Sales_Orders&quot;;\ndeliveryCalendarUrl = zoho.appuri + &quot;#Report:Delivery_Calendar&quot;;\ncustomersUrl = zoho.appuri + &quot;#Report:All_Customers&quot;;\n%&gt;\n&lt;style&gt;\n&lt;file name:zcs-global.css/&gt;\n\n/* ---- Ice Cream Management brand accents + tokens the fetched ZCS components expect ---- */\n:root {\n\t--sd-berry-dark: #8e1f4b;\n\t--sd-berry: #d1477a;\n\t--sd-berry-light: #f3b6cd;\n\t--sd-cream: #fff6f9;\n\t--zcs-surface: var(--zcs_white_color, #ffffff);\n\t--zcs-radius: 10px;\n\t--zcs-shadow: 0 1px 3px rgba(142, 31, 75, 0.12);\n\t--zcs-text-1: var(--zcs_primary_text_color, #3a1424);\n\t--zcs-text-2: var(--zcs_secondary_text_color, #7a3a53);\n\t--zcs-text-3: var(--zcs_tertiary_text_color, #b97e94);\n\t--zcs-border: var(--zcs_tertiary_border_color, #f4e2ea);\n\t--zcs-blue: var(--zcs_brand_color, #09598e);\n\t--zcs-green: #179E6C;\n\t--zcs-green-bg: #E5F6EF;\n\t--zcs-red: #FE455D;\n\t--zcs-red-bg: #FDEAEC;\n\t--zcs-orange: #B8770D;\n\t--zcs-orange-bg: #FBF1E1;\n}\n\n.zcs-page-header { margin-bottom: 24px; }\n.zcs-page-header__title { font-size: 22px; font-weight: 700; color: var(--zcs-text-1); margin: 0 0 4px; }\n.zcs-page-header__sub { font-size: 14px; color: var(--zcs-text-2); margin: 0; }\n\n.zcs-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 24px; }\n.zcs-kpi-card { background: var(--zcs-surface); border-radius: var(--zcs-radius); box-shadow: var(--zcs-shadow); padding: 20px 24px; border-top: 3px solid var(--sd-berry-light); }\n.zcs-kpi-card__label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--zcs-text-2); }\n.zcs-kpi-card__value { font-size: 32px; font-weight: 700; margin: 6px 0 4px; line-height: 1; }\n.zcs-kpi-card__sub { font-size: 12px; color: var(--zcs-text-3); }\n\n.zcs-section { background: var(--zcs-surface); border-radius: var(--zcs-radius); box-shadow: var(--zcs-shadow); padding: 20px 24px; margin-bottom: 16px; }\n.zcs-section__heading { font-size: 15px; font-weight: 600; color: var(--zcs-text-1); margin: 0 0 14px; }\n.zcs-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--zcs-border); font-size: 14px; color: var(--zcs-text-1); }\n.zcs-stat-row:last-child { border-bottom: none; }\n.zcs-badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; line-height: 1.4; }\n.zcs-badge--success { background: var(--zcs-green-bg); color: var(--zcs-green); }\n.zcs-badge--danger  { background: var(--zcs-red-bg);   color: var(--zcs-red); }\n.zcs-badge--warning { background: var(--zcs-orange-bg); color: var(--zcs-orange); }\n.zcs-badge--info    { background: #EAF1FB; color: var(--zcs-blue); }\n.zcs-badge--neutral { background: #f3f4f6; color: var(--zcs-text-2); }\n\n.zcs-action-list { background: var(--zcs-surface); border-radius: var(--zcs-radius); box-shadow: var(--zcs-shadow); padding: 20px 24px; margin-bottom: 16px; }\n.zcs-action-list__heading { font-size: 15px; font-weight: 600; color: var(--zcs-text-1); margin: 0 0 12px; }\n.zcs-action-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--zcs-border); font-size: 14px; color: var(--zcs-blue); text-decoration: none; cursor: pointer; }\n.zcs-action-row:last-child { border-bottom: none; }\n.zcs-action-row:hover { color: var(--sd-berry-dark); }\n.zcs-action-row__arrow { color: var(--zcs-text-3); }\n\n.sd-page { background: var(--sd-cream); padding: 24px; border-radius: var(--zcs-radius); }\n&lt;/style&gt;\n&lt;div class=&quot;sd-page&quot;&gt;\n\t&lt;div class=&quot;zcs-page-header&quot;&gt;\n\t\t&lt;h1 class=&quot;zcs-page-header__title&quot;&gt;Sales Dashboard&lt;/h1&gt;\n\t\t&lt;p class=&quot;zcs-page-header__sub&quot;&gt;Orders, revenue, and customer snapshot&lt;/p&gt;\n\t&lt;/div&gt;\n\n\t&lt;div class=&quot;zcs-kpi-grid&quot;&gt;\n\t\t&lt;div class=&quot;zcs-kpi-card&quot;&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__label&quot;&gt;Orders (Last 30 Days)&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__value zcs-color-blue&quot;&gt;&lt;%= ordersLast30 %&gt;&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__sub&quot;&gt;Orders placed in the last 30 days&lt;/div&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-kpi-card&quot;&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__label&quot;&gt;Revenue (Last 30 Days)&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__value zcs-color-green&quot;&gt;$&lt;%= revenueLast30 %&gt;&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__sub&quot;&gt;Total order value in the last 30 days&lt;/div&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-kpi-card&quot;&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__label&quot;&gt;Pending Orders&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__value zcs-color-yellow&quot;&gt;&lt;%= pendingCount %&gt;&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__sub&quot;&gt;Awaiting confirmation or shipment&lt;/div&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-kpi-card&quot;&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__label&quot;&gt;Shipped Orders&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__value zcs-color-blue&quot;&gt;&lt;%= shippedCount %&gt;&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-kpi-card__sub&quot;&gt;In transit to customers&lt;/div&gt;\n\t\t&lt;/div&gt;\n\t&lt;/div&gt;\n\n\t&lt;div class=&quot;zcs-section&quot;&gt;\n\t\t&lt;h2 class=&quot;zcs-section__heading&quot;&gt;Orders by Status&lt;/h2&gt;\n\t\t&lt;div class=&quot;zcs-stat-row&quot;&gt;\n\t\t\t&lt;span&gt;Pending / Confirmed&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-badge zcs-badge--warning&quot;&gt;&lt;%= pendingCount %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-stat-row&quot;&gt;\n\t\t\t&lt;span&gt;Shipped&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-badge zcs-badge--info&quot;&gt;&lt;%= shippedCount %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-stat-row&quot;&gt;\n\t\t\t&lt;span&gt;Delivered&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-badge zcs-badge--success&quot;&gt;&lt;%= deliveredCount %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-stat-row&quot;&gt;\n\t\t\t&lt;span&gt;Cancelled&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-badge zcs-badge--danger&quot;&gt;&lt;%= cancelledCount %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t&lt;/div&gt;\n\n\t&lt;div class=&quot;zcs-section&quot;&gt;\n\t\t&lt;h2 class=&quot;zcs-section__heading&quot;&gt;Active Customers by Type&lt;/h2&gt;\n\t\t&lt;div class=&quot;zcs-stat-row&quot;&gt;\n\t\t\t&lt;span&gt;Retail Store&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-badge zcs-badge--neutral&quot;&gt;&lt;%= retailCount %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-stat-row&quot;&gt;\n\t\t\t&lt;span&gt;Distributor&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-badge zcs-badge--neutral&quot;&gt;&lt;%= distributorCount %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-stat-row&quot;&gt;\n\t\t\t&lt;span&gt;Wholesaler&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-badge zcs-badge--neutral&quot;&gt;&lt;%= wholesalerCount %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-stat-row&quot;&gt;\n\t\t\t&lt;span&gt;Cafe &amp; Restaurant&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-badge zcs-badge--neutral&quot;&gt;&lt;%= cafeCount %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;zcs-stat-row&quot;&gt;\n\t\t\t&lt;span&gt;Direct Consumer&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-badge zcs-badge--neutral&quot;&gt;&lt;%= directCount %&gt;&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t&lt;/div&gt;\n\n\t&lt;div class=&quot;zcs-action-list&quot;&gt;\n\t\t&lt;h2 class=&quot;zcs-action-list__heading&quot;&gt;Quick Actions&lt;/h2&gt;\n\t\t&lt;a class=&quot;zcs-action-row&quot; href=&quot;&lt;%= ordersUrl %&gt;&quot;&gt;\n\t\t\t&lt;span&gt;All Sales Orders&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-action-row__arrow&quot;&gt;&amp;#8250;&lt;/span&gt;\n\t\t&lt;/a&gt;\n\t\t&lt;a class=&quot;zcs-action-row&quot; href=&quot;&lt;%= pendingUrl %&gt;&quot;&gt;\n\t\t\t&lt;span&gt;Pending Sales Orders&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-action-row__arrow&quot;&gt;&amp;#8250;&lt;/span&gt;\n\t\t&lt;/a&gt;\n\t\t&lt;a class=&quot;zcs-action-row&quot; href=&quot;&lt;%= deliveryCalendarUrl %&gt;&quot;&gt;\n\t\t\t&lt;span&gt;Delivery Calendar&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-action-row__arrow&quot;&gt;&amp;#8250;&lt;/span&gt;\n\t\t&lt;/a&gt;\n\t\t&lt;a class=&quot;zcs-action-row&quot; href=&quot;&lt;%= customersUrl %&gt;&quot;&gt;\n\t\t\t&lt;span&gt;All Customers&lt;/span&gt;\n\t\t\t&lt;span class=&quot;zcs-action-row__arrow&quot;&gt;&amp;#8250;&lt;/span&gt;\n\t\t&lt;/a&gt;\n\t&lt;/div&gt;\n&lt;/div&gt;\n&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t</layout>\n</zml>"
+		}
+	}
+
+	workflow
+	{
+		form
+		{
+			Production_Batches_On_Validate as "Compute Expiry Date"
+			{
+			    type = form
+			    form = Production_Batches
+			    record event = on add or edit
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                product_rec = Products[ID == input.Product];
+			                if (product_rec.count() > 0)
+			                {
+			                    input.Expiry_Date = input.Batch_Date.addDay(product_rec.Shelf_Life_Days);
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Calculate_PO_Line_Amount_On_Quantity as "Calculate Line Amount"
+			{
+			    type = form
+			    form = Raw_Material_Purchases
+			    record event = on add or edit
+			
+			    on user input of PO_Items.Quantity
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                PO_Items.Amount = PO_Items.Quantity * PO_Items.Unit_Price;
+			            )
+			        }
+			    }
+			}
+
+			Raw_Material_Purchases_On_Success as "Update Stock on Order Received"
+			{
+			    type = form
+			    form = Raw_Material_Purchases
+			    record event = on edit
+			
+			    on success
+			    {
+			        actions ( Status == "Received" )
+			        {
+			            custom deluge script
+			            (
+			                for each item in input.PO_Items
+			                {
+			                    material_id = item.Material;
+			                    qty = item.Quantity;
+			                    material_rec = Raw_Materials[ID == material_id];
+			                    material_rec.Current_Stock = material_rec.Current_Stock + qty;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Raw_Material_Purchases_On_Validate as "Compute Total Amount"
+			{
+			    type = form
+			    form = Raw_Material_Purchases
+			    record event = on add or edit
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                total = 0;
+			                for each item in input.PO_Items
+			                {
+			                    total = total + item.Amount;
+			                }
+			                input.Total_Amount = total;
+			            )
+			        }
+			    }
+			}
+
+			Order_Items_Quantity_On_User_Input as "Calculate Line Amount"
+			{
+			    type = form
+			    form = Sales_Orders
+			    record event = on add or edit
+			
+			    on user input of Order_Items.Quantity
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                Order_Items.Amount = Order_Items.Quantity * Order_Items.Unit_Price;
+			            )
+			        }
+			    }
+			}
+
+			Sales_Orders_On_Success as "Ship Order - FEFO Stock Deduction"
+			{
+			    type = form
+			    form = Sales_Orders
+			    record event = on edit
+			
+			    on success
+			    {
+			        actions ( Status == "Shipped" )
+			        {
+			            custom deluge script
+			            (
+			                for each item in input.Order_Items
+			                {
+			                    remaining = item.Quantity;
+			                    lots = Finished_Goods_Inventory[Product == item.Product && Status == "In Stock"] sort by Expiry_Date;
+			                    for each lot in lots
+			                    {
+			                        if (remaining <= 0)
+			                        {
+			                            break;
+			                        }
+			                        if (lot.Quantity_On_Hand <= remaining)
+			                        {
+			                            remaining = remaining - lot.Quantity_On_Hand;
+			                            lot.Quantity_On_Hand = 0;
+			                            lot.Status = "Sold Out";
+			                            lot.Last_Updated = zoho.currentdate;
+			                        }
+			                        else
+			                        {
+			                            lot.Quantity_On_Hand = lot.Quantity_On_Hand - remaining;
+			                            lot.Last_Updated = zoho.currentdate;
+			                            remaining = 0;
+			                        }
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Sales_Orders_On_Validate as "Compute Total Amount"
+			{
+			    type = form
+			    form = Sales_Orders
+			    record event = on add or edit
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                total = 0;
+			                for each item in input.Order_Items
+			                {
+			                    total = total + item.Amount;
+			                }
+			                input.Total_Amount = total;
+			            )
+			        }
+			    }
+			}
+
+			Temperature_Logs_On_Success as "Update Cold Storage Unit Status"
+			{
+			    type = form
+			    form = Temperature_Logs
+			    record event = on add or edit
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                unit_rec = Cold_Storage_Units[ID == input.Cold_Storage_Unit];
+			                if (unit_rec.count() > 0)
+			                {
+			                    if (input.Within_Range == false)
+			                    {
+			                        unit_rec.Status = "Needs Attention";
+			                    }
+			                    else if (unit_rec.Status == "Needs Attention")
+			                    {
+			                        unit_rec.Status = "Operational";
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Temperature_Logs_On_Validate as "Compute Within Range"
+			{
+			    type = form
+			    form = Temperature_Logs
+			    record event = on add or edit
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                unit_rec = Cold_Storage_Units[ID == input.Cold_Storage_Unit];
+			                if (unit_rec.count() > 0)
+			                {
+			                    deviation = input.Recorded_Temperature_C - unit_rec.Target_Temperature_C;
+			                    if (deviation < 0)
+			                    {
+			                        deviation = deviation * -1;
+			                    }
+			                    if (deviation > 3)
+			                    {
+			                        input.Within_Range = false;
+			                    }
+			                    else
+			                    {
+			                        input.Within_Range = true;
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+		}
+
+		schedule
+		{
+			Expire_Finished_Goods_Lot as "Auto-Expire Finished Goods Lot"
+			{
+			    type = schedule
+			    form = Finished_Goods_Inventory[Status == "In Stock"]
+			    start = Expiry_Date at "00:00:00"
+			    time zone = "Asia/Kolkata"
+			
+			    on start
+			    {
+			        actions
+			        {
+			            on load
+			            (
+			                input.Status = "Expired";
+			                input.Last_Updated = zoho.currentdate;
+			            )
+			        }
+			    }
+			}
+		}
+
+		blueprint
+		{
+			Production_Lifecycle as "Production Lifecycle"
+			{
+			    type = blueprint
+			    form = Production_Batches
+			
+			    start
+			    {
+			        start stage = "Planned"
+			        chart data
+			        {
+			            from port : 0
+			            to port   : 2
+			            position  : "50 100"
+			            path      : [50,100,100,100]
+			        }
+			    }
+			
+			    stages
+			    {
+			        "Planned"
+			        {
+			            chart data
+			            {
+			                position : "100 100"
+			            }
+			        }
+			        "In Production"
+			        {
+			            chart data
+			            {
+			                position : "300 100"
+			            }
+			        }
+			        "Quality Check"
+			        {
+			            chart data
+			            {
+			                position : "500 100"
+			            }
+			        }
+			        "Approved"
+			        {
+			            chart data
+			            {
+			                position : "700 50"
+			            }
+			        }
+			        "Rejected"
+			        {
+			            chart data
+			            {
+			                position : "700 150"
+			            }
+			        }
+			        "Packaged"
+			        {
+			            chart data
+			            {
+			                position : "900 50"
+			            }
+			        }
+			    }
+			
+			    transitions
+			    {
+			        Start_Production as "Start Production"
+			        {
+			            type = normal
+			            from stage = "Planned"
+			            to stage   = "In Production"
+			
+			            before
+			            {
+			                transition criteria = ( Planned_Quantity > 0 )
+			            }
+			
+			            after
+			            {
+			                actions
+			                {
+			                    custom deluge script
+			                    (
+			                    product_rec = Products[ID == input.Product];
+			                    if (product_rec.count() > 0)
+			                    {
+			                        for each item in product_rec.Recipe_Items
+			                        {
+			                            material_rec = Raw_Materials[ID == item.Raw_Material];
+			                            if (material_rec.count() > 0)
+			                            {
+			                                material_rec.Current_Stock = material_rec.Current_Stock - (item.Quantity_Required * input.Planned_Quantity);
+			                            }
+			                        }
+			                    }
+			                    )
+			                }
+			            }
+			
+			            chart data
+			            {
+			                from port : 2
+			                to port   : 0
+			                path      : [100,100,300,100]
+			            }
+			        }
+			
+			        Send_For_QC as "Send For QC"
+			        {
+			            type = normal
+			            from stage = "In Production"
+			            to stage   = "Quality Check"
+			
+			            before
+			            {
+			            }
+			
+			            after
+			            {
+			            }
+			
+			            chart data
+			            {
+			                from port : 2
+			                to port   : 0
+			                path      : [300,100,500,100]
+			            }
+			        }
+			
+			        Approve_Batch as "Approve Batch"
+			        {
+			            type = normal
+			            from stage = "Quality Check"
+			            to stage   = "Approved"
+			
+			            before
+			            {
+			            }
+			
+			            after
+			            {
+			                actions
+			                {
+			                    custom deluge script
+			                    (
+			                    insert into Finished_Goods_Inventory
+			                    [
+			                        Product = input.Product
+			                        Production_Batch = input.ID
+			                        Quantity_On_Hand = input.Actual_Quantity_Produced
+			                        Manufacture_Date = input.Manufacture_Date
+			                        Expiry_Date = input.Expiry_Date
+			                        Storage_Unit = input.Cold_Storage_Unit
+			                        Status = "In Stock"
+			                    ];
+			                    )
+			                }
+			            }
+			
+			            chart data
+			            {
+			                from port : 2
+			                to port   : 0
+			                path      : [500,100,700,50]
+			            }
+			        }
+			
+			        Reject_Batch as "Reject Batch"
+			        {
+			            type = normal
+			            from stage = "Quality Check"
+			            to stage   = "Rejected"
+			
+			            before
+			            {
+			                confirmation before execution
+			                (
+			                    message = "Reject this batch?"
+			                    confirm button text = "Yes, reject"
+			                    cancel button text = "Cancel"
+			                )
+			            }
+			
+			            after
+			            {
+			            }
+			
+			            chart data
+			            {
+			                from port : 2
+			                to port   : 0
+			                path      : [500,100,700,150]
+			            }
+			        }
+			
+			        Package_Batch as "Package Batch"
+			        {
+			            type = normal
+			            from stage = "Approved"
+			            to stage   = "Packaged"
+			
+			            before
+			            {
+			            }
+			
+			            after
+			            {
+			            }
+			
+			            chart data
+			            {
+			                from port : 2
+			                to port   : 0
+			                path      : [700,50,900,50]
+			            }
+			        }
+			    }
+			}
+		}
+	}
+
+	share_settings
+	{
+	"Production_Staff"
+	{
+	    name        = "Production_Staff"
+	    type        = Users_Permissions
+	    permissions = { Chat:true, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+	    description = "Manages raw materials, purchasing, product recipes, production batches, quality checks, and cold-storage/temperature monitoring."
+	
+	    ModulePermissions
+	    {
+	        Suppliers
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Suppliers={"View","Edit","Delete"}
+	                Active_Suppliers={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Cold_Storage_Units
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Cold_Storage_Units={"View","Edit","Delete"}
+	                Units_Needing_Attention={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Temperature_Logs
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Temperature_Logs={"View","Edit","Delete"}
+	                Out_Of_Range_Logs={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Raw_Materials
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Raw_Materials={"View","Edit","Delete"}
+	                Low_Stock_Materials={"View","Edit","Delete"}
+	                Expiring_Raw_Materials={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Products
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Products={"View","Edit","Delete"}
+	                Active_Products={"View","Edit","Delete"}
+	                Products_Board={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Raw_Material_Purchases
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Purchase_Orders={"View","Edit","Delete"}
+	                Pending_Purchase_Orders={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Production_Batches
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Production_Batches={"View","Edit","Delete"}
+	                Batch_Status_Board={"View","Edit","Delete"}
+	                Production_Calendar={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Quality_Checks
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Quality_Checks={"View","Edit","Delete"}
+	                Failed_Checks={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Finished_Goods_Inventory
+	        {
+	            enabled          = View,Viewall,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Finished_Goods={"View"}
+	                Expiring_Soon={"View"}
+	                Expired_Stock={"View"}
+	            }
+	        }
+	
+	        Operations_Dashboard
+	        {
+	            enabled = tab
+	        }
+	    }
+	}
+	"Sales_Staff"
+	{
+	    name        = "Sales_Staff"
+	    type        = Users_Permissions
+	    permissions = { Chat:true, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+	    description = "Manages customers and sales orders, with read access to the product catalog and finished-goods stock."
+	
+	    ModulePermissions
+	    {
+	        Customers
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Customers={"View","Edit","Delete"}
+	                Active_Customers={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Sales_Orders
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Sales_Orders={"View","Edit","Delete"}
+	                Pending_Sales_Orders={"View","Edit","Delete"}
+	                Delivery_Calendar={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Products
+	        {
+	            enabled          = View,Viewall,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Products={"View"}
+	                Active_Products={"View"}
+	                Products_Board={"View"}
+	            }
+	        }
+	
+	        Finished_Goods_Inventory
+	        {
+	            enabled          = View,Viewall,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Finished_Goods={"View"}
+	                Expiring_Soon={"View"}
+	                Expired_Stock={"View"}
+	            }
+	        }
+	
+	        Sales_Dashboard
+	        {
+	            enabled = tab
+	        }
+	    }
+	}
+	"Shop_Manager"
+	{
+	    name        = "Shop_Manager"
+	    type        = Users_Permissions
+	    permissions = { Chat:true, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+	    description = "Full operational access across the app, including both dashboards."
+	
+	    ModulePermissions
+	    {
+	        Suppliers
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Suppliers={"View","Edit","Delete"}
+	                Active_Suppliers={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Customers
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Customers={"View","Edit","Delete"}
+	                Active_Customers={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Cold_Storage_Units
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Cold_Storage_Units={"View","Edit","Delete"}
+	                Units_Needing_Attention={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Temperature_Logs
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Temperature_Logs={"View","Edit","Delete"}
+	                Out_Of_Range_Logs={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Raw_Materials
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Raw_Materials={"View","Edit","Delete"}
+	                Low_Stock_Materials={"View","Edit","Delete"}
+	                Expiring_Raw_Materials={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Products
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Products={"View","Edit","Delete"}
+	                Active_Products={"View","Edit","Delete"}
+	                Products_Board={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Raw_Material_Purchases
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Purchase_Orders={"View","Edit","Delete"}
+	                Pending_Purchase_Orders={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Production_Batches
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Production_Batches={"View","Edit","Delete"}
+	                Batch_Status_Board={"View","Edit","Delete"}
+	                Production_Calendar={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Quality_Checks
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Quality_Checks={"View","Edit","Delete"}
+	                Failed_Checks={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Finished_Goods_Inventory
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Finished_Goods={"View","Edit","Delete"}
+	                Expiring_Soon={"View","Edit","Delete"}
+	                Expired_Stock={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Sales_Orders
+	        {
+	            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Sales_Orders={"View","Edit","Delete"}
+	                Pending_Sales_Orders={"View","Edit","Delete"}
+	                Delivery_Calendar={"View","Edit","Delete"}
+	            }
+	        }
+	
+	        Operations_Dashboard
+	        {
+	            enabled = tab
+	        }
+	
+	        Sales_Dashboard
+	        {
+	            enabled = tab
+	        }
+	    }
+	}
+	}
+
+	web
+	{
+	forms
+	{
+	    form Suppliers
+	    {
+	        label placement = top
+	    }
+	    form Customers
+	    {
+	        label placement = top
+	    }
+	    form Cold_Storage_Units
+	    {
+	        label placement = top
+	    }
+	    form Temperature_Logs
+	    {
+	        label placement = top
+	    }
+	    form Raw_Materials
+	    {
+	        label placement = top
+	    }
+	    form Products
+	    {
+	        label placement = top
+	    }
+	    form Raw_Material_Purchases
+	    {
+	        label placement = top
+	    }
+	    form Production_Batches
+	    {
+	        label placement = top
+	    }
+	    form Quality_Checks
+	    {
+	        label placement = top
+	    }
+	    form Finished_Goods_Inventory
+	    {
+	        label placement = top
+	    }
+	    form Sales_Orders
+	    {
+	        label placement = top
+	    }
+	}
+	reports
+	{
+		report All_Cold_Storage_Units
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Unit_Name
+		                    Unit_Type
+		                    Location
+		                    Target_Temperature_C
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Unit_Name
+		                    Unit_Type
+		                    Location
+		                    Target_Temperature_C
+		                    Capacity
+		                    Installation_Date
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Units_Needing_Attention
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Unit_Name
+		                    Unit_Type
+		                    Location
+		                    Target_Temperature_C
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Unit_Name
+		                    Unit_Type
+		                    Location
+		                    Target_Temperature_C
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Active_Customers
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Customer_Name
+		                    Company_Name
+		                    Phone
+		                    Email
+		                    Customer_Type
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Customer_Name
+		                    Company_Name
+		                    Phone
+		                    Email
+		                    Customer_Type
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report All_Customers
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Customer_Name
+		                    Company_Name
+		                    Phone
+		                    Email
+		                    Customer_Type
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Customer_Name
+		                    Company_Name
+		                    Phone
+		                    Email
+		                    Address
+		                    Customer_Type
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report All_Finished_Goods
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Lot_Number
+		                    Product
+		                    Quantity_On_Hand
+		                    Expiry_Date
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Lot_Number
+		                    Product
+		                    Production_Batch
+		                    Quantity_On_Hand
+		                    Manufacture_Date
+		                    Expiry_Date
+		                    Storage_Unit
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Expired_Stock
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Lot_Number
+		                    Product
+		                    Quantity_On_Hand
+		                    Expiry_Date
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Lot_Number
+		                    Product
+		                    Quantity_On_Hand
+		                    Manufacture_Date
+		                    Expiry_Date
+		                    Storage_Unit
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Expiring_Soon
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Lot_Number
+		                    Product
+		                    Quantity_On_Hand
+		                    Expiry_Date
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Lot_Number
+		                    Product
+		                    Quantity_On_Hand
+		                    Manufacture_Date
+		                    Expiry_Date
+		                    Storage_Unit
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report All_Production_Batches
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Batch_Number
+		                    Product
+		                    Batch_Date
+		                    Actual_Quantity_Produced
+		                    Stage
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Batch_Number
+		                    Product
+		                    Batch_Date
+		                    Cold_Storage_Unit
+		                    Planned_Quantity
+		                    Actual_Quantity_Produced
+		                    Rejected_Quantity
+		                    Manufacture_Date
+		                    Expiry_Date
+		                    Supervisor_Name
+		                    Notes
+		                    Stage
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Batch_Status_Board
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Batch_Number
+		                    Product
+		                    Batch_Date
+		                    Stage
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Batch_Number
+		                    Product
+		                    Batch_Date
+		                    Planned_Quantity
+		                    Actual_Quantity_Produced
+		                    Stage
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Production_Calendar
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Batch_Number
+		                    Product
+		                    Batch_Date
+		                    Stage
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Batch_Number
+		                    Product
+		                    Batch_Date
+		                    Stage
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Active_Products
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Product_Name
+		                    Flavor_Category
+		                    Pack_Type
+		                    Unit_Price
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Product_Name
+		                    Flavor_Category
+		                    Pack_Type
+		                    Size
+		                    Unit_Price
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report All_Products
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Product_Name
+		                    SKU
+		                    Flavor_Category
+		                    Pack_Type
+		                    Unit_Price
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Product_Name
+		                    SKU
+		                    Flavor_Category
+		                    Pack_Type
+		                    Size
+		                    Unit_Price
+		                    Shelf_Life_Days
+		                    Storage_Temperature_C
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Products_Board
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Product_Name
+		                    Flavor_Category
+		                    Pack_Type
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Product_Name
+		                    Flavor_Category
+		                    Pack_Type
+		                    Unit_Price
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report All_Quality_Checks
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    QC_Number
+		                    Production_Batch
+		                    Check_Date
+		                    Test_Result
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    QC_Number
+		                    Production_Batch
+		                    Check_Date
+		                    Inspector_Name
+		                    Taste_Rating
+		                    Texture_Rating
+		                    Overrun_Percentage
+		                    Melting_Time_Minutes
+		                    Test_Result
+		                    Remarks
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Failed_Checks
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    QC_Number
+		                    Production_Batch
+		                    Check_Date
+		                    Inspector_Name
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    QC_Number
+		                    Production_Batch
+		                    Check_Date
+		                    Inspector_Name
+		                    Overrun_Percentage
+		                    Remarks
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report All_Purchase_Orders
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    PO_Number
+		                    Supplier
+		                    Purchase_Date
+		                    Total_Amount
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    PO_Number
+		                    Supplier
+		                    Purchase_Date
+		                    Total_Amount
+		                    Status
+		                    Received_Date
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Pending_Purchase_Orders
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    PO_Number
+		                    Supplier
+		                    Purchase_Date
+		                    Total_Amount
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    PO_Number
+		                    Supplier
+		                    Purchase_Date
+		                    Total_Amount
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report All_Raw_Materials
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Material_Name
+		                    Category
+		                    Unit_Of_Measure
+		                    Primary_Supplier
+		                    Current_Stock
+		                    Reorder_Level
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Material_Name
+		                    Category
+		                    Unit_Of_Measure
+		                    Primary_Supplier
+		                    Unit_Cost
+		                    Current_Stock
+		                    Reorder_Level
+		                    Expiry_Date
+		                    Storage_Unit
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Expiring_Raw_Materials
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Material_Name
+		                    Category
+		                    Current_Stock
+		                    Expiry_Date
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Material_Name
+		                    Category
+		                    Current_Stock
+		                    Expiry_Date
+		                    Storage_Unit
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Low_Stock_Materials
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Material_Name
+		                    Category
+		                    Current_Stock
+		                    Reorder_Level
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Material_Name
+		                    Category
+		                    Unit_Of_Measure
+		                    Primary_Supplier
+		                    Current_Stock
+		                    Reorder_Level
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report All_Sales_Orders
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Order_Number
+		                    Customer
+		                    Order_Date
+		                    Total_Amount
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Order_Number
+		                    Customer
+		                    Order_Date
+		                    Delivery_Date
+		                    Delivery_Type
+		                    Total_Amount
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Delivery_Calendar
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Order_Number
+		                    Customer
+		                    Delivery_Date
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Order_Number
+		                    Customer
+		                    Delivery_Date
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Pending_Sales_Orders
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Order_Number
+		                    Customer
+		                    Delivery_Date
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Order_Number
+		                    Customer
+		                    Order_Date
+		                    Delivery_Date
+		                    Total_Amount
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Active_Suppliers
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Supplier_Name
+		                    Contact_Person
+		                    Phone
+		                    Email
+		                    Material_Category_Supplied
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Supplier_Name
+		                    Contact_Person
+		                    Phone
+		                    Email
+		                    Material_Category_Supplied
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report All_Suppliers
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Supplier_Name
+		                    Contact_Person
+		                    Phone
+		                    Email
+		                    Material_Category_Supplied
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Supplier_Name
+		                    Contact_Person
+		                    Phone
+		                    Email
+		                    Address
+		                    Material_Category_Supplied
+		                    Status
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report All_Temperature_Logs
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Log_Number
+		                    Cold_Storage_Unit
+		                    Recorded_DateTime
+		                    Recorded_Temperature_C
+		                    Within_Range
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Log_Number
+		                    Cold_Storage_Unit
+		                    Recorded_DateTime
+		                    Recorded_Temperature_C
+		                    Recorded_By
+		                    Within_Range
+		                    Remarks
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
+		report Out_Of_Range_Logs
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Log_Number
+		                    Cold_Storage_Unit
+		                    Recorded_DateTime
+		                    Recorded_Temperature_C
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                Duplicate
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Log_Number
+		                    Cold_Storage_Unit
+		                    Recorded_DateTime
+		                    Recorded_Temperature_C
+		                    Recorded_By
+		                    Remarks
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Duplicate
+		                Delete
+		            )
+		        )
+		    )
+		}
+	}
+	menu
+	{
+	    space Ice_Cream_Space
+	    {
+	        displayname = "Ice Cream Management"
+	        icon = "food-ice-cream-22"
+	
+	        section Dashboards_Section
+	        {
+	            displayname = "Dashboards"
+	            icon = "business-chart"
+	
+	            page Operations_Dashboard
+	            {
+	                icon = "business-board-30"
+	            }
+	            page Sales_Dashboard
+	            {
+	                icon = "business-chart-growth"
+	            }
+	        }
+	
+	        section Master_Data_Section
+	        {
+	            displayname = "Master Data"
+	            icon = "design-collection"
+	
+	            form Suppliers
+	            {
+	                icon = "business-handshake"
+	            }
+	            report All_Suppliers
+	            {
+	                icon = "business-contacts"
+	            }
+	            report Active_Suppliers
+	            {
+	                icon = "business-badge"
+	            }
+	            form Customers
+	            {
+	                icon = "users-multiple-19"
+	            }
+	            report All_Customers
+	            {
+	                icon = "business-business-contact-87"
+	            }
+	            report Active_Customers
+	            {
+	                icon = "users-single-01"
+	            }
+	            form Cold_Storage_Units
+	            {
+	                icon = "furniture-fridge"
+	            }
+	            report All_Cold_Storage_Units
+	            {
+	                icon = "food-fridge"
+	            }
+	            report Units_Needing_Attention
+	            {
+	                icon = "health-temperature-24"
+	            }
+	            form Raw_Materials
+	            {
+	                icon = "food-scale"
+	            }
+	            report All_Raw_Materials
+	            {
+	                icon = "furniture-storage"
+	            }
+	            report Low_Stock_Materials
+	            {
+	                icon = "shopping-stock"
+	            }
+	            report Expiring_Raw_Materials
+	            {
+	                icon = "location-appointment"
+	            }
+	            form Products
+	            {
+	                icon = "food-ice-cream-72"
+	            }
+	            report All_Products
+	            {
+	                icon = "shopping-tag"
+	            }
+	            report Active_Products
+	            {
+	                icon = "shopping-bag-09"
+	            }
+	            report Products_Board
+	            {
+	                icon = "business-board-29"
+	            }
+	        }
+	
+	        section Purchasing_Inventory_Section
+	        {
+	            displayname = "Purchasing & Inventory"
+	            icon = "shopping-box"
+	
+	            form Raw_Material_Purchases
+	            {
+	                icon = "business-cheque"
+	            }
+	            report All_Purchase_Orders
+	            {
+	                icon = "shopping-receipt"
+	            }
+	            report Pending_Purchase_Orders
+	            {
+	                icon = "shopping-delivery-time"
+	            }
+	            form Finished_Goods_Inventory
+	            {
+	                icon = "shopping-stock"
+	            }
+	            report All_Finished_Goods
+	            {
+	                icon = "shopping-box-3d-50"
+	            }
+	            report Expiring_Soon
+	            {
+	                icon = "location-appointment"
+	            }
+	            report Expired_Stock
+	            {
+	                icon = "design-bug"
+	            }
+	        }
+	
+	        section Production_Quality_Section
+	        {
+	            displayname = "Production & Quality"
+	            icon = "business-hierarchy-54"
+	
+	            form Production_Batches
+	            {
+	                icon = "business-strategy"
+	            }
+	            report All_Production_Batches
+	            {
+	                icon = "business-progress"
+	            }
+	            report Batch_Status_Board
+	            {
+	                icon = "business-board-29"
+	            }
+	            report Production_Calendar
+	            {
+	                icon = "business-agenda"
+	            }
+	            form Quality_Checks
+	            {
+	                icon = "business-badge"
+	            }
+	            report All_Quality_Checks
+	            {
+	                icon = "files-check"
+	            }
+	            report Failed_Checks
+	            {
+	                icon = "design-bug"
+	            }
+	            form Temperature_Logs
+	            {
+	                icon = "furniture-fridge"
+	            }
+	            report All_Temperature_Logs
+	            {
+	                icon = "location-appointment"
+	            }
+	            report Out_Of_Range_Logs
+	            {
+	                icon = "health-temperature-24"
+	            }
+	        }
+	
+	        section Sales_Section
+	        {
+	            displayname = "Sales"
+	            icon = "business-money-growth"
+	
+	            form Sales_Orders
+	            {
+	                icon = "shopping-cart"
+	            }
+	            report All_Sales_Orders
+	            {
+	                icon = "shopping-receipt-list-43"
+	            }
+	            report Pending_Sales_Orders
+	            {
+	                icon = "shopping-delivery"
+	            }
+	            report Delivery_Calendar
+	            {
+	                icon = "shopping-delivery-time"
+	            }
+	        }
+	
+	        section SharedAnalytics_Section
+	        {
+	            type = shared_user_report_section
+	            displayname = "Reports"
+	            icon = "business-chart-bar-33"
+	        }
+	    }
+	
+	    preference
+	    {
+	        icon
+	        {
+	            style = outline
+	            show = {space,section,component}
+	        }
+	    }
+	}
+	customize
+	{
+	    layout
+	    {
+	        theme = "theme_2"
+	        variant = "variant_2"
+	    }
+	
+	    font = "poppins"
+	
+	    color options
+	    {
+	        name = "Mint Teal"
+	        brand color = "#2A9D8F"
+	        type = "custom"
+	        dark mode color = "#8FD9CC"
+	    }
+	
+	    logo
+	    {
+	        preference = "app_icon"
+	        placement = "left"
+	    }
+	
+	    custom css
+	    {
+	        content = ".zc-app-header { background-color: #E9F6F3; color: #0F6B5C; }"
+	    }
+	}
+	}
+}

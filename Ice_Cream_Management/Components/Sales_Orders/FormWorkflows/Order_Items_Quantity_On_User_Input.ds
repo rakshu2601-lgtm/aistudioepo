@@ -1,0 +1,17 @@
+Order_Items_Quantity_On_User_Input as "Calculate Line Amount"
+{
+    type = form
+    form = Sales_Orders
+    record event = on add or edit
+
+    on user input of Order_Items.Quantity
+    {
+        actions
+        {
+            custom deluge script
+            (
+                Order_Items.Amount = Order_Items.Quantity * Order_Items.Unit_Price;
+            )
+        }
+    }
+}

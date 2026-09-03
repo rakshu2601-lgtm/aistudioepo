@@ -1,0 +1,145 @@
+form Raw_Material_Purchases
+{
+    success message = "Purchase order saved"
+
+    Purchase_Order_Details
+    (
+        type = section
+        displayname = "Purchase Order Details"
+        row = 1
+        column = 0
+    )
+    PO_Number
+    (
+        type = autonumber
+        displayname = "PO Number"
+        start index = 1001
+        row = 1
+        column = 1
+    )
+    must have Supplier
+    (
+        type = picklist
+        displayname = "Supplier"
+        values = Suppliers.ID
+        displayformat = [Supplier_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Purchase_Date
+    (
+        type = date
+        displayname = "Purchase Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Order_Items_Section
+    (
+        type = section
+        displayname = "Order Items"
+        visibility = false
+        row = 2
+        column = 1
+    )
+    PO_Items
+    (
+        type = grid
+        displayname = "Purchase Order Items"
+        defaultrow = 1
+        Material
+        (
+            type = picklist
+            displayname = "Material"
+            values = Raw_Materials.ID
+            displayformat = [Material_Name]
+        )
+        Quantity
+        (
+            type = decimal
+            displayname = "Quantity"
+        )
+        Unit_Price
+        (
+            type = USD
+            displayname = "Unit Price"
+        )
+        Amount
+        (
+            type = decimal
+            displayname = "Amount"
+            initial value = 0
+        )
+        row = 2
+        column = 1
+        width = medium
+    )
+    Order_Summary
+    (
+        type = section
+        displayname = "Order Summary"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Total_Amount
+    (
+        type = decimal
+        displayname = "Total Amount"
+        initial value = 0
+        row = 3
+        column = 1
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"Ordered","Received","Cancelled"}
+        initial value = "Ordered"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Received_Date
+    (
+        type = date
+        displayname = "Received Date"
+        row = 3
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

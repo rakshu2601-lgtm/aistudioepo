@@ -1,0 +1,17 @@
+Calculate_PO_Line_Amount_On_Quantity as "Calculate Line Amount"
+{
+    type = form
+    form = Raw_Material_Purchases
+    record event = on add or edit
+
+    on user input of PO_Items.Quantity
+    {
+        actions
+        {
+            custom deluge script
+            (
+                PO_Items.Amount = PO_Items.Quantity * PO_Items.Unit_Price;
+            )
+        }
+    }
+}

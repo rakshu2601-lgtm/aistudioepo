@@ -1,0 +1,18 @@
+default list All_Purchase_Orders
+{
+    displayName = "All Purchase Orders"
+    show all rows from Raw_Material_Purchases
+    (
+        PO_Number
+        Supplier
+        Purchase_Date
+        Total_Amount
+        (
+            display = total
+        )
+        Status
+        Received_Date
+    )
+    filters ( Supplier  Status )
+    sort by ( Purchase_Date descending )
+}

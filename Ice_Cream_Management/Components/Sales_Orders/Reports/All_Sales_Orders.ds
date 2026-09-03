@@ -1,0 +1,19 @@
+default list All_Sales_Orders
+{
+    displayName = "All Sales Orders"
+    show all rows from Sales_Orders
+    (
+        Order_Number
+        Customer
+        Order_Date
+        Delivery_Date
+        Delivery_Type
+        Total_Amount
+        (
+            display = total
+        )
+        Status
+    )
+    filters ( Customer  Status  Delivery_Type )
+    sort by ( Order_Date descending )
+}

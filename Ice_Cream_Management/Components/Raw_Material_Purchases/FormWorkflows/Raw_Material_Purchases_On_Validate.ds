@@ -1,0 +1,22 @@
+Raw_Material_Purchases_On_Validate as "Compute Total Amount"
+{
+    type = form
+    form = Raw_Material_Purchases
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                total = 0;
+                for each item in input.PO_Items
+                {
+                    total = total + item.Amount;
+                }
+                input.Total_Amount = total;
+            )
+        }
+    }
+}

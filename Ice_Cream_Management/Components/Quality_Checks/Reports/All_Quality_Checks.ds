@@ -1,0 +1,19 @@
+default list All_Quality_Checks
+{
+    displayName = "All Quality Checks"
+    show all rows from Quality_Checks
+    (
+        QC_Number
+        Production_Batch
+        Check_Date
+        Inspector_Name
+        Taste_Rating
+        Texture_Rating
+        Overrun_Percentage
+        Melting_Time_Minutes
+        Test_Result
+        Remarks
+    )
+    filters ( Production_Batch  Test_Result )
+    sort by ( Check_Date descending )
+}

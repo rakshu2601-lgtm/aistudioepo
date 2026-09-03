@@ -1,0 +1,163 @@
+form Sales_Orders
+{
+    success message = "Sales order saved"
+
+    Order_Details
+    (
+        type = section
+        displayname = "Order Details"
+        row = 1
+        column = 0
+    )
+    Order_Number
+    (
+        type = autonumber
+        displayname = "Order Number"
+        start index = 2001
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Customer
+    (
+        type = picklist
+        displayname = "Customer"
+        values = Customers.ID
+        displayformat = [Company_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Order_Date
+    (
+        type = date
+        displayname = "Order Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Delivery_Details
+    (
+        type = section
+        displayname = "Delivery Details"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Delivery_Date
+    (
+        type = date
+        displayname = "Delivery Date"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Delivery_Type
+    (
+        type = picklist
+        displayname = "Delivery Type"
+        values = {"Store Pickup","Refrigerated Delivery"}
+        row = 2
+        column = 1
+        width = medium
+    )
+    Order_Items_Section
+    (
+        type = section
+        displayname = "Order Items"
+        visibility = false
+        row = 3
+        column = 1
+    )
+    Order_Items
+    (
+        type = grid
+        displayname = "Order Items"
+        defaultrow = 1
+        Product
+        (
+            type = picklist
+            displayname = "Product"
+            values = Products.ID
+            displayformat = [Product_Name]
+        )
+        Quantity
+        (
+            type = decimal
+            displayname = "Quantity"
+        )
+        Unit_Price
+        (
+            type = USD
+            displayname = "Unit Price"
+        )
+        Amount
+        (
+            type = decimal
+            displayname = "Amount"
+            initial value = 0
+        )
+        row = 3
+        column = 1
+        width = medium
+    )
+    Order_Summary
+    (
+        type = section
+        displayname = "Order Summary"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    Total_Amount
+    (
+        type = decimal
+        displayname = "Total Amount"
+        initial value = 0
+        row = 4
+        column = 1
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"Pending","Confirmed","Shipped","Delivered","Cancelled"}
+        initial value = "Pending"
+        row = 4
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

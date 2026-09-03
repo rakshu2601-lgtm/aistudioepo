@@ -1,0 +1,174 @@
+form Customers
+{
+    success message = "Customer saved successfully"
+
+    Identity_Details
+    (
+        type = section
+        displayname = "Identity Details"
+        row = 1
+        column = 0
+    )
+    must have Customer_Name
+    (
+        type = name
+        displayname = "Customer Name"
+        prefix
+        (
+            type = prefix
+            displayname = "Title"
+            value = {"Mr.", "Mrs.", "Ms.", "Dr."}
+        )
+        first_name
+        (
+            type = first_name
+            displayname = "First Name"
+        )
+        last_name
+        (
+            type = last_name
+            displayname = "Last Name"
+        )
+        suffix
+        (
+            type = suffix
+            displayname = "Suffix"
+            visibility = false
+        )
+        row = 1
+        column = 1
+        width = medium
+    )
+    Company_Name
+    (
+        type = text
+        displayname = "Company Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Contact_Details
+    (
+        type = section
+        displayname = "Contact Details"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Phone
+    (
+        type = phonenumber
+        displayname = "Phone"
+        defaultcountry = "in"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Email
+    (
+        type = email
+        displayname = "Email"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Address
+    (
+        type = address
+        displayname = "Address"
+        row = 2
+        column = 1
+        width = medium
+        address_line_1
+        (
+            type = address_line_1
+            displayname = "Address Line 1"
+        )
+        address_line_2
+        (
+            type = address_line_2
+            displayname = "Address Line 2"
+        )
+        district_city
+        (
+            type = district_city
+            displayname = "City"
+        )
+        state_province
+        (
+            type = state_province
+            displayname = "State"
+        )
+        postal_Code
+        (
+            type = postal_Code
+            displayname = "Postal Code"
+        )
+        country
+        (
+            type = country
+            displayname = "Country"
+        )
+        latitude
+        (
+            type = latitude
+            displayname = "Latitude"
+            visibility = false
+        )
+        longitude
+        (
+            type = longitude
+            displayname = "Longitude"
+            visibility = false
+        )
+    )
+    Customer_Type
+    (
+        type = picklist
+        displayname = "Customer Type"
+        values = {"Retail Store","Distributor","Wholesaler","Cafe & Restaurant","Direct Consumer"}
+        row = 2
+        column = 1
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"Active","Inactive"}
+        initial value = "Active"
+        row = 2
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

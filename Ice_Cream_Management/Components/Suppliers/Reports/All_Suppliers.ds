@@ -1,0 +1,16 @@
+default list All_Suppliers
+{
+    displayName = "All Suppliers"
+    show all rows from Suppliers
+    (
+        Supplier_Name
+        Contact_Person
+        Phone
+        Email
+        Address
+        Material_Category_Supplied
+        Status
+    )
+    filters ( Material_Category_Supplied  Status )
+    sort by ( Supplier_Name ascending )
+}

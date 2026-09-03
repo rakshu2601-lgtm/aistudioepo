@@ -1,0 +1,19 @@
+Expire_Finished_Goods_Lot as "Auto-Expire Finished Goods Lot"
+{
+    type = schedule
+    form = Finished_Goods_Inventory[Status == "In Stock"]
+    start = Expiry_Date at "00:00:00"
+    time zone = "Asia/Kolkata"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                input.Status = "Expired";
+                input.Last_Updated = zoho.currentdate;
+            )
+        }
+    }
+}

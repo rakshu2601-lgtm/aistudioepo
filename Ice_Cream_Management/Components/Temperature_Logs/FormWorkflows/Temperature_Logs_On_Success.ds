@@ -1,0 +1,28 @@
+Temperature_Logs_On_Success as "Update Cold Storage Unit Status"
+{
+    type = form
+    form = Temperature_Logs
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                unit_rec = Cold_Storage_Units[ID == input.Cold_Storage_Unit];
+                if (unit_rec.count() > 0)
+                {
+                    if (input.Within_Range == false)
+                    {
+                        unit_rec.Status = "Needs Attention";
+                    }
+                    else if (unit_rec.Status == "Needs Attention")
+                    {
+                        unit_rec.Status = "Operational";
+                    }
+                }
+            )
+        }
+    }
+}

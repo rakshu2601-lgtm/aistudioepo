@@ -1,0 +1,47 @@
+forms
+{
+    form Suppliers
+    {
+        label placement = top
+    }
+    form Customers
+    {
+        label placement = top
+    }
+    form Cold_Storage_Units
+    {
+        label placement = top
+    }
+    form Temperature_Logs
+    {
+        label placement = top
+    }
+    form Raw_Materials
+    {
+        label placement = top
+    }
+    form Products
+    {
+        label placement = top
+    }
+    form Raw_Material_Purchases
+    {
+        label placement = top
+    }
+    form Production_Batches
+    {
+        label placement = top
+    }
+    form Quality_Checks
+    {
+        label placement = top
+    }
+    form Finished_Goods_Inventory
+    {
+        label placement = top
+    }
+    form Sales_Orders
+    {
+        label placement = top
+    }
+}

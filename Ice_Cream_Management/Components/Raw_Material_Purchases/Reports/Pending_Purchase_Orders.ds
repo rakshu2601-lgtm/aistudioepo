@@ -1,0 +1,12 @@
+list Pending_Purchase_Orders
+{
+    displayName = "Pending Purchase Orders"
+    show all rows from Raw_Material_Purchases [Status == "Ordered"]
+    (
+        PO_Number
+        Supplier
+        Purchase_Date
+        Total_Amount
+    )
+    sort by ( Purchase_Date ascending )
+}

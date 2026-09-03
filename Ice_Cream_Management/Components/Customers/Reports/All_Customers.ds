@@ -1,0 +1,16 @@
+default list All_Customers
+{
+    displayName = "All Customers"
+    show all rows from Customers
+    (
+        Customer_Name
+        Company_Name
+        Phone
+        Email
+        Address
+        Customer_Type
+        Status
+    )
+    filters ( Customer_Type  Status )
+    sort by ( Company_Name ascending )
+}

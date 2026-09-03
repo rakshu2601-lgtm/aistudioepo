@@ -1,0 +1,16 @@
+list Low_Stock_Materials
+{
+    displayName = "Low Stock Materials"
+    show all rows from Raw_Materials [Current_Stock <= Reorder_Level]
+    (
+        Material_Name
+        Category
+        Unit_Of_Measure
+        Primary_Supplier
+        Current_Stock
+        (
+            display = total
+        )
+        Reorder_Level
+    )
+}

@@ -1,0 +1,16 @@
+default list All_Temperature_Logs
+{
+    displayName = "All Temperature Logs"
+    show all rows from Temperature_Logs
+    (
+        Log_Number
+        Cold_Storage_Unit
+        Recorded_DateTime
+        Recorded_Temperature_C
+        Recorded_By
+        Within_Range
+        Remarks
+    )
+    filters ( Cold_Storage_Unit )
+    sort by ( Recorded_DateTime descending )
+}

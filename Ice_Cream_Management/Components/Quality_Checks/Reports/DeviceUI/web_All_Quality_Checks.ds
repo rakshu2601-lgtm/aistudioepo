@@ -1,0 +1,83 @@
+report All_Quality_Checks
+{
+    quickview
+    (
+        layout
+        (
+            type = -1
+            datablock1
+            (
+                layout type = -1
+                fields
+                (
+                    QC_Number
+                    Production_Batch
+                    Check_Date
+                    Test_Result
+                )
+            )
+        )
+        menu
+        (
+            header
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+            record
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+        )
+        action
+        (
+            on click
+            (
+                View Record
+            )
+            on right click
+            (
+                Edit
+                Delete
+                Duplicate
+                View Record
+            )
+        )
+    )
+    detailview
+    (
+        layout
+        (
+            type = 1
+            datablock1
+            (
+                layout type = -2
+                fields
+                (
+                    QC_Number
+                    Production_Batch
+                    Check_Date
+                    Inspector_Name
+                    Taste_Rating
+                    Texture_Rating
+                    Overrun_Percentage
+                    Melting_Time_Minutes
+                    Test_Result
+                    Remarks
+                )
+            )
+        )
+        menu
+        (
+            header
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+        )
+    )
+}

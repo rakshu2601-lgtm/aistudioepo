@@ -1,0 +1,14 @@
+list Active_Suppliers
+{
+    displayName = "Active Suppliers"
+    show all rows from Suppliers [Status == "Active"]
+    (
+        Supplier_Name
+        Contact_Person
+        Phone
+        Email
+        Material_Category_Supplied
+    )
+    filters ( Material_Category_Supplied )
+    sort by ( Supplier_Name ascending )
+}

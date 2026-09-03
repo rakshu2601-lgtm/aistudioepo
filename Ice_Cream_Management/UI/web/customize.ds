@@ -1,0 +1,29 @@
+customize
+{
+    layout
+    {
+        theme = "theme_2"
+        variant = "variant_2"
+    }
+
+    font = "poppins"
+
+    color options
+    {
+        name = "Mint Teal"
+        brand color = "#2A9D8F"
+        type = "custom"
+        dark mode color = "#8FD9CC"
+    }
+
+    logo
+    {
+        preference = "app_icon"
+        placement = "left"
+    }
+
+    custom css
+    {
+        content = ".zc-app-header { background-color: #E9F6F3; color: #0F6B5C; }"
+    }
+}

@@ -1,0 +1,41 @@
+Sales_Orders_On_Success as "Ship Order - FEFO Stock Deduction"
+{
+    type = form
+    form = Sales_Orders
+    record event = on edit
+
+    on success
+    {
+        actions ( Status == "Shipped" )
+        {
+            custom deluge script
+            (
+                for each item in input.Order_Items
+                {
+                    remaining = item.Quantity;
+                    lots = Finished_Goods_Inventory[Product == item.Product && Status == "In Stock"] sort by Expiry_Date;
+                    for each lot in lots
+                    {
+                        if (remaining <= 0)
+                        {
+                            break;
+                        }
+                        if (lot.Quantity_On_Hand <= remaining)
+                        {
+                            remaining = remaining - lot.Quantity_On_Hand;
+                            lot.Quantity_On_Hand = 0;
+                            lot.Status = "Sold Out";
+                            lot.Last_Updated = zoho.currentdate;
+                        }
+                        else
+                        {
+                            lot.Quantity_On_Hand = lot.Quantity_On_Hand - remaining;
+                            lot.Last_Updated = zoho.currentdate;
+                            remaining = 0;
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

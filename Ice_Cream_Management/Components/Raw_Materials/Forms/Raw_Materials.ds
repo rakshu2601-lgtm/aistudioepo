@@ -1,0 +1,142 @@
+form Raw_Materials
+{
+    success message = "Raw material saved"
+
+    Material_Information
+    (
+        type = section
+        displayname = "Material Information"
+        row = 1
+        column = 0
+    )
+    must have unique Material_Name
+    (
+        type = text
+        displayname = "Material Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Category
+    (
+        type = picklist
+        displayname = "Category"
+        values = {"Dairy & Cream","Sugar & Sweeteners","Flavoring & Essence","Fruits, Nuts & Toppings","Stabilizers & Emulsifiers","Packaging - Cones","Packaging - Cups","Packaging - Tubs","Packaging - Sticks & Wrappers","Other"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    Unit_Of_Measure
+    (
+        type = picklist
+        displayname = "Unit Of Measure"
+        values = {"Liters","Kilograms","Grams","Units","Packs"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    Primary_Supplier
+    (
+        type = picklist
+        displayname = "Primary Supplier"
+        values = Suppliers.ID
+        displayformat = [Supplier_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Inventory_Details
+    (
+        type = section
+        displayname = "Inventory Details"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Unit_Cost
+    (
+        type = USD
+        displayname = "Unit Cost"
+        decimalplace = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+    Current_Stock
+    (
+        type = decimal
+        displayname = "Current Stock"
+        initial value = 0
+        row = 2
+        column = 1
+        width = medium
+    )
+    Reorder_Level
+    (
+        type = decimal
+        displayname = "Reorder Level"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Expiry_Date
+    (
+        type = date
+        displayname = "Expiry Date"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Storage_Unit
+    (
+        type = picklist
+        displayname = "Storage Unit"
+        values = Cold_Storage_Units.ID
+        displayformat = [Unit_Name]
+        searchable = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"Active","Discontinued"}
+        initial value = "Active"
+        row = 2
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

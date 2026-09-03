@@ -1,0 +1,19 @@
+default list All_Products
+{
+    displayName = "All Products"
+    show all rows from Products
+    (
+        Product_Name
+        SKU
+        Flavor_Category
+        Pack_Type
+        Size
+        Unit_Price
+        Shelf_Life_Days
+        Storage_Temperature_C
+        Status
+    )
+    filters ( Flavor_Category  Pack_Type  Status )
+    group by ( Flavor_Category ascending )
+    sort by ( Product_Name ascending )
+}

@@ -1,0 +1,15 @@
+list Active_Products
+{
+    displayName = "Active Products"
+    show all rows from Products [Status == "Active"]
+    (
+        Product_Name
+        SKU
+        Flavor_Category
+        Pack_Type
+        Size
+        Unit_Price
+    )
+    filters ( Flavor_Category  Pack_Type )
+    sort by ( Product_Name ascending )
+}

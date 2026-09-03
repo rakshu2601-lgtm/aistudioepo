@@ -1,0 +1,110 @@
+form Cold_Storage_Units
+{
+    success message = "Cold storage unit saved"
+
+    Unit_Details
+    (
+        type = section
+        displayname = "Unit Details"
+        row = 1
+        column = 0
+    )
+    must have unique Unit_Name
+    (
+        type = text
+        displayname = "Unit Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Unit_Type
+    (
+        type = picklist
+        displayname = "Unit Type"
+        values = {"Deep Freezer","Walk-in Cold Room","Display Freezer","Blast Freezer","Refrigerated Van","Other"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    Location
+    (
+        type = text
+        displayname = "Location"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Operating_Parameters
+    (
+        type = section
+        displayname = "Operating Parameters"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Target_Temperature_C
+    (
+        type = decimal
+        displayname = "Target Temperature (C)"
+        initial value = -18
+        row = 2
+        column = 1
+        width = medium
+    )
+    Capacity
+    (
+        type = text
+        displayname = "Capacity"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Installation_Date
+    (
+        type = date
+        displayname = "Installation Date"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"Operational","Needs Attention","Under Maintenance","Retired"}
+        initial value = "Operational"
+        row = 2
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

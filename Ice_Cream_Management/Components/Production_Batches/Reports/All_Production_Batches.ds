@@ -1,0 +1,21 @@
+default list All_Production_Batches
+{
+    displayName = "All Production Batches"
+    show all rows from Production_Batches
+    (
+        Batch_Number
+        Product
+        Batch_Date
+        Cold_Storage_Unit
+        Planned_Quantity
+        Actual_Quantity_Produced
+        Rejected_Quantity
+        Manufacture_Date
+        Expiry_Date
+        Supervisor_Name
+        Notes
+        Stage
+    )
+    filters ( Product  Stage )
+    sort by ( Batch_Date descending )
+}

@@ -1,0 +1,23 @@
+Raw_Material_Purchases_On_Success as "Update Stock on Order Received"
+{
+    type = form
+    form = Raw_Material_Purchases
+    record event = on edit
+
+    on success
+    {
+        actions ( Status == "Received" )
+        {
+            custom deluge script
+            (
+                for each item in input.PO_Items
+                {
+                    material_id = item.Material;
+                    qty = item.Quantity;
+                    material_rec = Raw_Materials[ID == material_id];
+                    material_rec.Current_Stock = material_rec.Current_Stock + qty;
+                }
+            )
+        }
+    }
+}

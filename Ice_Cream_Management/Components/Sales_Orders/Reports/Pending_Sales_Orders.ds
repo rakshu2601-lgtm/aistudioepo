@@ -1,0 +1,14 @@
+list Pending_Sales_Orders
+{
+    displayName = "Pending Sales Orders"
+    show all rows from Sales_Orders [Status in {"Pending","Confirmed"}]
+    (
+        Order_Number
+        Customer
+        Order_Date
+        Delivery_Date
+        Total_Amount
+        Status
+    )
+    sort by ( Delivery_Date ascending )
+}

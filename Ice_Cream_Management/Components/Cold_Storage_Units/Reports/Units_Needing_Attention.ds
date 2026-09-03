@@ -1,0 +1,13 @@
+list Units_Needing_Attention
+{
+    displayName = "Units Needing Attention"
+    show all rows from Cold_Storage_Units [Status in {"Needs Attention","Under Maintenance"}]
+    (
+        Unit_Name
+        Unit_Type
+        Location
+        Target_Temperature_C
+        Status
+    )
+    sort by ( Unit_Name ascending )
+}

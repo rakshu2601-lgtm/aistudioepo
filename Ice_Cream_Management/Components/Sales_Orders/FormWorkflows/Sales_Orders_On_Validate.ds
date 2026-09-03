@@ -1,0 +1,22 @@
+Sales_Orders_On_Validate as "Compute Total Amount"
+{
+    type = form
+    form = Sales_Orders
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                total = 0;
+                for each item in input.Order_Items
+                {
+                    total = total + item.Amount;
+                }
+                input.Total_Amount = total;
+            )
+        }
+    }
+}

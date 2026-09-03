@@ -1,0 +1,163 @@
+form Products
+{
+    success message = "Product saved"
+
+    Product_Information
+    (
+        type = section
+        displayname = "Product Information"
+        row = 1
+        column = 0
+    )
+    must have unique Product_Name
+    (
+        type = text
+        displayname = "Product Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    SKU
+    (
+        type = autonumber
+        displayname = "SKU"
+        start index = 6001
+        row = 1
+        column = 1
+        width = medium
+    )
+    Flavor_Category
+    (
+        type = picklist
+        displayname = "Flavor Category"
+        values = {"Classic","Chocolate-Based","Fruit-Based","Nut-Based","Sugar-Free / Diet","Sorbet / Sherbet","Specialty / Seasonal"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    Packaging_Pricing
+    (
+        type = section
+        displayname = "Packaging & Pricing"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Pack_Type
+    (
+        type = picklist
+        displayname = "Pack Type"
+        values = {"Cone","Cup","Tub - Small (500ml)","Tub - Large (1L+)","Stick / Bar","Family Pack","Bulk / Catering"}
+        row = 2
+        column = 1
+        width = medium
+    )
+    Size
+    (
+        type = text
+        displayname = "Size"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Unit_Price
+    (
+        type = USD
+        displayname = "Unit Price"
+        decimalplace = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+    Shelf_Life_Days
+    (
+        type = number
+        displayname = "Shelf Life Days"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Storage_Temperature_C
+    (
+        type = decimal
+        displayname = "Storage Temperature (C)"
+        initial value = -18
+        row = 2
+        column = 1
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"Active","Seasonal","Discontinued"}
+        initial value = "Active"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Recipe_Section
+    (
+        type = section
+        displayname = "Recipe Items"
+        visibility = false
+        row = 3
+        column = 1
+    )
+    Recipe_Items
+    (
+        type = grid
+        displayname = "Recipe Items"
+        defaultrow = 1
+        Raw_Material
+        (
+            type = picklist
+            displayname = "Raw Material"
+            values = Raw_Materials.ID
+            displayformat = [Material_Name]
+        )
+        Quantity_Required
+        (
+            type = decimal
+            displayname = "Quantity Required"
+        )
+        Unit_Of_Measure
+        (
+            type = text
+            displayname = "Unit Of Measure"
+        )
+        row = 3
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

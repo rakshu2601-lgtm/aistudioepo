@@ -1,0 +1,160 @@
+<%
+lowStockCount = Raw_Materials[Current_Stock <= Reorder_Level].count();
+batchesInProduction = Production_Batches[Stage == "In Production"].count();
+batchesAwaitingQC = Production_Batches[Stage == "Quality Check"].count();
+expiringSoonCount = Finished_Goods_Inventory[Status == "In Stock" && Expiry_Date <= zoho.currentdate.addDay(7)].count();
+unitsNeedingAttention = Cold_Storage_Units[Status in {"Needs Attention","Under Maintenance"}].count();
+plannedCount = Production_Batches[Stage == "Planned"].count();
+approvedCount = Production_Batches[Stage == "Approved"].count();
+rejectedCount = Production_Batches[Stage == "Rejected"].count();
+packagedCount = Production_Batches[Stage == "Packaged"].count();
+totalChecks = Quality_Checks[ID != 0].count();
+passedChecks = Quality_Checks[Test_Result == "Pass"].count();
+passRate = if (totalChecks > 0, (passedChecks * 100) / totalChecks, 0);
+batchBoardUrl = zoho.appuri + "#Report:Batch_Status_Board";
+lowStockReportUrl = zoho.appuri + "#Report:Low_Stock_Materials";
+expiringSoonUrl = zoho.appuri + "#Report:Expiring_Soon";
+unitsAttentionUrl = zoho.appuri + "#Report:Units_Needing_Attention";
+failedChecksUrl = zoho.appuri + "#Report:Failed_Checks";
+%>
+<style>
+<file name:zcs-global.css/>
+
+/* ---- Ice Cream Management brand accents + tokens the fetched ZCS components expect ---- */
+:root {
+  --od-mint-dark: #0f6b5c;
+  --od-mint: #2a9d8f;
+  --od-mint-light: #8fd9cc;
+  --od-cream: #fbf6ef;
+  --zcs-surface: var(--zcs_white_color, #ffffff);
+  --zcs-radius: 10px;
+  --zcs-shadow: 0 1px 3px rgba(15, 107, 92, 0.12);
+  --zcs-text-1: var(--zcs_primary_text_color, #17332e);
+  --zcs-text-2: var(--zcs_secondary_text_color, #3c6b62);
+  --zcs-text-3: var(--zcs_tertiary_text_color, #7aa89e);
+  --zcs-border: var(--zcs_tertiary_border_color, #e3efec);
+  --zcs-blue: var(--zcs_brand_color, #09598e);
+  --zcs-green: #179E6C;
+  --zcs-green-bg: #E5F6EF;
+  --zcs-red: #FE455D;
+  --zcs-red-bg: #FDEAEC;
+  --zcs-orange: #B8770D;
+  --zcs-orange-bg: #FBF1E1;
+}
+
+.zcs-page-header { margin-bottom: 24px; }
+.zcs-page-header__title { font-size: 22px; font-weight: 700; color: var(--zcs-text-1); margin: 0 0 4px; }
+.zcs-page-header__sub { font-size: 14px; color: var(--zcs-text-2); margin: 0; }
+
+.zcs-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.zcs-kpi-card { background: var(--zcs-surface); border-radius: var(--zcs-radius); box-shadow: var(--zcs-shadow); padding: 20px 24px; border-top: 3px solid var(--od-mint-light); }
+.zcs-kpi-card__label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--zcs-text-2); }
+.zcs-kpi-card__value { font-size: 32px; font-weight: 700; margin: 6px 0 4px; line-height: 1; }
+.zcs-kpi-card__sub { font-size: 12px; color: var(--zcs-text-3); }
+
+.zcs-section { background: var(--zcs-surface); border-radius: var(--zcs-radius); box-shadow: var(--zcs-shadow); padding: 20px 24px; margin-bottom: 16px; }
+.zcs-section__heading { font-size: 15px; font-weight: 600; color: var(--zcs-text-1); margin: 0 0 14px; }
+.zcs-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--zcs-border); font-size: 14px; color: var(--zcs-text-1); }
+.zcs-stat-row:last-child { border-bottom: none; }
+.zcs-badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; line-height: 1.4; }
+.zcs-badge--success { background: var(--zcs-green-bg); color: var(--zcs-green); }
+.zcs-badge--danger  { background: var(--zcs-red-bg);   color: var(--zcs-red); }
+.zcs-badge--warning { background: var(--zcs-orange-bg); color: var(--zcs-orange); }
+.zcs-badge--info    { background: #EAF1FB; color: var(--zcs-blue); }
+.zcs-badge--neutral { background: #f3f4f6; color: var(--zcs-text-2); }
+
+.zcs-action-list { background: var(--zcs-surface); border-radius: var(--zcs-radius); box-shadow: var(--zcs-shadow); padding: 20px 24px; margin-bottom: 16px; }
+.zcs-action-list__heading { font-size: 15px; font-weight: 600; color: var(--zcs-text-1); margin: 0 0 12px; }
+.zcs-action-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--zcs-border); font-size: 14px; color: var(--zcs-blue); text-decoration: none; cursor: pointer; }
+.zcs-action-row:last-child { border-bottom: none; }
+.zcs-action-row:hover { color: var(--od-mint-dark); }
+.zcs-action-row__arrow { color: var(--zcs-text-3); }
+
+.od-page { background: var(--od-cream); padding: 24px; border-radius: var(--zcs-radius); }
+</style>
+<div class="od-page">
+  <div class="zcs-page-header">
+    <h1 class="zcs-page-header__title">Operations Dashboard</h1>
+    <p class="zcs-page-header__sub">Production, quality, inventory, and cold-storage snapshot</p>
+  </div>
+
+  <div class="zcs-kpi-grid">
+    <div class="zcs-kpi-card">
+      <div class="zcs-kpi-card__label">Low Stock Materials</div>
+      <div class="zcs-kpi-card__value zcs-color-red"><%= lowStockCount %></div>
+      <div class="zcs-kpi-card__sub">Raw materials at or below reorder level</div>
+    </div>
+    <div class="zcs-kpi-card">
+      <div class="zcs-kpi-card__label">Batches In Production</div>
+      <div class="zcs-kpi-card__value zcs-color-blue"><%= batchesInProduction %></div>
+      <div class="zcs-kpi-card__sub">Currently churning / freezing</div>
+    </div>
+    <div class="zcs-kpi-card">
+      <div class="zcs-kpi-card__label">Lots Expiring Soon</div>
+      <div class="zcs-kpi-card__value zcs-color-yellow"><%= expiringSoonCount %></div>
+      <div class="zcs-kpi-card__sub">Finished-goods lots expiring within 7 days</div>
+    </div>
+    <div class="zcs-kpi-card">
+      <div class="zcs-kpi-card__label">Cold Storage Needing Attention</div>
+      <div class="zcs-kpi-card__value zcs-color-red"><%= unitsNeedingAttention %></div>
+      <div class="zcs-kpi-card__sub">Units out of target temperature range</div>
+    </div>
+    <div class="zcs-kpi-card">
+      <div class="zcs-kpi-card__label">QC Pass Rate</div>
+      <div class="zcs-kpi-card__value zcs-color-green"><%= passRate %>%</div>
+      <div class="zcs-kpi-card__sub"><%= passedChecks %> of <%= totalChecks %> checks passed</div>
+    </div>
+  </div>
+
+  <div class="zcs-section">
+    <h2 class="zcs-section__heading">Batches by Stage</h2>
+    <div class="zcs-stat-row">
+      <span>Planned</span>
+      <span class="zcs-badge zcs-badge--neutral"><%= plannedCount %></span>
+    </div>
+    <div class="zcs-stat-row">
+      <span>In Production</span>
+      <span class="zcs-badge zcs-badge--info"><%= batchesInProduction %></span>
+    </div>
+    <div class="zcs-stat-row">
+      <span>Quality Check</span>
+      <span class="zcs-badge zcs-badge--warning"><%= batchesAwaitingQC %></span>
+    </div>
+    <div class="zcs-stat-row">
+      <span>Approved</span>
+      <span class="zcs-badge zcs-badge--success"><%= approvedCount %></span>
+    </div>
+    <div class="zcs-stat-row">
+      <span>Rejected</span>
+      <span class="zcs-badge zcs-badge--danger"><%= rejectedCount %></span>
+    </div>
+    <div class="zcs-stat-row">
+      <span>Packaged</span>
+      <span class="zcs-badge zcs-badge--success"><%= packagedCount %></span>
+    </div>
+  </div>
+
+  <div class="zcs-action-list">
+    <h2 class="zcs-action-list__heading">Quick Actions</h2>
+    <a class="zcs-action-row" href="<%= batchBoardUrl %>">
+      <span>Batch Status Board</span>
+      <span class="zcs-action-row__arrow">&#8250;</span>
+    </a>
+    <a class="zcs-action-row" href="<%= lowStockReportUrl %>">
+      <span>Low Stock Materials</span>
+      <span class="zcs-action-row__arrow">&#8250;</span>
+    </a>
+    <a class="zcs-action-row" href="<%= expiringSoonUrl %>">
+      <span>Expiring Soon (Finished Goods)</span>
+      <span class="zcs-action-row__arrow">&#8250;</span>
+    </a>
+    <a class="zcs-action-row" href="<%= unitsAttentionUrl %>">
+      <span>Cold Storage Units Needing Attention</span>
+      <span class="zcs-action-row__arrow">&#8250;</span>
+    </a>
+    <a class="zcs-action-row" href="<%= failedChecksUrl %>">
+      <span>Failed Quality Checks</span>
+      <span class="zcs-action-row__arrow">&#8250;</span>
+    </a>
+  </div>
+</div>

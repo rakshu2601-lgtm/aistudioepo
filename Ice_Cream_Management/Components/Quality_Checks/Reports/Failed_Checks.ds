@@ -1,0 +1,14 @@
+list Failed_Checks
+{
+    displayName = "Failed Checks"
+    show all rows from Quality_Checks [Test_Result == "Fail"]
+    (
+        QC_Number
+        Production_Batch
+        Check_Date
+        Inspector_Name
+        Overrun_Percentage
+        Remarks
+    )
+    sort by ( Check_Date descending )
+}

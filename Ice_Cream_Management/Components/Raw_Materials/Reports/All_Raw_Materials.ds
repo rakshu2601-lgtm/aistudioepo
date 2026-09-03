@@ -1,0 +1,23 @@
+default list All_Raw_Materials
+{
+    displayName = "All Raw Materials"
+    show all rows from Raw_Materials
+    (
+        Material_Name
+        Category
+        Unit_Of_Measure
+        Primary_Supplier
+        Unit_Cost
+        Current_Stock
+        (
+            display = total
+        )
+        Reorder_Level
+        Expiry_Date
+        Storage_Unit
+        Status
+    )
+    filters ( Category  Status )
+    group by ( Category ascending )
+    sort by ( Material_Name ascending )
+}

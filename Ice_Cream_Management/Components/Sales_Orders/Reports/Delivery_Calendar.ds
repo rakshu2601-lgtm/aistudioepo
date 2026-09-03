@@ -1,0 +1,18 @@
+calendar Delivery_Calendar
+{
+    displayName = "Delivery Calendar"
+    show all rows from Sales_Orders [Delivery_Date is not null]
+    (
+        Order_Number
+        Customer
+        Delivery_Date
+        Status
+    )
+    filters ( Customer  Status )
+    options
+    (
+        display type = month
+        display field = Customer
+        start date = Delivery_Date
+    )
+}

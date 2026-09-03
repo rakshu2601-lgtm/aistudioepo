@@ -1,0 +1,17 @@
+kanban Products_Board
+{
+    displayName = "Products Board"
+    show all rows from Products
+    (
+        Product_Name
+        Flavor_Category
+        Pack_Type
+        Unit_Price
+        Status
+    )
+    options
+    (
+        display field = Status
+        emptycolumn = "Unassigned"
+    )
+}

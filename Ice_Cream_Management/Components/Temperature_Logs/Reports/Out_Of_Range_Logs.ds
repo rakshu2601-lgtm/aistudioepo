@@ -1,0 +1,14 @@
+list Out_Of_Range_Logs
+{
+    displayName = "Out Of Range Logs"
+    show all rows from Temperature_Logs [Within_Range == false]
+    (
+        Log_Number
+        Cold_Storage_Unit
+        Recorded_DateTime
+        Recorded_Temperature_C
+        Recorded_By
+        Remarks
+    )
+    sort by ( Recorded_DateTime descending )
+}

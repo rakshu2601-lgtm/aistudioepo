@@ -1,0 +1,14 @@
+list Expiring_Soon
+{
+    displayName = "Expiring Soon"
+    show all rows from Finished_Goods_Inventory [Status == "In Stock"]
+    (
+        Lot_Number
+        Product
+        Quantity_On_Hand
+        Manufacture_Date
+        Expiry_Date
+        Storage_Unit
+    )
+    sort by ( Expiry_Date ascending )
+}

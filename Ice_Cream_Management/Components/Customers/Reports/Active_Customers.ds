@@ -1,0 +1,14 @@
+list Active_Customers
+{
+    displayName = "Active Customers"
+    show all rows from Customers [Status == "Active"]
+    (
+        Customer_Name
+        Company_Name
+        Phone
+        Email
+        Customer_Type
+    )
+    filters ( Customer_Type )
+    sort by ( Company_Name ascending )
+}

@@ -1,0 +1,13 @@
+list Expiring_Raw_Materials
+{
+    displayName = "Expiring Raw Materials"
+    show all rows from Raw_Materials [Expiry_Date is not null && Status == "Active"]
+    (
+        Material_Name
+        Category
+        Current_Stock
+        Expiry_Date
+        Storage_Unit
+    )
+    sort by ( Expiry_Date ascending )
+}

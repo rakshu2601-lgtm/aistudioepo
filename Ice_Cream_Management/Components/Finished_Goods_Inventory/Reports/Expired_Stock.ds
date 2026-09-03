@@ -1,0 +1,14 @@
+list Expired_Stock
+{
+    displayName = "Expired Stock"
+    show all rows from Finished_Goods_Inventory [Status == "Expired"]
+    (
+        Lot_Number
+        Product
+        Quantity_On_Hand
+        Manufacture_Date
+        Expiry_Date
+        Storage_Unit
+    )
+    sort by ( Expiry_Date descending )
+}

@@ -1,0 +1,18 @@
+calendar Production_Calendar
+{
+    displayName = "Production Calendar"
+    show all rows from Production_Batches
+    (
+        Batch_Number
+        Product
+        Batch_Date
+        Stage
+    )
+    filters ( Product  Stage )
+    options
+    (
+        display type = month
+        display field = Product
+        start date = Batch_Date
+    )
+}

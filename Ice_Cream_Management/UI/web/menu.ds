@@ -1,0 +1,219 @@
+menu
+{
+    space Ice_Cream_Space
+    {
+        displayname = "Ice Cream Management"
+        icon = "food-ice-cream-22"
+
+        section Dashboards_Section
+        {
+            displayname = "Dashboards"
+            icon = "business-chart"
+
+            page Operations_Dashboard
+            {
+                icon = "business-board-30"
+            }
+            page Sales_Dashboard
+            {
+                icon = "business-chart-growth"
+            }
+        }
+
+        section Master_Data_Section
+        {
+            displayname = "Master Data"
+            icon = "design-collection"
+
+            form Suppliers
+            {
+                icon = "business-handshake"
+            }
+            report All_Suppliers
+            {
+                icon = "business-contacts"
+            }
+            report Active_Suppliers
+            {
+                icon = "business-badge"
+            }
+            form Customers
+            {
+                icon = "users-multiple-19"
+            }
+            report All_Customers
+            {
+                icon = "business-business-contact-87"
+            }
+            report Active_Customers
+            {
+                icon = "users-single-01"
+            }
+            form Cold_Storage_Units
+            {
+                icon = "furniture-fridge"
+            }
+            report All_Cold_Storage_Units
+            {
+                icon = "food-fridge"
+            }
+            report Units_Needing_Attention
+            {
+                icon = "health-temperature-24"
+            }
+            form Raw_Materials
+            {
+                icon = "food-scale"
+            }
+            report All_Raw_Materials
+            {
+                icon = "furniture-storage"
+            }
+            report Low_Stock_Materials
+            {
+                icon = "shopping-stock"
+            }
+            report Expiring_Raw_Materials
+            {
+                icon = "location-appointment"
+            }
+            form Products
+            {
+                icon = "food-ice-cream-72"
+            }
+            report All_Products
+            {
+                icon = "shopping-tag"
+            }
+            report Active_Products
+            {
+                icon = "shopping-bag-09"
+            }
+            report Products_Board
+            {
+                icon = "business-board-29"
+            }
+        }
+
+        section Purchasing_Inventory_Section
+        {
+            displayname = "Purchasing & Inventory"
+            icon = "shopping-box"
+
+            form Raw_Material_Purchases
+            {
+                icon = "business-cheque"
+            }
+            report All_Purchase_Orders
+            {
+                icon = "shopping-receipt"
+            }
+            report Pending_Purchase_Orders
+            {
+                icon = "shopping-delivery-time"
+            }
+            form Finished_Goods_Inventory
+            {
+                icon = "shopping-stock"
+            }
+            report All_Finished_Goods
+            {
+                icon = "shopping-box-3d-50"
+            }
+            report Expiring_Soon
+            {
+                icon = "location-appointment"
+            }
+            report Expired_Stock
+            {
+                icon = "design-bug"
+            }
+        }
+
+        section Production_Quality_Section
+        {
+            displayname = "Production & Quality"
+            icon = "business-hierarchy-54"
+
+            form Production_Batches
+            {
+                icon = "business-strategy"
+            }
+            report All_Production_Batches
+            {
+                icon = "business-progress"
+            }
+            report Batch_Status_Board
+            {
+                icon = "business-board-29"
+            }
+            report Production_Calendar
+            {
+                icon = "business-agenda"
+            }
+            form Quality_Checks
+            {
+                icon = "business-badge"
+            }
+            report All_Quality_Checks
+            {
+                icon = "files-check"
+            }
+            report Failed_Checks
+            {
+                icon = "design-bug"
+            }
+            form Temperature_Logs
+            {
+                icon = "furniture-fridge"
+            }
+            report All_Temperature_Logs
+            {
+                icon = "location-appointment"
+            }
+            report Out_Of_Range_Logs
+            {
+                icon = "health-temperature-24"
+            }
+        }
+
+        section Sales_Section
+        {
+            displayname = "Sales"
+            icon = "business-money-growth"
+
+            form Sales_Orders
+            {
+                icon = "shopping-cart"
+            }
+            report All_Sales_Orders
+            {
+                icon = "shopping-receipt-list-43"
+            }
+            report Pending_Sales_Orders
+            {
+                icon = "shopping-delivery"
+            }
+            report Delivery_Calendar
+            {
+                icon = "shopping-delivery-time"
+            }
+        }
+
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space,section,component}
+        }
+    }
+}

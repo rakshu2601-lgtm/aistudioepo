@@ -1,0 +1,33 @@
+Temperature_Logs_On_Validate as "Compute Within Range"
+{
+    type = form
+    form = Temperature_Logs
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                unit_rec = Cold_Storage_Units[ID == input.Cold_Storage_Unit];
+                if (unit_rec.count() > 0)
+                {
+                    deviation = input.Recorded_Temperature_C - unit_rec.Target_Temperature_C;
+                    if (deviation < 0)
+                    {
+                        deviation = deviation * -1;
+                    }
+                    if (deviation > 3)
+                    {
+                        input.Within_Range = false;
+                    }
+                    else
+                    {
+                        input.Within_Range = true;
+                    }
+                }
+            )
+        }
+    }
+}

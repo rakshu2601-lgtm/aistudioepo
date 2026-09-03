@@ -1,0 +1,16 @@
+default list All_Cold_Storage_Units
+{
+    displayName = "All Cold Storage Units"
+    show all rows from Cold_Storage_Units
+    (
+        Unit_Name
+        Unit_Type
+        Location
+        Target_Temperature_C
+        Capacity
+        Installation_Date
+        Status
+    )
+    filters ( Unit_Type  Status )
+    sort by ( Unit_Name ascending )
+}

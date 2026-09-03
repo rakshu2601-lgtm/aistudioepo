@@ -1,0 +1,146 @@
+"Shop_Manager"
+{
+    name        = "Shop_Manager"
+    type        = Users_Permissions
+    permissions = { Chat:true, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+    description = "Full operational access across the app, including both dashboards."
+
+    ModulePermissions
+    {
+        Suppliers
+        {
+            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Suppliers={"View","Edit","Delete"}
+                Active_Suppliers={"View","Edit","Delete"}
+            }
+        }
+
+        Customers
+        {
+            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Customers={"View","Edit","Delete"}
+                Active_Customers={"View","Edit","Delete"}
+            }
+        }
+
+        Cold_Storage_Units
+        {
+            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Cold_Storage_Units={"View","Edit","Delete"}
+                Units_Needing_Attention={"View","Edit","Delete"}
+            }
+        }
+
+        Temperature_Logs
+        {
+            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Temperature_Logs={"View","Edit","Delete"}
+                Out_Of_Range_Logs={"View","Edit","Delete"}
+            }
+        }
+
+        Raw_Materials
+        {
+            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Raw_Materials={"View","Edit","Delete"}
+                Low_Stock_Materials={"View","Edit","Delete"}
+                Expiring_Raw_Materials={"View","Edit","Delete"}
+            }
+        }
+
+        Products
+        {
+            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Products={"View","Edit","Delete"}
+                Active_Products={"View","Edit","Delete"}
+                Products_Board={"View","Edit","Delete"}
+            }
+        }
+
+        Raw_Material_Purchases
+        {
+            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Purchase_Orders={"View","Edit","Delete"}
+                Pending_Purchase_Orders={"View","Edit","Delete"}
+            }
+        }
+
+        Production_Batches
+        {
+            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Production_Batches={"View","Edit","Delete"}
+                Batch_Status_Board={"View","Edit","Delete"}
+                Production_Calendar={"View","Edit","Delete"}
+            }
+        }
+
+        Quality_Checks
+        {
+            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Quality_Checks={"View","Edit","Delete"}
+                Failed_Checks={"View","Edit","Delete"}
+            }
+        }
+
+        Finished_Goods_Inventory
+        {
+            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Finished_Goods={"View","Edit","Delete"}
+                Expiring_Soon={"View","Edit","Delete"}
+                Expired_Stock={"View","Edit","Delete"}
+            }
+        }
+
+        Sales_Orders
+        {
+            enabled          = Create,View,Edit,Viewall,Modifyall,Import,Export,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Sales_Orders={"View","Edit","Delete"}
+                Pending_Sales_Orders={"View","Edit","Delete"}
+                Delivery_Calendar={"View","Edit","Delete"}
+            }
+        }
+
+        Operations_Dashboard
+        {
+            enabled = tab
+        }
+
+        Sales_Dashboard
+        {
+            enabled = tab
+        }
+    }
+}

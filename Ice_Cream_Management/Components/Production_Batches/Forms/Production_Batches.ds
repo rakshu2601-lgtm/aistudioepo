@@ -1,0 +1,179 @@
+form Production_Batches
+{
+    success message = "Production batch created"
+
+    Batch_Information
+    (
+        type = section
+        displayname = "Batch Information"
+        row = 1
+        column = 0
+    )
+    Batch_Number
+    (
+        type = autonumber
+        displayname = "Batch Number"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Product
+    (
+        type = picklist
+        displayname = "Product"
+        values = Products.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Batch_Date
+    (
+        type = date
+        displayname = "Batch Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Production_Details
+    (
+        type = section
+        displayname = "Production Details"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Cold_Storage_Unit
+    (
+        type = picklist
+        displayname = "Cold Storage Unit"
+        values = Cold_Storage_Units.ID
+        displayformat = [Unit_Name]
+        searchable = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Planned_Quantity
+    (
+        type = decimal
+        displayname = "Planned Quantity"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Actual_Quantity_Produced
+    (
+        type = decimal
+        displayname = "Actual Quantity Produced"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Rejected_Quantity
+    (
+        type = decimal
+        displayname = "Rejected Quantity"
+        initial value = 0
+        row = 2
+        column = 1
+        width = medium
+    )
+    Shelf_Life_Tracking
+    (
+        type = section
+        displayname = "Shelf Life Tracking"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Manufacture_Date
+    (
+        type = date
+        displayname = "Manufacture Date"
+        initial value = "${zoho.currentdate}"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Expiry_Date
+    (
+        type = date
+        displayname = "Expiry Date"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Additional_Information
+    (
+        type = section
+        displayname = "Additional Information"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    Supervisor_Name
+    (
+        type = text
+        displayname = "Supervisor Name"
+        row = 4
+        column = 1
+        width = medium
+    )
+    Notes
+    (
+        type = textarea
+        displayname = "Notes"
+        row = 4
+        column = 1
+        width = medium
+    )
+    Stage
+    (
+        type = picklist
+        displayname = "Stage"
+        values = {"Planned","In Production","Quality Check","Approved","Rejected","Packaged"}
+        initial value = "Planned"
+        row = 4
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+
+    blueprint components
+    {
+        stages = {"Planned","In Production","Quality Check","Approved","Rejected","Packaged"}
+    }
+}

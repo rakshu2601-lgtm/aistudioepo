@@ -1,0 +1,21 @@
+Production_Batches_On_Validate as "Compute Expiry Date"
+{
+    type = form
+    form = Production_Batches
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                product_rec = Products[ID == input.Product];
+                if (product_rec.count() > 0)
+                {
+                    input.Expiry_Date = input.Batch_Date.addDay(product_rec.Shelf_Life_Days);
+                }
+            )
+        }
+    }
+}

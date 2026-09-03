@@ -1,0 +1,19 @@
+<page linkname = "Operations_Dashboard" displayname = "Operations Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Operations_Dashboard_Content' elementName='Operations_Dashboard_Content'>
+          <![CDATA[htmlpage Operations_Dashboard_Content()
+content
+<%{%>
+<file name:Operations_Dashboard_Content.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

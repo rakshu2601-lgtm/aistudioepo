@@ -1,0 +1,217 @@
+Production_Lifecycle as "Production Lifecycle"
+{
+    type = blueprint
+    form = Production_Batches
+
+    start
+    {
+        start stage = "Planned"
+        chart data
+        {
+            from port : 0
+            to port   : 2
+            position  : "50 100"
+            path      : [50,100,100,100]
+        }
+    }
+
+    stages
+    {
+        "Planned"
+        {
+            chart data
+            {
+                position : "100 100"
+            }
+        }
+        "In Production"
+        {
+            chart data
+            {
+                position : "300 100"
+            }
+        }
+        "Quality Check"
+        {
+            chart data
+            {
+                position : "500 100"
+            }
+        }
+        "Approved"
+        {
+            chart data
+            {
+                position : "700 50"
+            }
+        }
+        "Rejected"
+        {
+            chart data
+            {
+                position : "700 150"
+            }
+        }
+        "Packaged"
+        {
+            chart data
+            {
+                position : "900 50"
+            }
+        }
+    }
+
+    transitions
+    {
+        Start_Production as "Start Production"
+        {
+            type = normal
+            from stage = "Planned"
+            to stage   = "In Production"
+
+            before
+            {
+                transition criteria = ( Planned_Quantity > 0 )
+            }
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                    product_rec = Products[ID == input.Product];
+                    if (product_rec.count() > 0)
+                    {
+                        for each item in product_rec.Recipe_Items
+                        {
+                            material_rec = Raw_Materials[ID == item.Raw_Material];
+                            if (material_rec.count() > 0)
+                            {
+                                material_rec.Current_Stock = material_rec.Current_Stock - (item.Quantity_Required * input.Planned_Quantity);
+                            }
+                        }
+                    }
+                    )
+                }
+            }
+
+            chart data
+            {
+                from port : 2
+                to port   : 0
+                path      : [100,100,300,100]
+            }
+        }
+
+        Send_For_QC as "Send For QC"
+        {
+            type = normal
+            from stage = "In Production"
+            to stage   = "Quality Check"
+
+            before
+            {
+            }
+
+            after
+            {
+            }
+
+            chart data
+            {
+                from port : 2
+                to port   : 0
+                path      : [300,100,500,100]
+            }
+        }
+
+        Approve_Batch as "Approve Batch"
+        {
+            type = normal
+            from stage = "Quality Check"
+            to stage   = "Approved"
+
+            before
+            {
+            }
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                    insert into Finished_Goods_Inventory
+                    [
+                        Product = input.Product
+                        Production_Batch = input.ID
+                        Quantity_On_Hand = input.Actual_Quantity_Produced
+                        Manufacture_Date = input.Manufacture_Date
+                        Expiry_Date = input.Expiry_Date
+                        Storage_Unit = input.Cold_Storage_Unit
+                        Status = "In Stock"
+                    ];
+                    )
+                }
+            }
+
+            chart data
+            {
+                from port : 2
+                to port   : 0
+                path      : [500,100,700,50]
+            }
+        }
+
+        Reject_Batch as "Reject Batch"
+        {
+            type = normal
+            from stage = "Quality Check"
+            to stage   = "Rejected"
+
+            before
+            {
+                confirmation before execution
+                (
+                    message = "Reject this batch?"
+                    confirm button text = "Yes, reject"
+                    cancel button text = "Cancel"
+                )
+            }
+
+            after
+            {
+            }
+
+            chart data
+            {
+                from port : 2
+                to port   : 0
+                path      : [500,100,700,150]
+            }
+        }
+
+        Package_Batch as "Package Batch"
+        {
+            type = normal
+            from stage = "Approved"
+            to stage   = "Packaged"
+
+            before
+            {
+            }
+
+            after
+            {
+            }
+
+            chart data
+            {
+                from port : 2
+                to port   : 0
+                path      : [700,50,900,50]
+            }
+        }
+    }
+}

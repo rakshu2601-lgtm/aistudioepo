@@ -1,0 +1,21 @@
+default list All_Finished_Goods
+{
+    displayName = "All Finished Goods"
+    show all rows from Finished_Goods_Inventory
+    (
+        Lot_Number
+        Product
+        Production_Batch
+        Quantity_On_Hand
+        (
+            display = total
+        )
+        Manufacture_Date
+        Expiry_Date
+        Storage_Unit
+        Status
+    )
+    filters ( Product  Status )
+    group by ( Product ascending )
+    sort by ( Expiry_Date ascending )
+}

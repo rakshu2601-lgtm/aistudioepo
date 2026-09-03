@@ -1,0 +1,138 @@
+form Quality_Checks
+{
+    success message = "Quality check recorded"
+
+    Batch_Reference
+    (
+        type = section
+        displayname = "Batch Reference"
+        row = 1
+        column = 0
+    )
+    QC_Number
+    (
+        type = autonumber
+        displayname = "QC Number"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Production_Batch
+    (
+        type = picklist
+        displayname = "Production Batch"
+        values = Production_Batches.ID
+        displayformat = [Batch_Number]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Check_Date
+    (
+        type = date
+        displayname = "Check Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Inspection_Details
+    (
+        type = section
+        displayname = "Inspection Details"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Inspector_Name
+    (
+        type = text
+        displayname = "Inspector Name"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Taste_Rating
+    (
+        type = picklist
+        displayname = "Taste Rating"
+        values = {"Excellent","Good","Average","Poor"}
+        row = 2
+        column = 1
+        width = medium
+    )
+    Texture_Rating
+    (
+        type = picklist
+        displayname = "Texture Rating"
+        values = {"Excellent","Good","Average","Poor"}
+        row = 2
+        column = 1
+        width = medium
+    )
+    Overrun_Percentage
+    (
+        type = decimal
+        displayname = "Overrun Percentage"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Melting_Time_Minutes
+    (
+        type = decimal
+        displayname = "Melting Time Minutes"
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Test_Result
+    (
+        type = picklist
+        displayname = "Test Result"
+        values = {"Pass","Fail"}
+        row = 2
+        column = 1
+        width = medium
+    )
+    Remarks
+    (
+        type = textarea
+        displayname = "Remarks"
+        row = 2
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}
