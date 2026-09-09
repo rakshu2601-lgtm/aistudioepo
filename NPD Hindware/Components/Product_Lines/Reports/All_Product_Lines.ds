@@ -1,0 +1,26 @@
+default list All_Product_Lines
+{
+    displayName = "All Product Lines"
+    show all rows from Product_Lines
+    (
+        Product_Line_Code as "Code"
+        Product_Line_Name as "Name"
+        Plant
+        Plant.Branch as "Plant Branch"
+        Active
+        Notes
+    )
+    filters
+    (
+        Plant
+        Active
+    )
+    group by
+    (
+        Plant ascending
+    )
+    sort by
+    (
+        Product_Line_Name ascending
+    )
+}

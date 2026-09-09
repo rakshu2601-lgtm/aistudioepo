@@ -1,0 +1,30 @@
+Audit_Submission_Document_Add as "Audit Submission Document Add"
+{
+    type = form
+    form = Submission_Documents
+    record event = on add
+    description = "Audits a Sourcing support document or QA validation report upload against its exact attempt."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_details = "Submission Document ID: " + input.ID + "; Attempt: " + input.Attempt_Number + "; Gate: " + input.Stage_Gate + "; Category: " + input.Document_Category + "; Requirement ID: " + input.Document_Requirement + "; Document: " + input.Document_Name;
+                audit_id = insert into Process_Audit_Log
+                [
+                    NPD_Request = input.NPD_Request
+                    Stage_Gate_Instance = Stage_Gate_Submissions[ID == input.Stage_Gate_Submission].Stage_Gate_Instance
+                    Stage_Gate_Submission = input.Stage_Gate_Submission
+                    Event_Type = "Document Uploaded"
+                    Action_Name = input.Document_Category + " Uploaded"
+                    Observations = input.Remarks
+                    Performed_By_Email = zoho.loginuserid
+                    Performed_On = zoho.currenttime
+                    Event_Details = audit_details
+                ];
+            )
+        }
+    }
+}

@@ -1,0 +1,30 @@
+default list Gate_Routes_Admin
+{
+    displayName = "Gate Routes Admin"
+    show all rows from Gate_Routes
+    (
+        Route_Code
+        Route_Name
+        Plant
+        Product_Line
+        Version_Number
+        Effective_From
+        Effective_To
+        Status
+        Notes
+    )
+    filters
+    (
+        Plant
+        Product_Line
+        Status
+    )
+    group by
+    (
+        Plant ascending
+    )
+    sort by
+    (
+        Effective_From descending
+    )
+}

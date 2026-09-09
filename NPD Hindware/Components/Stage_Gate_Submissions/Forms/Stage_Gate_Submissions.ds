@@ -1,0 +1,278 @@
+form Stage_Gate_Submissions
+{
+    displayname = "Stage Gate Submissions"
+
+    Submission_Identity
+    (
+        type = section
+        displayname = "Submission Identity"
+        row = 1
+        column = 0
+    )
+    Submission_Number
+    (
+        type = autonumber
+        displayname = "Submission Number"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Stage_Gate_Instance
+    (
+        type = picklist
+        displayname = "Stage Gate Instance"
+        values = Stage_Gate_Instances.ID
+        displayformat = [Stage_Gate]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Attempt_Number
+    (
+        type = number
+        displayname = "Attempt Number"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Previous_Attempt_Number
+    (
+        type = number
+        displayname = "Previous Attempt Number"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Copied_Observations
+    (
+        type = textarea
+        displayname = "Copied Observations"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Applicable_Due_On
+    (
+        type = date
+        displayname = "Applicable Due On"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Submission_Status
+    (
+        type = picklist
+        displayname = "Submission Status"
+        values = {"Sourcing Draft", "Sourcing Rework", "QA Review", "Section Head Review", "Rejected by QA", "Rejected by Section Head", "Approved"}
+        initial value = "Sourcing Draft"
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    Sourcing_Submission
+    (
+        type = section
+        displayname = "Sourcing Submission"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Sourcing_Comments
+    (
+        type = textarea
+        displayname = "Sourcing Comments"
+        height = 100px
+        row = 2
+        column = 1
+        width = medium
+    )
+    Response_to_Observations
+    (
+        type = textarea
+        displayname = "Response to Observations"
+        height = 100px
+        row = 2
+        column = 1
+        width = medium
+    )
+    Sourcing_Submitted_By
+    (
+        type = picklist
+        displayname = "Sourcing Submitted By"
+        module = users
+        row = 2
+        column = 2
+        width = medium
+    )
+    Sourcing_Submitted_On
+    (
+        type = datetime
+        displayname = "Sourcing Submitted On"
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    QA_Review
+    (
+        type = section
+        displayname = "QA Review"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    QA_Decision
+    (
+        type = radiobuttons
+        displayname = "QA Decision"
+        values = {"Pass", "Reject"}
+        layout = 2
+        row = 3
+        column = 1
+        width = medium
+    )
+    QA_Observations
+    (
+        type = textarea
+        displayname = "QA Observations"
+        height = 100px
+        row = 3
+        column = 1
+        width = medium
+    )
+    QA_Reviewed_By
+    (
+        type = picklist
+        displayname = "QA Reviewed By"
+        module = users
+        row = 3
+        column = 1
+        width = medium
+    )
+    QA_Reviewed_On
+    (
+        type = datetime
+        displayname = "QA Reviewed On"
+        row = 3
+        column = 1
+        width = medium
+    )
+    QA_Due_On
+    (
+        type = date
+        displayname = "QA Due On"
+        row = 3
+        column = 2
+        width = medium
+    )
+    QA_Escalation_Sent
+    (
+        type = checkbox
+        displayname = "QA Escalation Sent"
+        initial value = false
+        row = 3
+        column = 2
+        width = medium
+    )
+
+    Section_Head_Review
+    (
+        type = section
+        displayname = "Section Head Review"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    Section_Head_Decision
+    (
+        type = radiobuttons
+        displayname = "Section Head Decision"
+        values = {"Approve", "Reject"}
+        layout = 2
+        row = 4
+        column = 1
+        width = medium
+    )
+    Section_Head_Observations
+    (
+        type = textarea
+        displayname = "Section Head Observations"
+        height = 100px
+        row = 4
+        column = 1
+        width = medium
+    )
+    Section_Head_Decided_By
+    (
+        type = picklist
+        displayname = "Section Head Decided By"
+        module = users
+        row = 4
+        column = 1
+        width = medium
+    )
+    Section_Head_Decided_On
+    (
+        type = datetime
+        displayname = "Section Head Decided On"
+        row = 4
+        column = 1
+        width = medium
+    )
+    Section_Head_Due_On
+    (
+        type = date
+        displayname = "Section Head Due On"
+        row = 4
+        column = 2
+        width = medium
+    )
+    Section_Escalation_Sent
+    (
+        type = checkbox
+        displayname = "Section Escalation Sent"
+        initial value = false
+        row = 4
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Submission"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Submission"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+
+    blueprint components
+    {
+        stages = {"Sourcing Draft", "Sourcing Rework", "QA Review", "Section Head Review", "Rejected by QA", "Rejected by Section Head", "Approved"}
+    }
+}

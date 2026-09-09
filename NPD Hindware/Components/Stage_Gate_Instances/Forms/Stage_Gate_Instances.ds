@@ -1,0 +1,150 @@
+form Stage_Gate_Instances
+{
+    displayname = "Stage Gate Instances"
+
+    Gate_Instance
+    (
+        type = section
+        displayname = "Gate Instance"
+        row = 1
+        column = 0
+    )
+    must have NPD_Request
+    (
+        type = picklist
+        displayname = "NPD Request"
+        values = NPD_Requests.ID
+        displayformat = [Request_Title]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Gate_Route_Step
+    (
+        type = picklist
+        displayname = "Gate Route Step"
+        values = Gate_Route_Steps.ID
+        displayformat = [Stage_Gate]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Stage_Gate
+    (
+        type = radiobuttons
+        displayname = "Stage Gate"
+        values = {"N1", "N5", "N10", "N30", "N50"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Sequence_Number
+    (
+        type = number
+        displayname = "Sequence Number"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Final_Gate
+    (
+        type = checkbox
+        displayname = "Final Gate"
+        initial value = false
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Gate_Status
+    (
+        type = picklist
+        displayname = "Gate Status"
+        values = {"Locked", "Ready for Sourcing", "QA Review", "Section Head Review", "Rework", "Approved", "Terminated"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    Activated_On
+    (
+        type = datetime
+        displayname = "Activated On"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Completed_On
+    (
+        type = datetime
+        displayname = "Completed On"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Latest_Attempt_Number
+    (
+        type = number
+        displayname = "Latest Attempt Number"
+        initial value = 0
+        row = 1
+        column = 2
+        width = medium
+    )
+    Sourcing_User
+    (
+        type = picklist
+        displayname = "Sourcing User"
+        module = users
+        row = 1
+        column = 2
+        width = medium
+    )
+    QA_Reviewer_User
+    (
+        type = picklist
+        displayname = "QA Reviewer User"
+        module = users
+        row = 1
+        column = 2
+        width = medium
+    )
+    Section_Head_User
+    (
+        type = picklist
+        displayname = "Section Head User"
+        module = users
+        row = 1
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Gate Instance"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Gate Instance"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

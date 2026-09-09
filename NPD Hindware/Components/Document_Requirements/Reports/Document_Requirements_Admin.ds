@@ -1,0 +1,31 @@
+default list Document_Requirements_Admin
+{
+    displayName = "Document Requirements Admin"
+    show all rows from Document_Requirements
+    (
+        Requirement_Code as "Requirement Code"
+        Requirement_Name as "Requirement"
+        Scope
+        Gate_Route as "Route"
+        Gate_Route_Step as "Step"
+        Mandatory
+        Sort_Order as "Order"
+        Active
+    )
+    filters
+    (
+        Scope
+        Gate_Route
+        Gate_Route_Step
+        Active
+    )
+    group by
+    (
+        Gate_Route ascending
+        Scope ascending
+    )
+    sort by
+    (
+        Sort_Order ascending
+    )
+}

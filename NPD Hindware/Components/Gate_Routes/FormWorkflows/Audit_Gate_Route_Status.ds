@@ -1,0 +1,37 @@
+Audit_Gate_Route_Status as "Audit Gate Route Status"
+{
+    type = form
+    form = Gate_Routes
+    record event = on add or edit
+    description = "Writes a successful status initialization or change to the process audit trail."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_action = "Gate Route Status Change - " + input.ID;
+                prior_audit_count = Process_Audit_Log[Action_Name == audit_action].count(ID);
+                prior_status = "";
+                if(prior_audit_count > 0)
+                {
+                    prior_status = Process_Audit_Log[Action_Name == audit_action].To_Status sort by Performed_On desc;
+                }
+                if(prior_audit_count == 0 || prior_status != input.Status)
+                {
+                    audit_id = insert into Process_Audit_Log
+                    [
+                        Event_Type = "Configuration Changed"
+                        Action_Name = audit_action
+                        From_Status = prior_status
+                        To_Status = input.Status
+                        Performed_By_Email = zoho.loginuserid
+                        Performed_On = zoho.currenttime
+                        Event_Details = "Gate Route " + input.Route_Code + " (" + input.Route_Name + ") status saved as " + input.Status + "."
+                    ];
+                }
+            )
+        }
+    }
+}

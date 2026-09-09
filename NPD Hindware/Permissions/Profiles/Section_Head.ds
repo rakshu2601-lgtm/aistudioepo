@@ -1,0 +1,141 @@
+"Section Head"
+{
+    name        = "Section Head"
+    type        = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false }
+    description = "Executes only Section Head approve/reject transitions and otherwise reviews operational context."
+
+    ModulePermissions
+    {
+        Process_Settings
+        {
+            allFieldsVisible = false
+        }
+        Plants
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions { All_Plants={"View"} }
+        }
+        Product_Lines
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions { All_Product_Lines={"View"} }
+        }
+        Gate_Routes
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions { Gate_Routes_Admin={"View"} }
+        }
+        Gate_Route_Steps
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions { Gate_Route_Steps_Admin={"View"} }
+        }
+        Document_Requirements
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions { Document_Requirements_Admin={"View"} }
+        }
+        NPD_Requests
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_NPD_Requests={"View"}
+                My_NPD_Requests={"View"}
+                NPD_Pipeline={"View"}
+                NPD_Approval_Queue={"View"}
+                Mass_Production_Queue={"View"}
+            }
+        }
+        Request_Documents
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions { All_Request_Documents={"View"} }
+        }
+        Sample_Validation_Items
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions { Sample_Validation_Sheet={"View"} }
+        }
+        Stage_Gate_Instances
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Stage_Gate_Tracker={"View"}
+                Stage_Gate_Board={"View"}
+            }
+        }
+        Stage_Gate_Submissions
+        {
+            enabled = Viewall,Modifyall,View,Edit,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                All_Stage_Gate_Submissions={"View"}
+                My_Review_Queue={"View"}
+                Submission_SLA_Calendar={"View"}
+            }
+            FieldPermissions
+            {
+                Submission_Identity{visibility:true,readonly:true}
+                Submission_Number{visibility:true,readonly:true}
+                Stage_Gate_Instance{visibility:true,readonly:true}
+                Attempt_Number{visibility:true,readonly:true}
+                Previous_Attempt_Number{visibility:true,readonly:true}
+                Copied_Observations{visibility:true,readonly:true}
+                Applicable_Due_On{visibility:true,readonly:true}
+                Submission_Status{visibility:true,readonly:true}
+                Sourcing_Submission{visibility:true,readonly:true}
+                Sourcing_Comments{visibility:true,readonly:true}
+                Response_to_Observations{visibility:true,readonly:true}
+                Sourcing_Submitted_By{visibility:true,readonly:true}
+                Sourcing_Submitted_On{visibility:true,readonly:true}
+                QA_Review{visibility:true,readonly:true}
+                QA_Decision{visibility:true,readonly:true}
+                QA_Observations{visibility:true,readonly:true}
+                QA_Reviewed_By{visibility:true,readonly:true}
+                QA_Reviewed_On{visibility:true,readonly:true}
+                QA_Due_On{visibility:true,readonly:true}
+                QA_Escalation_Sent{visibility:false}
+                Section_Head_Review{visibility:true,readonly:true}
+                Section_Head_Decision{visibility:true,readonly:false}
+                Section_Head_Observations{visibility:true,readonly:false}
+                Section_Head_Decided_By{visibility:true,readonly:true}
+                Section_Head_Decided_On{visibility:true,readonly:true}
+                Section_Head_Due_On{visibility:true,readonly:true}
+                Section_Escalation_Sent{visibility:false}
+            }
+        }
+        Submission_Documents
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions { All_Submission_Documents={"View"} }
+        }
+        Process_Audit_Log
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Process_Audit_Trail={"View"}
+                Process_Timeline={"View"}
+            }
+        }
+        NPD_Dashboard
+        {
+            enabled = tab
+        }
+    }
+}

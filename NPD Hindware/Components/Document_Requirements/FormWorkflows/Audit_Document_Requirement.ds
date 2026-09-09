@@ -1,0 +1,26 @@
+Audit_Document_Requirement as "Audit Document Requirement"
+{
+    type = form
+    form = Document_Requirements
+    record event = on add or edit
+    description = "Records document requirement configuration changes in the process audit log"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_details = "Requirement Code: " + input.Requirement_Code + "; Requirement Name: " + input.Requirement_Name + "; Scope: " + input.Scope + "; Gate Route ID: " + input.Gate_Route + "; Gate Route Step ID: " + input.Gate_Route_Step + "; Mandatory: " + input.Mandatory + "; Active: " + input.Active + "; Sort Order: " + input.Sort_Order;
+                audit_id = insert into Process_Audit_Log
+                [
+                    Event_Type = "Configuration Changed"
+                    Action_Name = "Document Requirement Saved"
+                    Performed_By_Email = zoho.loginuserid
+                    Performed_On = zoho.currenttime
+                    Event_Details = audit_details
+                ];
+            )
+        }
+    }
+}

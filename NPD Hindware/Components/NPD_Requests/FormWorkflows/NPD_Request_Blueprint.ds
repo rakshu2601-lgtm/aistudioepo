@@ -1,0 +1,517 @@
+NPD_Request_Blueprint as "NPD Request Blueprint"
+{
+    type = blueprint
+    form = NPD_Requests
+
+    start
+    {
+        start stage = "Draft"
+    }
+
+    stages
+    {
+        "Draft" { }
+        "Initial QA Review" { }
+        "NPD Rework" { }
+        "Initial QA Head Approval" { }
+        "Stage Gates In Progress" { }
+        "Final QA Head Approval" { }
+        "Mass Production" { }
+        "Terminated" { }
+    }
+
+    transitions
+    {
+        Submit_for_QA as "Submit for QA"
+        {
+            type = normal
+            from stage = "Draft"
+            to stage = "Initial QA Review"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"NPD Leader"}
+                    userfields = {Request_Owner}
+                )
+                confirmation before execution
+                (
+                    message = "Submit this request, its current mandatory documents, and Sample Validation Sheet to QA?"
+                    confirm button text = "Submit for QA"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        settings = Process_Settings[Active == true];
+                        Submitted_On = zoho.currenttime;
+                        Initial_QA_Due_On = zoho.currentdate.addBusinessDay(settings.Review_SLA_Working_Days);
+                        Initial_QA_Reviewer = settings.QA_Reviewer_User;
+                        Escalation_Sent = false;
+                        audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = input.ID
+                            Event_Type = "Submitted"
+                            Action_Name = "Submit for QA"
+                            From_Status = "Draft"
+                            To_Status = "Initial QA Review"
+                            Performed_By_Email = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Event_Details = "Active route, mandatory initial documents, and complete sample validation rows were validated."
+                        ];
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : settings.QA_Reviewer_User.email
+                            subject : "NPD request ready for initial QA review"
+                            message : "Request " + input.Request_Number + " - " + input.Request_Title + " is ready for initial QA review."
+                        )
+                    )
+                }
+            }
+        }
+
+        Resubmit_Documents as "Resubmit Documents"
+        {
+            type = normal
+            from stage = "NPD Rework"
+            to stage = "Initial QA Review"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"NPD Leader"}
+                    userfields = {Request_Owner}
+                )
+                confirmation before execution
+                (
+                    message = "Resubmit the corrected current documents and validation details to QA?"
+                    confirm button text = "Resubmit Documents"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        settings = Process_Settings[Active == true];
+                        Submitted_On = zoho.currenttime;
+                        Initial_QA_Due_On = zoho.currentdate.addBusinessDay(settings.Review_SLA_Working_Days);
+                        Initial_QA_Decision = null;
+                        Initial_QA_Reviewed_On = null;
+                        Initial_QA_Reviewer = settings.QA_Reviewer_User;
+                        Escalation_Sent = false;
+                        audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = input.ID
+                            Event_Type = "Resubmitted"
+                            Action_Name = "Resubmit Documents"
+                            From_Status = "NPD Rework"
+                            To_Status = "Initial QA Review"
+                            Observations = input.Initial_QA_Observations
+                            Performed_By_Email = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Event_Details = "Corrected current documents and sample validation details resubmitted."
+                        ];
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : settings.QA_Reviewer_User.email
+                            subject : "NPD request documents resubmitted"
+                            message : "Request " + input.Request_Number + " - " + input.Request_Title + " has been resubmitted for initial QA review."
+                        )
+                    )
+                }
+            }
+        }
+
+        QA_Docs_Pass as "QA Docs Pass"
+        {
+            type = normal
+            from stage = "Initial QA Review"
+            to stage = "Initial QA Head Approval"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"QA Reviewer"}
+                    userfields = {Initial_QA_Reviewer}
+                )
+            }
+            during
+            {
+                action = update_fields
+                workflow status = true
+                visible fields = [Initial_QA_Decision, Initial_QA_Observations]
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        settings = Process_Settings[Active == true];
+                        Initial_QA_Decision = "Pass";
+                        Initial_QA_Reviewer = zoho.loginuser;
+                        Initial_QA_Reviewed_On = zoho.currenttime;
+                        Initial_QA_Head_User = settings.QA_Head_User;
+                        Initial_QA_Due_On = zoho.currentdate.addBusinessDay(settings.Review_SLA_Working_Days);
+                        Escalation_Sent = false;
+                        audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = input.ID
+                            Event_Type = "Passed"
+                            Action_Name = "QA Docs Pass"
+                            From_Status = "Initial QA Review"
+                            To_Status = "Initial QA Head Approval"
+                            Decision = "Pass"
+                            Observations = input.Initial_QA_Observations
+                            Performed_By_Email = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                        ];
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : settings.QA_Head_User.email
+                            subject : "NPD request ready for initial QA Head approval"
+                            message : "Request " + input.Request_Number + " passed initial QA document review."
+                        )
+                    )
+                }
+            }
+        }
+
+        QA_Docs_Not_Pass as "QA Docs Not Pass"
+        {
+            type = normal
+            from stage = "Initial QA Review"
+            to stage = "NPD Rework"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"QA Reviewer"}
+                    userfields = {Initial_QA_Reviewer}
+                )
+            }
+            during
+            {
+                action = update_fields
+                workflow status = true
+                visible fields = [Initial_QA_Decision, Initial_QA_Observations]
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        settings = Process_Settings[Active == true];
+                        Initial_QA_Decision = "Not Pass";
+                        Initial_QA_Reviewer = zoho.loginuser;
+                        Initial_QA_Reviewed_On = zoho.currenttime;
+                        Initial_QA_Due_On = null;
+                        Escalation_Sent = false;
+                        audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = input.ID
+                            Event_Type = "Reworked"
+                            Action_Name = "QA Docs Not Pass"
+                            From_Status = "Initial QA Review"
+                            To_Status = "NPD Rework"
+                            Decision = "Not Pass"
+                            Observations = input.Initial_QA_Observations
+                            Performed_By_Email = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                        ];
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : settings.NPD_Leader_User.email
+                            subject : "NPD request requires document rework"
+                            message : "Request " + input.Request_Number + " requires rework. QA observations: " + input.Initial_QA_Observations
+                        )
+                    )
+                }
+            }
+        }
+
+        Initial_QA_Head_Approve as "Initial QA Head Approve"
+        {
+            type = normal
+            from stage = "Initial QA Head Approval"
+            to stage = "Stage Gates In Progress"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"QA Head"}
+                    userfields = {Initial_QA_Head_User}
+                )
+                confirmation before execution
+                (
+                    message = "Approve the initial gate and materialize the snapshotted route?"
+                    confirm button text = "Approve"
+                    cancel button text = "Cancel"
+                )
+            }
+            during
+            {
+                action = update_fields
+                workflow status = true
+                visible fields = [Initial_QA_Head_Decision, Initial_QA_Head_Observations]
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        settings = Process_Settings[Active == true];
+                        Initial_QA_Head_Decision = "Approved";
+                        Initial_QA_Head_User = zoho.loginuser;
+                        Initial_QA_Head_Decided_On = zoho.currenttime;
+                        Initial_QA_Due_On = null;
+                        Escalation_Sent = false;
+                        route_steps = Gate_Route_Steps[Gate_Route == input.Gate_Route && Active == true] sort by Sequence_Number;
+                        first_stage = "";
+                        for each route_step in route_steps
+                        {
+                            instance_status = "Locked";
+                            activated_time = null;
+                            latest_attempt = 0;
+                            if(route_step.Sequence_Number == 1)
+                            {
+                                instance_status = "Ready for Sourcing";
+                                activated_time = zoho.currenttime;
+                                latest_attempt = 1;
+                                first_stage = route_step.Stage_Gate;
+                            }
+                            instance_id = insert into Stage_Gate_Instances
+                            [
+                                NPD_Request = input.ID
+                                Gate_Route_Step = route_step.ID
+                                Stage_Gate = route_step.Stage_Gate
+                                Sequence_Number = route_step.Sequence_Number
+                                Final_Gate = route_step.Final_Gate
+                                Gate_Status = instance_status
+                                Activated_On = activated_time
+                                Latest_Attempt_Number = latest_attempt
+                                Sourcing_User = settings.Sourcing_User
+                                QA_Reviewer_User = settings.QA_Reviewer_User
+                                Section_Head_User = settings.Section_Head_User
+                            ];
+                            if(route_step.Sequence_Number == 1)
+                            {
+                                submission_id = insert into Stage_Gate_Submissions
+                                [
+                                    Stage_Gate_Instance = instance_id
+                                    Attempt_Number = 1
+                                    Submission_Status = "Sourcing Draft"
+                                ];
+                            }
+                        }
+                        Current_Stage_Gate = first_stage;
+                        audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = input.ID
+                            Event_Type = "Approved"
+                            Action_Name = "Initial QA Head Approve"
+                            From_Status = "Initial QA Head Approval"
+                            To_Status = "Stage Gates In Progress"
+                            Decision = "Approved"
+                            Observations = input.Initial_QA_Head_Observations
+                            Performed_By_Email = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Event_Details = "Route steps were snapshotted as stage gate instances and sequence 1 was activated."
+                        ];
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : settings.Sourcing_User.email
+                            subject : "First NPD stage gate ready for sourcing"
+                            message : "Request " + input.Request_Number + " has entered stage gates. " + first_stage + " attempt 1 is ready for sourcing."
+                        )
+                    )
+                }
+            }
+        }
+
+        Initial_QA_Head_Reject as "Initial QA Head Reject"
+        {
+            type = normal
+            from stage = "Initial QA Head Approval"
+            to stage = "Terminated"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"QA Head"}
+                    userfields = {Initial_QA_Head_User}
+                )
+            }
+            during
+            {
+                action = update_fields
+                workflow status = true
+                visible fields = [Initial_QA_Head_Decision, Initial_QA_Head_Observations, Termination_Reason]
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        settings = Process_Settings[Active == true];
+                        Initial_QA_Head_Decision = "Rejected";
+                        Initial_QA_Head_User = zoho.loginuser;
+                        Initial_QA_Head_Decided_On = zoho.currenttime;
+                        Initial_QA_Due_On = null;
+                        audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = input.ID
+                            Event_Type = "Rejected"
+                            Action_Name = "Initial QA Head Reject"
+                            From_Status = "Initial QA Head Approval"
+                            To_Status = "Terminated"
+                            Decision = "Rejected"
+                            Observations = input.Initial_QA_Head_Observations
+                            Performed_By_Email = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Event_Details = input.Termination_Reason
+                        ];
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : settings.NPD_Leader_User.email
+                            subject : "NPD request terminated at initial QA Head gate"
+                            message : "Request " + input.Request_Number + " was terminated. Reason: " + input.Termination_Reason
+                        )
+                    )
+                }
+            }
+        }
+
+        Final_QA_Head_Approve as "Final QA Head Approve"
+        {
+            type = normal
+            from stage = "Final QA Head Approval"
+            to stage = "Mass Production"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"QA Head"}
+                )
+                confirmation before execution
+                (
+                    message = "Approve final release to Mass Production and notify the configured distribution list?"
+                    confirm button text = "Release"
+                    cancel button text = "Cancel"
+                )
+            }
+            during
+            {
+                action = update_fields
+                workflow status = true
+                visible fields = [Final_QA_Head_Decision, Final_QA_Head_Observations]
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        settings = Process_Settings[Active == true];
+                        Final_QA_Head_Decision = "Approved";
+                        Final_QA_Head_User = zoho.loginuser;
+                        Final_QA_Head_Decided_On = zoho.currenttime;
+                        Mass_Production_Released_On = zoho.currenttime;
+                        Initial_QA_Due_On = null;
+                        Escalation_Sent = false;
+                        audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = input.ID
+                            Event_Type = "Released to Mass Production"
+                            Action_Name = "Final QA Head Approve"
+                            From_Status = "Final QA Head Approval"
+                            To_Status = "Mass Production"
+                            Decision = "Approved"
+                            Observations = input.Final_QA_Head_Observations
+                            Performed_By_Email = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Event_Details = "Final QA Head approval completed and Mass Production release timestamp recorded."
+                        ];
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : settings.Final_Notification_Emails.toList(",")
+                            subject : "NPD released to Mass Production: " + input.Request_Number
+                            message : "Request " + input.Request_Number + " - " + input.Request_Title + " has received final QA Head approval and is released to Mass Production."
+                        )
+                    )
+                }
+            }
+        }
+
+        Final_QA_Head_Reject as "Final QA Head Reject"
+        {
+            type = normal
+            from stage = "Final QA Head Approval"
+            to stage = "Terminated"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"QA Head"}
+                )
+            }
+            during
+            {
+                action = update_fields
+                workflow status = true
+                visible fields = [Final_QA_Head_Decision, Final_QA_Head_Observations, Termination_Reason]
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        settings = Process_Settings[Active == true];
+                        Final_QA_Head_Decision = "Rejected";
+                        Final_QA_Head_User = zoho.loginuser;
+                        Final_QA_Head_Decided_On = zoho.currenttime;
+                        Initial_QA_Due_On = null;
+                        audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = input.ID
+                            Event_Type = "Rejected"
+                            Action_Name = "Final QA Head Reject"
+                            From_Status = "Final QA Head Approval"
+                            To_Status = "Terminated"
+                            Decision = "Rejected"
+                            Observations = input.Final_QA_Head_Observations
+                            Performed_By_Email = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Event_Details = input.Termination_Reason
+                        ];
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : settings.NPD_Leader_User.email
+                            subject : "NPD request terminated at final QA Head gate"
+                            message : "Request " + input.Request_Number + " was terminated. Reason: " + input.Termination_Reason
+                        )
+                    )
+                }
+            }
+        }
+    }
+}

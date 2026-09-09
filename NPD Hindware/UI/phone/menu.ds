@@ -1,0 +1,95 @@
+menu
+{
+    unused
+    {
+        form NPD_Requests { icon = "business-bulb-61" }
+        form Request_Documents { icon = "files-folder-14" }
+        form Stage_Gate_Instances { icon = "business-progress" }
+        form Stage_Gate_Submissions { icon = "files-upload" }
+        form Submission_Documents { icon = "files-folder-upload" }
+        form Sample_Validation_Items { icon = "files-check" }
+        form Process_Audit_Log { icon = "files-time" }
+        form Process_Settings { icon = "files-settings-99" }
+        form Plants { icon = "business-factory" }
+        form Product_Lines { icon = "business-stock" }
+        form Gate_Routes { icon = "business-strategy" }
+        form Gate_Route_Steps { icon = "business-hierarchy-54" }
+        form Document_Requirements { icon = "files-single-content-03" }
+
+        report All_NPD_Requests { icon = "files-folder-19" }
+        report NPD_Pipeline { icon = "business-chart-growth" }
+        report All_Request_Documents { icon = "files-folder-15" }
+        report Stage_Gate_Board { icon = "business-board-30" }
+        report All_Stage_Gate_Submissions { icon = "files-folder-17" }
+        report All_Submission_Documents { icon = "files-folder-18" }
+        report Process_Audit_Trail { icon = "files-archive-check" }
+        report Process_Timeline { icon = "files-folder-time" }
+        report Process_Settings_Admin { icon = "files-settings-46" }
+        report All_Plants { icon = "business-building" }
+        report All_Product_Lines { icon = "files-box" }
+        report Gate_Routes_Admin { icon = "business-goal-65" }
+        report Gate_Route_Steps_Admin { icon = "business-hierarchy-53" }
+        report Document_Requirements_Admin { icon = "files-single-content-02" }
+    }
+
+    space NPD_Quality_Process
+    {
+        displayname = "NPD Quality Process"
+        icon = "business-goal-64"
+
+        section NPD_Workspace
+        {
+            displayname = "NPD Workspace"
+            icon = "business-chart"
+            page NPD_Dashboard { icon = "business-chart-pie-36" }
+            report My_NPD_Requests { icon = "files-folder-user" }
+        }
+
+        section Reviews_and_Approvals
+        {
+            displayname = "Reviews and Approvals"
+            icon = "business-signature"
+            report NPD_Approval_Queue { icon = "files-folder-check" }
+            report My_Review_Queue { icon = "files-user" }
+            report Submission_SLA_Calendar { icon = "business-agenda" }
+        }
+
+        section Stage_Gates
+        {
+            displayname = "Stage Gates"
+            icon = "business-hierarchy-54"
+            report Stage_Gate_Tracker { icon = "business-progress" }
+        }
+
+        section Validation_and_Documents
+        {
+            displayname = "Validation and Documents"
+            icon = "files-folder-check"
+            report Sample_Validation_Sheet { icon = "files-notebook" }
+        }
+
+        section Outcomes
+        {
+            displayname = "Outcomes"
+            icon = "business-award-48"
+            report Mass_Production_Queue { icon = "business-factory" }
+        }
+
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space,section,component}
+        }
+    }
+}
+

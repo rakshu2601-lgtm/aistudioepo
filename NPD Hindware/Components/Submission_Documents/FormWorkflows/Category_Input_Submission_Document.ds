@@ -1,0 +1,34 @@
+Category_Input_Submission_Document as "Category Input Submission Document"
+{
+    type = form
+    form = Submission_Documents
+    record event = on add or edit
+    description = "Shows the configured requirement only for Sourcing supporting documents."
+
+    on user input of Document_Category
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Document_Category == "Sourcing Supporting Document")
+                {
+                    show Document_Requirement;
+                    clear Document_Requirement;
+                    if(input.Stage_Gate_Submission != null)
+                    {
+                        submission_record = Stage_Gate_Submissions[ID == input.Stage_Gate_Submission];
+                        instance_record = Stage_Gate_Instances[ID == submission_record.Stage_Gate_Instance];
+                        allowed_requirements = Document_Requirements[Active == true && Scope == "Stage Gate" && Gate_Route_Step == instance_record.Gate_Route_Step] sort by Sort_Order;
+                        Document_Requirement:ui.add(allowed_requirements.ID.getall());
+                    }
+                }
+                else
+                {
+                    input.Document_Requirement = null;
+                    hide Document_Requirement;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,21 @@
+Load_Sample_Validation_Item as "Load Sample Validation Item"
+{
+    type = form
+    form = Sample_Validation_Items
+    record event = on add or edit
+    description = "Initializes the performing user for new sample validation items."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.ID == null && input.Performed_By == null)
+                {
+                    input.Performed_By = zoho.loginuser;
+                }
+            )
+        }
+    }
+}

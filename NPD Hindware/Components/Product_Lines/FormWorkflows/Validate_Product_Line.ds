@@ -1,0 +1,37 @@
+Validate_Product_Line as "Validate Product Line"
+{
+    type = form
+    form = Product_Lines
+    record event = on add or edit
+    description = "Prevents duplicate product line names within a plant and activation under an inactive plant"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                validation_failed = false;
+                duplicate_count = Product_Lines[Plant == input.Plant && Product_Line_Name == input.Product_Line_Name && ID != input.ID].count(ID);
+                if(duplicate_count > 0)
+                {
+                    alert(Product_Line_Name, "A product line with this name already exists for the selected plant.");
+                    validation_failed = true;
+                }
+                if(input.Active == true)
+                {
+                    inactive_plant_count = Plants[ID == input.Plant && Active == false].count(ID);
+                    if(inactive_plant_count > 0)
+                    {
+                        alert(Plant, "An active product line cannot be assigned to an inactive plant.");
+                        validation_failed = true;
+                    }
+                }
+                if(validation_failed == true)
+                {
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

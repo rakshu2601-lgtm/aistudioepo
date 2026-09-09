@@ -1,0 +1,19 @@
+Validate_New_Stage_Gate_Submission as "Validate New Stage Gate Submission"
+{
+    type = form
+    form = Stage_Gate_Submissions
+    record event = on add
+    description = "Prevents manual attempt creation; attempts are created only by controlled instance activation and rejection automation."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Stage gate attempts are system-created and cannot be added manually.";
+                cancel submit;
+            )
+        }
+    }
+}

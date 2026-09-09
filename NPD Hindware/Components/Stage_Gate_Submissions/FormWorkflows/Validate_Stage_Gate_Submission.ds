@@ -1,0 +1,152 @@
+Validate_Stage_Gate_Submission as "Validate Stage Gate Submission"
+{
+    type = form
+    form = Stage_Gate_Submissions
+    record event = on edit
+    description = "Enforces fixed actors, immutable terminal attempts, unique attempt numbers, required current-attempt documents, and decision evidence."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                validation_failed = false;
+                settings = Process_Settings[Active == true];
+                if(settings.count(ID) != 1)
+                {
+                    alert "Exactly one Active Process Settings record is required.";
+                    validation_failed = true;
+                }
+                else
+                {
+                    actor_email = zoho.loginuserid.toLowerCase();
+                    duplicate_attempts = Stage_Gate_Submissions[Stage_Gate_Instance == input.Stage_Gate_Instance && Attempt_Number == input.Attempt_Number && ID != input.ID].count(ID);
+                    if(duplicate_attempts > 0)
+                    {
+                        alert(Attempt_Number, "Attempt Number must be unique within the Stage Gate Instance.");
+                        validation_failed = true;
+                    }
+                    if(input.Attempt_Number <= 0)
+                    {
+                        alert(Attempt_Number, "Attempt Number must be greater than zero.");
+                        validation_failed = true;
+                    }
+                    if(old.Submission_Status == "Rejected by QA" || old.Submission_Status == "Rejected by Section Head" || old.Submission_Status == "Approved")
+                    {
+                        alert "Rejected and approved attempts are immutable historical records.";
+                        validation_failed = true;
+                    }
+
+                    protected_change = input.Stage_Gate_Instance != old.Stage_Gate_Instance || input.Attempt_Number != old.Attempt_Number || input.Previous_Attempt_Number != old.Previous_Attempt_Number || input.Copied_Observations != old.Copied_Observations || input.Applicable_Due_On != old.Applicable_Due_On || input.Sourcing_Submitted_By != old.Sourcing_Submitted_By || input.Sourcing_Submitted_On != old.Sourcing_Submitted_On || input.QA_Reviewed_By != old.QA_Reviewed_By || input.QA_Reviewed_On != old.QA_Reviewed_On || input.QA_Due_On != old.QA_Due_On || input.QA_Escalation_Sent != old.QA_Escalation_Sent || input.Section_Head_Decided_By != old.Section_Head_Decided_By || input.Section_Head_Decided_On != old.Section_Head_Decided_On || input.Section_Head_Due_On != old.Section_Head_Due_On || input.Section_Escalation_Sent != old.Section_Escalation_Sent;
+                    if(input.Submission_Status == old.Submission_Status && protected_change)
+                    {
+                        alert "Identity, copied observations, actor, timestamp, SLA, and escalation fields are system maintained.";
+                        validation_failed = true;
+                    }
+
+                    if(input.Submission_Status != old.Submission_Status)
+                    {
+                        if((old.Submission_Status == "Sourcing Draft" || old.Submission_Status == "Sourcing Rework") && input.Submission_Status == "QA Review")
+                        {
+                            if(actor_email != settings.Sourcing_User.email.toLowerCase())
+                            {
+                                alert "Only the configured Sourcing user may submit this attempt to QA.";
+                                validation_failed = true;
+                            }
+                            if(ifnull(input.Sourcing_Comments, "").trim().isEmpty())
+                            {
+                                alert(Sourcing_Comments, "Sourcing comments are required when submitting.");
+                                validation_failed = true;
+                            }
+                            if(old.Submission_Status == "Sourcing Rework" && ifnull(input.Response_to_Observations, "").trim().isEmpty())
+                            {
+                                alert(Response_to_Observations, "A response to the copied observations is required for rework.");
+                                validation_failed = true;
+                            }
+                            instance_record = Stage_Gate_Instances[ID == input.Stage_Gate_Instance];
+                            mandatory_requirements = Document_Requirements[Scope == "Stage Gate" && Gate_Route_Step == instance_record.Gate_Route_Step && Mandatory == true && Active == true];
+                            for each requirement_record in mandatory_requirements
+                            {
+                                matching_document_count = Submission_Documents[Stage_Gate_Submission == input.ID && Document_Category == "Sourcing Supporting Document" && Document_Requirement == requirement_record.ID].count(ID);
+                                if(matching_document_count == 0)
+                                {
+                                    alert "Upload a current-attempt document for every active mandatory requirement of this route step.";
+                                    validation_failed = true;
+                                }
+                            }
+                        }
+                        else if(old.Submission_Status == "QA Review" && (input.Submission_Status == "Section Head Review" || input.Submission_Status == "Rejected by QA"))
+                        {
+                            if(actor_email != settings.QA_Reviewer_User.email.toLowerCase())
+                            {
+                                alert "Only the configured QA Reviewer may complete QA review.";
+                                validation_failed = true;
+                            }
+                            qa_observations = ifnull(input.QA_Observations, "").trim();
+                            if(input.Submission_Status == "Rejected by QA" && qa_observations.isEmpty())
+                            {
+                                alert(QA_Observations, "QA observations are required when rejecting.");
+                                validation_failed = true;
+                            }
+                            if(input.Submission_Status == "Section Head Review")
+                            {
+                                qa_report_count = Submission_Documents[Stage_Gate_Submission == input.ID && Document_Category == "QA Validation Report"].count(ID);
+                                if(qa_report_count == 0)
+                                {
+                                    alert "Upload at least one QA Validation Report for this attempt before passing it.";
+                                    validation_failed = true;
+                                }
+                                if(qa_observations.toLowerCase() != "no observation" && qa_observations.length() < 10)
+                                {
+                                    alert(QA_Observations, "Enter No Observation or substantive QA observations.");
+                                    validation_failed = true;
+                                }
+                            }
+                        }
+                        else if(old.Submission_Status == "Section Head Review" && (input.Submission_Status == "Approved" || input.Submission_Status == "Rejected by Section Head"))
+                        {
+                            if(actor_email != settings.Section_Head_User.email.toLowerCase())
+                            {
+                                alert "Only the configured Section Head may decide this attempt.";
+                                validation_failed = true;
+                            }
+                            if(input.Submission_Status == "Rejected by Section Head" && ifnull(input.Section_Head_Observations, "").trim().isEmpty())
+                            {
+                                alert(Section_Head_Observations, "Section Head observations are required when rejecting.");
+                                validation_failed = true;
+                            }
+                        }
+                        else
+                        {
+                            alert "This status change is not an allowed stage-gate handoff.";
+                            validation_failed = true;
+                        }
+                    }
+                    else
+                    {
+                        if((old.Submission_Status == "Sourcing Draft" || old.Submission_Status == "Sourcing Rework") && actor_email != settings.Sourcing_User.email.toLowerCase())
+                        {
+                            alert "Only the configured Sourcing user may edit this attempt.";
+                            validation_failed = true;
+                        }
+                        else if(old.Submission_Status == "QA Review" && actor_email != settings.QA_Reviewer_User.email.toLowerCase())
+                        {
+                            alert "Only the configured QA Reviewer may edit this review.";
+                            validation_failed = true;
+                        }
+                        else if(old.Submission_Status == "Section Head Review" && actor_email != settings.Section_Head_User.email.toLowerCase())
+                        {
+                            alert "Only the configured Section Head may edit this review.";
+                            validation_failed = true;
+                        }
+                    }
+                }
+                if(validation_failed)
+                {
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

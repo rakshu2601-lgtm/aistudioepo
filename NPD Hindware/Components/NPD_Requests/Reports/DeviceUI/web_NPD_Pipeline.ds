@@ -1,0 +1,5 @@
+report NPD_Pipeline
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Request_Number Request_Title Plant Product_Line Process_Status Current_Stage_Gate ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Request_Number Request_Title Request_Owner Plant Product_Line Branch Process_Status Current_Stage_Gate Initial_QA_Due_On Target_Launch_Date ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

@@ -1,0 +1,54 @@
+Validate_NPD_Request as "Validate NPD Request"
+{
+    type = form
+    form = NPD_Requests
+    record event = on add
+    description = "Validates new-request ownership and plant, product-line, and route consistency."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                validation_failed = false;
+                settings = Process_Settings[Active == true];
+                if(settings.count(ID) != 1)
+                {
+                    alert "Exactly one Active Process Settings record is required.";
+                    validation_failed = true;
+                }
+                else
+                {
+                    if(input.Request_Owner.email.toLowerCase() != settings.NPD_Leader_User.email.toLowerCase())
+                    {
+                        alert(Request_Owner, "New requests must be owned by the configured NPD Leader.");
+                        validation_failed = true;
+                    }
+
+                    matching_product_line = Product_Lines[ID == input.Product_Line && Plant == input.Plant && Active == true].count(ID);
+                    if(matching_product_line != 1)
+                    {
+                        alert(Product_Line, "Select an active product line belonging to the selected plant.");
+                        validation_failed = true;
+                    }
+
+                    if(input.Gate_Route != null)
+                    {
+                        selected_route_count = Gate_Routes[ID == input.Gate_Route && Plant == input.Plant && Product_Line == input.Product_Line].count(ID);
+                        if(selected_route_count != 1)
+                        {
+                            alert(Gate_Route, "The snapshotted route does not match the selected plant and product line.");
+                            validation_failed = true;
+                        }
+                    }
+                }
+
+                if(validation_failed)
+                {
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

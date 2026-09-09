@@ -1,0 +1,74 @@
+Stage_Gate_Submission_SLA as "Stage Gate Submission SLA"
+{
+    type = schedule
+    form = Stage_Gate_Submissions[Applicable_Due_On != null && Applicable_Due_On < zoho.currentdate && (Submission_Status == "QA Review" || Submission_Status == "Section Head Review")]
+    start = Applicable_Due_On at "09:00:00"
+    frequency = daily
+    time zone = "Asia/Kolkata"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                settings = Process_Settings[Active == true];
+                if(settings.count(ID) == 1)
+                {
+                    recipient_email = settings.QA_Reviewer_User.email;
+                    manager_email = settings.QA_Review_Manager_Email;
+                    due_date = input.QA_Due_On;
+                    escalation_sent = input.QA_Escalation_Sent;
+                    if(input.Submission_Status == "Section Head Review")
+                    {
+                        recipient_email = settings.Section_Head_User.email;
+                        manager_email = settings.Section_Head_Manager_Email;
+                        due_date = input.Section_Head_Due_On;
+                        escalation_sent = input.Section_Escalation_Sent;
+                    }
+                    sendmail
+                    (
+                        from : zoho.adminuserid
+                        to : recipient_email
+                        subject : "Overdue stage gate review: attempt " + input.Attempt_Number
+                        message : "Submission " + input.Submission_Number + " remains in " + input.Submission_Status + ". Due date: " + due_date + "."
+                    )
+                    overdue_working_days = due_date.workDaysBetween(zoho.currentdate);
+                    if(escalation_sent == false && overdue_working_days > 0 && manager_email != null)
+                    {
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : manager_email
+                            cc : recipient_email
+                            subject : "Escalation: stage gate SLA exceeded for attempt " + input.Attempt_Number
+                            message : "Submission " + input.Submission_Number + " has exceeded the configured " + settings.Review_SLA_Working_Days + "-working-day SLA in " + input.Submission_Status + "."
+                        )
+                        if(input.Submission_Status == "QA Review")
+                        {
+                            input.QA_Escalation_Sent = true;
+                        }
+                        else
+                        {
+                            input.Section_Escalation_Sent = true;
+                        }
+                        instance_record = Stage_Gate_Instances[ID == input.Stage_Gate_Instance];
+                        audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = instance_record.NPD_Request
+                            Stage_Gate_Instance = input.Stage_Gate_Instance
+                            Stage_Gate_Submission = input.ID
+                            Event_Type = "Escalated"
+                            Action_Name = "Stage Gate Review SLA Escalation"
+                            From_Status = input.Submission_Status
+                            To_Status = input.Submission_Status
+                            Performed_By_Email = zoho.adminuserid
+                            Performed_On = zoho.currenttime
+                            Event_Details = "One-time manager escalation sent after the configured SLA was exceeded."
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

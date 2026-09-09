@@ -1,0 +1,19 @@
+default list Process_Settings_Admin
+{
+    displayName = "Process Settings Admin"
+    show all rows from Process_Settings
+    (
+        Configuration_Name
+        NPD_Leader_User
+        QA_Reviewer_User
+        QA_Head_User
+        Sourcing_User
+        Section_Head_User
+        QA_Review_Manager_Email
+        Section_Head_Manager_Email
+        QA_Head_Manager_Email
+        Review_SLA_Working_Days
+        Final_Notification_Emails
+        Active
+    )
+}

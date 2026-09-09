@@ -1,0 +1,41 @@
+list Mass_Production_Queue
+{
+    displayName = "Mass Production Queue"
+    show all rows from NPD_Requests [Process_Status == "Mass Production"]
+    (
+        Request_Number
+        Request_Title
+        Request_Owner
+        Plant
+        Product_Line
+        Branch
+        Product_Name
+        Product_Category
+        Development_Type
+        Process_Status
+        Current_Stage_Gate
+        Target_Launch_Date
+        Mass_Production_Released_On
+    )
+    filters
+    (
+        Plant
+        Product_Line
+        Branch
+        Process_Status
+    )
+    sort by
+    (
+        Mass_Production_Released_On descending
+        Request_Number ascending
+    )
+    conditional formatting
+    (
+        "Released"
+        {
+            condition = (Process_Status == "Mass Production")
+            fields = [Request_Number, Request_Title, Process_Status, Mass_Production_Released_On]
+            format = "background-color:#DFF3E4;color:#176B34;font-weight:bold"
+        }
+    )
+}

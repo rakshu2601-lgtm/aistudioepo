@@ -1,0 +1,36 @@
+kanban NPD_Pipeline
+{
+    displayName = "NPD Pipeline"
+    show all rows from NPD_Requests
+    (
+        Request_Number
+        Request_Title
+        Request_Owner
+        Plant
+        Product_Line
+        Branch
+        Process_Status
+        Current_Stage_Gate
+        Initial_QA_Due_On
+        Target_Launch_Date
+    )
+    filters
+    (
+        Plant
+        Product_Line
+        Branch
+        Process_Status
+    )
+    sort by
+    (
+        Initial_QA_Due_On ascending
+        Request_Number ascending
+    )
+    options
+    (
+        display field = Process_Status
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

@@ -1,0 +1,17 @@
+customize
+{
+    layout = slidingpane
+    font = "lato"
+    style = "3"
+    color options
+    {
+        name = "NPD Quality Teal"
+        brand color = "#0F766E"
+        type = "custom"
+        dark mode color = "#2DD4BF"
+    }
+    logo
+    {
+        preference = "app_icon"
+    }
+}

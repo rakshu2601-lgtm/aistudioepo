@@ -1,0 +1,30 @@
+default list All_Plants
+{
+    displayName = "All Plants"
+    show all rows from Plants
+    (
+        Plant_Code
+        Plant_Name
+        Branch
+        Active
+        Notes
+    )
+    filters
+    (
+        Branch
+        Active
+    )
+    sort by
+    (
+        Plant_Name ascending
+    )
+    conditional formatting
+    (
+        "Highlight Inactive Plants"
+        {
+            condition = (Active == false)
+            fields = [Plant_Code, Plant_Name, Branch, Active, Notes]
+            format = "background-color:#FDECEC;color:#9B1C1C"
+        }
+    )
+}

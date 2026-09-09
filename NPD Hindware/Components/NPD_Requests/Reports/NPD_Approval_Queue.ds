@@ -1,0 +1,42 @@
+list NPD_Approval_Queue
+{
+    displayName = "NPD Approval Queue"
+    show all rows from NPD_Requests [Process_Status == "Initial QA Review" || Process_Status == "Initial QA Head Approval" || Process_Status == "Final QA Head Approval"]
+    (
+        Request_Number
+        Request_Title
+        Request_Owner
+        Plant
+        Product_Line
+        Branch
+        Process_Status
+        Current_Stage_Gate
+        Submitted_On
+        Initial_QA_Due_On
+        Initial_QA_Reviewer
+        Initial_QA_Head_User
+        Final_QA_Head_User
+    )
+    filters
+    (
+        Plant
+        Product_Line
+        Branch
+        Process_Status
+        "Overdue" : (Initial_QA_Due_On < zoho.currentdate)
+    )
+    sort by
+    (
+        Initial_QA_Due_On ascending
+        Submitted_On ascending
+    )
+    conditional formatting
+    (
+        "Overdue"
+        {
+            condition = (Initial_QA_Due_On < zoho.currentdate)
+            fields = [Request_Number, Request_Title, Process_Status, Initial_QA_Due_On]
+            format = "background-color:#FDE2E2;color:#A61B1B;font-weight:bold"
+        }
+    )
+}

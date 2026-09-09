@@ -1,0 +1,111 @@
+"Management Viewer"
+{
+    name        = "Management Viewer"
+    type        = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false }
+    description = "Organization-wide read-only operational, audit, and dashboard access with no transitions."
+
+    ModulePermissions
+    {
+        Process_Settings
+        {
+            allFieldsVisible = false
+        }
+        Plants
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions { All_Plants={"View"} }
+        }
+        Product_Lines
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions { All_Product_Lines={"View"} }
+        }
+        Gate_Routes
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions { Gate_Routes_Admin={"View"} }
+        }
+        Gate_Route_Steps
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions { Gate_Route_Steps_Admin={"View"} }
+        }
+        Document_Requirements
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions { Document_Requirements_Admin={"View"} }
+        }
+        NPD_Requests
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_NPD_Requests={"View"}
+                My_NPD_Requests={"View"}
+                NPD_Pipeline={"View"}
+                NPD_Approval_Queue={"View"}
+                Mass_Production_Queue={"View"}
+            }
+        }
+        Request_Documents
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions { All_Request_Documents={"View"} }
+        }
+        Sample_Validation_Items
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions { Sample_Validation_Sheet={"View"} }
+        }
+        Stage_Gate_Instances
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Stage_Gate_Tracker={"View"}
+                Stage_Gate_Board={"View"}
+            }
+        }
+        Stage_Gate_Submissions
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Stage_Gate_Submissions={"View"}
+                My_Review_Queue={"View"}
+                Submission_SLA_Calendar={"View"}
+            }
+        }
+        Submission_Documents
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions { All_Submission_Documents={"View"} }
+        }
+        Process_Audit_Log
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Process_Audit_Trail={"View"}
+                Process_Timeline={"View"}
+            }
+        }
+        NPD_Dashboard
+        {
+            enabled = tab
+        }
+    }
+}

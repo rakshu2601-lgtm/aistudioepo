@@ -1,0 +1,26 @@
+NPD_Request_Input_Request_Document as "NPD Request Input Request Document"
+{
+    type = form
+    form = Request_Documents
+    record event = on add
+    description = "Refreshes eligible active initial-request requirements for the selected request route"
+
+    on user input of NPD_Request
+    {
+        actions
+        {
+            custom deluge script
+            (
+                clear Document_Requirement;
+                input.Document_Requirement = null;
+                input.Version_Number = 1;
+                if(input.NPD_Request != null)
+                {
+                    request_record = NPD_Requests[ID == input.NPD_Request];
+                    allowed_requirements = Document_Requirements[Active == true && Scope == "Initial Request" && Gate_Route == request_record.Gate_Route] sort by Sort_Order;
+                    Document_Requirement:ui.add(allowed_requirements.ID.getall());
+                }
+            )
+        }
+    }
+}

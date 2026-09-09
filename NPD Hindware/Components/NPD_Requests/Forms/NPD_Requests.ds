@@ -1,0 +1,359 @@
+form NPD_Requests
+{
+    displayname = "NPD Requests"
+    record owner = Request_Owner
+
+    Request_Identity
+    (
+        type = section
+        displayname = "Request Identity"
+        row = 1
+        column = 0
+    )
+    Request_Number
+    (
+        type = autonumber
+        displayname = "Request Number"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Request_Title
+    (
+        type = text
+        displayname = "Request Title"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Request_Owner
+    (
+        type = picklist
+        displayname = "Request Owner"
+        module = users
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Plant
+    (
+        type = picklist
+        values = Plants.ID
+        displayformat = [Plant_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Product_Line
+    (
+        type = picklist
+        displayname = "Product Line"
+        values = Product_Lines.ID
+        displayformat = [Product_Line_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Gate_Route
+    (
+        type = picklist
+        displayname = "Gate Route"
+        values = Gate_Routes.ID
+        displayformat = [Route_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Branch
+    (
+        type = text
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    Basic_Information
+    (
+        type = section
+        displayname = "Basic Information"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Product_Name
+    (
+        type = text
+        displayname = "Product Name"
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Product_Category
+    (
+        type = text
+        displayname = "Product Category"
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Development_Type
+    (
+        type = radiobuttons
+        displayname = "Development Type"
+        values = {"New Product", "Product Modification"}
+        layout = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+    Customer_or_Market
+    (
+        type = text
+        displayname = "Customer or Market"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Target_Launch_Date
+    (
+        type = date
+        displayname = "Target Launch Date"
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Product_Description
+    (
+        type = textarea
+        displayname = "Product Description"
+        height = 100px
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Business_Justification
+    (
+        type = textarea
+        displayname = "Business Justification"
+        height = 100px
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    Lifecycle
+    (
+        type = section
+        displayname = "Lifecycle and Decisions"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Process_Status
+    (
+        type = picklist
+        displayname = "Process Status"
+        values = {"Draft", "Initial QA Review", "NPD Rework", "Initial QA Head Approval", "Stage Gates In Progress", "Final QA Head Approval", "Mass Production", "Terminated"}
+        initial value = "Draft"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Current_Stage_Gate
+    (
+        type = text
+        displayname = "Current Stage Gate"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Submitted_On
+    (
+        type = datetime
+        displayname = "Submitted On"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Initial_QA_Due_On
+    (
+        type = date
+        displayname = "Current Review Due On"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Initial_QA_Decision
+    (
+        type = radiobuttons
+        displayname = "Initial QA Decision"
+        values = {"Pass", "Not Pass"}
+        layout = 2
+        row = 3
+        column = 1
+        width = medium
+    )
+    Initial_QA_Observations
+    (
+        type = textarea
+        displayname = "Initial QA Observations"
+        height = 100px
+        row = 3
+        column = 1
+        width = medium
+    )
+    Initial_QA_Reviewer
+    (
+        type = picklist
+        displayname = "Initial QA Reviewer"
+        module = users
+        row = 3
+        column = 1
+        width = medium
+    )
+    Initial_QA_Reviewed_On
+    (
+        type = datetime
+        displayname = "Initial QA Reviewed On"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Initial_QA_Head_Decision
+    (
+        type = radiobuttons
+        displayname = "Initial QA Head Decision"
+        values = {"Approved", "Rejected"}
+        layout = 2
+        row = 3
+        column = 2
+        width = medium
+    )
+    Initial_QA_Head_Observations
+    (
+        type = textarea
+        displayname = "Initial QA Head Observations"
+        height = 100px
+        row = 3
+        column = 2
+        width = medium
+    )
+    Initial_QA_Head_User
+    (
+        type = picklist
+        displayname = "Initial QA Head User"
+        module = users
+        row = 3
+        column = 2
+        width = medium
+    )
+    Initial_QA_Head_Decided_On
+    (
+        type = datetime
+        displayname = "Initial QA Head Decided On"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Final_QA_Head_Decision
+    (
+        type = radiobuttons
+        displayname = "Final QA Head Decision"
+        values = {"Approved", "Rejected"}
+        layout = 2
+        row = 3
+        column = 2
+        width = medium
+    )
+    Final_QA_Head_Observations
+    (
+        type = textarea
+        displayname = "Final QA Head Observations"
+        height = 100px
+        row = 3
+        column = 2
+        width = medium
+    )
+    Final_QA_Head_User
+    (
+        type = picklist
+        displayname = "Final QA Head User"
+        module = users
+        row = 3
+        column = 2
+        width = medium
+    )
+    Final_QA_Head_Decided_On
+    (
+        type = datetime
+        displayname = "Final QA Head Decided On"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Mass_Production_Released_On
+    (
+        type = datetime
+        displayname = "Mass Production Released On"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Termination_Reason
+    (
+        type = textarea
+        displayname = "Termination Reason"
+        height = 100px
+        row = 3
+        column = 2
+        width = medium
+    )
+    Escalation_Sent
+    (
+        type = checkbox
+        displayname = "Escalation Sent"
+        initial value = false
+        row = 3
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Draft"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Request"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+
+    blueprint components
+    {
+        stages = {"Draft", "Initial QA Review", "NPD Rework", "Initial QA Head Approval", "Stage Gates In Progress", "Final QA Head Approval", "Mass Production", "Terminated"}
+    }
+}

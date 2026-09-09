@@ -1,0 +1,24 @@
+Gate_Route_Input_Document_Requirement as "Gate Route Input Document Requirement"
+{
+    type = form
+    form = Document_Requirements
+    record event = on add or edit
+    description = "Filters route-step choices to steps belonging to the selected route"
+
+    on user input of Gate_Route
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Gate_Route_Step = null;
+                clear Gate_Route_Step;
+                if(input.Gate_Route != null)
+                {
+                    route_steps = Gate_Route_Steps[Gate_Route == input.Gate_Route] sort by Sequence_Number;
+                    Gate_Route_Step:ui.add(route_steps.ID.getall());
+                }
+            )
+        }
+    }
+}

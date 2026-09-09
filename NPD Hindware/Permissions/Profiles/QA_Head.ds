@@ -1,0 +1,150 @@
+"QA Head"
+{
+    name        = "QA Head"
+    type        = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false }
+    description = "Executes only initial and final QA Head gates and otherwise has read-only operational and audit access."
+
+    ModulePermissions
+    {
+        Process_Settings
+        {
+            allFieldsVisible = false
+        }
+        Plants
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions { All_Plants={"View"} }
+        }
+        Product_Lines
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions { All_Product_Lines={"View"} }
+        }
+        Gate_Routes
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions { Gate_Routes_Admin={"View"} }
+        }
+        Gate_Route_Steps
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions { Gate_Route_Steps_Admin={"View"} }
+        }
+        Document_Requirements
+        {
+            enabled = Viewall,View,Search
+            allFieldsVisible = true
+            ReportPermissions { Document_Requirements_Admin={"View"} }
+        }
+        NPD_Requests
+        {
+            enabled = Viewall,Modifyall,View,Edit,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                All_NPD_Requests={"View"}
+                My_NPD_Requests={"View"}
+                NPD_Pipeline={"View"}
+                NPD_Approval_Queue={"View"}
+                Mass_Production_Queue={"View"}
+            }
+            FieldPermissions
+            {
+                Request_Identity{visibility:true,readonly:true}
+                Request_Number{visibility:true,readonly:true}
+                Request_Title{visibility:true,readonly:true}
+                Request_Owner{visibility:true,readonly:true}
+                Plant{visibility:true,readonly:true}
+                Product_Line{visibility:true,readonly:true}
+                Gate_Route{visibility:true,readonly:true}
+                Branch{visibility:true,readonly:true}
+                Basic_Information{visibility:true,readonly:true}
+                Product_Name{visibility:true,readonly:true}
+                Product_Category{visibility:true,readonly:true}
+                Development_Type{visibility:true,readonly:true}
+                Customer_or_Market{visibility:true,readonly:true}
+                Target_Launch_Date{visibility:true,readonly:true}
+                Product_Description{visibility:true,readonly:true}
+                Business_Justification{visibility:true,readonly:true}
+                Lifecycle{visibility:true,readonly:true}
+                Process_Status{visibility:true,readonly:true}
+                Current_Stage_Gate{visibility:true,readonly:true}
+                Submitted_On{visibility:true,readonly:true}
+                Initial_QA_Due_On{visibility:true,readonly:true}
+                Initial_QA_Decision{visibility:true,readonly:true}
+                Initial_QA_Observations{visibility:true,readonly:true}
+                Initial_QA_Reviewer{visibility:true,readonly:true}
+                Initial_QA_Reviewed_On{visibility:true,readonly:true}
+                Initial_QA_Head_Decision{visibility:true,readonly:false}
+                Initial_QA_Head_Observations{visibility:true,readonly:false}
+                Initial_QA_Head_User{visibility:true,readonly:true}
+                Initial_QA_Head_Decided_On{visibility:true,readonly:true}
+                Final_QA_Head_Decision{visibility:true,readonly:false}
+                Final_QA_Head_Observations{visibility:true,readonly:false}
+                Final_QA_Head_User{visibility:true,readonly:true}
+                Final_QA_Head_Decided_On{visibility:true,readonly:true}
+                Mass_Production_Released_On{visibility:true,readonly:true}
+                Termination_Reason{visibility:true,readonly:false}
+                Escalation_Sent{visibility:false}
+            }
+        }
+        Request_Documents
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions { All_Request_Documents={"View"} }
+        }
+        Sample_Validation_Items
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions { Sample_Validation_Sheet={"View"} }
+        }
+        Stage_Gate_Instances
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Stage_Gate_Tracker={"View"}
+                Stage_Gate_Board={"View"}
+            }
+        }
+        Stage_Gate_Submissions
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Stage_Gate_Submissions={"View"}
+                My_Review_Queue={"View"}
+                Submission_SLA_Calendar={"View"}
+            }
+        }
+        Submission_Documents
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions { All_Submission_Documents={"View"} }
+        }
+        Process_Audit_Log
+        {
+            enabled = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Process_Audit_Trail={"View"}
+                Process_Timeline={"View"}
+            }
+        }
+        NPD_Dashboard
+        {
+            enabled = tab
+        }
+    }
+}

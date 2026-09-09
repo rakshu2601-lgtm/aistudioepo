@@ -1,0 +1,70 @@
+Validate_Gate_Route_Step as "Validate Gate Route Step"
+{
+    type = form
+    form = Gate_Route_Steps
+    record event = on add or edit
+    description = "Validates positive and route-unique step values, final-gate eligibility, and protected in-flight route configuration."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                validation_failed = false;
+
+                if(input.Sequence_Number == null || input.Sequence_Number <= 0)
+                {
+                    alert "Sequence Number must be greater than zero.";
+                    validation_failed = true;
+                }
+
+                duplicate_stage_count = Gate_Route_Steps[Gate_Route == input.Gate_Route && Stage_Gate == input.Stage_Gate && ID != input.ID].count(ID);
+                if(duplicate_stage_count > 0)
+                {
+                    alert "The selected Stage Gate already exists for this route.";
+                    validation_failed = true;
+                }
+
+                duplicate_sequence_count = Gate_Route_Steps[Gate_Route == input.Gate_Route && Sequence_Number == input.Sequence_Number && ID != input.ID].count(ID);
+                if(duplicate_sequence_count > 0)
+                {
+                    alert "The Sequence Number already exists for this route.";
+                    validation_failed = true;
+                }
+
+                if(input.Final_Gate == true && input.Stage_Gate != "N30" && input.Stage_Gate != "N50")
+                {
+                    alert "Only N30 or N50 can be marked as the Final Gate.";
+                    validation_failed = true;
+                }
+
+                route_is_active = Gate_Routes[ID == input.Gate_Route && Status == "Active"].count(ID) > 0;
+                in_flight_request_count = NPD_Requests[Gate_Route == input.Gate_Route && (Process_Status == "Initial QA Review" || Process_Status == "NPD Rework" || Process_Status == "Initial QA Head Approval" || Process_Status == "Stage Gates In Progress" || Process_Status == "Final QA Head Approval")].count(ID);
+                if(route_is_active && in_flight_request_count > 0)
+                {
+                    alert "Steps cannot be changed while this Active route is referenced by an in-flight request.";
+                    validation_failed = true;
+                }
+
+                persisted_step = Gate_Route_Steps[ID == input.ID];
+                if(persisted_step.count() > 0 && persisted_step.Gate_Route != input.Gate_Route)
+                {
+                    persisted_route_id = persisted_step.Gate_Route;
+                    persisted_route_is_active = Gate_Routes[ID == persisted_route_id && Status == "Active"].count(ID) > 0;
+                    persisted_in_flight_count = NPD_Requests[Gate_Route == persisted_route_id && (Process_Status == "Initial QA Review" || Process_Status == "NPD Rework" || Process_Status == "Initial QA Head Approval" || Process_Status == "Stage Gates In Progress" || Process_Status == "Final QA Head Approval")].count(ID);
+                    if(persisted_route_is_active && persisted_in_flight_count > 0)
+                    {
+                        alert "This step cannot be moved from an Active route that is referenced by an in-flight request.";
+                        validation_failed = true;
+                    }
+                }
+
+                if(validation_failed == true)
+                {
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

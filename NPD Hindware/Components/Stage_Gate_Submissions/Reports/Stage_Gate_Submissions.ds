@@ -1,0 +1,67 @@
+default list All_Stage_Gate_Submissions
+{
+    displayName = "Stage Gate Submissions"
+    show all rows from Stage_Gate_Submissions
+    (
+        Submission_Number
+        Stage_Gate_Instance
+        Attempt_Number
+        Previous_Attempt_Number
+        Submission_Status
+        Sourcing_Comments
+        Response_to_Observations
+        Copied_Observations
+        Sourcing_Submitted_By
+        Sourcing_Submitted_On
+        QA_Decision
+        QA_Observations
+        QA_Reviewed_By
+        QA_Reviewed_On
+        QA_Due_On
+        Section_Head_Decision
+        Section_Head_Observations
+        Section_Head_Decided_By
+        Section_Head_Decided_On
+        Section_Head_Due_On
+    )
+    filters
+    (
+        Stage_Gate_Instance
+        Submission_Status
+        Sourcing_Submitted_By
+        QA_Reviewed_By
+        Section_Head_Decided_By
+    )
+    sort by
+    (
+        Submission_Number descending
+        Attempt_Number descending
+    )
+    conditional formatting
+    (
+        "Rework Attempt"
+        {
+            condition = (Submission_Status == "Sourcing Rework")
+            fields = [Submission_Number, Attempt_Number, Submission_Status]
+            format = "background-color:#FFF4D6;color:#8A5A00;font-weight:bold"
+        }
+        "Overdue Review"
+        {
+            condition = ((Submission_Status == "QA Review" && QA_Due_On < zoho.currentdate) || (Submission_Status == "Section Head Review" && Section_Head_Due_On < zoho.currentdate))
+            fields = [Submission_Number, Submission_Status, QA_Due_On, Section_Head_Due_On]
+            format = "background-color:#FFE3E3;color:#B42318;font-weight:bold"
+        }
+        "Rejected Attempt"
+        {
+            condition = (Submission_Status == "Rejected by QA" || Submission_Status == "Rejected by Section Head")
+            fields = [Submission_Number, Attempt_Number, Submission_Status]
+            format = "background-color:#FDECEC;color:#9B1C1C"
+        }
+        "Approved Attempt"
+        {
+            condition = (Submission_Status == "Approved")
+            fields = [Submission_Number, Attempt_Number, Submission_Status]
+            format = "background-color:#E7F6EC;color:#176B37;font-weight:bold"
+        }
+    )
+}

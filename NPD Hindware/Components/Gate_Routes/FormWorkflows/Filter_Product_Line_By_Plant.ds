@@ -1,0 +1,24 @@
+Filter_Product_Line_By_Plant as "Filter Product Line by Plant"
+{
+    type = form
+    form = Gate_Routes
+    record event = on add or edit
+    description = "Clears Product Line and limits its choices to product lines belonging to the selected plant."
+
+    on user input of Plant
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Product_Line = null;
+                clear Product_Line;
+                if(input.Plant != null)
+                {
+                    matching_product_lines = Product_Lines[Plant == input.Plant] sort by Product_Line_Name;
+                    Product_Line:ui.add(matching_product_lines.ID.getall());
+                }
+            )
+        }
+    }
+}

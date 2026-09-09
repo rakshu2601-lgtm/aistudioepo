@@ -1,0 +1,5 @@
+report Sample_Validation_Sheet
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( NPD_Request Sequence_Number Check_Category Checkpoint Result ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on tap ( View Record ) on long press ( Edit Delete Duplicate View Record ) on left swipe ( Delete ) on right swipe ( Edit ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( NPD_Request Sequence_Number Check_Category Checkpoint Specification_or_Acceptance_Criteria Observed_Value Result Remarks Evidence_File Performed_By Performed_On ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

@@ -1,0 +1,22 @@
+Load_Stage_Gate_Instance as "Load Stage Gate Instance"
+{
+    type = form
+    form = Stage_Gate_Instances
+    record event = on add or edit
+    description = "Makes system-controlled gate instance fields read-only for ordinary users."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                is_administrator = thisapp.permissions.isUserInProfile("Administrator");
+                if(is_administrator == false)
+                {
+                    disable NPD_Request, Gate_Route_Step, Stage_Gate, Sequence_Number, Final_Gate, Gate_Status, Activated_On, Completed_On, Latest_Attempt_Number, Sourcing_User, QA_Reviewer_User, Section_Head_User;
+                }
+            )
+        }
+    }
+}

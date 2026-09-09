@@ -1,0 +1,89 @@
+Validate_Request_Document as "Validate Request Document"
+{
+    type = form
+    form = Request_Documents
+    record event = on add or edit
+    description = "Allows controlled owner uploads in Draft or NPD Rework and preserves immutable document versions"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                validation_failed = false;
+                if(input.ID != null)
+                {
+                    existing_document = Request_Documents[ID == input.ID];
+                    if(input.NPD_Request != existing_document.NPD_Request || input.Document_Requirement != existing_document.Document_Requirement || input.Document_Name != existing_document.Document_Name || input.Document_File != existing_document.Document_File || input.Version_Number != existing_document.Version_Number || input.Current_Version != existing_document.Current_Version || input.Uploaded_By != existing_document.Uploaded_By || input.Uploaded_On != existing_document.Uploaded_On)
+                    {
+                        alert "Uploaded document versions are immutable. Add a new row for a replacement; only Remarks may be edited.";
+                        validation_failed = true;
+                    }
+                }
+                else
+                {
+                    request_count = NPD_Requests[ID == input.NPD_Request].count(ID);
+                    if(request_count == 0)
+                    {
+                        alert(NPD_Request, "Select a valid NPD request.");
+                        validation_failed = true;
+                    }
+                    else
+                    {
+                        request_record = NPD_Requests[ID == input.NPD_Request];
+                        if(request_record.Process_Status != "Draft" && request_record.Process_Status != "NPD Rework")
+                        {
+                            alert(NPD_Request, "Documents may be added only while the request is in Draft or NPD Rework.");
+                            validation_failed = true;
+                        }
+
+                        requirement_count = Document_Requirements[ID == input.Document_Requirement && Active == true && Scope == "Initial Request" && Gate_Route == request_record.Gate_Route].count(ID);
+                        if(requirement_count == 0)
+                        {
+                            alert(Document_Requirement, "Select an active Initial Request requirement configured for this request route.");
+                            validation_failed = true;
+                        }
+
+                        settings_count = Process_Settings[Active == true].count(ID);
+                        if(settings_count != 1)
+                        {
+                            alert "Exactly one active process settings record is required before uploading documents.";
+                            validation_failed = true;
+                        }
+                        else
+                        {
+                            active_settings = Process_Settings[Active == true];
+                            if(request_record.Request_Owner.email.toLowerCase() != zoho.loginuserid.toLowerCase() || active_settings.NPD_Leader_User.email.toLowerCase() != zoho.loginuserid.toLowerCase())
+                            {
+                                alert "Only the request owner who is the configured NPD leader may upload request documents.";
+                                validation_failed = true;
+                            }
+                        }
+
+                        expected_version = 1;
+                        prior_version_count = Request_Documents[NPD_Request == input.NPD_Request && Document_Requirement == input.Document_Requirement].count(ID);
+                        if(prior_version_count > 0)
+                        {
+                            prior_max_version = Request_Documents[NPD_Request == input.NPD_Request && Document_Requirement == input.Document_Requirement].maximum(Version_Number);
+                            expected_version = prior_max_version + 1;
+                        }
+                        if(input.Version_Number == null || input.Version_Number <= 0 || input.Version_Number != expected_version)
+                        {
+                            alert(Version_Number, "Version Number must be the next positive version: " + expected_version + ".");
+                            validation_failed = true;
+                        }
+
+                        input.Uploaded_By = zoho.loginuser;
+                        input.Uploaded_On = zoho.currenttime;
+                        input.Current_Version = true;
+                    }
+                }
+                if(validation_failed)
+                {
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

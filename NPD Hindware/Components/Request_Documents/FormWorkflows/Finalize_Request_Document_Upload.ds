@@ -1,0 +1,33 @@
+Finalize_Request_Document_Upload as "Finalize Request Document Upload"
+{
+    type = form
+    form = Request_Documents
+    record event = on add
+    description = "Retires older current flags and audits the new upload without deleting prior versions"
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                older_versions = Request_Documents[ID != input.ID && NPD_Request == input.NPD_Request && Document_Requirement == input.Document_Requirement && Current_Version == true];
+                for each older_version in older_versions
+                {
+                    older_version.Current_Version = false;
+                }
+
+                audit_details = "Document Requirement ID: " + input.Document_Requirement + "; Document Name: " + input.Document_Name + "; Version: " + input.Version_Number + "; Request Document ID: " + input.ID;
+                audit_id = insert into Process_Audit_Log
+                [
+                    NPD_Request = input.NPD_Request
+                    Event_Type = "Document Uploaded"
+                    Action_Name = "Initial Request Document Uploaded"
+                    Performed_By_Email = zoho.loginuserid
+                    Performed_On = zoho.currenttime
+                    Event_Details = audit_details
+                ];
+            )
+        }
+    }
+}

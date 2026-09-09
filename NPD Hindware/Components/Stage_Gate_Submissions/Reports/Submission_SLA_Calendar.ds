@@ -1,0 +1,41 @@
+calendar Submission_SLA_Calendar
+{
+    displayName = "Submission SLA Calendar"
+    show all rows from Stage_Gate_Submissions[Applicable_Due_On != null && (Submission_Status == "QA Review" || Submission_Status == "Section Head Review")]
+    (
+        Submission_Number
+        Stage_Gate_Instance
+        Attempt_Number
+        Submission_Status
+        Applicable_Due_On
+        QA_Due_On
+        Section_Head_Due_On
+    )
+    filters
+    (
+        Submission_Status
+        Stage_Gate_Instance
+    )
+    options
+    (
+        display type = month
+        week start day = monday
+        display field = Submission_Number
+        start date = Applicable_Due_On
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+    conditional formatting
+    (
+        "Overdue Review"
+        {
+            condition = (Applicable_Due_On < zoho.currentdate)
+            fields = [Submission_Number, Submission_Status, Applicable_Due_On]
+            format = "background-color:#FFE3E3;color:#B42318;font-weight:bold"
+        }
+    )
+}

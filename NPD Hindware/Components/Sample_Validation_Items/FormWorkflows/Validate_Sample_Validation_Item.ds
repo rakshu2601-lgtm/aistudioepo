@@ -1,0 +1,85 @@
+Validate_Sample_Validation_Item as "Validate Sample Validation Item"
+{
+    type = form
+    form = Sample_Validation_Items
+    record event = on add or edit
+    description = "Validates sequence, outcome remarks, request ownership and state, and the configured NPD leader."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                validation_failed = false;
+
+                if(input.Sequence_Number == null || input.Sequence_Number <= 0)
+                {
+                    alert(Sequence_Number, "Sequence Number must be greater than zero.");
+                    validation_failed = true;
+                }
+
+                if(input.NPD_Request != null)
+                {
+                    duplicate_sequence_count = Sample_Validation_Items[NPD_Request == input.NPD_Request && Sequence_Number == input.Sequence_Number && ID != input.ID].count(ID);
+                    if(duplicate_sequence_count > 0)
+                    {
+                        alert(Sequence_Number, "This sequence number already exists for the selected NPD request.");
+                        validation_failed = true;
+                    }
+
+                    request_count = NPD_Requests[ID == input.NPD_Request].count(ID);
+                    if(request_count == 0)
+                    {
+                        alert(NPD_Request, "Select a valid NPD request.");
+                        validation_failed = true;
+                    }
+                    else
+                    {
+                        request_record = NPD_Requests[ID == input.NPD_Request];
+                        if(request_record.Process_Status != "Draft" && request_record.Process_Status != "NPD Rework")
+                        {
+                            alert(NPD_Request, "Validation items can be added or edited only while the request is in Draft or NPD Rework.");
+                            validation_failed = true;
+                        }
+                        if(request_record.Request_Owner.email.toLowerCase() != zoho.loginuserid.toLowerCase())
+                        {
+                            alert "Only the request owner can add or edit validation items for this request.";
+                            validation_failed = true;
+                        }
+                    }
+                }
+
+                if(input.Result == "Fail" || input.Result == "Not Applicable")
+                {
+                    if(input.Remarks == null || input.Remarks.trim().isEmpty())
+                    {
+                        alert(Remarks, "Remarks are required when the result is Fail or Not Applicable.");
+                        validation_failed = true;
+                    }
+                }
+
+                active_settings_count = Process_Settings[Active == true].count(ID);
+                if(active_settings_count != 1)
+                {
+                    alert "Exactly one active Process Settings record is required before saving validation items.";
+                    validation_failed = true;
+                }
+                else if(input.Performed_By != null)
+                {
+                    active_settings = Process_Settings[Active == true];
+                    if(input.Performed_By.email.toLowerCase() != active_settings.NPD_Leader_User.email.toLowerCase())
+                    {
+                        alert(Performed_By, "Performed By must be the configured NPD Leader.");
+                        validation_failed = true;
+                    }
+                }
+
+                if(validation_failed == true)
+                {
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

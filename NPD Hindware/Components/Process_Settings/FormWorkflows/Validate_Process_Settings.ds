@@ -1,0 +1,67 @@
+Validate_Process_Settings as "Validate Process Settings"
+{
+    type = form
+    form = Process_Settings
+    record event = on add or edit
+    description = "Enforces one active configuration, positive SLA, distinct fixed assignees, and a populated notification list."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                validation_failed = false;
+                if(input.Review_SLA_Working_Days == null || input.Review_SLA_Working_Days <= 0)
+                {
+                    alert "Review SLA Working Days must be greater than zero.";
+                    validation_failed = true;
+                }
+
+                existing_settings = Process_Settings[ID != input.ID].count(ID);
+                other_active_settings = Process_Settings[Active == true && ID != input.ID].count(ID);
+                if(input.Active == true && other_active_settings > 0)
+                {
+                    alert "Only one Process Settings record can be Active.";
+                    validation_failed = true;
+                }
+                if(input.Active == false && (existing_settings == 0 || other_active_settings == 0))
+                {
+                    alert "Exactly one Process Settings record must remain Active.";
+                    validation_failed = true;
+                }
+
+                if(input.NPD_Leader_User == null || input.QA_Reviewer_User == null || input.QA_Head_User == null || input.Sourcing_User == null || input.Section_Head_User == null)
+                {
+                    alert "Select a valid Creator user for every fixed process assignee.";
+                    validation_failed = true;
+                }
+                else
+                {
+                    fixed_assignee_emails = List();
+                    fixed_assignee_emails.add(input.NPD_Leader_User.email.toLowerCase());
+                    fixed_assignee_emails.add(input.QA_Reviewer_User.email.toLowerCase());
+                    fixed_assignee_emails.add(input.QA_Head_User.email.toLowerCase());
+                    fixed_assignee_emails.add(input.Sourcing_User.email.toLowerCase());
+                    fixed_assignee_emails.add(input.Section_Head_User.email.toLowerCase());
+                    if(fixed_assignee_emails.distinct().size() != fixed_assignee_emails.size())
+                    {
+                        alert "Each fixed process role must be assigned to a different Creator user.";
+                        validation_failed = true;
+                    }
+                }
+
+                if(input.Final_Notification_Emails == null || input.Final_Notification_Emails.trim().isEmpty())
+                {
+                    alert "Enter at least one final-release notification recipient.";
+                    validation_failed = true;
+                }
+
+                if(validation_failed == true)
+                {
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

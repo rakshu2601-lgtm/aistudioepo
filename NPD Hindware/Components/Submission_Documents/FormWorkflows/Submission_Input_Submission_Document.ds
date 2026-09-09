@@ -1,0 +1,26 @@
+Submission_Input_Submission_Document as "Submission Input Submission Document"
+{
+    type = form
+    form = Submission_Documents
+    record event = on add
+    description = "Refreshes active stage-gate requirements for the selected submission attempt."
+
+    on user input of Stage_Gate_Submission
+    {
+        actions
+        {
+            custom deluge script
+            (
+                clear Document_Requirement;
+                input.Document_Requirement = null;
+                if(input.Stage_Gate_Submission != null)
+                {
+                    submission_record = Stage_Gate_Submissions[ID == input.Stage_Gate_Submission];
+                    instance_record = Stage_Gate_Instances[ID == submission_record.Stage_Gate_Instance];
+                    allowed_requirements = Document_Requirements[Active == true && Scope == "Stage Gate" && Gate_Route_Step == instance_record.Gate_Route_Step] sort by Sort_Order;
+                    Document_Requirement:ui.add(allowed_requirements.ID.getall());
+                }
+            )
+        }
+    }
+}

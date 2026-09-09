@@ -1,0 +1,5 @@
+report All_Stage_Gate_Submissions
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Submission_Number Stage_Gate_Instance Attempt_Number Submission_Status QA_Due_On Section_Head_Due_On ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Submission_Number Stage_Gate_Instance Attempt_Number Previous_Attempt_Number Submission_Status Sourcing_Comments Response_to_Observations Copied_Observations Sourcing_Submitted_By Sourcing_Submitted_On QA_Decision QA_Observations QA_Reviewed_By QA_Reviewed_On QA_Due_On Section_Head_Decision Section_Head_Observations Section_Head_Decided_By Section_Head_Decided_On Section_Head_Due_On ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

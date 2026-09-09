@@ -1,0 +1,35 @@
+Scope_Input_Document_Requirement as "Scope Input Document Requirement"
+{
+    type = form
+    form = Document_Requirements
+    record event = on add or edit
+    description = "Toggles the route-step lookup according to requirement scope"
+
+    on user input of Scope
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Scope == "Stage Gate")
+                {
+                    clear Gate_Route_Step;
+                    if(input.Gate_Route != null)
+                    {
+                        route_steps = Gate_Route_Steps[Gate_Route == input.Gate_Route] sort by Sequence_Number;
+                        Gate_Route_Step:ui.add(route_steps.ID.getall());
+                    }
+                    show Gate_Route_Step;
+                    enable Gate_Route_Step;
+                }
+                else
+                {
+                    input.Gate_Route_Step = null;
+                    clear Gate_Route_Step;
+                    hide Gate_Route_Step;
+                    disable Gate_Route_Step;
+                }
+            )
+        }
+    }
+}

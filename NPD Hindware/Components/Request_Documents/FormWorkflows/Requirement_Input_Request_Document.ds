@@ -1,0 +1,27 @@
+Requirement_Input_Request_Document as "Requirement Input Request Document"
+{
+    type = form
+    form = Request_Documents
+    record event = on add
+    description = "Assigns the next document version number for the selected request checklist item"
+
+    on user input of Document_Requirement
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Version_Number = 1;
+                if(input.NPD_Request != null && input.Document_Requirement != null)
+                {
+                    prior_version_count = Request_Documents[NPD_Request == input.NPD_Request && Document_Requirement == input.Document_Requirement].count(ID);
+                    if(prior_version_count > 0)
+                    {
+                        prior_max_version = Request_Documents[NPD_Request == input.NPD_Request && Document_Requirement == input.Document_Requirement].maximum(Version_Number);
+                        input.Version_Number = prior_max_version + 1;
+                    }
+                }
+            )
+        }
+    }
+}

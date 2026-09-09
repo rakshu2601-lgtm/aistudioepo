@@ -1,0 +1,48 @@
+Load_NPD_Request as "Load NPD Request"
+{
+    type = form
+    form = NPD_Requests
+    record event = on add or edit
+    description = "Applies status- and profile-specific visibility and editability while keeping controlled lifecycle fields system maintained."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                is_npd_leader = thisapp.permissions.isUserInProfile("NPD Leader");
+                if(input.ID == null && input.Request_Owner == null)
+                {
+                    input.Request_Owner = zoho.loginuser;
+                }
+
+                disable Gate_Route, Branch, Process_Status, Current_Stage_Gate, Submitted_On, Initial_QA_Due_On, Initial_QA_Decision, Initial_QA_Observations, Initial_QA_Reviewer, Initial_QA_Reviewed_On, Initial_QA_Head_Decision, Initial_QA_Head_Observations, Initial_QA_Head_User, Initial_QA_Head_Decided_On, Final_QA_Head_Decision, Final_QA_Head_Observations, Final_QA_Head_User, Final_QA_Head_Decided_On, Mass_Production_Released_On, Termination_Reason, Escalation_Sent;
+
+                hide Initial_QA_Decision, Initial_QA_Observations, Initial_QA_Reviewer, Initial_QA_Reviewed_On, Initial_QA_Head_Decision, Initial_QA_Head_Observations, Initial_QA_Head_User, Initial_QA_Head_Decided_On, Final_QA_Head_Decision, Final_QA_Head_Observations, Final_QA_Head_User, Final_QA_Head_Decided_On, Mass_Production_Released_On, Termination_Reason;
+
+                if(input.Process_Status == "Initial QA Review" || input.Process_Status == "NPD Rework" || input.Initial_QA_Decision != null)
+                {
+                    show Initial_QA_Decision, Initial_QA_Observations, Initial_QA_Reviewer, Initial_QA_Reviewed_On;
+                }
+                if(input.Process_Status == "Initial QA Head Approval" || input.Process_Status == "Stage Gates In Progress" || input.Process_Status == "Final QA Head Approval" || input.Process_Status == "Mass Production" || input.Initial_QA_Head_Decision != null)
+                {
+                    show Initial_QA_Head_Decision, Initial_QA_Head_Observations, Initial_QA_Head_User, Initial_QA_Head_Decided_On;
+                }
+                if(input.Process_Status == "Final QA Head Approval" || input.Process_Status == "Mass Production" || input.Final_QA_Head_Decision != null)
+                {
+                    show Final_QA_Head_Decision, Final_QA_Head_Observations, Final_QA_Head_User, Final_QA_Head_Decided_On, Mass_Production_Released_On;
+                }
+                if(input.Process_Status == "Terminated")
+                {
+                    show Termination_Reason;
+                }
+
+                if(!(is_npd_leader == true && (input.Process_Status == "Draft" || input.Process_Status == "NPD Rework")))
+                {
+                    disable Request_Title, Request_Owner, Plant, Product_Line, Product_Name, Product_Category, Development_Type, Customer_or_Market, Target_Launch_Date, Product_Description, Business_Justification;
+                }
+            )
+        }
+    }
+}

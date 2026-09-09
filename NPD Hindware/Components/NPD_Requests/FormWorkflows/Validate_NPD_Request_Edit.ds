@@ -1,0 +1,149 @@
+Validate_NPD_Request_Edit as "Validate NPD Request Edit"
+{
+    type = form
+    form = NPD_Requests
+    record event = on edit
+    description = "Enforces protected lifecycle fields, immutable snapshots, authorized state transitions, submission completeness, and decision observations."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                validation_failed = false;
+                settings = Process_Settings[Active == true];
+                if(settings.count(ID) != 1)
+                {
+                    alert "Exactly one Active Process Settings record is required.";
+                    validation_failed = true;
+                }
+                else
+                {
+                    matching_product_line = Product_Lines[ID == input.Product_Line && Plant == input.Plant && Active == true].count(ID);
+                    if(matching_product_line != 1)
+                    {
+                        alert(Product_Line, "Select an active product line belonging to the selected plant.");
+                        validation_failed = true;
+                    }
+
+                    if(input.Gate_Route != null)
+                    {
+                        selected_route_count = Gate_Routes[ID == input.Gate_Route && Plant == input.Plant && Product_Line == input.Product_Line].count(ID);
+                        if(selected_route_count != 1)
+                        {
+                            alert(Gate_Route, "The snapshotted route does not match the selected plant and product line.");
+                            validation_failed = true;
+                        }
+                    }
+
+                    if(input.Process_Status == old.Process_Status)
+                    {
+                        protected_change = input.Current_Stage_Gate != old.Current_Stage_Gate || input.Submitted_On != old.Submitted_On || input.Initial_QA_Due_On != old.Initial_QA_Due_On || input.Initial_QA_Decision != old.Initial_QA_Decision || input.Initial_QA_Observations != old.Initial_QA_Observations || input.Initial_QA_Reviewer != old.Initial_QA_Reviewer || input.Initial_QA_Reviewed_On != old.Initial_QA_Reviewed_On || input.Initial_QA_Head_Decision != old.Initial_QA_Head_Decision || input.Initial_QA_Head_Observations != old.Initial_QA_Head_Observations || input.Initial_QA_Head_User != old.Initial_QA_Head_User || input.Initial_QA_Head_Decided_On != old.Initial_QA_Head_Decided_On || input.Final_QA_Head_Decision != old.Final_QA_Head_Decision || input.Final_QA_Head_Observations != old.Final_QA_Head_Observations || input.Final_QA_Head_User != old.Final_QA_Head_User || input.Final_QA_Head_Decided_On != old.Final_QA_Head_Decided_On || input.Mass_Production_Released_On != old.Mass_Production_Released_On || input.Termination_Reason != old.Termination_Reason || input.Escalation_Sent != old.Escalation_Sent;
+                        if(protected_change)
+                        {
+                            alert "Lifecycle, decision, SLA, and release fields can be changed only by controlled transitions and schedules.";
+                            validation_failed = true;
+                        }
+                        if((old.Process_Status != "Draft" && old.Process_Status != "NPD Rework") && (input.Plant != old.Plant || input.Product_Line != old.Product_Line || input.Gate_Route != old.Gate_Route || input.Branch != old.Branch))
+                        {
+                            alert "Plant, product line, gate route, and branch snapshots cannot change after submission.";
+                            validation_failed = true;
+                        }
+                    }
+
+                    if(input.Process_Status != old.Process_Status)
+                    {
+                        actor_email = zoho.loginuserid.toLowerCase();
+                        if((old.Process_Status == "Draft" || old.Process_Status == "NPD Rework") && input.Process_Status == "Initial QA Review")
+                        {
+                            if(actor_email != settings.NPD_Leader_User.email.toLowerCase())
+                            {
+                                alert "Only the configured NPD Leader may submit or resubmit documents.";
+                                validation_failed = true;
+                            }
+                            active_route_count = Gate_Routes[ID == input.Gate_Route && Status == "Active" && Effective_From <= zoho.currentdate && (Effective_To == null || Effective_To >= zoho.currentdate)].count(ID);
+                            if(active_route_count != 1)
+                            {
+                                alert "Submission requires the snapshotted route to remain effective and Active.";
+                                validation_failed = true;
+                            }
+                            mandatory_requirements = Document_Requirements[Gate_Route == input.Gate_Route && Scope == "Initial Request" && Mandatory == true && Active == true];
+                            for each requirement_record in mandatory_requirements
+                            {
+                                current_document_count = Request_Documents[NPD_Request == input.ID && Document_Requirement == requirement_record.ID && Current_Version == true].count(ID);
+                                if(current_document_count == 0)
+                                {
+                                    alert "Upload a current document for every mandatory initial document requirement.";
+                                    validation_failed = true;
+                                }
+                            }
+                            validation_row_count = Sample_Validation_Items[NPD_Request == input.ID].count(ID);
+                            incomplete_row_count = Sample_Validation_Items[NPD_Request == input.ID && (Sequence_Number == null || Check_Category == null || Checkpoint == null || Specification_or_Acceptance_Criteria == null || Result == null || Performed_By == null || Performed_On == null)].count(ID);
+                            if(validation_row_count == 0 || incomplete_row_count > 0)
+                            {
+                                alert "Add at least one complete Sample Validation Item before submission.";
+                                validation_failed = true;
+                            }
+                        }
+                        else if(old.Process_Status == "Initial QA Review" && (input.Process_Status == "Initial QA Head Approval" || input.Process_Status == "NPD Rework"))
+                        {
+                            if(actor_email != settings.QA_Reviewer_User.email.toLowerCase())
+                            {
+                                alert "Only the configured QA Reviewer may complete initial QA review.";
+                                validation_failed = true;
+                            }
+                            observations = ifnull(input.Initial_QA_Observations, "").trim();
+                            if(input.Process_Status == "NPD Rework" && observations.isEmpty())
+                            {
+                                alert(Initial_QA_Observations, "Observations are required when documents do not pass.");
+                                validation_failed = true;
+                            }
+                            if(input.Process_Status == "Initial QA Head Approval" && observations.toLowerCase() != "no observation" && observations.length() < 10)
+                            {
+                                alert(Initial_QA_Observations, "Enter No Observation or substantive QA observations.");
+                                validation_failed = true;
+                            }
+                        }
+                        else if(old.Process_Status == "Initial QA Head Approval" && (input.Process_Status == "Stage Gates In Progress" || input.Process_Status == "Terminated"))
+                        {
+                            if(actor_email != settings.QA_Head_User.email.toLowerCase())
+                            {
+                                alert "Only the configured QA Head may make the initial QA Head decision.";
+                                validation_failed = true;
+                            }
+                            if(input.Process_Status == "Terminated" && ifnull(input.Termination_Reason, "").trim().isEmpty())
+                            {
+                                alert(Termination_Reason, "A termination reason is required.");
+                                validation_failed = true;
+                            }
+                        }
+                        else if(old.Process_Status == "Final QA Head Approval" && (input.Process_Status == "Mass Production" || input.Process_Status == "Terminated"))
+                        {
+                            if(actor_email != settings.QA_Head_User.email.toLowerCase())
+                            {
+                                alert "Only the configured QA Head may make the final QA Head decision.";
+                                validation_failed = true;
+                            }
+                            if(input.Process_Status == "Terminated" && ifnull(input.Termination_Reason, "").trim().isEmpty())
+                            {
+                                alert(Termination_Reason, "A termination reason is required.");
+                                validation_failed = true;
+                            }
+                        }
+                        else
+                        {
+                            alert "This Process Status change is not an allowed NPD request transition.";
+                            validation_failed = true;
+                        }
+                    }
+                }
+
+                if(validation_failed)
+                {
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

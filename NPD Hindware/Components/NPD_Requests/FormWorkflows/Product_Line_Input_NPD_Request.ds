@@ -1,0 +1,36 @@
+Product_Line_Input_NPD_Request as "Product Line Input NPD Request"
+{
+    type = form
+    form = NPD_Requests
+    record event = on add or edit
+    description = "Snapshots the one effective active route and the plant branch for the selected product line."
+
+    on user input of Product_Line
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Gate_Route = null;
+                input.Branch = "";
+                if(input.Plant != null && input.Product_Line != null)
+                {
+                    effective_routes = Gate_Routes[Plant == input.Plant && Product_Line == input.Product_Line && Status == "Active" && Effective_From <= zoho.currentdate && (Effective_To == null || Effective_To >= zoho.currentdate)];
+                    if(effective_routes.count(ID) == 1)
+                    {
+                        input.Gate_Route = effective_routes.ID;
+                        input.Branch = Plants[ID == input.Plant].Branch;
+                    }
+                    else if(effective_routes.count(ID) == 0)
+                    {
+                        alert "No effective Active gate route is configured for the selected plant and product line.";
+                    }
+                    else
+                    {
+                        alert "More than one effective Active gate route exists. Ask an administrator to correct route configuration.";
+                    }
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,39 @@
+Validate_Stage_Gate_Instance as "Validate Stage Gate Instance"
+{
+    type = form
+    form = Stage_Gate_Instances
+    record event = on add or edit
+    description = "Prevents duplicate request sequence and request stage snapshots."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                validation_failed = false;
+                if(input.NPD_Request != null)
+                {
+                    duplicate_sequence_count = Stage_Gate_Instances[NPD_Request == input.NPD_Request && Sequence_Number == input.Sequence_Number && ID != input.ID].count(ID);
+                    if(duplicate_sequence_count > 0)
+                    {
+                        alert(Sequence_Number, "This sequence number already exists for the selected NPD request.");
+                        validation_failed = true;
+                    }
+
+                    duplicate_stage_count = Stage_Gate_Instances[NPD_Request == input.NPD_Request && Stage_Gate == input.Stage_Gate && ID != input.ID].count(ID);
+                    if(duplicate_stage_count > 0)
+                    {
+                        alert(Stage_Gate, "This stage gate already exists for the selected NPD request.");
+                        validation_failed = true;
+                    }
+                }
+
+                if(validation_failed == true)
+                {
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

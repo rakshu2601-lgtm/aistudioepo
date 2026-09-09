@@ -1,0 +1,145 @@
+form Sample_Validation_Items
+{
+    displayname = "Sample Validation Items"
+
+    Validation_Item
+    (
+        type = section
+        displayname = "Validation Item"
+        row = 1
+        column = 0
+    )
+    must have NPD_Request
+    (
+        type = picklist
+        displayname = "NPD Request"
+        values = NPD_Requests.ID
+        displayformat = [Request_Title]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Sequence_Number
+    (
+        type = number
+        displayname = "Sequence Number"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Check_Category
+    (
+        type = text
+        displayname = "Check Category"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Checkpoint
+    (
+        type = text
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Specification_or_Acceptance_Criteria
+    (
+        type = textarea
+        displayname = "Specification or Acceptance Criteria"
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Test_Method
+    (
+        type = text
+        displayname = "Test Method"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Observed_Value
+    (
+        type = text
+        displayname = "Observed Value"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Result
+    (
+        type = radiobuttons
+        values = {"Pass", "Fail", "Not Applicable"}
+        layout = 1
+        row = 1
+        column = 2
+        width = medium
+    )
+    Remarks
+    (
+        type = textarea
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Evidence_File
+    (
+        type = upload file
+        displayname = "Evidence File"
+        browse = local_drive, google_docs, zoho_docs
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Performed_By
+    (
+        type = picklist
+        displayname = "Performed By"
+        module = users
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Performed_On
+    (
+        type = date
+        displayname = "Performed On"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Validation Item"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Validation Item"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

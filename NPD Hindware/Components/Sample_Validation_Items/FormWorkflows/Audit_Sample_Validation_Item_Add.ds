@@ -1,0 +1,29 @@
+Audit_Sample_Validation_Item_Add as "Audit Sample Validation Item Add"
+{
+    type = form
+    form = Sample_Validation_Items
+    record event = on add
+    description = "Records creation of a structured sample validation check in the process audit trail."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_details = "Validation Item ID: " + input.ID + "; Sequence: " + input.Sequence_Number + "; Category: " + input.Check_Category + "; Checkpoint: " + input.Checkpoint + "; Result: " + input.Result + "; Remarks: " + input.Remarks + "; Performed On: " + input.Performed_On;
+                audit_id = insert into Process_Audit_Log
+                [
+                    NPD_Request = input.NPD_Request
+                    Event_Type = "Created"
+                    Action_Name = "Sample Validation Item Added"
+                    Decision = input.Result
+                    Observations = input.Remarks
+                    Performed_By_Email = zoho.loginuserid
+                    Performed_On = zoho.currenttime
+                    Event_Details = audit_details
+                ];
+            )
+        }
+    }
+}

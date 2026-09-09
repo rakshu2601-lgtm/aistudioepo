@@ -1,0 +1,62 @@
+default list All_NPD_Requests
+{
+    displayName = "All NPD Requests"
+    show all rows from NPD_Requests
+    (
+        Request_Number
+        Request_Title
+        Request_Owner
+        Plant
+        Product_Line
+        Branch
+        Gate_Route
+        Development_Type
+        Target_Launch_Date
+        Process_Status
+        Current_Stage_Gate
+        Submitted_On
+        Initial_QA_Due_On
+        Mass_Production_Released_On
+        Termination_Reason
+    )
+    filters
+    (
+        Plant
+        Product_Line
+        Branch
+        Process_Status
+        "Overdue Reviews" : (Initial_QA_Due_On < zoho.currentdate && (Process_Status == "Initial QA Review" || Process_Status == "Initial QA Head Approval" || Process_Status == "Final QA Head Approval"))
+    )
+    sort by
+    (
+        Submitted_On descending
+        Request_Number descending
+    )
+    conditional formatting
+    (
+        "Rework"
+        {
+            condition = (Process_Status == "NPD Rework")
+            fields = [Request_Number, Request_Title, Process_Status]
+            format = "background-color:#FFF4D6;color:#8A5A00;font-weight:bold"
+        }
+        "Overdue"
+        {
+            condition = (Initial_QA_Due_On < zoho.currentdate && (Process_Status == "Initial QA Review" || Process_Status == "Initial QA Head Approval" || Process_Status == "Final QA Head Approval"))
+            fields = [Request_Number, Request_Title, Initial_QA_Due_On, Process_Status]
+            format = "background-color:#FDE2E2;color:#A61B1B;font-weight:bold"
+        }
+        "Terminated"
+        {
+            condition = (Process_Status == "Terminated")
+            fields = [Request_Number, Request_Title, Process_Status, Termination_Reason]
+            format = "background-color:#ECEFF3;color:#5B6472"
+        }
+        "Mass Production"
+        {
+            condition = (Process_Status == "Mass Production")
+            fields = [Request_Number, Request_Title, Process_Status, Mass_Production_Released_On]
+            format = "background-color:#DFF3E4;color:#176B34;font-weight:bold"
+        }
+    )
+}

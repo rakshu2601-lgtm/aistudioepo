@@ -1,0 +1,89 @@
+form Gate_Route_Steps
+{
+    displayname = "Gate Route Steps"
+
+    Step_Details
+    (
+        type = section
+        displayname = "Step Details"
+        row = 1
+        column = 0
+    )
+    must have Gate_Route
+    (
+        type = picklist
+        displayname = "Gate Route"
+        values = Gate_Routes.ID
+        displayformat = [Route_Name]
+        searchable = true
+        row = 1
+        column = 1
+    )
+    must have Stage_Gate
+    (
+        type = radiobuttons
+        displayname = "Stage Gate"
+        values = {"N1", "N5", "N10", "N30", "N50"}
+        row = 1
+        column = 1
+    )
+    must have Sequence_Number
+    (
+        type = number
+        displayname = "Sequence Number"
+        row = 1
+        column = 1
+    )
+    Final_Gate
+    (
+        type = checkbox
+        displayname = "Final Gate"
+        initial value = false
+        row = 1
+        column = 1
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 1
+        column = 1
+    )
+    Instructions
+    (
+        type = textarea
+        displayname = "Instructions"
+        row = 1
+        column = 1
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Route Step"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Route Step"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

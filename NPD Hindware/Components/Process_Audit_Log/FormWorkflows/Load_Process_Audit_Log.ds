@@ -1,0 +1,18 @@
+Load_Process_Audit_Log as "Load Process Audit Log"
+{
+    type = form
+    form = Process_Audit_Log
+    record event = on add or edit
+    description = "Makes every audit field read-only so audit records remain application-controlled and immutable in the user interface."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable NPD_Request, Stage_Gate_Instance, Stage_Gate_Submission, Event_Type, Action_Name, From_Status, To_Status, Decision, Observations, Performed_By_Email, Performed_On, Event_Details;
+            )
+        }
+    }
+}

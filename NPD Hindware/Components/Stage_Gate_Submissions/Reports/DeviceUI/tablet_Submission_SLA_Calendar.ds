@@ -1,0 +1,5 @@
+report Submission_SLA_Calendar
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Submission_Number Stage_Gate_Instance Attempt_Number Submission_Status Applicable_Due_On ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on tap ( View Record ) on long press ( Edit Delete Duplicate View Record ) on left swipe ( Delete ) on right swipe ( Edit ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Submission_Number Stage_Gate_Instance Attempt_Number Submission_Status Applicable_Due_On QA_Due_On Section_Head_Due_On ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

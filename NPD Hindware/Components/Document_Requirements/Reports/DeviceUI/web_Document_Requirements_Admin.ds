@@ -1,0 +1,5 @@
+report Document_Requirements_Admin
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Requirement_Code Requirement_Name Scope Mandatory Sort_Order Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Requirement_Code Requirement_Name Scope Gate_Route Gate_Route_Step Mandatory Sort_Order Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

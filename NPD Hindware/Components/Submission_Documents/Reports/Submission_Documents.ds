@@ -1,0 +1,38 @@
+default list All_Submission_Documents
+{
+    displayName = "Submission Documents"
+    show all rows from Submission_Documents
+    (
+        Stage_Gate_Submission as "Submission"
+        NPD_Request as "Request"
+        Stage_Gate as "Gate"
+        Attempt_Number as "Attempt"
+        Document_Category as "Category"
+        Document_Requirement as "Requirement"
+        Document_Name as "Document"
+        Document_File as "File"
+        Uploaded_By as "Uploader"
+        Uploaded_On as "Uploaded On"
+        Remarks
+    )
+    filters
+    (
+        NPD_Request
+        Stage_Gate
+        Attempt_Number
+        Document_Category
+        Document_Requirement
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Stage_Gate_Submission ascending
+    )
+    sort by
+    (
+        Uploaded_On descending
+    )
+}

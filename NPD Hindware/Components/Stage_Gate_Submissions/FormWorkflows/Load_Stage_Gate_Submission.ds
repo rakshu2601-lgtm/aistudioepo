@@ -1,0 +1,53 @@
+Load_Stage_Gate_Submission as "Load Stage Gate Submission"
+{
+    type = form
+    form = Stage_Gate_Submissions
+    record event = on add or edit
+    description = "Shows only the sections relevant to the attempt state and enables fields solely for the configured fixed actor profile."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                is_sourcing_user = thisapp.permissions.isUserInProfile("Sourcing Team");
+                is_qa_reviewer = thisapp.permissions.isUserInProfile("QA Reviewer");
+                is_section_head = thisapp.permissions.isUserInProfile("Section Head");
+                hide QA_Review, Section_Head_Review, Copied_Observations, Response_to_Observations;
+                disable Stage_Gate_Instance, Attempt_Number, Previous_Attempt_Number, Copied_Observations, Applicable_Due_On, Submission_Status, Sourcing_Submitted_By, Sourcing_Submitted_On, QA_Reviewed_By, QA_Reviewed_On, QA_Due_On, QA_Escalation_Sent, Section_Head_Decided_By, Section_Head_Decided_On, Section_Head_Due_On, Section_Escalation_Sent;
+                disable Sourcing_Comments, Response_to_Observations, QA_Decision, QA_Observations, Section_Head_Decision, Section_Head_Observations;
+
+                if(input.Submission_Status == "Sourcing Rework")
+                {
+                    show Copied_Observations, Response_to_Observations;
+                }
+                if(input.Submission_Status == "QA Review" || input.Submission_Status == "Section Head Review" || input.Submission_Status == "Rejected by QA" || input.Submission_Status == "Rejected by Section Head" || input.Submission_Status == "Approved")
+                {
+                    show QA_Review;
+                }
+                if(input.Submission_Status == "Section Head Review" || input.Submission_Status == "Rejected by Section Head" || input.Submission_Status == "Approved")
+                {
+                    show Section_Head_Review;
+                }
+
+                if(is_sourcing_user == true && (input.Submission_Status == "Sourcing Draft" || input.Submission_Status == "Sourcing Rework"))
+                {
+                    enable Sourcing_Comments;
+                    if(input.Submission_Status == "Sourcing Rework")
+                    {
+                        enable Response_to_Observations;
+                    }
+                }
+                else if(is_qa_reviewer == true && input.Submission_Status == "QA Review")
+                {
+                    enable QA_Decision, QA_Observations;
+                }
+                else if(is_section_head == true && input.Submission_Status == "Section Head Review")
+                {
+                    enable Section_Head_Decision, Section_Head_Observations;
+                }
+            )
+        }
+    }
+}

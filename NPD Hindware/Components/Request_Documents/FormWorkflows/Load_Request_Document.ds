@@ -1,0 +1,35 @@
+Load_Request_Document as "Load Request Document"
+{
+    type = form
+    form = Request_Documents
+    record event = on add or edit
+    description = "Filters initial-request checklist choices and protects system-maintained version metadata"
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                clear Document_Requirement;
+                if(input.NPD_Request != null)
+                {
+                    request_record = NPD_Requests[ID == input.NPD_Request];
+                    allowed_requirements = Document_Requirements[Active == true && Scope == "Initial Request" && Gate_Route == request_record.Gate_Route] sort by Sort_Order;
+                    Document_Requirement:ui.add(allowed_requirements.ID.getall());
+                }
+                if(input.ID == null)
+                {
+                    input.Uploaded_By = zoho.loginuser;
+                    input.Uploaded_On = zoho.currenttime;
+                    input.Current_Version = true;
+                }
+                disable Version_Number, Current_Version, Uploaded_By, Uploaded_On;
+                if(input.ID != null)
+                {
+                    disable NPD_Request, Document_Requirement, Document_Name, Document_File;
+                }
+            )
+        }
+    }
+}

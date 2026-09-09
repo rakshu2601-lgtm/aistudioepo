@@ -1,0 +1,18 @@
+<page linkname = "NPD_Dashboard" displayname = "NPD Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <panel elementName='NPD_Dashboard_Panel'>
+          <pr>
+            <pc width='100%'>
+              <text type='Text' value='NPD Dashboard' size='24px' bold='true'> </text>
+            </pc>
+          </pr>
+        </panel>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

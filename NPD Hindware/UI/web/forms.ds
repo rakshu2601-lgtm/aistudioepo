@@ -1,0 +1,55 @@
+forms
+{
+    form NPD_Requests
+    {
+        label placement = left
+    }
+    form Request_Documents
+    {
+        label placement = left
+    }
+    form Stage_Gate_Instances
+    {
+        label placement = left
+    }
+    form Stage_Gate_Submissions
+    {
+        label placement = left
+    }
+    form Submission_Documents
+    {
+        label placement = left
+    }
+    form Sample_Validation_Items
+    {
+        label placement = left
+    }
+    form Process_Audit_Log
+    {
+        label placement = left
+    }
+    form Process_Settings
+    {
+        label placement = left
+    }
+    form Plants
+    {
+        label placement = left
+    }
+    form Product_Lines
+    {
+        label placement = left
+    }
+    form Gate_Routes
+    {
+        label placement = left
+    }
+    form Gate_Route_Steps
+    {
+        label placement = left
+    }
+    form Document_Requirements
+    {
+        label placement = left
+    }
+}

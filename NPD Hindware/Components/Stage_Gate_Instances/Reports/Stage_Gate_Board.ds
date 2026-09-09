@@ -1,0 +1,40 @@
+kanban Stage_Gate_Board
+{
+    displayName = "Stage Gate Board"
+    show all rows from Stage_Gate_Instances
+    (
+        NPD_Request
+        NPD_Request.Plant as "Plant"
+        NPD_Request.Product_Line as "Product Line"
+        Stage_Gate
+        Sequence_Number
+        Gate_Status
+        Latest_Attempt_Number as "Attempt"
+        Activated_On
+        Completed_On
+        Sourcing_User
+        QA_Reviewer_User
+        Section_Head_User
+    )
+    filters
+    (
+        NPD_Request
+        Stage_Gate
+        Gate_Status
+        Sourcing_User
+        QA_Reviewer_User
+        Section_Head_User
+    )
+    sort by
+    (
+        NPD_Request ascending
+        Sequence_Number ascending
+    )
+    options
+    (
+        display field = Gate_Status
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

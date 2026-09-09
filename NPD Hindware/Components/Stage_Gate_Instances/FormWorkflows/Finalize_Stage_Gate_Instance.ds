@@ -1,0 +1,90 @@
+Finalize_Stage_Gate_Instance as "Finalize Stage Gate Instance"
+{
+    type = form
+    form = Stage_Gate_Instances
+    record event = on add or edit
+    description = "Audits status changes and initializes the first sourcing attempt when an instance first becomes ready."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_action = "Stage Gate Instance Status - " + input.ID;
+                prior_audit_count = Process_Audit_Log[Action_Name == audit_action].count(ID);
+                prior_status = "";
+                if(prior_audit_count > 0)
+                {
+                    prior_status = Process_Audit_Log[Action_Name == audit_action].To_Status sort by Performed_On desc;
+                }
+
+                if(prior_audit_count == 0 || prior_status != input.Gate_Status)
+                {
+                    audit_event_type = "Submitted";
+                    if(prior_audit_count == 0)
+                    {
+                        audit_event_type = "Created";
+                    }
+                    else if(input.Gate_Status == "Approved")
+                    {
+                        audit_event_type = "Approved";
+                    }
+                    else if(input.Gate_Status == "Rework")
+                    {
+                        audit_event_type = "Reworked";
+                    }
+                    else if(input.Gate_Status == "Terminated")
+                    {
+                        audit_event_type = "Rejected";
+                    }
+
+                    audit_id = insert into Process_Audit_Log
+                    [
+                        NPD_Request = input.NPD_Request
+                        Stage_Gate_Instance = input.ID
+                        Event_Type = audit_event_type
+                        Action_Name = audit_action
+                        From_Status = prior_status
+                        To_Status = input.Gate_Status
+                        Performed_By_Email = zoho.loginuserid
+                        Performed_On = zoho.currenttime
+                        Event_Details = "Stage " + input.Stage_Gate + ", sequence " + input.Sequence_Number + ", latest attempt " + input.Latest_Attempt_Number + "."
+                    ];
+                }
+
+                if(input.Gate_Status == "Ready for Sourcing")
+                {
+                    submission_count = Stage_Gate_Submissions[Stage_Gate_Instance == input.ID].count(ID);
+                    if(submission_count == 0)
+                    {
+                        submission_id = insert into Stage_Gate_Submissions
+                        [
+                            Stage_Gate_Instance = input.ID
+                            Attempt_Number = 1
+                            Submission_Status = "Sourcing Draft"
+                        ];
+
+                        instance_record = Stage_Gate_Instances[ID == input.ID];
+                        instance_record.Latest_Attempt_Number = 1;
+                        if(input.Activated_On == null)
+                        {
+                            instance_record.Activated_On = zoho.currenttime;
+                        }
+
+                        if(input.Sourcing_User != null)
+                        {
+                            sendmail
+                            (
+                                from : zoho.adminuserid
+                                to : input.Sourcing_User.email
+                                subject : "Stage gate ready for sourcing: " + input.Stage_Gate
+                                message : "NPD request " + input.NPD_Request + " stage " + input.Stage_Gate + " is ready. Sourcing attempt 1 has been created."
+                            )
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

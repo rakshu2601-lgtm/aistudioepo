@@ -1,0 +1,60 @@
+NPD_Request_Review_SLA as "NPD Request Review SLA"
+{
+    type = schedule
+    form = NPD_Requests[Initial_QA_Due_On != null && Initial_QA_Due_On < zoho.currentdate && (Process_Status == "Initial QA Review" || Process_Status == "Initial QA Head Approval" || Process_Status == "Final QA Head Approval")]
+    start = Initial_QA_Due_On at "09:00:00"
+    frequency = daily
+    time zone = "Asia/Kolkata"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                settings = Process_Settings[Active == true];
+                if(settings.count(ID) == 1)
+                {
+                    recipient_email = settings.QA_Reviewer_User.email;
+                    manager_email = settings.QA_Review_Manager_Email;
+                    if(input.Process_Status == "Initial QA Head Approval" || input.Process_Status == "Final QA Head Approval")
+                    {
+                        recipient_email = settings.QA_Head_User.email;
+                        manager_email = settings.QA_Head_Manager_Email;
+                    }
+                    sendmail
+                    (
+                        from : zoho.adminuserid
+                        to : recipient_email
+                        subject : "Overdue NPD review: " + input.Request_Title
+                        message : "Request " + input.Request_Number + " is overdue in " + input.Process_Status + ". Due date: " + input.Initial_QA_Due_On + "."
+                    )
+                    overdue_working_days = input.Initial_QA_Due_On.workDaysBetween(zoho.currentdate);
+                    if(input.Escalation_Sent == false && manager_email != null)
+                    {
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : manager_email
+                            cc : recipient_email
+                            subject : "Escalation: overdue NPD review " + input.Request_Title
+                            message : "Request " + input.Request_Number + " remains in " + input.Process_Status + " beyond the configured working-day SLA."
+                        )
+                        input.Escalation_Sent = true;
+                        audit_event_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = input.ID
+                            Event_Type = "Escalated"
+                            Action_Name = "NPD Review SLA Escalation"
+                            From_Status = input.Process_Status
+                            To_Status = input.Process_Status
+                            Performed_By_Email = zoho.adminuserid
+                            Performed_On = zoho.currenttime
+                            Event_Details = "One-time escalation sent after " + overdue_working_days + " working days overdue."
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

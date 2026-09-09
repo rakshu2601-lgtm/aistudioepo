@@ -1,0 +1,106 @@
+Validate_Gate_Route as "Validate Gate Route"
+{
+    type = form
+    form = Gate_Routes
+    record event = on add or edit
+    description = "Validates route ownership, effective dates, active-period uniqueness, activation-ready child steps, and in-flight usage."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                validation_failed = false;
+                persisted_status = "";
+                if(input.ID != null)
+                {
+                    persisted_route_count = Gate_Routes[ID == input.ID].count(ID);
+                    if(persisted_route_count > 0)
+                    {
+                        persisted_status = Gate_Routes[ID == input.ID].Status;
+                    }
+                }
+
+                matching_product_line_count = Product_Lines[ID == input.Product_Line && Plant == input.Plant].count(ID);
+                if(matching_product_line_count == 0)
+                {
+                    alert(Product_Line, "Select a product line that belongs to the selected plant.");
+                    validation_failed = true;
+                }
+
+                if(input.Effective_To != null && input.Effective_To < input.Effective_From)
+                {
+                    alert(Effective_To, "Effective To must be on or after Effective From.");
+                    validation_failed = true;
+                }
+
+                if(input.Status == "Active")
+                {
+                    if(input.Effective_To == null)
+                    {
+                        overlapping_active_routes = Gate_Routes[Plant == input.Plant && Product_Line == input.Product_Line && Status == "Active" && ID != input.ID && (Effective_To == null || Effective_To >= input.Effective_From)].count(ID);
+                    }
+                    else
+                    {
+                        overlapping_active_routes = Gate_Routes[Plant == input.Plant && Product_Line == input.Product_Line && Status == "Active" && ID != input.ID && Effective_From <= input.Effective_To && (Effective_To == null || Effective_To >= input.Effective_From)].count(ID);
+                    }
+                    if(overlapping_active_routes > 0)
+                    {
+                        alert(Status, "Another Active route overlaps this effective period for the selected plant and product line.");
+                        validation_failed = true;
+                    }
+
+                    if(persisted_status != "Active")
+                    {
+                        active_step_count = Gate_Route_Steps[Gate_Route == input.ID && Active == true].count(ID);
+                        unique_sequences = Gate_Route_Steps[Gate_Route == input.ID && Active == true].distinct(Sequence_Number);
+                        final_gate_count = Gate_Route_Steps[Gate_Route == input.ID && Active == true && Final_Gate == true].count(ID);
+                        invalid_final_gate_count = Gate_Route_Steps[Gate_Route == input.ID && Active == true && Final_Gate == true && Stage_Gate != "N30" && Stage_Gate != "N50"].count(ID);
+
+                        sequence_is_valid = true;
+                        if(active_step_count == 0)
+                        {
+                            sequence_is_valid = false;
+                        }
+                        else
+                        {
+                            minimum_sequence = Gate_Route_Steps[Gate_Route == input.ID && Active == true].minimum(Sequence_Number);
+                            maximum_sequence = Gate_Route_Steps[Gate_Route == input.ID && Active == true].maximum(Sequence_Number);
+                            if(unique_sequences.size() != active_step_count || minimum_sequence != 1 || maximum_sequence != active_step_count)
+                            {
+                                sequence_is_valid = false;
+                            }
+                        }
+
+                        if(sequence_is_valid == false)
+                        {
+                            alert(Status, "Activation requires active route steps with a unique contiguous sequence beginning at 1.");
+                            validation_failed = true;
+                        }
+                        if(final_gate_count != 1 || invalid_final_gate_count > 0)
+                        {
+                            alert(Status, "Activation requires exactly one Final Gate, and it must be N30 or N50.");
+                            validation_failed = true;
+                        }
+                    }
+                }
+
+                if(persisted_status == "Active" && input.Status != "Active")
+                {
+                    in_flight_request_count = NPD_Requests[Gate_Route == input.ID && (Process_Status == "Initial QA Review" || Process_Status == "NPD Rework" || Process_Status == "Initial QA Head Approval" || Process_Status == "Stage Gates In Progress" || Process_Status == "Final QA Head Approval")].count(ID);
+                    if(in_flight_request_count > 0)
+                    {
+                        alert(Status, "This route cannot be deactivated while it is used by an in-flight NPD request.");
+                        validation_failed = true;
+                    }
+                }
+
+                if(validation_failed == true)
+                {
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,33 @@
+default list All_Request_Documents
+{
+    displayName = "Request Documents"
+    show all rows from Request_Documents
+    (
+        NPD_Request
+        Document_Requirement
+        Document_Name
+        Version_Number
+        Current_Version
+        Uploaded_By
+        Uploaded_On
+        Remarks
+    )
+    filters
+    (
+        NPD_Request
+        Document_Requirement
+        Current_Version
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        NPD_Request ascending
+    )
+    sort by
+    (
+        Uploaded_On descending
+    )
+}

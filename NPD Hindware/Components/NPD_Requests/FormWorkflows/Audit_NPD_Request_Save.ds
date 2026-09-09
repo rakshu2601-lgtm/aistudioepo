@@ -1,0 +1,28 @@
+Audit_NPD_Request_Save as "Audit NPD Request Save"
+{
+    type = form
+    form = NPD_Requests
+    record event = on add
+    description = "Creates the request-created audit event after the first draft is saved."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_event_id = insert into Process_Audit_Log
+                [
+                    NPD_Request = input.ID
+                    Event_Type = "Created"
+                    Action_Name = "NPD Request Created"
+                    From_Status = ""
+                    To_Status = input.Process_Status
+                    Performed_By_Email = zoho.loginuserid
+                    Performed_On = zoho.currenttime
+                    Event_Details = "Request " + input.Request_Number + " created with route ID " + input.Gate_Route + " and branch " + input.Branch + "."
+                ];
+            )
+        }
+    }
+}

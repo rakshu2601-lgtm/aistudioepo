@@ -1,0 +1,25 @@
+Audit_Gate_Route_Step_Changes as "Audit Gate Route Step Changes"
+{
+    type = form
+    form = Gate_Route_Steps
+    record event = on add or edit
+    description = "Records successful gate route step configuration changes in the process audit trail."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_event_id = insert into Process_Audit_Log
+                [
+                    Event_Type = "Configuration Changed"
+                    Action_Name = "Gate Route Step Saved"
+                    Performed_By_Email = zoho.loginuserid
+                    Performed_On = zoho.currenttime
+                    Event_Details = "Route ID: " + input.Gate_Route + ", Stage: " + input.Stage_Gate + ", Sequence: " + input.Sequence_Number + ", Final: " + input.Final_Gate + ", Active: " + input.Active
+                ];
+            )
+        }
+    }
+}

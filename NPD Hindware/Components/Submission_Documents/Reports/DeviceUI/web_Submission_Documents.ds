@@ -1,0 +1,5 @@
+report All_Submission_Documents
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Stage_Gate_Submission NPD_Request Stage_Gate Attempt_Number Document_Name Uploaded_On ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Stage_Gate_Submission NPD_Request Stage_Gate Attempt_Number Document_Category Document_Requirement Document_Name Document_File Uploaded_By Uploaded_On Remarks ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

@@ -1,0 +1,39 @@
+list My_Review_Queue
+{
+    displayName = "My Review Queue"
+    show all rows from Stage_Gate_Submissions[((Submission_Status == "Sourcing Draft" || Submission_Status == "Sourcing Rework") && Stage_Gate_Instance.Sourcing_User.email == zoho.loginuserid) || (Submission_Status == "QA Review" && Stage_Gate_Instance.QA_Reviewer_User.email == zoho.loginuserid) || (Submission_Status == "Section Head Review" && Stage_Gate_Instance.Section_Head_User.email == zoho.loginuserid)]
+    (
+        Submission_Number
+        Stage_Gate_Instance
+        Attempt_Number
+        Submission_Status
+        Sourcing_Submitted_On
+        QA_Due_On
+        Section_Head_Due_On
+    )
+    filters
+    (
+        Submission_Status
+        Stage_Gate_Instance
+    )
+    sort by
+    (
+        QA_Due_On ascending
+        Section_Head_Due_On ascending
+    )
+    conditional formatting
+    (
+        "Rework Assigned"
+        {
+            condition = (Submission_Status == "Sourcing Rework")
+            fields = [Submission_Number, Attempt_Number, Submission_Status]
+            format = "background-color:#FFF4D6;color:#8A5A00;font-weight:bold"
+        }
+        "Overdue Assigned Review"
+        {
+            condition = ((Submission_Status == "QA Review" && QA_Due_On < zoho.currentdate) || (Submission_Status == "Section Head Review" && Section_Head_Due_On < zoho.currentdate))
+            fields = [Submission_Number, Submission_Status, QA_Due_On, Section_Head_Due_On]
+            format = "background-color:#FFE3E3;color:#B42318;font-weight:bold"
+        }
+    )
+}

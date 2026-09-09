@@ -1,0 +1,5 @@
+report My_Review_Queue
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Submission_Number Stage_Gate_Instance Attempt_Number Submission_Status QA_Due_On Section_Head_Due_On ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Submission_Number Stage_Gate_Instance Attempt_Number Submission_Status Sourcing_Submitted_On QA_Due_On Section_Head_Due_On ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

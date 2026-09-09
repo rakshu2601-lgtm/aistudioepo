@@ -1,0 +1,26 @@
+Plant_Input_NPD_Request as "Plant Input NPD Request"
+{
+    type = form
+    form = NPD_Requests
+    record event = on add or edit
+    description = "Filters active product lines for the selected plant and clears the route snapshot."
+
+    on user input of Plant
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Product_Line = null;
+                input.Gate_Route = null;
+                input.Branch = "";
+                clear Product_Line;
+                if(input.Plant != null)
+                {
+                    active_product_lines = Product_Lines[Plant == input.Plant && Active == true] sort by Product_Line_Name;
+                    Product_Line:ui.add(active_product_lines.ID.getall());
+                }
+            )
+        }
+    }
+}

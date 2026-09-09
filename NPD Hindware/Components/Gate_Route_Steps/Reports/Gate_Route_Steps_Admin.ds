@@ -1,0 +1,29 @@
+default list Gate_Route_Steps_Admin
+{
+    displayName = "Gate Route Steps Admin"
+    show all rows from Gate_Route_Steps
+    (
+        Gate_Route as "Route"
+        Gate_Route.Plant as "Plant"
+        Gate_Route.Product_Line as "Product Line"
+        Stage_Gate as "Stage"
+        Sequence_Number as "Sequence"
+        Final_Gate as "Final Gate"
+        Active
+        Instructions
+    )
+    filters
+    (
+        Gate_Route
+        Stage_Gate
+        Active
+    )
+    group by
+    (
+        Gate_Route ascending
+    )
+    sort by
+    (
+        Sequence_Number ascending
+    )
+}

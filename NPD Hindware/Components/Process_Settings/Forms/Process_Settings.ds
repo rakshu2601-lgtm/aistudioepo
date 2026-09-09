@@ -1,0 +1,147 @@
+form Process_Settings
+{
+    displayname = "Process Settings"
+
+    Settings_Section
+    (
+        type = section
+        displayname = "Process Configuration"
+        row = 1
+        column = 0
+    )
+    must have unique Configuration_Name
+    (
+        type = text
+        displayname = "Configuration Name"
+        initial value = "Default"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have NPD_Leader_User
+    (
+        type = picklist
+        displayname = "NPD Leader User"
+        module = users
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have QA_Reviewer_User
+    (
+        type = picklist
+        displayname = "QA Reviewer User"
+        module = users
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have QA_Head_User
+    (
+        type = picklist
+        displayname = "QA Head User"
+        module = users
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Sourcing_User
+    (
+        type = picklist
+        displayname = "Sourcing User"
+        module = users
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Section_Head_User
+    (
+        type = picklist
+        displayname = "Section Head User"
+        module = users
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have QA_Review_Manager_Email
+    (
+        type = email
+        displayname = "QA Review Manager Email"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Section_Head_Manager_Email
+    (
+        type = email
+        displayname = "Section Head Manager Email"
+        row = 1
+        column = 2
+        width = medium
+    )
+    QA_Head_Manager_Email
+    (
+        type = email
+        displayname = "QA Head Manager Email"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Review_SLA_Working_Days
+    (
+        type = number
+        displayname = "Review SLA Working Days"
+        initial value = 7
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Final_Notification_Emails
+    (
+        type = textarea
+        displayname = "Final Notification Emails"
+        description [ type = tooltip  message = "Enter a comma-separated distribution list." ]
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        initial value = true
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Configuration"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Configuration"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

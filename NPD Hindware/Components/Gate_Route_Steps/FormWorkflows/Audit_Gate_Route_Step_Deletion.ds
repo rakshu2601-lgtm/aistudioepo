@@ -1,0 +1,25 @@
+Audit_Gate_Route_Step_Deletion as "Audit Gate Route Step Deletion"
+{
+    type = form
+    form = Gate_Route_Steps
+    record event = on delete
+    description = "Records successful gate route step deletions in the process audit trail."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                audit_event_id = insert into Process_Audit_Log
+                [
+                    Event_Type = "Configuration Changed"
+                    Action_Name = "Gate Route Step Deleted"
+                    Performed_By_Email = zoho.loginuserid
+                    Performed_On = zoho.currenttime
+                    Event_Details = "Route ID: " + input.Gate_Route + ", Stage: " + input.Stage_Gate + ", Sequence: " + input.Sequence_Number
+                ];
+            )
+        }
+    }
+}

@@ -1,0 +1,19 @@
+Prevent_Stage_Gate_Submission_Deletion as "Prevent Stage Gate Submission Deletion"
+{
+    type = form
+    form = Stage_Gate_Submissions
+    record event = on delete
+    description = "Preserves every stage-gate attempt as an immutable audit record."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Stage gate attempts are immutable and cannot be deleted.";
+                cancel delete;
+            )
+        }
+    }
+}

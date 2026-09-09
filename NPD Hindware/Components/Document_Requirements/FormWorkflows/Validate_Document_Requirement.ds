@@ -1,0 +1,82 @@
+Validate_Document_Requirement as "Validate Document Requirement"
+{
+    type = form
+    form = Document_Requirements
+    record event = on add or edit
+    description = "Validates scope, route-step ownership, positive ordering, and active requirement uniqueness"
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                validation_failed = false;
+                scope_step_valid = true;
+
+                if(input.Scope == "Stage Gate")
+                {
+                    if(input.Gate_Route_Step == null)
+                    {
+                        alert(Gate_Route_Step, "Select a route step for a Stage Gate requirement.");
+                        validation_failed = true;
+                        scope_step_valid = false;
+                    }
+                    else
+                    {
+                        matching_step_count = Gate_Route_Steps[ID == input.Gate_Route_Step && Gate_Route == input.Gate_Route].count(ID);
+                        if(matching_step_count == 0)
+                        {
+                            alert(Gate_Route_Step, "The selected route step does not belong to the selected route.");
+                            validation_failed = true;
+                            scope_step_valid = false;
+                        }
+                    }
+                }
+                else if(input.Scope == "Initial Request" && input.Gate_Route_Step != null)
+                {
+                    alert(Gate_Route_Step, "Route step must be blank for an Initial Request requirement.");
+                    validation_failed = true;
+                    scope_step_valid = false;
+                }
+
+                if(input.Sort_Order != null && input.Sort_Order <= 0)
+                {
+                    alert(Sort_Order, "Sort Order must be greater than zero.");
+                    validation_failed = true;
+                }
+
+                if(input.Active == true && input.Gate_Route != null && input.Scope != null && scope_step_valid == true)
+                {
+                    duplicate_name_count = 0;
+                    duplicate_order_count = 0;
+                    if(input.Scope == "Initial Request")
+                    {
+                        duplicate_name_count = Document_Requirements[ID != input.ID && Active == true && Gate_Route == input.Gate_Route && Scope == input.Scope && Gate_Route_Step == null && Requirement_Name == input.Requirement_Name].count(ID);
+                        duplicate_order_count = Document_Requirements[ID != input.ID && Active == true && Gate_Route == input.Gate_Route && Scope == input.Scope && Gate_Route_Step == null && Sort_Order == input.Sort_Order].count(ID);
+                    }
+                    else
+                    {
+                        duplicate_name_count = Document_Requirements[ID != input.ID && Active == true && Gate_Route == input.Gate_Route && Scope == input.Scope && Gate_Route_Step == input.Gate_Route_Step && Requirement_Name == input.Requirement_Name].count(ID);
+                        duplicate_order_count = Document_Requirements[ID != input.ID && Active == true && Gate_Route == input.Gate_Route && Scope == input.Scope && Gate_Route_Step == input.Gate_Route_Step && Sort_Order == input.Sort_Order].count(ID);
+                    }
+                    if(duplicate_name_count > 0)
+                    {
+                        alert(Requirement_Name, "An active requirement with this name already exists for the same route, scope, and step.");
+                        validation_failed = true;
+                    }
+                    if(duplicate_order_count > 0)
+                    {
+                        alert(Sort_Order, "An active requirement with this order already exists for the same route, scope, and step.");
+                        validation_failed = true;
+                    }
+                }
+
+                if(validation_failed == true)
+                {
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

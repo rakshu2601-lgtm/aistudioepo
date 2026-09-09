@@ -1,0 +1,58 @@
+default list Sample_Validation_Sheet
+{
+    displayName = "Sample Validation Sheet"
+    show all rows from Sample_Validation_Items
+    (
+        NPD_Request
+        Sequence_Number
+        Check_Category
+        Checkpoint
+        Specification_or_Acceptance_Criteria
+        Observed_Value
+        Result
+        Remarks
+        Evidence_File
+        Performed_By
+        Performed_On
+    )
+    filters
+    (
+        NPD_Request
+        Check_Category
+        Result
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        NPD_Request ascending
+        Check_Category ascending
+    )
+    sort by
+    (
+        Sequence_Number ascending
+    )
+    conditional formatting
+    (
+        "Passed Checks"
+        {
+            condition = (Result == "Pass")
+            fields = [Result]
+            format = "background-color:#E7F6EC;color:#176B3A;font-weight:bold"
+        }
+        "Failed Checks"
+        {
+            condition = (Result == "Fail")
+            fields = [Checkpoint, Observed_Value, Result, Remarks]
+            format = "background-color:#FDE8E7;color:#A61B1B;font-weight:bold"
+        }
+        "Not Applicable Checks"
+        {
+            condition = (Result == "Not Applicable")
+            fields = [Result, Remarks]
+            format = "background-color:#FFF4D6;color:#7A5200;font-style:italic"
+        }
+    )
+}

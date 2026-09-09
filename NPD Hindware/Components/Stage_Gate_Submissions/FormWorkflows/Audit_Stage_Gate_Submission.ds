@@ -1,0 +1,37 @@
+Audit_Stage_Gate_Submission as "Audit Stage Gate Submission"
+{
+    type = form
+    form = Stage_Gate_Submissions
+    record event = on add
+    description = "Audits creation of every immutable stage-gate attempt; blueprint after-actions audit each handoff."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                instance_record = Stage_Gate_Instances[ID == input.Stage_Gate_Instance];
+                event_type = "Created";
+                if(input.Submission_Status == "Sourcing Rework")
+                {
+                    event_type = "Reworked";
+                }
+                audit_id = insert into Process_Audit_Log
+                [
+                    NPD_Request = instance_record.NPD_Request
+                    Stage_Gate_Instance = input.Stage_Gate_Instance
+                    Stage_Gate_Submission = input.ID
+                    Event_Type = event_type
+                    Action_Name = "Stage Gate Attempt Created"
+                    From_Status = ""
+                    To_Status = input.Submission_Status
+                    Observations = ifnull(input.Copied_Observations, "")
+                    Performed_By_Email = zoho.loginuserid
+                    Performed_On = zoho.currenttime
+                    Event_Details = "Attempt " + input.Attempt_Number + " for stage " + instance_record.Stage_Gate + "."
+                ];
+            )
+        }
+    }
+}

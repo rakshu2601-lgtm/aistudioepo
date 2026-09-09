@@ -1,0 +1,24 @@
+Prevent_Protected_Step_Deletion as "Prevent Protected Step Deletion"
+{
+    type = form
+    form = Gate_Route_Steps
+    record event = on delete
+    description = "Prevents deletion of steps from an Active route referenced by an in-flight request."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                route_is_active = Gate_Routes[ID == input.Gate_Route && Status == "Active"].count(ID) > 0;
+                in_flight_request_count = NPD_Requests[Gate_Route == input.Gate_Route && (Process_Status == "Initial QA Review" || Process_Status == "NPD Rework" || Process_Status == "Initial QA Head Approval" || Process_Status == "Stage Gates In Progress" || Process_Status == "Final QA Head Approval")].count(ID);
+                if(route_is_active && in_flight_request_count > 0)
+                {
+                    alert "This step cannot be deleted while its Active route is referenced by an in-flight request.";
+                    cancel delete;
+                }
+            )
+        }
+    }
+}

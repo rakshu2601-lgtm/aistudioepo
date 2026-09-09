@@ -1,0 +1,148 @@
+form Submission_Documents
+{
+    displayname = "Submission Documents"
+    success message = "Submission document uploaded successfully."
+
+    Submission_Document
+    (
+        type = section
+        displayname = "Submission Document"
+        row = 1
+        column = 0
+    )
+    must have Stage_Gate_Submission
+    (
+        type = picklist
+        displayname = "Stage Gate Submission"
+        values = Stage_Gate_Submissions.ID
+        displayformat = [Submission_Number]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Document_Category
+    (
+        type = radiobuttons
+        displayname = "Document Category"
+        values = {"Sourcing Supporting Document", "QA Validation Report"}
+        layout = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    Document_Requirement
+    (
+        type = picklist
+        displayname = "Document Requirement"
+        values = Document_Requirements.ID
+        displayformat = [Requirement_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Document_Name
+    (
+        type = text
+        displayname = "Document Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Document_File
+    (
+        type = upload file
+        displayname = "Document File"
+        browse = local_drive, google_docs, zoho_docs
+        row = 1
+        column = 1
+        width = medium
+    )
+    Remarks
+    (
+        type = textarea
+        displayname = "Remarks"
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Uploaded_By
+    (
+        type = picklist
+        displayname = "Uploaded By"
+        module = users
+        row = 1
+        column = 2
+        width = medium
+    )
+    Uploaded_On
+    (
+        type = datetime
+        displayname = "Uploaded On"
+        initial value = "${zoho.currenttime}"
+        row = 1
+        column = 2
+        width = medium
+    )
+    NPD_Request
+    (
+        type = picklist
+        displayname = "Request"
+        values = NPD_Requests.ID
+        displayformat = [Request_Title]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Stage_Gate
+    (
+        type = radiobuttons
+        displayname = "Stage Gate"
+        values = {"N1", "N5", "N10", "N30", "N50"}
+        layout = 1
+        row = 1
+        column = 2
+        width = medium
+    )
+    Attempt_Number
+    (
+        type = number
+        displayname = "Attempt Number"
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Upload Document"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Remarks"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

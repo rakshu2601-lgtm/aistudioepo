@@ -1,0 +1,113 @@
+form Document_Requirements
+{
+    displayname = "Document Requirements"
+
+    Requirement_Details
+    (
+        type = section
+        displayname = "Requirement Details"
+        row = 1
+        column = 0
+    )
+    must have unique Requirement_Code
+    (
+        type = text
+        displayname = "Requirement Code"
+        row = 1
+        column = 1
+    )
+    must have Requirement_Name
+    (
+        type = text
+        displayname = "Requirement Name"
+        row = 1
+        column = 1
+    )
+    must have Scope
+    (
+        type = radiobuttons
+        displayname = "Scope"
+        values = {"Initial Request", "Stage Gate"}
+        row = 1
+        column = 1
+    )
+    must have Gate_Route
+    (
+        type = picklist
+        displayname = "Gate Route"
+        values = Gate_Routes.ID
+        displayformat = [Route_Name]
+        searchable = true
+        row = 1
+        column = 1
+    )
+    Gate_Route_Step
+    (
+        type = picklist
+        displayname = "Gate Route Step"
+        values = Gate_Route_Steps.ID
+        displayformat = [Stage_Gate]
+        searchable = true
+        row = 1
+        column = 1
+    )
+    Mandatory
+    (
+        type = checkbox
+        displayname = "Mandatory"
+        initial value = true
+        row = 1
+        column = 1
+    )
+    Instructions
+    (
+        type = textarea
+        displayname = "Instructions"
+        row = 1
+        column = 1
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 1
+        column = 1
+    )
+    must have Sort_Order
+    (
+        type = number
+        displayname = "Sort Order"
+        row = 1
+        column = 1
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Requirement"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Requirement"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

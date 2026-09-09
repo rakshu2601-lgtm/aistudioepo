@@ -1,0 +1,66 @@
+default list Stage_Gate_Tracker
+{
+    displayName = "Stage Gate Tracker"
+    show all rows from Stage_Gate_Instances
+    (
+        NPD_Request
+        NPD_Request.Plant as "Plant"
+        NPD_Request.Product_Line as "Product Line"
+        Stage_Gate
+        Sequence_Number
+        Gate_Status
+        Latest_Attempt_Number as "Attempt"
+        Activated_On
+        Completed_On
+        Sourcing_User
+        QA_Reviewer_User
+        Section_Head_User
+    )
+    filters
+    (
+        NPD_Request
+        Stage_Gate
+        Gate_Status
+        Sourcing_User
+        QA_Reviewer_User
+        Section_Head_User
+    )
+    sort by
+    (
+        NPD_Request ascending
+        Sequence_Number ascending
+    )
+    conditional formatting
+    (
+        "Ready for Sourcing"
+        {
+            condition = (Gate_Status == "Ready for Sourcing")
+            fields = [NPD_Request, Stage_Gate, Gate_Status, Sourcing_User]
+            format = "background-color:#E8F3FF;color:#155A8A;font-weight:bold"
+        }
+        "Rework Required"
+        {
+            condition = (Gate_Status == "Rework")
+            fields = [NPD_Request, Stage_Gate, Gate_Status, Latest_Attempt_Number]
+            format = "background-color:#FFF4D6;color:#7A5200;font-weight:bold"
+        }
+        "Overdue Review"
+        {
+            condition = ((Gate_Status == "QA Review" || Gate_Status == "Section Head Review") && Activated_On < zoho.currentdate)
+            fields = [NPD_Request, Stage_Gate, Gate_Status, Activated_On, QA_Reviewer_User, Section_Head_User]
+            format = "background-color:#FDE8E7;color:#A61B1B;font-weight:bold"
+        }
+        "Approved Gate"
+        {
+            condition = (Gate_Status == "Approved")
+            fields = [NPD_Request, Stage_Gate, Gate_Status, Completed_On]
+            format = "background-color:#E7F6EC;color:#176B3A;font-weight:bold"
+        }
+        "Terminated Gate"
+        {
+            condition = (Gate_Status == "Terminated")
+            fields = [NPD_Request, Stage_Gate, Gate_Status, Completed_On]
+            format = "background-color:#ECEFF3;color:#4B5563;text-decoration:line-through"
+        }
+    )
+}

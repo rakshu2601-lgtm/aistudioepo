@@ -1,0 +1,455 @@
+Stage_Gate_Submission_Blueprint as "Stage Gate Submission Blueprint"
+{
+    type = blueprint
+    form = Stage_Gate_Submissions
+
+    start
+    {
+        start stage = "Sourcing Draft"
+    }
+
+    stages
+    {
+        "Sourcing Draft" { }
+        "Sourcing Rework" { }
+        "QA Review" { }
+        "Section Head Review" { }
+        "Rejected by QA" { }
+        "Rejected by Section Head" { }
+        "Approved" { }
+    }
+
+    transitions
+    {
+        Submit_to_QA as "Submit to QA"
+        {
+            type = normal
+            from stage = "Sourcing Draft"
+            to stage = "QA Review"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Sourcing Team"}
+                )
+            }
+            during
+            {
+                action = update_fields
+                workflow status = true
+                visible fields = [Sourcing_Comments]
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        settings = Process_Settings[Active == true];
+                        instance_record = Stage_Gate_Instances[ID == input.Stage_Gate_Instance];
+                        Sourcing_Submitted_By = zoho.loginuser;
+                        Sourcing_Submitted_On = zoho.currenttime;
+                        QA_Due_On = zoho.currentdate.addBusinessDay(settings.Review_SLA_Working_Days);
+                        Applicable_Due_On = QA_Due_On;
+                        QA_Escalation_Sent = false;
+                        instance_record.Gate_Status = "QA Review";
+                        instance_record.Latest_Attempt_Number = input.Attempt_Number;
+                        audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = instance_record.NPD_Request
+                            Stage_Gate_Instance = input.Stage_Gate_Instance
+                            Stage_Gate_Submission = input.ID
+                            Event_Type = "Submitted"
+                            Action_Name = "Submit to QA"
+                            From_Status = "Sourcing Draft"
+                            To_Status = "QA Review"
+                            Observations = input.Sourcing_Comments
+                            Performed_By_Email = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Event_Details = "Mandatory route-step documents validated for attempt " + input.Attempt_Number + "."
+                        ];
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : settings.QA_Reviewer_User.email
+                            subject : "Stage gate attempt ready for QA"
+                            message : "Attempt " + input.Attempt_Number + " for " + instance_record.Stage_Gate + " is ready for QA review."
+                        )
+                    )
+                }
+            }
+        }
+
+        Send_to_QA_Again as "Send to QA Again"
+        {
+            type = normal
+            from stage = "Sourcing Rework"
+            to stage = "QA Review"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Sourcing Team"}
+                )
+            }
+            during
+            {
+                action = update_fields
+                workflow status = true
+                visible fields = [Response_to_Observations, Sourcing_Comments]
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        settings = Process_Settings[Active == true];
+                        instance_record = Stage_Gate_Instances[ID == input.Stage_Gate_Instance];
+                        Sourcing_Submitted_By = zoho.loginuser;
+                        Sourcing_Submitted_On = zoho.currenttime;
+                        QA_Due_On = zoho.currentdate.addBusinessDay(settings.Review_SLA_Working_Days);
+                        Applicable_Due_On = QA_Due_On;
+                        QA_Escalation_Sent = false;
+                        instance_record.Gate_Status = "QA Review";
+                        instance_record.Latest_Attempt_Number = input.Attempt_Number;
+                        audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = instance_record.NPD_Request
+                            Stage_Gate_Instance = input.Stage_Gate_Instance
+                            Stage_Gate_Submission = input.ID
+                            Event_Type = "Resubmitted"
+                            Action_Name = "Send to QA Again"
+                            From_Status = "Sourcing Rework"
+                            To_Status = "QA Review"
+                            Observations = input.Response_to_Observations
+                            Performed_By_Email = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Event_Details = "Updated mandatory documents validated for rework attempt " + input.Attempt_Number + "."
+                        ];
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : settings.QA_Reviewer_User.email
+                            subject : "Reworked stage gate attempt ready for QA"
+                            message : "Rework attempt " + input.Attempt_Number + " for " + instance_record.Stage_Gate + " is ready for QA review."
+                        )
+                    )
+                }
+            }
+        }
+
+        QA_Pass as "QA Pass"
+        {
+            type = normal
+            from stage = "QA Review"
+            to stage = "Section Head Review"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"QA Reviewer"}
+                )
+            }
+            during
+            {
+                action = update_fields
+                workflow status = true
+                visible fields = [QA_Decision, QA_Observations]
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        settings = Process_Settings[Active == true];
+                        instance_record = Stage_Gate_Instances[ID == input.Stage_Gate_Instance];
+                        QA_Decision = "Pass";
+                        QA_Reviewed_By = zoho.loginuser;
+                        QA_Reviewed_On = zoho.currenttime;
+                        Section_Head_Due_On = zoho.currentdate.addBusinessDay(settings.Review_SLA_Working_Days);
+                        Applicable_Due_On = Section_Head_Due_On;
+                        Section_Escalation_Sent = false;
+                        instance_record.Gate_Status = "Section Head Review";
+                        audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = instance_record.NPD_Request
+                            Stage_Gate_Instance = input.Stage_Gate_Instance
+                            Stage_Gate_Submission = input.ID
+                            Event_Type = "Passed"
+                            Action_Name = "QA Pass"
+                            From_Status = "QA Review"
+                            To_Status = "Section Head Review"
+                            Decision = "Pass"
+                            Observations = input.QA_Observations
+                            Performed_By_Email = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Event_Details = "QA Validation Report confirmed for attempt " + input.Attempt_Number + "."
+                        ];
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : settings.Section_Head_User.email
+                            subject : "Stage gate attempt ready for Section Head review"
+                            message : "Attempt " + input.Attempt_Number + " for " + instance_record.Stage_Gate + " passed QA and awaits your decision."
+                        )
+                    )
+                }
+            }
+        }
+
+        QA_Reject as "QA Reject"
+        {
+            type = normal
+            from stage = "QA Review"
+            to stage = "Rejected by QA"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"QA Reviewer"}
+                )
+            }
+            during
+            {
+                action = update_fields
+                workflow status = true
+                visible fields = [QA_Decision, QA_Observations]
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        settings = Process_Settings[Active == true];
+                        instance_record = Stage_Gate_Instances[ID == input.Stage_Gate_Instance];
+                        QA_Decision = "Reject";
+                        QA_Reviewed_By = zoho.loginuser;
+                        QA_Reviewed_On = zoho.currenttime;
+                        next_attempt_number = input.Attempt_Number + 1;
+                        rework_id = insert into Stage_Gate_Submissions
+                        [
+                            Stage_Gate_Instance = input.Stage_Gate_Instance
+                            Attempt_Number = next_attempt_number
+                            Previous_Attempt_Number = input.Attempt_Number
+                            Submission_Status = "Sourcing Rework"
+                            Copied_Observations = input.QA_Observations
+                        ];
+                        instance_record.Gate_Status = "Rework";
+                        instance_record.Latest_Attempt_Number = next_attempt_number;
+                        audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = instance_record.NPD_Request
+                            Stage_Gate_Instance = input.Stage_Gate_Instance
+                            Stage_Gate_Submission = input.ID
+                            Event_Type = "Rejected"
+                            Action_Name = "QA Reject"
+                            From_Status = "QA Review"
+                            To_Status = "Rejected by QA"
+                            Decision = "Reject"
+                            Observations = input.QA_Observations
+                            Performed_By_Email = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Event_Details = "Attempt frozen; rework attempt " + next_attempt_number + " created."
+                        ];
+                        rework_audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = instance_record.NPD_Request
+                            Stage_Gate_Instance = input.Stage_Gate_Instance
+                            Stage_Gate_Submission = rework_id
+                            Event_Type = "Reworked"
+                            Action_Name = "QA Rework Attempt Created"
+                            From_Status = "Rejected by QA"
+                            To_Status = "Sourcing Rework"
+                            Observations = input.QA_Observations
+                            Performed_By_Email = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Event_Details = "New immutable attempt " + next_attempt_number + " created from attempt " + input.Attempt_Number + "."
+                        ];
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : settings.Sourcing_User.email
+                            subject : "Stage gate attempt returned for rework"
+                            message : "Attempt " + input.Attempt_Number + " for " + instance_record.Stage_Gate + " was rejected by QA. Rework attempt " + next_attempt_number + " is ready."
+                        )
+                    )
+                }
+            }
+        }
+
+        Section_Head_Approve as "Section Head Approve"
+        {
+            type = normal
+            from stage = "Section Head Review"
+            to stage = "Approved"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Section Head"}
+                )
+            }
+            during
+            {
+                action = update_fields
+                workflow status = true
+                visible fields = [Section_Head_Decision, Section_Head_Observations]
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        settings = Process_Settings[Active == true];
+                        instance_record = Stage_Gate_Instances[ID == input.Stage_Gate_Instance];
+                        Section_Head_Decision = "Approve";
+                        Section_Head_Decided_By = zoho.loginuser;
+                        Section_Head_Decided_On = zoho.currenttime;
+                        instance_record.Gate_Status = "Approved";
+                        instance_record.Completed_On = zoho.currenttime;
+                        instance_record.Latest_Attempt_Number = input.Attempt_Number;
+                        request_record = NPD_Requests[ID == instance_record.NPD_Request];
+                        audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = instance_record.NPD_Request
+                            Stage_Gate_Instance = input.Stage_Gate_Instance
+                            Stage_Gate_Submission = input.ID
+                            Event_Type = "Approved"
+                            Action_Name = "Section Head Approve"
+                            From_Status = "Section Head Review"
+                            To_Status = "Approved"
+                            Decision = "Approve"
+                            Observations = input.Section_Head_Observations
+                            Performed_By_Email = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Event_Details = "Stage gate attempt " + input.Attempt_Number + " approved."
+                        ];
+                        if(instance_record.Final_Gate == false)
+                        {
+                            next_instance = Stage_Gate_Instances[NPD_Request == instance_record.NPD_Request && Sequence_Number == instance_record.Sequence_Number + 1 && Gate_Status == "Locked"];
+                            if(next_instance.count(ID) == 1)
+                            {
+                                next_submission_id = insert into Stage_Gate_Submissions
+                                [
+                                    Stage_Gate_Instance = next_instance.ID
+                                    Attempt_Number = 1
+                                    Submission_Status = "Sourcing Draft"
+                                ];
+                                next_instance.Gate_Status = "Ready for Sourcing";
+                                next_instance.Activated_On = zoho.currenttime;
+                                next_instance.Latest_Attempt_Number = 1;
+                                request_record.Current_Stage_Gate = next_instance.Stage_Gate;
+                                sendmail
+                                (
+                                    from : zoho.adminuserid
+                                    to : settings.Sourcing_User.email
+                                    subject : "Next stage gate ready for sourcing"
+                                    message : next_instance.Stage_Gate + " is now active and attempt 1 is ready for sourcing."
+                                )
+                            }
+                        }
+                        else
+                        {
+                            request_record.Process_Status = "Final QA Head Approval";
+                            request_record.Current_Stage_Gate = instance_record.Stage_Gate;
+                            request_record.Initial_QA_Due_On = zoho.currentdate.addBusinessDay(settings.Review_SLA_Working_Days);
+                            request_record.Escalation_Sent = false;
+                            sendmail
+                            (
+                                from : zoho.adminuserid
+                                to : settings.QA_Head_User.email
+                                subject : "Final stage gate approved"
+                                message : instance_record.Stage_Gate + " is approved and the request is ready for final QA Head approval."
+                            )
+                        }
+                    )
+                }
+            }
+        }
+
+        Section_Head_Reject as "Section Head Reject"
+        {
+            type = normal
+            from stage = "Section Head Review"
+            to stage = "Rejected by Section Head"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Section Head"}
+                )
+            }
+            during
+            {
+                action = update_fields
+                workflow status = true
+                visible fields = [Section_Head_Decision, Section_Head_Observations]
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        settings = Process_Settings[Active == true];
+                        instance_record = Stage_Gate_Instances[ID == input.Stage_Gate_Instance];
+                        Section_Head_Decision = "Reject";
+                        Section_Head_Decided_By = zoho.loginuser;
+                        Section_Head_Decided_On = zoho.currenttime;
+                        next_attempt_number = input.Attempt_Number + 1;
+                        rework_id = insert into Stage_Gate_Submissions
+                        [
+                            Stage_Gate_Instance = input.Stage_Gate_Instance
+                            Attempt_Number = next_attempt_number
+                            Previous_Attempt_Number = input.Attempt_Number
+                            Submission_Status = "Sourcing Rework"
+                            Copied_Observations = input.Section_Head_Observations
+                        ];
+                        instance_record.Gate_Status = "Rework";
+                        instance_record.Latest_Attempt_Number = next_attempt_number;
+                        audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = instance_record.NPD_Request
+                            Stage_Gate_Instance = input.Stage_Gate_Instance
+                            Stage_Gate_Submission = input.ID
+                            Event_Type = "Rejected"
+                            Action_Name = "Section Head Reject"
+                            From_Status = "Section Head Review"
+                            To_Status = "Rejected by Section Head"
+                            Decision = "Reject"
+                            Observations = input.Section_Head_Observations
+                            Performed_By_Email = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Event_Details = "Attempt frozen; rework attempt " + next_attempt_number + " created."
+                        ];
+                        rework_audit_id = insert into Process_Audit_Log
+                        [
+                            NPD_Request = instance_record.NPD_Request
+                            Stage_Gate_Instance = input.Stage_Gate_Instance
+                            Stage_Gate_Submission = rework_id
+                            Event_Type = "Reworked"
+                            Action_Name = "Section Head Rework Attempt Created"
+                            From_Status = "Rejected by Section Head"
+                            To_Status = "Sourcing Rework"
+                            Observations = input.Section_Head_Observations
+                            Performed_By_Email = zoho.loginuserid
+                            Performed_On = zoho.currenttime
+                            Event_Details = "New immutable attempt " + next_attempt_number + " created from attempt " + input.Attempt_Number + "."
+                        ];
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : settings.Sourcing_User.email
+                            subject : "Stage gate attempt returned by Section Head"
+                            message : "Attempt " + input.Attempt_Number + " for " + instance_record.Stage_Gate + " was rejected. Rework attempt " + next_attempt_number + " is ready."
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
