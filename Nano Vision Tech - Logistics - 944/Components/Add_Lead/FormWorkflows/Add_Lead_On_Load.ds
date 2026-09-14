@@ -1,0 +1,35 @@
+Add_Lead_On_Load as "Add Lead On Load"
+{
+    type = form
+    form = Add_Lead
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                hide Hidden;
+                disable Status;
+                disable Action_Mode;
+                disable Customer_Company_Name;
+                disable Contact_Person;
+                disable Email;
+                disable Phone;
+                disable Country;
+                disable Lead_Products.Product_ID;
+                disable Lead_Products.Product_Name;
+                disable Lead_Products.Product_Category;
+                disable Lead_Products.Product_Type;
+                disable Lead_Products.Product_Description;
+                disable Lead_Products.Manufacturer_Part_Number;
+                disable Lead_Products.Internal_Part_Number;
+                disable Lead_Products.Brand_Make;
+                disable Lead_Products.Model;
+                disable Lead_Products.Unit_of_Measure;
+                disable Lead_Products.Expected_Total_Price;
+            )
+        }
+    }
+}

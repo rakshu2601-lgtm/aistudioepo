@@ -1,0 +1,17 @@
+customize
+{
+    layout = slidingpane
+    font = "lato"
+    style = "3"
+    color options
+    {
+        name = "Nano Vision Blue"
+        brand color = "#6147E5"
+        type = "custom"
+        dark mode color = "#6147E5"
+    }
+    logo
+    {
+        preference = "app_icon"
+    }
+}

@@ -1,0 +1,19 @@
+<page linkname = "Admin_Dashboard" displayname = "Admin Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Admin_Overview' elementName='Admin_Overview'>
+          <![CDATA[htmlpage Admin_Overview()
+            content
+            <%{%>
+              <file name:Admin_Overview.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

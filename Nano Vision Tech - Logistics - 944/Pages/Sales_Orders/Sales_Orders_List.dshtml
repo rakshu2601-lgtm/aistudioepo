@@ -1,0 +1,189 @@
+<%
+statusFilter = ifnull(input.Status_Filter,"All");
+if(statusFilter == "")
+{
+    statusFilter = "All";
+}
+allOrders = Create_Sales_Order[ID != 0] sort by Sales_Order_Date desc;
+allCount = allOrders.count();
+needsQuotesCount = Create_Sales_Order[Status == "New"].count();
+compareCount = Create_Sales_Order[Status == "Quotes Received"].count();
+readyCount = Create_Sales_Order[Status == "Quotes Received" && Selected_Supplier_Quote != null].count();
+downstreamCount = Create_Sales_Order[Status == "Purchase Order Created" || Status == "Purchase Order Approved" || Status == "Customer Approved" || Status == "Invoice Created" || Status == "Invoice Paid" || Status == "Logistics Pending" || Status == "Products Received"].count();
+completeCount = Create_Sales_Order[Status == "Delivered" || Status == "Return Requested"].count();
+if(statusFilter == "Needs Quotes")
+{
+    orders = Create_Sales_Order[Status == "New"] sort by Sales_Order_Date desc;
+}
+else if(statusFilter == "Compare Quotes")
+{
+    orders = Create_Sales_Order[Status == "Quotes Received"] sort by Sales_Order_Date desc;
+}
+else if(statusFilter == "Ready for PO")
+{
+    orders = Create_Sales_Order[Status == "Quotes Received" && Selected_Supplier_Quote != null] sort by Sales_Order_Date desc;
+}
+else if(statusFilter == "Downstream")
+{
+    orders = Create_Sales_Order[Status == "Purchase Order Created" || Status == "Purchase Order Approved" || Status == "Customer Approved" || Status == "Invoice Created" || Status == "Invoice Paid" || Status == "Logistics Pending" || Status == "Products Received"] sort by Sales_Order_Date desc;
+}
+else if(statusFilter == "Delivered / Returns")
+{
+    orders = Create_Sales_Order[Status == "Delivered" || Status == "Return Requested"] sort by Sales_Order_Date desc;
+}
+else if(statusFilter == "All")
+{
+    orders = allOrders;
+}
+else
+{
+    orders = Create_Sales_Order[Status == statusFilter] sort by Sales_Order_Date desc;
+}
+%>
+<style>
+/* ZCS global utility subset used by this single-snippet page. */
+:root{--zcs-theme-brand-color:var(--zcs_brand_color);--zcs-page-bg-color:#f5f4f8;--zcs-primary-text-color:var(--zcs_primary_text_color);--zcs-secondary-text-color:var(--zcs_secondary_text_color);--zcs-teritiary-text-color:var(--zcs_tertiary_text_color);--zcs-border-color:var(--zcs_tertiary_border_color);--zcs-white-color:#fff;font-size:16px;line-height:1.5}.zcs-flex{display:flex}.zcs-inline-flex{display:inline-flex}.zcs-align-items-center{align-items:center}.zcs-justify-center{justify-content:center}.zcs-justify-space-between{justify-content:space-between}.zcs-row-wrap{flex-wrap:wrap}.zcs-gap-6{gap:.375rem}.zcs-gap-8{gap:.5rem}.zcs-gap-12{gap:.75rem}.zcs-p-20{padding:1.25rem}.zcs-px-6{padding-left:.375rem;padding-right:.375rem}.zcs-px-10{padding-left:.625rem;padding-right:.625rem}.zcs-px-16{padding-left:1rem;padding-right:1rem}.zcs-py-2{padding-top:.125rem;padding-bottom:.125rem}.zcs-py-8{padding-top:.5rem;padding-bottom:.5rem}.zcs-py-12{padding-top:.75rem;padding-bottom:.75rem}.zcs-m-0{margin:0}.zcs-mt-10{margin-top:.625rem}.zcs-mt-12{margin-top:.75rem}.zcs-mb-0{margin-bottom:0}.zcs-w-full{width:100%}.zcs-box-border{box-sizing:border-box}.zcs-rounded-sm{border-radius:.25rem}.zcs-rounded-md{border-radius:.375rem}.zcs-font-11{font-size:.6875rem}.zcs-font-12{font-size:.75rem}.zcs-font-13{font-size:.8125rem}.zcs-font-14{font-size:.875rem}.zcs-font-18{font-size:1.125rem}.zcs-font-medium{font-weight:500}.zcs-font-semibold{font-weight:600}.zcs-lh-heading{line-height:1.25}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-secondary{color:var(--zcs-secondary-text-color)}.zcs-color-tertiary{color:var(--zcs-teritiary-text-color)}.zcs-text-left{text-align:left}.zcs-text-center{text-align:center}.zcs-sticky{position:sticky}a{text-decoration:none}#splash-screen{display:none!important}.zc-pb-page-content-wrapper .zc-pb-tile-container{padding:0!important}.zc-pb-page-content-wrapper .zc-pb-tile-card{box-shadow:none!important}
+*{box-sizing:border-box}.so-page{height:100%;min-height:560px;padding:12px;background:var(--zcs-page-bg-color);color:var(--zcs-primary-text-color);font-family:Arial,sans-serif}.so-shell{height:100%;min-height:536px;display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--zcs-border-color);border-radius:12px;background:var(--zcs-white-color)}.so-header{flex:0 0 auto;padding:14px 18px 12px;border-bottom:1px solid var(--zcs-border-color)}.so-heading{display:flex;align-items:center;gap:10px}.so-heading-icon{width:32px;height:32px;border-radius:8px;background:var(--zcs_component_hover_color);color:var(--zcs_brand_color);font-size:16px}.so-subtitle{margin:3px 0 0;color:var(--zcs-secondary-text-color);font-size:12px}.so-head-count{padding:5px 9px;border:1px solid var(--zcs-border-color);border-radius:6px;background:#faf9fc;color:var(--zcs-secondary-text-color);font-size:12px;white-space:nowrap}.so-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:10px 14px;border-bottom:1px solid var(--zcs-border-color);background:#fbfafe}.so-kpi{min-width:0;padding:8px 10px;border-left:3px solid #d9d2eb;background:#fff;border-radius:5px}.so-kpi strong{display:block;font-size:16px;line-height:1.15}.so-kpi span{display:block;margin-top:2px;color:var(--zcs-secondary-text-color);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.so-kpi.attn{border-left-color:#d79a27}.so-kpi.ready{border-left-color:#258a61}.so-kpi.flow{border-left-color:var(--zcs_brand_color)}.so-kpi.done{border-left-color:#4777b8}.so-filters{display:flex;gap:7px;overflow-x:auto;padding:10px 14px;border-bottom:1px solid var(--zcs-border-color);scrollbar-width:none}.so-filters::-webkit-scrollbar{display:none}.so-chip{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;padding:5px 9px;border:1px solid var(--zcs-border-color);border-radius:14px;background:#fff;color:var(--zcs-secondary-text-color);font-size:12px}.so-chip:hover,.so-chip.active{border-color:var(--zcs_brand_color);background:var(--zcs_component_hover_color);color:var(--zcs_brand_color)}.so-chip-count{min-width:18px;text-align:center;font-weight:600}.so-viewbar{display:flex;justify-content:space-between;gap:12px;padding:7px 14px;background:#faf9fc;color:var(--zcs-secondary-text-color);font-size:11px}.so-register{flex:1 1 auto;min-height:260px;overflow:auto;padding:0 12px 12px}.zcs-table-wrapper{height:100%;overflow:auto;border:1px solid var(--zcs-border-color);border-radius:6px;background:#fff}.zcs-table-wrapper table{width:100%;min-width:1100px;border-collapse:collapse}.zcs-table-wrapper thead{top:0;z-index:2}.zcs-table-wrapper th{padding:8px 10px;background:#f7f6fa;box-shadow:0 -1px 0 var(--zcs-border-color) inset;color:var(--zcs-secondary-text-color);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.035em;white-space:nowrap}.zcs-table-wrapper td{padding:10px;border-top:1px solid var(--zcs-border-color);vertical-align:top;font-size:12px}.zcs-table-wrapper tbody tr:first-child td{border-top:0}.zcs-table-wrapper tbody tr:hover td{background:#fbfafe}.so-order-link{display:inline-flex;align-items:center;gap:6px;color:var(--zcs_brand_color);font-size:13px;font-weight:600}.so-order-link i{font-size:12px}.so-customer{max-width:210px;margin-top:3px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.so-minor{margin-top:3px;color:var(--zcs-secondary-text-color);font-size:11px;line-height:1.35}.so-products{max-width:220px}.so-next{max-width:205px;color:var(--zcs-primary-text-color);font-weight:600;line-height:1.35}.so-next i{margin-right:5px;color:var(--zcs_brand_color)}.zcs-badge{width:auto;white-space:nowrap}.zcs-badge-filled-outline{border:1px solid}.zcs-badge-green{background:#e4fcf3;border-color:#179e6c;color:#117551}.zcs-badge-red{background:#fde3e6;border-color:#fe455d;color:#c83249}.zcs-badge-yellow{background:#fcf4e6;border-color:#d99a1c;color:#95660d}.zcs-badge-blue{background:#e8efff;border-color:#2a6ffc;color:#245bc5}.zcs-badge-orange{background:#f8f0eb;border-color:#f4660c;color:#b94b08}.zcs-badge-grey{background:#eeeef1;border-color:#777784;color:#4f4f5a}.so-readiness{display:flex;flex-wrap:wrap;gap:5px}.so-signal{display:inline-flex;align-items:center;gap:4px;padding:3px 6px;border-radius:4px;background:#f3f1f7;color:var(--zcs-secondary-text-color);font-size:11px}.so-signal.selected{background:#e7f7f0;color:#157451}.so-actions{display:flex;gap:5px;justify-content:flex-end;white-space:nowrap}.so-action{width:28px;height:28px;border:1px solid var(--zcs-border-color);border-radius:5px;color:var(--zcs-secondary-text-color)}.so-action:hover,.so-action.primary{border-color:var(--zcs_brand_color);background:var(--zcs_component_hover_color);color:var(--zcs_brand_color)}.so-mobile{display:none}.zcs-nodata-wrapper{flex:1;min-height:260px}.empty-icon{width:44px;height:44px;margin:0 auto;border-radius:50%;background:var(--zcs_component_hover_color);color:var(--zcs_brand_color);font-size:20px}.empty-link{display:inline-flex;margin-top:12px;padding:7px 12px;border:1px solid var(--zcs_brand_color);border-radius:6px;color:var(--zcs_brand_color);font-size:13px}
+@media(max-width:760px){.so-page{height:auto;min-height:100%;padding:7px}.so-shell{height:auto;min-height:0;overflow:visible}.so-header{padding:12px}.so-head-count{display:none}.so-kpis{grid-template-columns:repeat(2,minmax(0,1fr));padding:9px}.so-kpi:first-child{grid-column:span 2}.so-viewbar{padding:7px 10px}.so-viewbar span:last-child{display:none}.so-register{display:none}.so-mobile{display:grid;gap:9px;padding:9px}.so-card{padding:12px;border:1px solid var(--zcs-border-color);border-radius:8px;background:#fff}.so-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.so-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:11px}.so-card-field{min-width:0}.so-label{display:block;margin-bottom:2px;color:var(--zcs-teritiary-text-color);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.035em}.so-value{display:block;font-size:12px;overflow-wrap:anywhere}.so-card .so-products{max-width:none;grid-column:span 2}.so-card-next{margin-top:10px;padding:8px;background:#faf9fc;border-radius:6px}.so-card-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.so-card-actions .so-action{width:auto;padding:0 8px;gap:5px;font-size:11px}.so-card-actions .so-action span{display:inline}.zcs-nodata-wrapper{min-height:320px}}
+</style>
+<div class='so-page'>
+  <section class='so-shell'>
+    <header class='so-header zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-12'>
+      <div class='so-heading'>
+        <div class='so-heading-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline e-commerce-shopping-cart-simple'></i></div>
+        <div><h2 class='zcs-font-18 zcs-font-semibold zcs-lh-heading zcs-color-primary zcs-m-0'>Sales order register</h2><p class='so-subtitle'>Sourcing readiness and fulfillment handoffs at a glance</p></div>
+      </div>
+      <span class='so-head-count'><%=allCount%> total orders</span>
+    </header>
+    <div class='so-kpis' aria-label='Sales order summaries'>
+      <div class='so-kpi'><strong><%=allCount%></strong><span>Total orders</span></div>
+      <div class='so-kpi attn'><strong><%=needsQuotesCount%></strong><span>Need supplier quotes</span></div>
+      <div class='so-kpi ready'><strong><%=readyCount%></strong><span>Ready for PO</span></div>
+      <div class='so-kpi flow'><strong><%=downstreamCount%></strong><span>In fulfillment</span></div>
+      <div class='so-kpi done'><strong><%=completeCount%></strong><span>Delivered or returns</span></div>
+    </div>
+    <nav class='so-filters' aria-label='Sales order lifecycle filters'>
+      <a class='so-chip <%if(statusFilter == "All"){%>active<%}%>' href='#Page:Sales_Orders?Status_Filter=All'>All <span class='so-chip-count'><%=allCount%></span></a>
+      <a class='so-chip <%if(statusFilter == "Needs Quotes"){%>active<%}%>' href='#Page:Sales_Orders?Status_Filter=Needs%20Quotes'>Needs quotes <span class='so-chip-count'><%=needsQuotesCount%></span></a>
+      <a class='so-chip <%if(statusFilter == "Compare Quotes"){%>active<%}%>' href='#Page:Sales_Orders?Status_Filter=Compare%20Quotes'>Compare quotes <span class='so-chip-count'><%=compareCount%></span></a>
+      <a class='so-chip <%if(statusFilter == "Ready for PO"){%>active<%}%>' href='#Page:Sales_Orders?Status_Filter=Ready%20for%20PO'>Ready for PO <span class='so-chip-count'><%=readyCount%></span></a>
+      <a class='so-chip <%if(statusFilter == "Downstream"){%>active<%}%>' href='#Page:Sales_Orders?Status_Filter=Downstream'>Downstream <span class='so-chip-count'><%=downstreamCount%></span></a>
+      <a class='so-chip <%if(statusFilter == "Delivered / Returns"){%>active<%}%>' href='#Page:Sales_Orders?Status_Filter=Delivered%20%2F%20Returns'>Delivered / returns <span class='so-chip-count'><%=completeCount%></span></a>
+    </nav>
+    <div class='so-viewbar'><span><strong><%=orders.count()%></strong> orders in <strong><%=statusFilter%></strong></span><span>Quote selection indicates sourcing readiness</span></div>
+    <%if(orders.count() == 0){%>
+      <div class='zcs-nodata-wrapper zcs-flex zcs-align-items-center zcs-justify-center zcs-text-center'>
+        <div class='zcs-p-20'><div class='empty-icon zcs-flex zcs-align-items-center zcs-justify-center'><i class='zc-li-outline files-2-file-search'></i></div><h5 class='zcs-font-18 zcs-font-medium zcs-lh-heading zcs-color-primary zcs-mt-10 zcs-mb-0'>No orders match this view</h5><p class='zcs-font-14 zcs-color-secondary zcs-mt-12 zcs-mb-0'>Choose another lifecycle filter to continue scanning.</p><a class='empty-link' href='#Page:Sales_Orders?Status_Filter=All'><i class='zc-li-outline arrows-1-refresh-69'></i>&nbsp; Show all orders</a></div>
+      </div>
+    <%}else{%>
+      <main class='so-register'>
+        <div class='zcs-table-wrapper zcs-relative'>
+          <table>
+            <thead class='zcs-sticky'><tr><th class='zcs-text-left'>Order and customer</th><th class='zcs-text-left'>Status</th><th class='zcs-text-left'>Dates</th><th class='zcs-text-left'>Requirement and products</th><th class='zcs-text-left'>Sourcing readiness</th><th class='zcs-text-left'>Next handoff</th><th class='zcs-text-left'>Actions</th></tr></thead>
+            <tbody>
+            <%for each orderRec in orders
+            {
+                statusValue = ifnull(orderRec.Status,"Unknown");
+                sourceValue = ifnull(orderRec.Requirement_Source,"Not specified");
+                orderDateValue = "Not set";
+                if(orderRec.Sales_Order_Date != null){orderDateValue = orderRec.Sales_Order_Date.toString("dd MMM yyyy");}
+                deliveryDateValue = "Not set";
+                if(orderRec.Requested_Delivery_Date != null){deliveryDateValue = orderRec.Requested_Delivery_Date.toString("dd MMM yyyy");}
+                customerName = "Not assigned";
+                if(orderRec.Customer != null){customerName = ifnull(orderRec.Customer.Customer_Name,"Not assigned");}
+                else if(orderRec.Lead != null){customerName = ifnull(orderRec.Lead.Customer_Company_Name,"Lead customer not named");}
+                products = Sales_Order_Product[Parent_Sales_Order == orderRec.ID];
+                productCount = products.count();
+                productSummary = "No products added";
+                productIndex = 0;
+                for each productRec in products
+                {
+                    if(productIndex < 2)
+                    {
+                        productName = ifnull(productRec.Product_Name,"Unnamed product");
+                        if(productIndex == 0){productSummary = productName;}else{productSummary = productSummary + ", " + productName;}
+                    }
+                    productIndex = productIndex + 1;
+                }
+                if(productCount > 2){productSummary = productSummary + " and " + (productCount - 2) + " more";}
+                quotes = Add_Supplier_Quote[Sales_Order == orderRec.ID];
+                quoteCount = quotes.count();
+                purchaseOrders = Create_Purchase_Order[Sales_Order == orderRec.ID];
+                poCount = purchaseOrders.count();
+                supplierName = "Not selected";
+                if(orderRec.Recommended_Supplier != null){supplierName = ifnull(orderRec.Recommended_Supplier.Supplier_Name,"Not selected");}
+                selectedQuoteId = 0;
+                if(orderRec.Selected_Supplier_Quote != null){selectedQuoteId = orderRec.Selected_Supplier_Quote.ID;}
+                nextStep = "Review order detail";
+                badgeClass = "zcs-badge-grey";
+                if(statusValue == "New"){nextStep = "Collect supplier quotes";badgeClass = "zcs-badge-yellow";}
+                else if(statusValue == "Quotes Received" && selectedQuoteId == 0){nextStep = "Compare quotes and select a supplier";badgeClass = "zcs-badge-blue";}
+                else if(statusValue == "Quotes Received" && selectedQuoteId > 0 && poCount == 0){nextStep = "Create the purchase order";badgeClass = "zcs-badge-orange";}
+                else if(statusValue == "Purchase Order Created"){nextStep = "Approve the purchase order";badgeClass = "zcs-badge-orange";}
+                else if(statusValue == "Purchase Order Approved"){nextStep = "Share the purchase order with the customer";badgeClass = "zcs-badge-blue";}
+                else if(statusValue == "Customer Approved"){nextStep = "Create and verify the supplier invoice";badgeClass = "zcs-badge-blue";}
+                else if(statusValue == "Invoice Created"){nextStep = "Record invoice payment";badgeClass = "zcs-badge-yellow";}
+                else if(statusValue == "Invoice Paid" || statusValue == "Logistics Pending"){nextStep = "Arrange and monitor logistics";badgeClass = "zcs-badge-blue";}
+                else if(statusValue == "Products Received"){nextStep = "Complete delivery to the customer";badgeClass = "zcs-badge-blue";}
+                else if(statusValue == "Delivered"){nextStep = "Monitor for closure or return needs";badgeClass = "zcs-badge-green";}
+                else if(statusValue == "Return Requested"){nextStep = "Review and resolve the return";badgeClass = "zcs-badge-red";}
+            %>
+              <tr>
+                <td><a class='so-order-link' href='#Page:Sales_Order_Detail?Sales_Order_ID=<%=orderRec.ID%>'><i class='zc-li-outline files-2-file-text'></i>SO <%=ifnull(orderRec.Sales_Order_ID,orderRec.ID)%></a><div class='so-customer'><%=customerName%></div><div class='so-minor'><%=sourceValue%></div></td>
+                <td><span class='zcs-badge zcs-badge-filled-outline <%=badgeClass%> zcs-inline-flex zcs-align-items-center zcs-rounded-sm zcs-px-10 zcs-py-2 zcs-font-11'><%=statusValue%></span></td>
+                <td><div><%=orderDateValue%></div><div class='so-minor'>Due <%=deliveryDateValue%></div></td>
+                <td><div class='so-products'><strong><%=productCount%></strong> product<%if(productCount != 1){%>s<%}%>: <%=productSummary%></div><div class='so-minor'><%=ifnull(orderRec.Customer_Requirements,"No requirement summary")%></div></td>
+                <td><div class='so-readiness'><span class='so-signal'><i class='zc-li-outline business-coins'></i><%=quoteCount%> quote<%if(quoteCount != 1){%>s<%}%></span><span class='so-signal <%if(selectedQuoteId > 0){%>selected<%}%>'><i class='zc-li-outline ui-1-check-circle-08'></i><%if(selectedQuoteId > 0){%>Selected<%}else{%>Not selected<%}%></span><span class='so-signal'><i class='zc-li-outline e-commerce-shopping-cart-simple'></i><%=poCount%> PO</span></div><div class='so-minor'><%=supplierName%></div></td>
+                <td><div class='so-next'><i class='zc-li-outline arrows-1-tail-right'></i><%=nextStep%></div></td>
+                <td><div class='so-actions'><a class='so-action zcs-flex zcs-align-items-center zcs-justify-center' title='Order detail' href='#Page:Sales_Order_Detail?Sales_Order_ID=<%=orderRec.ID%>'><i class='zc-li-outline ui-1-eye-19'></i></a><%if(quoteCount > 0){%><a class='so-action zcs-flex zcs-align-items-center zcs-justify-center' title='Compare quotes' href='#Page:Quote_Comparison?Sales_Order_ID=<%=orderRec.ID%>'><i class='zc-li-outline design-2-layout-11'></i></a><%}%><%if(selectedQuoteId > 0 && poCount == 0){%><a class='so-action primary zcs-flex zcs-align-items-center zcs-justify-center' title='Create PO' href='#Form:Create_Purchase_Order?Sales_Order=<%=orderRec.ID%>&amp;Selected_Supplier_Quote=<%=selectedQuoteId%>&amp;zc_LoadIn=dialog'><i class='zc-li-outline e-commerce-shopping-cart-simple'></i></a><%}%><a class='so-action zcs-flex zcs-align-items-center zcs-justify-center' title='History' href='#Page:History?Sales_Order_ID=<%=orderRec.ID%>'><i class='zc-li-outline ui-2-time'></i></a></div></td>
+              </tr>
+            <%}%>
+            </tbody>
+          </table>
+        </div>
+      </main>
+      <main class='so-mobile'>
+      <%for each mobileOrderRec in orders
+      {
+          mobileStatusValue = ifnull(mobileOrderRec.Status,"Unknown");
+          mobileSourceValue = ifnull(mobileOrderRec.Requirement_Source,"Not specified");
+          mobileOrderDate = "Not set";
+          if(mobileOrderRec.Sales_Order_Date != null){mobileOrderDate = mobileOrderRec.Sales_Order_Date.toString("dd MMM yyyy");}
+          mobileDeliveryDate = "Not set";
+          if(mobileOrderRec.Requested_Delivery_Date != null){mobileDeliveryDate = mobileOrderRec.Requested_Delivery_Date.toString("dd MMM yyyy");}
+          mobileCustomer = "Not assigned";
+          if(mobileOrderRec.Customer != null){mobileCustomer = ifnull(mobileOrderRec.Customer.Customer_Name,"Not assigned");}
+          else if(mobileOrderRec.Lead != null){mobileCustomer = ifnull(mobileOrderRec.Lead.Customer_Company_Name,"Lead customer not named");}
+          mobileProducts = Sales_Order_Product[Parent_Sales_Order == mobileOrderRec.ID];
+          mobileProductCount = mobileProducts.count();
+          mobileQuotes = Add_Supplier_Quote[Sales_Order == mobileOrderRec.ID];
+          mobileQuoteCount = mobileQuotes.count();
+          mobilePOs = Create_Purchase_Order[Sales_Order == mobileOrderRec.ID];
+          mobilePOCount = mobilePOs.count();
+          mobileSelectedQuoteId = 0;
+          if(mobileOrderRec.Selected_Supplier_Quote != null){mobileSelectedQuoteId = mobileOrderRec.Selected_Supplier_Quote.ID;}
+          mobileNext = "Review order detail";
+          mobileBadge = "zcs-badge-grey";
+          if(mobileStatusValue == "New"){mobileNext = "Collect supplier quotes";mobileBadge = "zcs-badge-yellow";}
+          else if(mobileStatusValue == "Quotes Received" && mobileSelectedQuoteId == 0){mobileNext = "Compare quotes and select a supplier";mobileBadge = "zcs-badge-blue";}
+          else if(mobileStatusValue == "Quotes Received" && mobileSelectedQuoteId > 0 && mobilePOCount == 0){mobileNext = "Create the purchase order";mobileBadge = "zcs-badge-orange";}
+          else if(mobileStatusValue == "Purchase Order Created"){mobileNext = "Approve the purchase order";mobileBadge = "zcs-badge-orange";}
+          else if(mobileStatusValue == "Purchase Order Approved"){mobileNext = "Share the purchase order with the customer";mobileBadge = "zcs-badge-blue";}
+          else if(mobileStatusValue == "Customer Approved"){mobileNext = "Create and verify the supplier invoice";mobileBadge = "zcs-badge-blue";}
+          else if(mobileStatusValue == "Invoice Created"){mobileNext = "Record invoice payment";mobileBadge = "zcs-badge-yellow";}
+          else if(mobileStatusValue == "Invoice Paid" || mobileStatusValue == "Logistics Pending"){mobileNext = "Arrange and monitor logistics";mobileBadge = "zcs-badge-blue";}
+          else if(mobileStatusValue == "Products Received"){mobileNext = "Complete delivery to the customer";mobileBadge = "zcs-badge-blue";}
+          else if(mobileStatusValue == "Delivered"){mobileNext = "Monitor for closure or return needs";mobileBadge = "zcs-badge-green";}
+          else if(mobileStatusValue == "Return Requested"){mobileNext = "Review and resolve the return";mobileBadge = "zcs-badge-red";}
+      %>
+        <article class='so-card'>
+          <div class='so-card-head'><div><a class='so-order-link' href='#Page:Sales_Order_Detail?Sales_Order_ID=<%=mobileOrderRec.ID%>'><i class='zc-li-outline files-2-file-text'></i>SO <%=ifnull(mobileOrderRec.Sales_Order_ID,mobileOrderRec.ID)%></a><div class='so-customer'><%=mobileCustomer%></div></div><span class='zcs-badge zcs-badge-filled-outline <%=mobileBadge%> zcs-inline-flex zcs-align-items-center zcs-rounded-sm zcs-px-6 zcs-py-2 zcs-font-11'><%=mobileStatusValue%></span></div>
+          <div class='so-card-grid'><div class='so-card-field'><span class='so-label'>Source</span><span class='so-value'><%=mobileSourceValue%></span></div><div class='so-card-field'><span class='so-label'>Order date</span><span class='so-value'><%=mobileOrderDate%></span></div><div class='so-card-field'><span class='so-label'>Requested delivery</span><span class='so-value'><%=mobileDeliveryDate%></span></div><div class='so-card-field'><span class='so-label'>Readiness</span><span class='so-value'><%=mobileQuoteCount%> quotes, <%=mobilePOCount%> PO</span></div><div class='so-card-field so-products'><span class='so-label'>Requirement</span><span class='so-value'><%=mobileProductCount%> product<%if(mobileProductCount != 1){%>s<%}%>. <%=ifnull(mobileOrderRec.Customer_Requirements,"No requirement summary")%></span></div></div>
+          <div class='so-card-next'><span class='so-label'>Next handoff</span><span class='so-value so-next'><i class='zc-li-outline arrows-1-tail-right'></i><%=mobileNext%></span></div>
+          <div class='so-card-actions'><a class='so-action zcs-flex zcs-align-items-center zcs-justify-center' href='#Page:Sales_Order_Detail?Sales_Order_ID=<%=mobileOrderRec.ID%>'><i class='zc-li-outline ui-1-eye-19'></i><span>Detail</span></a><%if(mobileQuoteCount > 0){%><a class='so-action zcs-flex zcs-align-items-center zcs-justify-center' href='#Page:Quote_Comparison?Sales_Order_ID=<%=mobileOrderRec.ID%>'><i class='zc-li-outline design-2-layout-11'></i><span>Quotes</span></a><%}%><%if(mobileSelectedQuoteId > 0 && mobilePOCount == 0){%><a class='so-action primary zcs-flex zcs-align-items-center zcs-justify-center' href='#Form:Create_Purchase_Order?Sales_Order=<%=mobileOrderRec.ID%>&amp;Selected_Supplier_Quote=<%=mobileSelectedQuoteId%>&amp;zc_LoadIn=dialog'><i class='zc-li-outline e-commerce-shopping-cart-simple'></i><span>Create PO</span></a><%}%><a class='so-action zcs-flex zcs-align-items-center zcs-justify-center' href='#Page:History?Sales_Order_ID=<%=mobileOrderRec.ID%>'><i class='zc-li-outline ui-2-time'></i><span>History</span></a></div>
+        </article>
+      <%}%>
+      </main>
+    <%}%>
+  </section>
+</div>

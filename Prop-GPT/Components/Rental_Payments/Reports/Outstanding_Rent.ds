@@ -1,0 +1,38 @@
+list Outstanding_Rent
+{
+    displayName = "Outstanding Rent"
+    show all rows from Rental_Payments [Payment_Status == "Due" || Payment_Status == "Partially Paid" || Payment_Status == "Overdue"]
+    (
+        Payment_ID
+        Lease
+        Tenant
+        Property
+        Unit
+        Billing_Month
+        Due_Date
+        Amount_Due
+        Amount_Paid
+        Payment_Status
+    )
+    filters
+    (
+        Tenant
+        Property
+        Unit
+        Billing_Month
+        Payment_Status
+    )
+    sort by
+    (
+        Due_Date ascending
+    )
+    conditional formatting
+    (
+        "Overdue Rent"
+        {
+            condition = (Payment_Status == "Overdue")
+            fields = [Payment_ID,Tenant,Property,Unit,Due_Date,Amount_Due,Amount_Paid,Payment_Status]
+            format = "background-color:#FEE2E2;color:#991B1B;font-weight:bold"
+        }
+    )
+}

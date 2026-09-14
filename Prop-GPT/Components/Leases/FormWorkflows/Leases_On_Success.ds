@@ -1,0 +1,34 @@
+Leases_On_Success as "Update Unit Occupancy"
+{
+    type = form
+    form = Leases
+    record event = on add or edit
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Unit != null)
+                {
+                    unit_record = Units[ID == input.Unit && Active == true];
+                    if(unit_record.count() > 0)
+                    {
+                        if(input.Lease_Status == "Active")
+                        {
+                            unit_record.Occupancy_Status = "Occupied";
+                        }
+                        else if(input.Lease_Status == "Expired" || input.Lease_Status == "Terminated")
+                        {
+                            other_active = Leases[ID != input.ID && Unit == input.Unit && Lease_Status == "Active"];
+                            if(other_active.count() == 0)
+                            {
+                                unit_record.Occupancy_Status = "Vacant";
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

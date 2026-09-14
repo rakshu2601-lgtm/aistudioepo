@@ -1,0 +1,19 @@
+<page linkname = "Sales_Dashboard" displayname = "Sales Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Sales_Dashboard_Snippet' elementName='Sales_Dashboard_Snippet'>
+          <![CDATA[htmlpage Sales_Dashboard_Snippet()
+            content
+            <%{%>
+                <file name:Sales_Dashboard_Snippet.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

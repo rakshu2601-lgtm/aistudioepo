@@ -1,0 +1,19 @@
+<page linkname = "Work_Order_Tracking" parameters = "int Work_Order_ID" displayname = "Work Order Tracking"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='WorkOrderTrackingSnippet' elementName='Work Order Tracking Content'>
+          <![CDATA[htmlpage WorkOrderTrackingSnippet()
+content
+<%{%>
+<file name:Work_Order_Tracking.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

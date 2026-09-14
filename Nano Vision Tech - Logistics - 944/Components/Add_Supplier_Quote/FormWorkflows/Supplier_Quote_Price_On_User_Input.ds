@@ -1,0 +1,18 @@
+Supplier_Quote_Price_On_User_Input as "Recalculate Supplier Quote Total"
+{
+    type = form
+    form = Add_Supplier_Quote
+    record event = on add or edit
+
+    on user input of Supplier_Quote_Products.Supplier_Unit_Price
+    {
+        actions
+        {
+            custom deluge script
+            (
+                row.Supplier_Total_Price = ifnull(row.Quoted_Quantity,0) * ifnull(row.Supplier_Unit_Price,0);
+                disable row.Supplier_Total_Price;
+            )
+        }
+    }
+}

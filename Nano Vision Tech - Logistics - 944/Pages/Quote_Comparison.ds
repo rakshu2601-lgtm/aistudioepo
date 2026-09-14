@@ -1,0 +1,19 @@
+<page linkname = "Quote_Comparison" parameters = "int Sales_Order_ID" displayname = "Quote Comparison"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Quote_Comparison_Snippet' elementName='Quote_Comparison_Snippet'>
+          <![CDATA[htmlpage Quote_Comparison_Snippet()
+            content
+             <%{%>
+                 <file name:Quote_Comparison_Snippet.dshtml/>
+             <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

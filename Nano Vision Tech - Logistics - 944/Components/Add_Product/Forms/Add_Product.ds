@@ -1,0 +1,276 @@
+form Add_Product
+{
+    displayname = "Add Product"
+    success message = "Product saved successfully"
+    Product_Information
+    (
+        type = section
+        displayname = "Product Information"
+        row = 1
+        column = 0
+        width = medium
+    )
+    must have Product_Name
+    (
+        type = text
+        displayname = "Product Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Product_Category
+    (
+        type = picklist
+        displayname = "Product Category"
+        values = {"Server","Networking Equipment","Storage Equipment","Server Component","Networking Component","Storage Component","Computer Component","Accessory","Spare Part","Other IT Equipment"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Product_Type
+    (
+        type = picklist
+        displayname = "Product Type"
+        values = {"Rack Server","Tower Server","Blade Server","Workstation","Router","Network Switch","Firewall","Wireless Access Point","Network Controller","Load Balancer","Storage Array","NAS","SAN","Hard Disk Drive","Solid-State Drive","Processor","Memory","Motherboard","Power Supply","RAID Controller","Network Interface Card","Graphics Card","Transceiver","SFP Module","QSFP Module","Network Cable","Fibre Cable","Rack","UPS","Cooling Component","Server Accessory","Networking Accessory","Spare Part","Other"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    Brand_Make
+    (
+        type = text
+        displayname = "Brand / Make"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Model
+    (
+        type = text
+        row = 1
+        column = 1
+        width = medium
+    )
+    Manufacturer_Part_Number
+    (
+        type = text
+        displayname = "Manufacturer Part Number"
+        row = 1
+        column = 2
+        width = medium
+    )
+    unique Internal_Part_Number
+    (
+        type = text
+        displayname = "Internal Part Number"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Product_Description
+    (
+        type = textarea
+        displayname = "Product Description"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Technical_Information
+    (
+        type = section
+        displayname = "Technical Information"
+        visibility = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Technical_Specifications
+    (
+        type = textarea
+        displayname = "Technical Specifications"
+        height = 120px
+        row = 2
+        column = 1
+        width = medium
+    )
+    Configuration_Template
+    (
+        type = textarea
+        displayname = "Configuration Template"
+        height = 120px
+        row = 2
+        column = 2
+        width = medium
+    )
+    Warranty_Period
+    (
+        type = text
+        displayname = "Warranty Period"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Country_of_Origin
+    (
+        type = text
+        displayname = "Country of Origin"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Commercial_Reference
+    (
+        type = section
+        displayname = "Commercial Reference"
+        visibility = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Unit_of_Measure
+    (
+        type = picklist
+        displayname = "Unit of Measure"
+        values = {"Unit","Piece","Set","Pack","Pair","Box","Meter","License","Lot"}
+        row = 3
+        column = 1
+        width = medium
+    )
+    Default_Currency
+    (
+        type = picklist
+        displayname = "Default Currency"
+        values = {"USD","EUR"}
+        initial value = "USD"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Reference_Cost
+    (
+        type = USD
+        displayname = "Reference Cost"
+        decimalplace = 2
+        maxchar = 16
+        row = 3
+        column = 1
+        width = medium
+    )
+    Reference_Selling_Price
+    (
+        type = USD
+        displayname = "Reference Selling Price"
+        decimalplace = 2
+        maxchar = 16
+        row = 3
+        column = 2
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        initial value = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Documents
+    (
+        type = section
+        displayname = "Documents"
+        visibility = true
+        row = 4
+        column = 1
+        width = medium
+    )
+    Product_Image
+    (
+        type = image
+        displayname = "Product Image"
+        source = file,camera
+        aspect ratio = original
+        row = 4
+        column = 1
+        width = medium
+    )
+    Product_Datasheet
+    (
+        type = upload file
+        displayname = "Product Datasheet"
+        browse = local_drive, google_docs, zoho_docs
+        row = 4
+        column = 2
+        width = medium
+    )
+    Additional_Attachments
+    (
+        type = upload file
+        displayname = "Additional Attachments"
+        file count = 10
+        browse = local_drive, google_docs, zoho_docs
+        row = 4
+        column = 1
+        width = medium
+    )
+    Hidden
+    (
+        type = section
+        displayname = "Hidden"
+        visibility = true
+        row = 5
+        column = 1
+        width = medium
+    )
+    Product_ID
+    (
+        type = autonumber
+        displayname = "Product ID"
+        start index = 1
+        row = 5
+        column = 1
+        width = medium
+    )
+    Created_Date_Time
+    (
+        type = datetime
+        displayname = "Created Date and Time"
+        initial value = "${zoho.currenttime}"
+        row = 5
+        column = 1
+        width = medium
+    )
+    Last_Updated_Date_Time
+    (
+        type = datetime
+        displayname = "Last Updated Date and Time"
+        initial value = "${zoho.currenttime}"
+        row = 5
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Add"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

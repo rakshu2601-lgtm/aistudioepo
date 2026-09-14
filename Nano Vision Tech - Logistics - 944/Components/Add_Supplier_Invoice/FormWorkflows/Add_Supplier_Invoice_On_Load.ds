@@ -1,0 +1,39 @@
+Add_Supplier_Invoice_On_Load as "Add Supplier Invoice On Load"
+{
+    type = form
+    form = Add_Supplier_Invoice
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                hide Hidden;
+                disable Sales_Order;
+                disable Invoice_Amount;
+                disable Status;
+                disable Action_Mode;
+                disable Supplier_Invoice_Products.Product;
+                disable Supplier_Invoice_Products.Product_ID;
+                disable Supplier_Invoice_Products.Product_Name;
+                disable Supplier_Invoice_Products.Manufacturer_Part_Number;
+                disable Supplier_Invoice_Products.Brand_Make;
+                disable Supplier_Invoice_Products.Model;
+                disable Supplier_Invoice_Products.Configuration;
+                disable Supplier_Invoice_Products.Unit_of_Measure;
+                disable Supplier_Invoice_Products.Total_Price;
+                if(input.ID == null)
+                {
+                    supplier_record = Add_Supplier[Email == zoho.loginuserid && Active == true];
+                    if(supplier_record.count() > 0)
+                    {
+                        input.Supplier = supplier_record.ID;
+                        disable Supplier;
+                    }
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,22 @@
+default list All_Properties
+{
+    displayName = "All Properties"
+    show all rows from Properties
+    (
+        Property_ID
+        Property_Name
+        Property_Type
+        Address
+        Active
+        Added_Time
+    )
+    filters
+    (
+        Property_Type
+        Active
+    )
+    sort by
+    (
+        Property_Name ascending
+    )
+}

@@ -1,0 +1,27 @@
+Units_On_Validate as "Validate Unit"
+{
+    type = form
+    form = Units
+    record event = on add or edit
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                property_record = Properties[ID == input.Property];
+                if(property_record.count() == 0 || property_record.Property_Type != "Multi-Unit Property")
+                {
+                    alert "Units can only be added to a Multi-Unit Property.";
+                    cancel submit;
+                }
+                duplicate_units = Units[Property == input.Property && Unit_Number == input.Unit_Number && ID != input.ID];
+                if(duplicate_units.count() > 0)
+                {
+                    alert "This unit number already exists for the selected property.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

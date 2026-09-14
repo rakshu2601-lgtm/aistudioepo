@@ -1,0 +1,18 @@
+Lead_Product_Price_On_User_Input as "Recalculate Lead Product Total"
+{
+    type = form
+    form = Add_Lead
+    record event = on add or edit
+
+    on user input of Lead_Products.Expected_Unit_Price
+    {
+        actions
+        {
+            custom deluge script
+            (
+                row.Expected_Total_Price = ifnull(row.Quantity,0) * ifnull(row.Expected_Unit_Price,0);
+                disable row.Expected_Total_Price;
+            )
+        }
+    }
+}

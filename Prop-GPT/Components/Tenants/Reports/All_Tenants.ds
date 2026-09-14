@@ -1,0 +1,22 @@
+default list All_Tenants
+{
+    displayName = "All Tenants"
+    show all rows from Tenants
+    (
+        Tenant_ID
+        Tenant_Name
+        Email
+        Phone
+        Alternate_Phone
+        Active
+        Added_Time
+    )
+    filters
+    (
+        Active
+    )
+    sort by
+    (
+        Tenant_Name ascending
+    )
+}

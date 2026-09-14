@@ -1,0 +1,18 @@
+Add_Supplier_On_Success as "Update Supplier Timestamp"
+{
+    type = form
+    form = Add_Supplier
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                supplier_record = Add_Supplier[ID == input.ID];
+                supplier_record.Last_Updated_Date_Time = zoho.currenttime;
+            )
+        }
+    }
+}

@@ -1,0 +1,51 @@
+Create_Return_Request_On_Success as "Process Return Request"
+{
+    type = form
+    form = Create_Return_Request
+    record event = on add
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                sales_order_record = Create_Sales_Order[ID == input.Sales_Order];
+                sales_order_record.Status = "Return Requested";
+                insert into Add_History
+                [
+                    Action_Type = "Return Request Created"
+                    Status = "Return Requested"
+                    Previous_Status = "Delivered"
+                    New_Status = "Return Requested"
+                    Comments = input.Issue_Description
+                    Sales_Order_Lookup = input.Sales_Order
+                    Purchase_Order_Lookup = input.Purchase_Order
+                    Return_Request_Lookup = input.ID
+                    Subform_Details_Change_Summary = input.Return_Remarks
+                    Updated_By = input.Created_By
+                    Updated_By_Email = input.Created_By_Email
+                    Updated_Date_Time = zoho.currenttime
+                ];
+                if(sales_order_record.Lead != null)
+                {
+                    lead_record = Add_Lead[ID == sales_order_record.Lead];
+                    if(lead_record.Sales_Agent != null)
+                    {
+                        employee_record = Add_Employee[ID == lead_record.Sales_Agent];
+                        if(employee_record.Email != null && employee_record.Email != "")
+                        {
+                            sendmail
+                            (
+                                from : zoho.adminuserid
+                                to : employee_record.Email
+                                subject : "Return request created"
+                                message : "Return request " + input.Return_Request_ID + " has been created for a delivered sales order."
+                            )
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

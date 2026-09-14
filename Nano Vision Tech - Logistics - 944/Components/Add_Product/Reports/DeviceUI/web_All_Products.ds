@@ -1,0 +1,5 @@
+report All_Products
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Product_ID Product_Name Product_Category Product_Type Active "Activate" "Deactivate" ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Product_ID Product_Name Product_Category Product_Type Brand_Make Model Internal_Part_Number Unit_of_Measure Default_Currency Reference_Cost Reference_Selling_Price Active "Activate" "Deactivate" ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

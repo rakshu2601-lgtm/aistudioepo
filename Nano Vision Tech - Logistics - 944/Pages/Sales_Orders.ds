@@ -1,0 +1,19 @@
+<page linkname = "Sales_Orders" parameters = "string Status_Filter" displayname = "Sales Orders"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Sales_Orders_List' elementName='Sales_Orders_List'>
+          <![CDATA[htmlpage Sales_Orders_List()
+            content
+            <%{%>
+              <file name:Sales_Orders_List.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

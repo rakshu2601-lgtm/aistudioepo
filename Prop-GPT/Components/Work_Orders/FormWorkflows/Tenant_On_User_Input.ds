@@ -1,0 +1,39 @@
+Work_Order_Tenant_On_User_Input as "Resolve Tenant Residence"
+{
+    type = form
+    form = Work_Orders
+    record event = on add or edit
+    on user input of Tenant
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Property = null;
+                input.Unit = null;
+                if(input.Tenant != null)
+                {
+                    active_leases = Leases[Tenant == input.Tenant && Lease_Status == "Active" && Lease_Start_Date <= zoho.currentdate && (Lease_End_Date is null || Lease_End_Date >= zoho.currentdate)];
+                    if(active_leases.count() == 1)
+                    {
+                        for each active_lease in active_leases
+                        {
+                            input.Property = active_lease.Property;
+                            input.Unit = active_lease.Unit;
+                        }
+                    }
+                    else if(active_leases.count() == 0)
+                    {
+                        alert "No current active lease was found for this tenant.";
+                    }
+                    else
+                    {
+                        alert "Multiple active leases were found; resolve the lease data before raising a work order.";
+                    }
+                }
+                disable Property;
+                disable Unit;
+            )
+        }
+    }
+}

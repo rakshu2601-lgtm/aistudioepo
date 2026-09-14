@@ -1,0 +1,62 @@
+Create_Sales_Order_From_Lead as "Create Sales Order From Lead"
+{
+    type = functions
+    form = Add_Lead
+    execution type = for each record
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                sales_order_rows = Collection();
+                for each lead_item in input.Lead_Products
+                {
+                    sales_order_row = Create_Sales_Order.Sales_Order_Products();
+                    sales_order_row.Product = lead_item.Product;
+                    sales_order_row.Product_ID = lead_item.Product_ID;
+                    sales_order_row.Product_Name = lead_item.Product_Name;
+                    sales_order_row.Product_Category = lead_item.Product_Category;
+                    sales_order_row.Product_Type = lead_item.Product_Type;
+                    sales_order_row.Product_Description = lead_item.Product_Description;
+                    sales_order_row.Manufacturer_Part_Number = lead_item.Manufacturer_Part_Number;
+                    sales_order_row.Internal_Part_Number = lead_item.Internal_Part_Number;
+                    sales_order_row.Brand_Make = lead_item.Brand_Make;
+                    sales_order_row.Model = lead_item.Model;
+                    sales_order_row.Unit_of_Measure = lead_item.Unit_of_Measure;
+                    sales_order_row.Configuration = lead_item.Configuration;
+                    sales_order_row.Technical_Requirements = lead_item.Technical_Requirements;
+                    sales_order_row.Quantity = lead_item.Quantity;
+                    sales_order_row.Remarks = lead_item.Remarks;
+                    sales_order_rows.insert(sales_order_row);
+                }
+                sales_order_record_id = insert into Create_Sales_Order
+                [
+                    Customer = input.Customer
+                    Lead = input.ID
+                    Requirement_Source = "Customer Request"
+                    Sales_Order_Date = zoho.currentdate
+                    Sales_Order_Products = sales_order_rows
+                    Customer_Requirements = input.Requirement
+                    Additional_Remarks = "Created from lead"
+                    Status = "New"
+                ];
+                previous_status = input.Status;
+                input.Status = "Sales Order Created";
+                insert into Add_History
+                [
+                    Action_Type = "Sales Order Created"
+                    Status = "Sales Order Created"
+                    Previous_Status = previous_status
+                    New_Status = "Sales Order Created"
+                    Comments = "Sales order created from lead"
+                    Lead_Lookup = input.ID
+                    Sales_Order_Lookup = sales_order_record_id
+                    Updated_By_Email = zoho.loginuserid
+                    Updated_Date_Time = zoho.currenttime
+                ];
+            )
+        }
+    }
+}

@@ -1,0 +1,27 @@
+timeline Work_Order_Status_Timeline
+{
+    displayName = "Work Order Status Timeline"
+    show all rows from Work_Order_Status_History
+    (
+        Work_Order
+        Previous_Status
+        New_Status
+        Changed_At
+        Changed_By
+        Change_Source
+        Notes
+    )
+    filters
+    (
+        Work_Order
+    )
+    sort by
+    (
+        Changed_At ascending
+    )
+    options
+    (
+        display field = New_Status
+        start date = Changed_At
+    )
+}

@@ -1,0 +1,19 @@
+<page linkname = "Lead_Detail" parameters = "int Lead_ID" displayname = "Lead Detail"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Lead_Detail_Snippet' elementName='Lead_Detail_Snippet'>
+          <![CDATA[htmlpage Lead_Detail_Snippet()
+            content
+             <%{%>
+                 <file name:Lead_Detail.dshtml/>
+             <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

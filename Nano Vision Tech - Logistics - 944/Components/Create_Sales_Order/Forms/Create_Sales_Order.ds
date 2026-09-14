@@ -1,0 +1,198 @@
+form Create_Sales_Order
+{
+    displayname = "Create Sales Order"
+    success message = "Sales order saved successfully"
+    Order_Information
+    (
+        type = section
+        displayname = "Order Information"
+        row = 1
+        column = 0
+        width = medium
+    )
+    must have Requirement_Source
+    (
+        type = radiobuttons
+        displayname = "Requirement Source"
+        values = {"Customer Request","R&D Market Need"}
+        initial value = "Customer Request"
+        layout = 2
+        row = 1
+        column = 1
+        width = medium
+    )
+    Customer
+    (
+        type = picklist
+        values = Add_Customer.ID
+        displayformat = [Customer_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Lead
+    (
+        type = picklist
+        values = Add_Lead.ID
+        displayformat = [Customer_Company_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Sales_Order_Date
+    (
+        type = date
+        displayname = "Sales Order Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Requested_Delivery_Date
+    (
+        type = date
+        displayname = "Requested Delivery Date"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Customer_Requirements
+    (
+        type = textarea
+        displayname = "Customer Requirements"
+        height = 120px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Additional_Remarks
+    (
+        type = textarea
+        displayname = "Additional Remarks"
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Comparison_Remarks
+    (
+        type = textarea
+        displayname = "Comparison Remarks"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Comparison_Sheet
+    (
+        type = upload file
+        displayname = "Comparison Sheet"
+        browse = local_drive, google_docs, zoho_docs
+        row = 1
+        column = 1
+        width = medium
+    )
+    Product_Requirements
+    (
+        type = section
+        displayname = "Product Requirements"
+        visibility = false
+        row = 2
+        column = 1
+        width = medium
+    )
+    Sales_Order_Products
+    (
+        type = grid
+        displayname = "Sales Order Products"
+        values = Sales_Order_Product.ID
+        bidirectional = Parent_Sales_Order
+        defaultrow = 1
+        row = 2
+        column = 1
+        width = medium
+    )
+    Hidden
+    (
+        type = section
+        displayname = "Hidden"
+        visibility = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Sales_Order_ID
+    (
+        type = autonumber
+        displayname = "Sales Order ID"
+        start index = 1
+        row = 3
+        column = 1
+        width = medium
+    )
+    Recommended_Supplier
+    (
+        type = picklist
+        displayname = "Recommended Supplier"
+        values = Add_Supplier.ID
+        displayformat = [Supplier_Name]
+        searchable = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Selected_Supplier_Quote
+    (
+        type = picklist
+        displayname = "Selected Supplier Quote"
+        values = Add_Supplier_Quote.ID
+        displayformat = [Supplier_Quote_ID]
+        searchable = true
+        row = 3
+        column = 2
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        values = {"New","Quotes Received","Purchase Order Created","Purchase Order Approved","Customer Approved","Invoice Created","Invoice Paid","Logistics Pending","Products Received","Delivered","Return Requested"}
+        initial value = "New"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Action_Mode
+    (
+        type = text
+        displayname = "Action Mode"
+        row = 3
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Create"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

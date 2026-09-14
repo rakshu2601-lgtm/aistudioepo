@@ -1,0 +1,18 @@
+Damaged_Quantity_On_User_Input as "Recalculate Receipt Quantities"
+{
+    type = form
+    form = Create_Logistics_Booking
+    record event = on add or edit
+
+    on user input of Logistics_Booking_Products.Damaged_Quantity
+    {
+        actions
+        {
+            custom deluge script
+            (
+                row.Rejected_Quantity = ifnull(row.Damaged_Quantity,0);
+                row.Accepted_Quantity = ifnull(row.Received_Quantity,0) - ifnull(row.Damaged_Quantity,0);
+            )
+        }
+    }
+}

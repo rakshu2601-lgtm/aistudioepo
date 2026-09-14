@@ -1,0 +1,49 @@
+<%
+  successTitle = ifnull(input.title,"").trim();
+  if(successTitle == "")
+  {
+    successTitle = "Operation completed";
+  }
+  successMessage = ifnull(input.message,"").trim();
+  if(successMessage == "")
+  {
+    successMessage = "Your operation was completed successfully.";
+  }
+  actionLabel = ifnull(input.nextLabel,"").trim();
+  if(actionLabel == "")
+  {
+    actionLabel = "Continue";
+  }
+  actionUrl = ifnull(input.nextUrl,"").trim();
+%>
+<style>
+/* ZCS global utilities used by this page, from zcs-global. */
+:root{--zcs-page-bg-color:#f3f3f4;--zcs-primary-text-color:var(--zcs_primary_text_color);--zcs-secondary-text-color:var(--zcs_secondary_text_color);--zcs-border-color:var(--zcs_tertiary_border_color);--zcs-white-color:#fff;font-size:16px;line-height:1.5}
+*{box-sizing:border-box}.zcs-flex{display:flex}.zcs-align-items-center{align-items:center}.zcs-justify-center{justify-content:center}.zcs-w-full{width:100%}.zcs-px-16{padding-left:1rem;padding-right:1rem}.zcs-py-8{padding-top:.5rem;padding-bottom:.5rem}.zcs-mx-0{margin-left:0;margin-right:0}.zcs-mb-0{margin-bottom:0}.zcs-mt-10{margin-top:.625rem}.zcs-mt-12{margin-top:.75rem}.zcs-mt-20{margin-top:1.25rem}.zcs-rounded-md{border-radius:.375rem}.zcs-box-border{box-sizing:border-box}.zcs-font-14{font-size:.875rem}.zcs-font-18{font-size:1.125rem}.zcs-font-normal{font-weight:400}.zcs-font-medium{font-weight:500}.zcs-lh-body{line-height:1.5}.zcs-lh-heading{line-height:1.25}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-secondary{color:var(--zcs-secondary-text-color)}.zcs-text-center{text-align:center}a{text-decoration:none}
+/* ZCS component CSS: button-primary-button-no-icon. */
+.zcs-button{width:auto;min-width:7rem;min-height:36px}.zcs-primary-button{background-color:var(--zcs_brand_color);color:var(--zcs_brand_foreground_color)}.zcs-primary-button:hover{background-color:var(--zcs_brand_dark_color)}.zcs-primary-button:active,.zcs-primary-button:focus{background-color:var(--zcs_component_hover_color);outline:2px solid var(--zcs_brand_color);outline-offset:2px}
+/* Adapted ZCS no-data-no-data-with-button structure for a compact confirmation state. */
+html,body,div#zppagesLive,div#elementsContainer,.Layout.elemContainment,.zcpage-elemContainer,.zc-pb-formreport-placeholder,.zc-pb-page-content-wrapper,.zc-pb-tile-container,.zc-pb-tile-card{width:100%!important;min-height:100%!important;margin:0!important}.zc-pb-page-content-wrapper .elemContainment,.zc-pb-page-content-wrapper .zc-pb-tile-container,.zc-pb-page-content-wrapper .zc-pb-tile-card{padding:0!important;border-radius:0!important}.zc-pb-page-content-wrapper .zc-pb-tile-card{border:0!important;box-shadow:none!important}#splash-screen{display:none!important}
+.confirmation-page{min-height:100vh;padding:clamp(16px,5vw,40px);background:var(--zcs-page-bg-color);font-family:Arial,sans-serif}.confirmation-card{width:min(100%,460px);padding:clamp(24px,5vw,32px);background:var(--zcs-white-color);border:1px solid var(--zcs-border-color);border-radius:12px;box-shadow:0 8px 24px rgba(30,35,60,.06)}.confirmation-icon{width:56px;height:56px;margin:0 auto;border-radius:50%;background:#e8f7f1;color:#179e6c;font-size:30px}.confirmation-message{max-width:360px;margin-left:auto;margin-right:auto}.zcs-nodata-btn-wrapper{width:100%}@media(max-width:520px){.confirmation-page{padding:12px}.confirmation-card{padding:24px 20px}.zcs-button{width:100%}}
+</style>
+<div class='confirmation-page zcs-nodata-wrapper zcs-w-full zcs-flex zcs-align-items-center zcs-justify-center zcs-text-center'>
+  <main class='confirmation-card zcs-nodata-content zcs-box-border' aria-labelledby='confirmation-title'>
+    <div class='confirmation-icon zcs-flex zcs-align-items-center zcs-justify-center' aria-hidden='true'>
+      <i class='zc-li-outline ui-1-check-circle-08'></i>
+    </div>
+    <h1 id='confirmation-title' class='zcs-nodata-header zcs-font-18 zcs-font-medium zcs-lh-heading zcs-color-primary zcs-mt-20 zcs-mx-0 zcs-mb-0'><%=successTitle%></h1>
+    <p class='confirmation-message zcs-nodata-desc zcs-font-14 zcs-font-normal zcs-lh-body zcs-color-secondary zcs-mt-12 zcs-mb-0'><%=successMessage%></p>
+<%
+  if(actionUrl != "")
+  {
+%>
+    <div class='zcs-nodata-btn-wrapper zcs-flex zcs-align-items-center zcs-justify-center zcs-mt-20'>
+      <a class='zcs-button zcs-primary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-px-16 zcs-py-8 zcs-rounded-md zcs-box-border zcs-font-14 zcs-font-normal zcs-lh-body' href='<%=actionUrl%>'>
+        <span class='zcs-button-text'><%=actionLabel%></span>
+      </a>
+    </div>
+<%
+  }
+%>
+  </main>
+</div>

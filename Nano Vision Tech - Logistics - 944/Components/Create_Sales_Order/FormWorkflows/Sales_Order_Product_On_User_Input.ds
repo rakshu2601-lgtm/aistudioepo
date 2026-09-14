@@ -1,0 +1,41 @@
+Sales_Order_Product_On_User_Input as "Snapshot Sales Order Product"
+{
+    type = form
+    form = Create_Sales_Order
+    record event = on add or edit
+
+    on user input of Sales_Order_Products.Product
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(row.Product != null)
+                {
+                    product_record = Add_Product[ID == row.Product];
+                    row.Product_ID = product_record.Product_ID.toString();
+                    row.Product_Name = product_record.Product_Name;
+                    row.Product_Category = product_record.Product_Category;
+                    row.Product_Type = product_record.Product_Type;
+                    row.Product_Description = product_record.Product_Description;
+                    row.Manufacturer_Part_Number = product_record.Manufacturer_Part_Number;
+                    row.Internal_Part_Number = product_record.Internal_Part_Number;
+                    row.Brand_Make = product_record.Brand_Make;
+                    row.Model = product_record.Model;
+                    row.Unit_of_Measure = product_record.Unit_of_Measure;
+                    row.Configuration = product_record.Configuration_Template;
+                    disable row.Product_ID;
+                    disable row.Product_Name;
+                    disable row.Product_Category;
+                    disable row.Product_Type;
+                    disable row.Product_Description;
+                    disable row.Manufacturer_Part_Number;
+                    disable row.Internal_Part_Number;
+                    disable row.Brand_Make;
+                    disable row.Model;
+                    disable row.Unit_of_Measure;
+                }
+            )
+        }
+    }
+}

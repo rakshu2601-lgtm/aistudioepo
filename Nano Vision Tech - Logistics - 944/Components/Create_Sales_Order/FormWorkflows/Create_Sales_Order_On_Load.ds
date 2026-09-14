@@ -1,0 +1,39 @@
+Create_Sales_Order_On_Load as "Create Sales Order On Load"
+{
+    type = form
+    form = Create_Sales_Order
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                hide Hidden;
+                disable Status;
+                disable Action_Mode;
+                disable Recommended_Supplier;
+                disable Selected_Supplier_Quote;
+                disable Sales_Order_Products.Product_ID;
+                disable Sales_Order_Products.Product_Name;
+                disable Sales_Order_Products.Product_Category;
+                disable Sales_Order_Products.Product_Type;
+                disable Sales_Order_Products.Product_Description;
+                disable Sales_Order_Products.Manufacturer_Part_Number;
+                disable Sales_Order_Products.Internal_Part_Number;
+                disable Sales_Order_Products.Brand_Make;
+                disable Sales_Order_Products.Model;
+                disable Sales_Order_Products.Unit_of_Measure;
+                if(input.Requirement_Source == "Customer Request")
+                {
+                    show Lead;
+                }
+                else
+                {
+                    hide Lead;
+                }
+            )
+        }
+    }
+}

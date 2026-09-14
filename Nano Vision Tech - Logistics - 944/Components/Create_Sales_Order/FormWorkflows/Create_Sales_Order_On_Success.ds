@@ -1,0 +1,26 @@
+Create_Sales_Order_On_Success as "Create Sales Order History"
+{
+    type = form
+    form = Create_Sales_Order
+    record event = on add
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                insert into Add_History
+                [
+                    Action_Type = "Record Created"
+                    Status = input.Status
+                    New_Status = input.Status
+                    Comments = "Sales order created"
+                    Sales_Order_Lookup = input.ID
+                    Updated_By_Email = zoho.loginuserid
+                    Updated_Date_Time = zoho.currenttime
+                ];
+            )
+        }
+    }
+}

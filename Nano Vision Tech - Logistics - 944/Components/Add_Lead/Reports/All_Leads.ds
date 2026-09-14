@@ -1,0 +1,58 @@
+default list All_Leads
+{
+    displayName = "All Leads"
+    show all rows from Add_Lead
+    (
+        Lead_ID as "Lead ID"
+        Lead_Source as "Lead Source"
+        Customer
+        Customer_Company_Name as "Customer Company Name"
+        Contact_Person as "Contact Person"
+        Email
+        Phone
+        Country
+        Expected_Price as "Expected Price"
+        Sales_Agent as "Sales Agent"
+        Lead_Date as "Lead Date"
+        Status
+        custom action "Create Sales Order"
+        (
+            workflow = Create_Sales_Order_From_Lead
+            show action for each record = true
+            column header = "Create Sales Order"
+            success message = "Sales order created"
+            condition = (Status == "New")
+            confirmation before execution
+            (
+                message for individual record = "Create a sales order from this lead?"
+                confirm button text = "Create"
+                cancel button text = "Cancel"
+            )
+        )
+        custom action "Mark Lost"
+        (
+            workflow = Mark_Lead_Lost
+            show action for each record = true
+            column header = "Mark Lost"
+            success message = "Lead marked lost"
+            condition = (Status == "New")
+            confirmation before execution
+            (
+                message for individual record = "Mark this lead as lost?"
+                confirm button text = "Mark Lost"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Lead_Source
+        Sales_Agent
+        Lead_Date
+        Status
+    )
+    sort by
+    (
+        Lead_Date descending
+    )
+}

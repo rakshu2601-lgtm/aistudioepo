@@ -1,0 +1,19 @@
+map Property_Map
+{
+    displayName = "Property Map"
+    show all rows from Properties
+    (
+        Property_Name
+        Property_Type
+        Address
+        Active
+    )
+    filters
+    (
+        Active
+    )
+    options
+    (
+        display field = Address
+    )
+}

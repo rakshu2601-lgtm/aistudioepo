@@ -1,0 +1,150 @@
+<%
+bookings = Create_Logistics_Booking[ID != 0] sort by Booking_Date desc;
+eligiblePaidCount = 0;
+for each paidPO in Create_Purchase_Order[Status == "Invoice Paid"]
+{
+    if(Logistics_Booking_Purchase_Order[Purchase_Order == paidPO.ID].count() == 0)
+    {
+        eligiblePaidCount = eligiblePaidCount + 1;
+    }
+}
+newCount = 0;
+receiptCount = 0;
+qcCountSummary = 0;
+completedCount = 0;
+exceptionCount = 0;
+overdueCount = 0;
+for each summaryBooking in bookings
+{
+    summaryStatus = ifnull(summaryBooking.Status,"Unknown");
+    summaryPORows = Logistics_Booking_Purchase_Order[Parent_Logistics_Booking == summaryBooking.ID];
+    summaryProductRows = Logistics_Booking_Product[Parent_Logistics_Booking == summaryBooking.ID];
+    summaryQCRows = Logistics_Quality_Check_Product[Parent_Logistics_Booking == summaryBooking.ID];
+    summaryReceiptDone = summaryBooking.Received_Date != null;
+    summaryQCDone = summaryBooking.Quality_Check_Date != null;
+    summaryCompleted = summaryStatus == "Products Received";
+    summaryQuantityIssue = false;
+    summaryDamageIssue = false;
+    summaryQCIssue = false;
+    for each summaryProduct in summaryProductRows
+    {
+        if(ifnull(summaryProduct.Received_Quantity,0) < ifnull(summaryProduct.Expected_Quantity,0)){summaryQuantityIssue = true;}
+        if(ifnull(summaryProduct.Damaged_Quantity,0) > 0 || ifnull(summaryProduct.Rejected_Quantity,0) > 0){summaryDamageIssue = true;}
+    }
+    for each summaryQC in summaryQCRows
+    {
+        if(summaryQC.Quality_Result == "Failed" || summaryQC.Quality_Result == "Partially Passed" || ifnull(summaryQC.Rejected_Quantity,0) > 0){summaryQCIssue = true;}
+    }
+    summaryOverdue = summaryBooking.Expected_Arrival_Date != null && summaryBooking.Expected_Arrival_Date < zoho.currentdate && summaryBooking.Actual_Arrival_Date == null && !summaryCompleted;
+    summaryHasException = summaryBooking.Tracking_Reference == null || summaryBooking.Tracking_Reference == "" || summaryPORows.count() == 0 || summaryProductRows.count() == 0 || summaryOverdue || summaryQuantityIssue || summaryDamageIssue || summaryQCIssue || (summaryReceiptDone && !summaryQCDone);
+    if(summaryStatus == "New"){newCount = newCount + 1;}
+    if(summaryReceiptDone && !summaryQCDone){receiptCount = receiptCount + 1;}
+    if(summaryQCDone && !summaryCompleted){qcCountSummary = qcCountSummary + 1;}
+    if(summaryCompleted){completedCount = completedCount + 1;}
+    if(summaryHasException){exceptionCount = exceptionCount + 1;}
+    if(summaryOverdue){overdueCount = overdueCount + 1;}
+}
+%>
+<style>
+/* ZCS global utility subset used by this page (zcs-global) */
+:root{--zcs-theme-brand-color:var(--zcs_brand_color,#6147e5);--zcs-page-bg-color:#f3f3f4;--zcs-primary-text-color:var(--zcs_primary_text_color,#1c1c40);--zcs-secondary-text-color:var(--zcs_secondary_text_color,#65657a);--zcs-border-color:var(--zcs_tertiary_border_color,#e7e7ee);--zcs-white-color:#fff;font-size:16px;line-height:1.5}*{box-sizing:border-box}a{text-decoration:none}.zcs-flex{display:flex}.zcs-inline-flex{display:inline-flex}.zcs-align-items-center{align-items:center}.zcs-justify-center{justify-content:center}.zcs-justify-space-between{justify-content:space-between}.zcs-direction-column{flex-direction:column}.zcs-gap-4{gap:.25rem}.zcs-gap-6{gap:.375rem}.zcs-gap-8{gap:.5rem}.zcs-gap-10{gap:.625rem}.zcs-gap-12{gap:.75rem}.zcs-gap-16{gap:1rem}.zcs-p-0{padding:0}.zcs-p-20{padding:1.25rem}.zcs-px-8{padding-left:.5rem;padding-right:.5rem}.zcs-px-10{padding-left:.625rem;padding-right:.625rem}.zcs-px-12{padding-left:.75rem;padding-right:.75rem}.zcs-py-2{padding-top:.125rem;padding-bottom:.125rem}.zcs-py-6{padding-top:.375rem;padding-bottom:.375rem}.zcs-py-8{padding-top:.5rem;padding-bottom:.5rem}.zcs-py-10{padding-top:.625rem;padding-bottom:.625rem}.zcs-rounded-sm{border-radius:.25rem}.zcs-rounded-md{border-radius:.375rem}.zcs-font-12{font-size:.75rem}.zcs-font-13{font-size:.8125rem}.zcs-font-14{font-size:.875rem}.zcs-font-18{font-size:1.125rem}.zcs-font-24{font-size:1.5rem}.zcs-font-medium{font-weight:500}.zcs-font-semibold{font-weight:600}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-tertiary{color:var(--zcs-secondary-text-color)}.zcs-w-full{width:100%}.zcs-box-border{box-sizing:border-box}.zcs-card{background:var(--zcs-white-color);border:1px solid var(--zcs-border-color);border-radius:10px}.zcs-sticky{position:sticky}.zcs-m-0{margin:0}
+/* ZCS horizontal-tab-horizontal-tab-with-count */
+.zcs-horizontal-tabhead{box-shadow:0 -1px 0 var(--zcs-border-color) inset;overflow-x:auto;overflow-y:hidden;list-style:none}.zcs-horizontal-tabitem{list-style:none;border-bottom:2px solid transparent;white-space:nowrap}.zcs-horizontal-tablink{color:var(--zcs-secondary-text-color)}.zcs-horizontal-tabcount{min-width:20px;background:var(--zcs-page-bg-color)}
+/* ZCS table-table-with-custom-action-button-icon */
+.zcs-table-wrapper{border:1px solid var(--zcs-border-color);background:#fff;overflow:auto;border-radius:8px}.zcs-table-wrapper table{line-height:normal;border-collapse:collapse}.zcs-table-wrapper thead{top:0;z-index:3}.zcs-table-wrapper th{background:#f9fafe;box-shadow:0 -1px 0 var(--zcs-border-color) inset;white-space:nowrap;text-align:left;font-weight:600}.zcs-table-wrapper td{border-top:1px solid var(--zcs-border-color);vertical-align:top}.zcs-table-wrapper tbody tr:hover td{background:#fafafe}.zcs-custom-btn{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--zcs-border-color);background:#fff;color:var(--zcs-primary-text-color);transition:.2s}.zcs-custom-btn:hover{border-color:var(--zcs_brand_color,#6147e5);color:var(--zcs_brand_color,#6147e5);background:var(--zcs_component_hover_color,#f1edff)}
+/* ZCS badge-filled-outlined-badge */
+.zcs-badge{width:auto;border:1px solid}.zcs-badge-green{background:#e4fcf3;border-color:#179e6c;color:#137a55}.zcs-badge-yellow{background:#fcf4e6;border-color:#faae13;color:#8a5b00}.zcs-badge-blue{background:#e8efff;border-color:#2a6ffc;color:#1d55c5}.zcs-badge-red{background:#fde3e6;border-color:#fe455d;color:#b52035}.zcs-badge-grey{background:#eee;border-color:#777;color:#4d4d55}
+/* ZCS progress-bar-range-bar-with-text */
+.zcs-progress-bar{height:7px;background:var(--zcs_component_hover_color,#ece9fa);border-radius:4px;overflow:hidden}.zcs-progress-bar-indicator{height:inherit;border-radius:inherit;background:var(--zcs_brand_color,#6147e5)}
+.zc-pb-page-content-wrapper div#zppagesLive,.zc-pb-page-content-wrapper div#elementsContainer,.zc-pb-page-content-wrapper .elemContainment,.zc-pb-page-content-wrapper .zcpage-elemContainer{height:100%}.zc-container-wrapper .zc-main-content .inner .zc-page-content-wrapper .zc-pb-page-content-wrapper .elemContainment,.zc-full-height .zc-page-content-wrapper .zc-pb-page-content-wrapper .elemContainment,.zc-pb-page-content-wrapper .zc-pb-tile-container{padding:0!important}.zc-page-content-wrapper .zc-pb-page-content-wrapper .zc-pb-tile-card{box-shadow:none!important;border-radius:0!important}#splash-screen{display:none!important}
+.logistics-page{height:100%;overflow:hidden;background:var(--zcs-page-bg-color);padding:14px;font:14px/1.45 Arial,sans-serif;color:var(--zcs-primary-text-color)}.page-header{padding:4px 2px 12px}.page-header h1{margin:0 0 3px;font-size:22px;font-weight:600}.page-header p{margin:0;color:var(--zcs-secondary-text-color);font-size:13px}.summary-strip{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:8px;margin-bottom:10px}.summary-card{padding:10px 12px;background:#fff;border:1px solid var(--zcs-border-color);border-radius:8px}.summary-card i{font-size:16px;color:var(--zcs_brand_color,#6147e5)}.summary-value{font-size:18px;font-weight:600;line-height:1.1}.summary-label{font-size:11px;color:var(--zcs-secondary-text-color);margin-top:3px}.filter-input{position:absolute;opacity:0;pointer-events:none}.filter-bar{background:#fff;border:1px solid var(--zcs-border-color);border-radius:8px 8px 0 0;overflow:hidden}.filter-bar .zcs-horizontal-tabhead{padding-left:6px}.filter-bar label{cursor:pointer}.filter-input:focus+.filter-bar label[for='filter-all']{outline:2px solid var(--zcs_brand_color,#6147e5);outline-offset:-2px}#filter-all:checked~.filter-bar label[for='filter-all'],#filter-new:checked~.filter-bar label[for='filter-new'],#filter-receipt:checked~.filter-bar label[for='filter-receipt'],#filter-qc:checked~.filter-bar label[for='filter-qc'],#filter-complete:checked~.filter-bar label[for='filter-complete'],#filter-exception:checked~.filter-bar label[for='filter-exception'],#filter-overdue:checked~.filter-bar label[for='filter-overdue']{color:var(--zcs_brand_color,#6147e5)}#filter-all:checked~.filter-bar label[for='filter-all'] li,#filter-new:checked~.filter-bar label[for='filter-new'] li,#filter-receipt:checked~.filter-bar label[for='filter-receipt'] li,#filter-qc:checked~.filter-bar label[for='filter-qc'] li,#filter-complete:checked~.filter-bar label[for='filter-complete'] li,#filter-exception:checked~.filter-bar label[for='filter-exception'] li,#filter-overdue:checked~.filter-bar label[for='filter-overdue'] li{border-bottom-color:var(--zcs_brand_color,#6147e5)}.register-shell{height:calc(100% - 188px);overflow:hidden}.register-scroll{height:100%;border-radius:0 0 8px 8px}.register-table{min-width:1160px}.shipment-row{display:none}#filter-all:checked~.register-shell .shipment-row,#filter-new:checked~.register-shell .is-new,#filter-receipt:checked~.register-shell .is-receipt,#filter-qc:checked~.register-shell .is-qc,#filter-complete:checked~.register-shell .is-complete,#filter-exception:checked~.register-shell .has-exception,#filter-overdue:checked~.register-shell .is-overdue{display:table-row}.record-link{font-weight:600;color:var(--zcs_brand_color,#6147e5)}.subtle{display:block;color:var(--zcs-secondary-text-color);font-size:12px;margin-top:3px}.route{min-width:145px}.dates{min-width:135px}.scope{min-width:115px}.progress-cell{min-width:165px}.progress-label{display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px}.milestone-dots{display:flex;justify-content:space-between;margin-top:6px}.milestone-dots span{width:7px;height:7px;border-radius:50%;background:#d8d8e2}.milestone-dots span.done{background:var(--zcs_brand_color,#6147e5)}.exception-stack{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:145px}.actions{display:flex;flex-wrap:wrap;gap:5px;min-width:150px}.empty{height:100%;min-height:260px;text-align:center}.empty h3{margin:10px 0 4px;font-size:18px}.empty p{max-width:520px;margin:0 auto;color:var(--zcs-secondary-text-color)}
+@media(max-width:760px){.logistics-page{height:auto;min-height:100%;overflow:auto;padding:10px}.page-header h1{font-size:20px}.summary-strip{grid-template-columns:repeat(2,1fr)}.summary-card:last-child{grid-column:1/-1}.filter-bar{position:sticky;top:0;z-index:5}.register-shell{height:auto;overflow:visible}.register-scroll{height:auto;border:0;background:transparent;overflow:visible}.register-table{min-width:0;display:block}.register-table thead{display:none}.register-table tbody{display:block}.register-table .shipment-row{grid-template-columns:1fr 1fr;background:#fff;border:1px solid var(--zcs-border-color);border-radius:10px;margin:10px 0;overflow:hidden}.register-table td{display:block;border:0!important;padding:10px 12px!important}.register-table td:first-child{grid-column:1/-1;background:#f9fafe}.register-table td:last-child{grid-column:1/-1}.register-table td:before{content:attr(data-label);display:block;margin-bottom:3px;color:var(--zcs-secondary-text-color);font-size:10px;font-weight:600;text-transform:uppercase}.register-table td:first-child:before{display:none}#filter-all:checked~.register-shell .shipment-row,#filter-new:checked~.register-shell .is-new,#filter-receipt:checked~.register-shell .is-receipt,#filter-qc:checked~.register-shell .is-qc,#filter-complete:checked~.register-shell .is-complete,#filter-exception:checked~.register-shell .has-exception,#filter-overdue:checked~.register-shell .is-overdue{display:grid}.progress-cell,.actions,.exception-stack,.route,.dates,.scope{min-width:0}.actions .zcs-custom-btn{flex:1 1 auto;justify-content:center}}
+@media(max-width:430px){.register-table .shipment-row{grid-template-columns:1fr}.register-table td,.register-table td:first-child,.register-table td:last-child{grid-column:1}.summary-strip{grid-template-columns:1fr 1fr}}
+</style>
+<div class='logistics-page'>
+  <header class='page-header'><h1>Shipment register</h1><p>Read milestones, delays, and receiving exceptions at a glance.</p></header>
+  <div class='summary-strip'>
+    <div class='summary-card zcs-flex zcs-align-items-center zcs-gap-10'><i class='zc-li-outline files-3-box'></i><div><div class='summary-value'><%=bookings.count()%></div><div class='summary-label'>Total bookings</div></div></div>
+    <div class='summary-card zcs-flex zcs-align-items-center zcs-gap-10'><i class='zc-li-outline loader-dots-06'></i><div><div class='summary-value'><%=newCount%></div><div class='summary-label'>Open shipments</div></div></div>
+    <div class='summary-card zcs-flex zcs-align-items-center zcs-gap-10'><i class='zc-li-outline ui-2-alert-circle'></i><div><div class='summary-value'><%=exceptionCount%></div><div class='summary-label'>With exceptions</div></div></div>
+    <div class='summary-card zcs-flex zcs-align-items-center zcs-gap-10'><i class='zc-li-outline ui-2-time'></i><div><div class='summary-value'><%=overdueCount%></div><div class='summary-label'>Arrival overdue</div></div></div>
+    <div class='summary-card zcs-flex zcs-align-items-center zcs-gap-10'><i class='zc-li-outline e-commerce-bill'></i><div><div class='summary-value'><%=eligiblePaidCount%></div><div class='summary-label'>Paid orders ready to book</div></div></div>
+  </div>
+  <input class='filter-input' type='radio' name='shipment-filter' id='filter-all' checked>
+  <input class='filter-input' type='radio' name='shipment-filter' id='filter-new'>
+  <input class='filter-input' type='radio' name='shipment-filter' id='filter-receipt'>
+  <input class='filter-input' type='radio' name='shipment-filter' id='filter-qc'>
+  <input class='filter-input' type='radio' name='shipment-filter' id='filter-complete'>
+  <input class='filter-input' type='radio' name='shipment-filter' id='filter-exception'>
+  <input class='filter-input' type='radio' name='shipment-filter' id='filter-overdue'>
+  <nav class='filter-bar zcs-horizontal-tabpanel' aria-label='Shipment milestone and status filters'><ul class='zcs-horizontal-tabhead zcs-flex zcs-gap-6 zcs-m-0 zcs-p-0'>
+    <label for='filter-all'><li class='zcs-horizontal-tabitem'><span class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-gap-6 zcs-px-10 zcs-py-10'><span>All</span><span class='zcs-horizontal-tabcount zcs-rounded-sm zcs-px-6 zcs-py-2 zcs-font-12'><%=bookings.count()%></span></span></li></label>
+    <label for='filter-new'><li class='zcs-horizontal-tabitem'><span class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-gap-6 zcs-px-10 zcs-py-10'><span>New</span><span class='zcs-horizontal-tabcount zcs-rounded-sm zcs-px-6 zcs-py-2 zcs-font-12'><%=newCount%></span></span></li></label>
+    <label for='filter-receipt'><li class='zcs-horizontal-tabitem'><span class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-gap-6 zcs-px-10 zcs-py-10'><span>Receipt recorded</span><span class='zcs-horizontal-tabcount zcs-rounded-sm zcs-px-6 zcs-py-2 zcs-font-12'><%=receiptCount%></span></span></li></label>
+    <label for='filter-qc'><li class='zcs-horizontal-tabitem'><span class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-gap-6 zcs-px-10 zcs-py-10'><span>QC recorded</span><span class='zcs-horizontal-tabcount zcs-rounded-sm zcs-px-6 zcs-py-2 zcs-font-12'><%=qcCountSummary%></span></span></li></label>
+    <label for='filter-complete'><li class='zcs-horizontal-tabitem'><span class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-gap-6 zcs-px-10 zcs-py-10'><span>Completed</span><span class='zcs-horizontal-tabcount zcs-rounded-sm zcs-px-6 zcs-py-2 zcs-font-12'><%=completedCount%></span></span></li></label>
+    <label for='filter-exception'><li class='zcs-horizontal-tabitem'><span class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-gap-6 zcs-px-10 zcs-py-10'><span>Exceptions</span><span class='zcs-horizontal-tabcount zcs-rounded-sm zcs-px-6 zcs-py-2 zcs-font-12'><%=exceptionCount%></span></span></li></label>
+    <label for='filter-overdue'><li class='zcs-horizontal-tabitem'><span class='zcs-horizontal-tablink zcs-flex zcs-align-items-center zcs-gap-6 zcs-px-10 zcs-py-10'><span>Overdue</span><span class='zcs-horizontal-tabcount zcs-rounded-sm zcs-px-6 zcs-py-2 zcs-font-12'><%=overdueCount%></span></span></li></label>
+  </ul></nav>
+  <section class='register-shell'>
+  <%if(bookings.count() == 0){%>
+    <div class='empty zcs-card zcs-flex zcs-align-items-center zcs-justify-center'><div class='zcs-p-20'><i class='zc-li-outline files-3-box zcs-font-24 zcs-color-tertiary'></i><h3>No logistics bookings</h3><p>Bookings appear here after an eligible invoice-paid purchase order is assigned to a shipment.</p></div></div>
+  <%}else{%>
+    <div class='register-scroll zcs-table-wrapper'><table class='register-table zcs-w-full'><thead class='zcs-sticky'><tr><th class='zcs-px-12 zcs-py-8'>Booking / provider</th><th class='zcs-px-12 zcs-py-8'>Route / tracking</th><th class='zcs-px-12 zcs-py-8'>Dates</th><th class='zcs-px-12 zcs-py-8'>Scope</th><th class='zcs-px-12 zcs-py-8'>Milestone</th><th class='zcs-px-12 zcs-py-8'>Exceptions</th><th class='zcs-px-12 zcs-py-8'>Status</th><th class='zcs-px-12 zcs-py-8'>Actions</th></tr></thead><tbody>
+    <%for each booking in bookings
+    {
+        statusValue = ifnull(booking.Status,"Unknown");
+        poRows = Logistics_Booking_Purchase_Order[Parent_Logistics_Booking == booking.ID];
+        productRows = Logistics_Booking_Product[Parent_Logistics_Booking == booking.ID];
+        qcRows = Logistics_Quality_Check_Product[Parent_Logistics_Booking == booking.ID];
+        poCount = poRows.count(); productCount = productRows.count(); qcCount = qcRows.count();
+        receiptDone = booking.Received_Date != null;
+        qcDone = booking.Quality_Check_Date != null;
+        completed = statusValue == "Products Received";
+        readyToComplete = receiptDone && qcDone && productCount > 0 && qcCount > 0;
+        quantityIssue = false; damageIssue = false; qcIssue = false;
+        for each productRow in productRows
+        {
+            expectedQty = ifnull(productRow.Expected_Quantity,0);
+            receivedQty = ifnull(productRow.Received_Quantity,0);
+            if(receivedQty < expectedQty){quantityIssue = true; readyToComplete = false;}
+            if(ifnull(productRow.Damaged_Quantity,0) > 0 || ifnull(productRow.Rejected_Quantity,0) > 0){damageIssue = true;}
+            inspectedQty = ifnull(Logistics_Quality_Check_Product[Logistics_Booking_Product == productRow.ID].sum(Inspected_Quantity),0);
+            if(inspectedQty < receivedQty){readyToComplete = false;}
+        }
+        for each qcRow in qcRows
+        {
+            if(qcRow.Quality_Result == "Failed" || qcRow.Quality_Result == "Partially Passed" || ifnull(qcRow.Rejected_Quantity,0) > 0){qcIssue = true;}
+        }
+        overdue = booking.Expected_Arrival_Date != null && booking.Expected_Arrival_Date < zoho.currentdate && booking.Actual_Arrival_Date == null && !completed;
+        hasException = booking.Tracking_Reference == null || booking.Tracking_Reference == "" || poCount == 0 || productCount == 0 || overdue || quantityIssue || damageIssue || qcIssue || (receiptDone && !qcDone);
+        progress = 25; milestoneLabel = "Booked";
+        if(receiptDone){progress = 50; milestoneLabel = "Receipt recorded";}
+        if(qcDone){progress = 75; milestoneLabel = "QC recorded";}
+        if(completed){progress = 100; milestoneLabel = "Completed";}
+        badgeClass = "zcs-badge-grey"; badgeIcon = "ui-2-help";
+        if(statusValue == "New"){badgeClass = "zcs-badge-blue"; badgeIcon = "loader-dots-06";}
+        if(completed){badgeClass = "zcs-badge-green"; badgeIcon = "ui-1-check-circle-08";}
+        rowClass = "shipment-row";
+        if(statusValue == "New"){rowClass = rowClass + " is-new";}
+        if(receiptDone && !qcDone){rowClass = rowClass + " is-receipt";}
+        if(qcDone && !completed){rowClass = rowClass + " is-qc";}
+        if(completed){rowClass = rowClass + " is-complete";}
+        if(hasException){rowClass = rowClass + " has-exception";}
+        if(overdue){rowClass = rowClass + " is-overdue";}
+    %>
+      <tr class='<%=rowClass%>'>
+        <td data-label='Booking / provider' class='zcs-px-12 zcs-py-8'><a class='record-link' href='#Page:Logistics_Booking_Detail?Logistics_Booking_ID=<%=booking.ID%>'>Booking <%=booking.Logistics_Booking_ID%></a><span class='subtle'><%=ifnull(booking.Logistics_Provider,"Provider not set")%></span></td>
+        <td data-label='Route / tracking' class='route zcs-px-12 zcs-py-8'><span class='zcs-inline-flex zcs-align-items-center zcs-gap-6'><i class='zc-li-outline location-pin'></i><%=ifnull(booking.Pickup_Location,"Origin not set")%></span><span class='subtle'>To <%=ifnull(booking.Warehouse_Destination,"destination not set")%></span><span class='subtle'>Tracking: <%=ifnull(booking.Tracking_Reference,"Not set")%></span></td>
+        <td data-label='Dates' class='dates zcs-px-12 zcs-py-8'>Booked: <%=ifnull(booking.Booking_Date,"Not set")%><span class='subtle'>Expected: <%=ifnull(booking.Expected_Arrival_Date,"Not set")%></span><span class='subtle'>Actual: <%=ifnull(booking.Actual_Arrival_Date,"Pending")%></span></td>
+        <td data-label='Scope' class='scope zcs-px-12 zcs-py-8'><strong><%=poCount%></strong> purchase orders<span class='subtle'><%=productCount%> products · <%=qcCount%> QC rows</span></td>
+        <td data-label='Milestone' class='progress-cell zcs-px-12 zcs-py-8'><div class='progress-label'><span><%=milestoneLabel%></span><strong><%=progress%>%</strong></div><div class='zcs-progress-bar'><div class='zcs-progress-bar-indicator' style='width:<%=progress%>%'></div></div><div class='milestone-dots' aria-label='Booked, receipt, quality check, complete'><span class='done'></span><span class='<%if(receiptDone){%>done<%}%>'></span><span class='<%if(qcDone){%>done<%}%>'></span><span class='<%if(completed){%>done<%}%>'></span></div></td>
+        <td data-label='Exceptions' class='zcs-px-12 zcs-py-8'><div class='exception-stack'><%if(booking.Tracking_Reference == null || booking.Tracking_Reference == ""){%><span class='zcs-badge zcs-badge-red zcs-inline-flex zcs-align-items-center zcs-gap-4 zcs-rounded-sm zcs-px-8 zcs-py-2 zcs-font-12'><i class='zc-li-outline ui-1-circle-remove'></i>Missing tracking</span><%}%><%if(poCount == 0 || productCount == 0){%><span class='zcs-badge zcs-badge-red zcs-inline-flex zcs-align-items-center zcs-gap-4 zcs-rounded-sm zcs-px-8 zcs-py-2 zcs-font-12'><i class='zc-li-outline ui-1-circle-remove'></i>Missing shipment links</span><%}%><%if(overdue){%><span class='zcs-badge zcs-badge-red zcs-inline-flex zcs-align-items-center zcs-gap-4 zcs-rounded-sm zcs-px-8 zcs-py-2 zcs-font-12'><i class='zc-li-outline ui-2-time'></i>Arrival overdue</span><%}%><%if(quantityIssue){%><span class='zcs-badge zcs-badge-yellow zcs-inline-flex zcs-align-items-center zcs-gap-4 zcs-rounded-sm zcs-px-8 zcs-py-2 zcs-font-12'><i class='zc-li-outline ui-2-alert-circle'></i>Quantity short</span><%}%><%if(damageIssue || qcIssue){%><span class='zcs-badge zcs-badge-red zcs-inline-flex zcs-align-items-center zcs-gap-4 zcs-rounded-sm zcs-px-8 zcs-py-2 zcs-font-12'><i class='zc-li-outline ui-2-alert-circle'></i>QC exception</span><%}%><%if(receiptDone && !qcDone){%><span class='zcs-badge zcs-badge-yellow zcs-inline-flex zcs-align-items-center zcs-gap-4 zcs-rounded-sm zcs-px-8 zcs-py-2 zcs-font-12'><i class='zc-li-outline loader-dots-06'></i>QC pending</span><%}%><%if(!hasException){%><span class='zcs-badge zcs-badge-green zcs-inline-flex zcs-align-items-center zcs-gap-4 zcs-rounded-sm zcs-px-8 zcs-py-2 zcs-font-12'><i class='zc-li-outline ui-1-check-circle-08'></i>Clear</span><%}%></div></td>
+        <td data-label='Status' class='zcs-px-12 zcs-py-8'><span class='zcs-badge <%=badgeClass%> zcs-inline-flex zcs-align-items-center zcs-gap-4 zcs-rounded-sm zcs-px-10 zcs-py-2'><i class='zc-li-outline <%=badgeIcon%>'></i><%=statusValue%></span></td>
+        <td data-label='Actions' class='zcs-px-12 zcs-py-8'><div class='actions'><a class='zcs-custom-btn zcs-px-10 zcs-py-6 zcs-rounded-sm' href='#Page:Logistics_Booking_Detail?Logistics_Booking_ID=<%=booking.ID%>'><i class='zc-li-outline ui-1-eye-17'></i>View</a><%if(statusValue == "New" && !receiptDone){%><a class='zcs-custom-btn zcs-px-10 zcs-py-6 zcs-rounded-sm' href='#Form:Create_Logistics_Booking?recLinkID=<%=booking.ID%>&amp;viewLinkName=All_Logistics_Bookings&amp;Action_Mode=Receipt&amp;zc_LoadIn=dialog'><i class='zc-li-outline files-3-box'></i>Receipt</a><%}else if(statusValue == "New" && receiptDone && !qcDone){%><a class='zcs-custom-btn zcs-px-10 zcs-py-6 zcs-rounded-sm' href='#Form:Create_Logistics_Booking?recLinkID=<%=booking.ID%>&amp;viewLinkName=All_Logistics_Bookings&amp;Action_Mode=Quality Check&amp;zc_LoadIn=dialog'><i class='zc-li-outline ui-1-check-circle-08'></i>QC</a><%}else if(statusValue == "New" && readyToComplete){%><a class='zcs-custom-btn zcs-px-10 zcs-py-6 zcs-rounded-sm' href='#Form:Create_Logistics_Booking?recLinkID=<%=booking.ID%>&amp;viewLinkName=All_Logistics_Bookings&amp;Action_Mode=Products Received&amp;zc_LoadIn=dialog'><i class='zc-li-outline ui-1-check-small'></i>Complete</a><%}%><a class='zcs-custom-btn zcs-px-10 zcs-py-6 zcs-rounded-sm' href='#Report:All_Histories?Logistics_Booking_Lookup=<%=booking.ID%>'><i class='zc-li-outline ui-2-time'></i>History</a></div></td>
+      </tr>
+    <%}%>
+    </tbody></table></div>
+  <%}%>
+  </section>
+</div>

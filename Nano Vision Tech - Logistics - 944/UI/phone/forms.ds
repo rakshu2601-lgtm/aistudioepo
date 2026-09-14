@@ -1,0 +1,32 @@
+forms
+{
+    form Add_Approval_Setup { label placement = left }
+    form Add_Customer { label placement = left }
+    form Add_Employee { label placement = left }
+    form Add_History { label placement = left }
+    form Add_Lead { label placement = left }
+    form Add_Preference { label placement = left }
+    form Add_Product { label placement = left }
+    form Add_Role { label placement = left }
+    form Add_Supplier { label placement = left }
+    form Add_Supplier_Invoice { label placement = left }
+    form Add_Supplier_Quote { label placement = left }
+    form Alert { label placement = left }
+    form Approval_Setup_For { label placement = left }
+    form Create_Logistics_Booking { label placement = left }
+    form Create_Purchase_Order { label placement = left }
+    form Create_Return_Request { label placement = left }
+    form Create_Sales_Order { label placement = left }
+    form Create_Template { label placement = left }
+    form Lead_Product { label placement = left }
+    form Logistics_Booking_Product { label placement = left }
+    form Logistics_Booking_Purchase_Order { label placement = left }
+    form Logistics_Quality_Check_Product { label placement = left }
+    form Navigation { label placement = left }
+    form Purchase_Order_Product { label placement = left }
+    form Request_Access { label placement = left }
+    form Return_Request_Product { label placement = left }
+    form Sales_Order_Product { label placement = left }
+    form Supplier_Invoice_Product { label placement = left }
+    form Supplier_Quote_Product { label placement = left }
+}

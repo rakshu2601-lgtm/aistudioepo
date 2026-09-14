@@ -1,0 +1,29 @@
+API_Configuration_On_Validate as "Validate API Configuration"
+{
+    type = form
+    form = API_Configuration
+    record event = on add or edit
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Secret_Key == null || input.Secret_Key.trim() == "")
+                {
+                    alert "Secret Key is required.";
+                    cancel submit;
+                }
+                if(input.Active == true)
+                {
+                    active_configs = API_Configuration[Active == true && ID != input.ID];
+                    if(active_configs.count() > 0)
+                    {
+                        alert "Only one API configuration can be active.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

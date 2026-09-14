@@ -1,0 +1,43 @@
+Add_Supplier_Quote_On_Load as "Add Supplier Quote On Load"
+{
+    type = form
+    form = Add_Supplier_Quote
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                hide Hidden;
+                disable Status;
+                disable Action_Mode;
+                disable Supplier_Quote_Products.Sales_Order_Product;
+                disable Supplier_Quote_Products.Product;
+                disable Supplier_Quote_Products.Product_ID;
+                disable Supplier_Quote_Products.Product_Name;
+                disable Supplier_Quote_Products.Product_Category;
+                disable Supplier_Quote_Products.Product_Type;
+                disable Supplier_Quote_Products.Product_Description;
+                disable Supplier_Quote_Products.Manufacturer_Part_Number;
+                disable Supplier_Quote_Products.Internal_Part_Number;
+                disable Supplier_Quote_Products.Brand_Make;
+                disable Supplier_Quote_Products.Model;
+                disable Supplier_Quote_Products.Requested_Configuration;
+                disable Supplier_Quote_Products.Requested_Quantity;
+                disable Supplier_Quote_Products.Unit_of_Measure;
+                disable Supplier_Quote_Products.Supplier_Total_Price;
+                if(input.ID == null)
+                {
+                    supplier_record = Add_Supplier[Email == zoho.loginuserid && Active == true];
+                    if(supplier_record.count() > 0)
+                    {
+                        input.Supplier = supplier_record.ID;
+                        disable Supplier;
+                    }
+                }
+            )
+        }
+    }
+}

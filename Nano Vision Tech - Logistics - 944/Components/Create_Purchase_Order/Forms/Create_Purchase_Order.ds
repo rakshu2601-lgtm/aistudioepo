@@ -1,0 +1,378 @@
+form Create_Purchase_Order
+{
+    displayname = "Create Purchase Order"
+    success message = "Purchase order saved successfully"
+    Purchase_Order_Information
+    (
+        type = section
+        displayname = "Purchase Order Information"
+        row = 1
+        column = 0
+        width = medium
+    )
+    must have Supplier
+    (
+        type = picklist
+        values = Add_Supplier.ID
+        displayformat = [Supplier_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Sales_Order
+    (
+        type = picklist
+        displayname = "Sales Order"
+        values = Create_Sales_Order.ID
+        displayformat = [Sales_Order_ID]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Selected_Supplier_Quote
+    (
+        type = picklist
+        displayname = "Selected Supplier Quote"
+        values = Add_Supplier_Quote.ID
+        displayformat = [Supplier_Quote_ID]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Customer
+    (
+        type = picklist
+        values = Add_Customer.ID
+        displayformat = [Customer_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    PO_Date
+    (
+        type = date
+        displayname = "PO Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Expected_Delivery_Date
+    (
+        type = date
+        displayname = "Expected Delivery Date"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Currency
+    (
+        type = picklist
+        values = {"USD","EUR"}
+        initial value = "USD"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Dispatch_Location
+    (
+        type = text
+        displayname = "Dispatch Location"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Purchase_Order_Document
+    (
+        type = upload file
+        displayname = "Purchase Order Document"
+        browse = local_drive, google_docs, zoho_docs
+        row = 1
+        column = 1
+        width = medium
+    )
+    Ordered_Products
+    (
+        type = section
+        displayname = "Ordered Products"
+        visibility = false
+        row = 2
+        column = 1
+        width = medium
+    )
+    Purchase_Order_Products
+    (
+        type = grid
+        displayname = "Purchase Order Products"
+        values = Purchase_Order_Product.ID
+        bidirectional = Parent_Purchase_Order
+        row = 2
+        column = 1
+        width = medium
+    )
+    Commercials
+    (
+        type = section
+        displayname = "Commercials"
+        visibility = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Supplier_Price
+    (
+        type = USD
+        displayname = "Supplier Price"
+        decimalplace = 2
+        maxchar = 16
+        row = 3
+        column = 1
+        width = medium
+    )
+    Shipping_Charge
+    (
+        type = USD
+        displayname = "Shipping Charge"
+        decimalplace = 2
+        maxchar = 16
+        row = 3
+        column = 2
+        width = medium
+    )
+    Customs_Duty_Via_Freight
+    (
+        type = USD
+        displayname = "Customs Duty via Freight"
+        decimalplace = 2
+        maxchar = 16
+        row = 3
+        column = 1
+        width = medium
+    )
+    Additional_Margin
+    (
+        type = USD
+        displayname = "Additional Margin"
+        decimalplace = 2
+        maxchar = 16
+        row = 3
+        column = 2
+        width = medium
+    )
+    Subtotal
+    (
+        type = USD
+        decimalplace = 2
+        maxchar = 16
+        row = 3
+        column = 1
+        width = medium
+    )
+    Total_Customer_Price
+    (
+        type = USD
+        displayname = "Total Customer Price"
+        decimalplace = 2
+        maxchar = 16
+        row = 3
+        column = 2
+        width = medium
+    )
+    Commercial_Terms
+    (
+        type = textarea
+        displayname = "Commercial Terms"
+        height = 100px
+        row = 3
+        column = 1
+        width = medium
+    )
+    Technical_Specifications
+    (
+        type = textarea
+        displayname = "Technical Specifications"
+        height = 100px
+        row = 3
+        column = 2
+        width = medium
+    )
+    Additional_Remarks
+    (
+        type = textarea
+        displayname = "Additional Remarks"
+        height = 100px
+        row = 3
+        column = 1
+        width = medium
+    )
+    Customer_Handoff
+    (
+        type = section
+        displayname = "Customer Handoff"
+        visibility = true
+        row = 4
+        column = 1
+        width = medium
+    )
+    Shared_With_Customer
+    (
+        type = checkbox
+        displayname = "Shared with Customer"
+        initial value = false
+        row = 4
+        column = 1
+        width = medium
+    )
+    Shared_With_Customer_Date
+    (
+        type = datetime
+        displayname = "Shared with Customer Date"
+        row = 4
+        column = 2
+        width = medium
+    )
+    Customer_Approval_Date
+    (
+        type = datetime
+        displayname = "Customer Approval Date"
+        row = 4
+        column = 1
+        width = medium
+    )
+    Customer_Approval_Comments
+    (
+        type = textarea
+        displayname = "Customer Approval Comments"
+        height = 100px
+        row = 4
+        column = 2
+        width = medium
+    )
+    Customer_Approval_Attachment
+    (
+        type = upload file
+        displayname = "Customer Approval Attachment"
+        browse = local_drive, google_docs, zoho_docs
+        row = 4
+        column = 1
+        width = medium
+    )
+    Delivery
+    (
+        type = section
+        displayname = "Delivery"
+        visibility = true
+        row = 5
+        column = 1
+        width = medium
+    )
+    Delivery_Date
+    (
+        type = date
+        displayname = "Delivery Date"
+        row = 5
+        column = 1
+        width = medium
+    )
+    Delivered_By
+    (
+        type = picklist
+        displayname = "Delivered By"
+        values = Add_Employee.ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 5
+        column = 2
+        width = medium
+    )
+    Delivery_Confirmation
+    (
+        type = checkbox
+        displayname = "Delivery Confirmation"
+        initial value = false
+        row = 5
+        column = 1
+        width = medium
+    )
+    Delivery_Attachment
+    (
+        type = upload file
+        displayname = "Delivery Attachment"
+        browse = local_drive, google_docs, zoho_docs
+        row = 5
+        column = 2
+        width = medium
+    )
+    Delivery_Remarks
+    (
+        type = textarea
+        displayname = "Delivery Remarks"
+        height = 100px
+        row = 5
+        column = 1
+        width = medium
+    )
+    Hidden
+    (
+        type = section
+        displayname = "Hidden"
+        visibility = true
+        row = 6
+        column = 1
+        width = medium
+    )
+    Purchase_Order_ID
+    (
+        type = autonumber
+        displayname = "Purchase Order ID"
+        start index = 1
+        row = 6
+        column = 1
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        values = {"New","Approved","Customer Approved","Invoice Created","Invoice Paid","Logistics Pending","Products Received","Delivered"}
+        initial value = "New"
+        row = 6
+        column = 1
+        width = medium
+    )
+    Action_Mode
+    (
+        type = text
+        displayname = "Action Mode"
+        row = 6
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Create"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

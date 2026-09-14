@@ -1,0 +1,35 @@
+form Work_Order_Tracker_Filter
+{
+    title
+    {
+        displayname = "Work Order Tracker Filter"
+    }
+    store data in zc = false
+    Tracking_Filter
+    (
+        type = section
+        displayname = "Tracking Filter"
+        row = 1
+        column = 0
+    )
+    must have Work_Order
+    (
+        type = picklist
+        displayname = "Work Order ID"
+        values = Work_Orders.ID
+        displayformat = [Work_Order_ID]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        View_Tracking
+        (
+            type = button
+            displayname = "View Tracking"
+            tooltip = "Open the complete status timeline for this work order"
+        )
+    }
+}

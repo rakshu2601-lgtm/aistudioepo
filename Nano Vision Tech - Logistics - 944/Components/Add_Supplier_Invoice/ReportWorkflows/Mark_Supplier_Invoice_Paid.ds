@@ -1,0 +1,17 @@
+Mark_Supplier_Invoice_Paid as "Mark Supplier Invoice Paid"
+{
+    type = functions
+    form = Add_Supplier_Invoice
+    execution type = for each record
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                openUrl("#Form:Add_Supplier_Invoice?recLinkID=" + input.ID + "&viewLinkName=All_Supplier_Invoices&Action_Mode=Mark Paid", "same window");
+            )
+        }
+    }
+}

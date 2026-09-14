@@ -1,0 +1,19 @@
+<page linkname = "Supplier_Quotes" displayname = "Supplier Quotes"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Supplier_Quotes_List' elementName='Supplier_Quotes_List'>
+          <![CDATA[htmlpage Supplier_Quotes_List()
+            content
+            <%{%>
+              <file name:Supplier_Quotes_List.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

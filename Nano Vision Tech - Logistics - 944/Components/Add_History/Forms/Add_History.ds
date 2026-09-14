@@ -1,0 +1,201 @@
+form Add_History
+{
+    displayname = "Add History"
+    success message = "History recorded successfully"
+    History_Information
+    (
+        type = section
+        displayname = "History Information"
+        row = 1
+        column = 0
+        width = medium
+    )
+    must have Action_Type
+    (
+        type = picklist
+        displayname = "Action Type"
+        values = {"Record Created","Status Changed","Sales Order Created","Lead Marked Lost","Supplier Quote Received","Supplier Recommended","Supplier Quote Selected","Purchase Order Created","Purchase Order Approved","Purchase Order Shared with Customer","Customer Approval Recorded","Supplier Invoice Created","Supplier Invoice Paid","Logistics Booking Created","Purchase Order Added to Logistics","Products Received","Quality Check Completed","Delivery Confirmed","Return Request Created","Subform Updated","Other"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    Status
+    (
+        type = text
+        row = 1
+        column = 2
+        width = medium
+    )
+    Previous_Status
+    (
+        type = text
+        displayname = "Previous Status"
+        row = 1
+        column = 1
+        width = medium
+    )
+    New_Status
+    (
+        type = text
+        displayname = "New Status"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Comments
+    (
+        type = textarea
+        height = 120px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Subform_Details_Change_Summary
+    (
+        type = textarea
+        displayname = "Subform Details Change Summary"
+        height = 120px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Audit_Context
+    (
+        type = section
+        displayname = "Audit Context"
+        visibility = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Lead_Lookup
+    (
+        type = picklist
+        displayname = "Lead"
+        values = Add_Lead.ID
+        displayformat = [Lead_ID]
+        searchable = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Sales_Order_Lookup
+    (
+        type = picklist
+        displayname = "Sales Order"
+        values = Create_Sales_Order.ID
+        displayformat = [Sales_Order_ID]
+        searchable = true
+        row = 2
+        column = 2
+        width = medium
+    )
+    Supplier_Quote_Lookup
+    (
+        type = picklist
+        displayname = "Supplier Quote"
+        values = Add_Supplier_Quote.ID
+        displayformat = [Supplier_Quote_ID]
+        searchable = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Purchase_Order_Lookup
+    (
+        type = picklist
+        displayname = "Purchase Order"
+        values = Create_Purchase_Order.ID
+        displayformat = [Purchase_Order_ID]
+        searchable = true
+        row = 2
+        column = 2
+        width = medium
+    )
+    Supplier_Invoice_Lookup
+    (
+        type = picklist
+        displayname = "Supplier Invoice"
+        values = Add_Supplier_Invoice.ID
+        displayformat = [Supplier_Invoice_ID]
+        searchable = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Logistics_Booking_Lookup
+    (
+        type = picklist
+        displayname = "Logistics Booking"
+        values = Create_Logistics_Booking.ID
+        displayformat = [Logistics_Booking_ID]
+        searchable = true
+        row = 2
+        column = 2
+        width = medium
+    )
+    Return_Request_Lookup
+    (
+        type = picklist
+        displayname = "Return Request"
+        values = Create_Return_Request.ID
+        displayformat = [Return_Request_ID]
+        searchable = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Updated_By
+    (
+        type = picklist
+        displayname = "Updated By"
+        values = Add_Employee.ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 2
+        column = 2
+        width = medium
+    )
+    Updated_By_Email
+    (
+        type = email
+        displayname = "Updated By Email"
+        initial value = "${zoho.loginuserid}"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Updated_Date_Time
+    (
+        type = datetime
+        displayname = "Updated Date Time"
+        initial value = "${zoho.currenttime}"
+        row = 2
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Approve Purchase Order"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

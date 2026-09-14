@@ -1,0 +1,19 @@
+<page linkname = "RD_Dashboard" displayname = "R&D Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='RD_Operations' elementName='RD_Operations'>
+          <![CDATA[htmlpage RD_Operations()
+            content
+            <%{%>
+              <file name:RD_Operations.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

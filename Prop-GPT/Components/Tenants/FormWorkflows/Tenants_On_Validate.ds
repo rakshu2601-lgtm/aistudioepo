@@ -1,0 +1,31 @@
+Tenants_On_Validate as "Validate Tenant Phones"
+{
+    type = form
+    form = Tenants
+    record event = on add or edit
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                e164_pattern = "^\\+[1-9][0-9]{7,14}$";
+                if(input.Phone.matches(e164_pattern) == false)
+                {
+                    alert "Phone must use E.164 format, for example +12125551234.";
+                    cancel submit;
+                }
+                if(input.Alternate_Phone != null && input.Alternate_Phone != "" && input.Alternate_Phone.matches(e164_pattern) == false)
+                {
+                    alert "Alternate Phone must use E.164 format.";
+                    cancel submit;
+                }
+                if(input.Emergency_Contact_Phone != null && input.Emergency_Contact_Phone != "" && input.Emergency_Contact_Phone.matches(e164_pattern) == false)
+                {
+                    alert "Emergency Contact Phone must use E.164 format.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

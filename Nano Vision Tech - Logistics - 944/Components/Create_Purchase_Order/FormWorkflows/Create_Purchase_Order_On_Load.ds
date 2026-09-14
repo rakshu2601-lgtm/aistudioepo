@@ -1,0 +1,24 @@
+Create_Purchase_Order_On_Load as "Create Purchase Order On Load"
+{
+    type = form
+    form = Create_Purchase_Order
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                hide Hidden;
+                disable Supplier_Price;
+                disable Subtotal;
+                disable Total_Customer_Price;
+                disable Status;
+                disable Action_Mode;
+                disable Purchase_Order_Products.Supplier_Total_Price;
+                disable Purchase_Order_Products.Customer_Total_Price;
+            )
+        }
+    }
+}

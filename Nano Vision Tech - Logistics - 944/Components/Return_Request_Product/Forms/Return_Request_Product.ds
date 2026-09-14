@@ -1,0 +1,213 @@
+form Return_Request_Product
+{
+    displayname = "Return Request Product"
+    Return_Product_Information
+    (
+        type = section
+        displayname = "Return Product Information"
+        row = 1
+        column = 0
+        width = medium
+    )
+    Parent_Return_Request
+    (
+        type = picklist
+        displayname = "Parent Return Request"
+        values = Create_Return_Request.ID
+        displayformat = [Return_Request_ID]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Purchase_Order_Product
+    (
+        type = picklist
+        displayname = "Purchase Order Product"
+        values = Purchase_Order_Product.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product
+    (
+        type = picklist
+        values = Add_Product.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Product_ID
+    (
+        type = text
+        displayname = "Product ID"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product_Name
+    (
+        type = text
+        displayname = "Product Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Product_Category
+    (
+        type = text
+        displayname = "Product Category"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product_Type
+    (
+        type = text
+        displayname = "Product Type"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Product_Description
+    (
+        type = textarea
+        displayname = "Product Description"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Manufacturer_Part_Number
+    (
+        type = text
+        displayname = "Manufacturer Part Number"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Internal_Part_Number
+    (
+        type = text
+        displayname = "Internal Part Number"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Brand_Make
+    (
+        type = text
+        displayname = "Brand / Make"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Model
+    (
+        type = text
+        row = 1
+        column = 2
+        width = medium
+    )
+    Configuration
+    (
+        type = textarea
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Serial_Number
+    (
+        type = text
+        displayname = "Serial Number"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Delivered_Quantity
+    (
+        type = decimal
+        displayname = "Delivered Quantity"
+        decimalplace = 2
+        row = 1
+        column = 1
+        width = medium
+    )
+    Unit_of_Measure
+    (
+        type = text
+        displayname = "Unit of Measure"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Return_Quantity
+    (
+        type = decimal
+        displayname = "Return Quantity"
+        decimalplace = 2
+        row = 1
+        column = 1
+        width = medium
+    )
+    Defect_Description
+    (
+        type = textarea
+        displayname = "Defect Description"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Damage_Responsibility
+    (
+        type = radiobuttons
+        displayname = "Damage Responsibility"
+        values = {"Supplier","Company"}
+        layout = 2
+        row = 1
+        column = 1
+        width = medium
+    )
+    Attachments
+    (
+        type = upload file
+        file count = 10
+        browse = local_drive, google_docs, zoho_docs
+        row = 1
+        column = 2
+        width = medium
+    )
+    Remarks
+    (
+        type = textarea
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+        }
+    }
+}

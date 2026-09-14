@@ -1,0 +1,19 @@
+<page linkname = "Sales_Order_Detail" parameters = "int Sales_Order_ID" displayname = "Sales Order Detail"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Order_Detail' elementName='Order_Detail'>
+          <![CDATA[htmlpage Order_Detail()
+            content
+             <%{%>
+                 <file name:Order_Detail.dshtml/>
+             <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

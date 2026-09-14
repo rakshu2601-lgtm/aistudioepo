@@ -1,0 +1,19 @@
+<page linkname = "Supplier_Invoice_Detail" parameters = "int Supplier_Invoice_ID" displayname = "Supplier Invoice Detail"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Supplier_Invoice_Detail_Snippet' elementName='Supplier_Invoice_Detail'>
+          <![CDATA[htmlpage Supplier_Invoice_Detail_Snippet()
+            content
+             <%{%>
+                 <file name:Supplier_Invoice_Detail.dshtml/>
+             <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

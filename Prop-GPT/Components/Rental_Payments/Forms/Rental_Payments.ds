@@ -1,0 +1,175 @@
+form Rental_Payments
+{
+    title
+    {
+        displayname = "Rental Payments"
+        on add = "Add Rental Payment"
+        on edit = "Edit Rental Payment"
+    }
+    Payment_Details
+    (
+        type = section
+        displayname = "Payment Details"
+        row = 1
+        column = 0
+    )
+    Payment_ID
+    (
+        type = autonumber
+        displayname = "Payment ID"
+        start index = 1001
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Lease
+    (
+        type = picklist
+        displayname = "Lease"
+        values = Leases.ID
+        displayformat = [Lease_ID]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Tenant
+    (
+        type = picklist
+        displayname = "Tenant"
+        values = Tenants.ID
+        displayformat = [Tenant_Name]
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Property
+    (
+        type = picklist
+        displayname = "Property"
+        values = Properties.ID
+        displayformat = [Property_Name]
+        row = 1
+        column = 1
+        width = medium
+    )
+    Unit
+    (
+        type = picklist
+        displayname = "Unit"
+        values = Units.ID
+        displayformat = [Unit_Number]
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Billing_Month
+    (
+        type = date
+        displayname = "Billing Month"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Due_Date
+    (
+        type = date
+        displayname = "Due Date"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Reminder_Date
+    (
+        type = date
+        displayname = "Reminder Date"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Amount_Due
+    (
+        type = USD
+        displayname = "Amount Due"
+        decimalplace = 2
+        maxchar = 12
+        row = 1
+        column = 2
+        width = medium
+    )
+    Amount_Paid
+    (
+        type = USD
+        displayname = "Amount Paid"
+        initial value = 0
+        decimalplace = 2
+        maxchar = 12
+        row = 1
+        column = 1
+        width = medium
+    )
+    Paid_Date
+    (
+        type = date
+        displayname = "Paid Date"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Payment_Status
+    (
+        type = picklist
+        displayname = "Payment Status"
+        values = {"Due","Partially Paid","Paid","Overdue","Waived"}
+        initial value = "Due"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Payment_Reference
+    (
+        type = text
+        displayname = "Payment Reference"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Notes
+    (
+        type = textarea
+        displayname = "Notes"
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Payment"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Payment"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

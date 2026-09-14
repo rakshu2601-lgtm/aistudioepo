@@ -1,0 +1,37 @@
+default list All_Supplier_Invoices
+{
+    displayName = "All Supplier Invoices"
+    show all rows from Add_Supplier_Invoice
+    (
+        Supplier_Invoice_ID as "Supplier Invoice ID"
+        Supplier
+        Purchase_Order as "Purchase Order"
+        Sales_Order as "Sales Order"
+        Supplier_Invoice_Number as "Supplier Invoice Number"
+        Invoice_Date as "Invoice Date"
+        Invoice_Amount as "Invoice Amount"
+        Currency
+        Paid_Date as "Paid Date"
+        Payment_Reference as "Payment Reference"
+        Status
+        custom action "Mark Paid"
+        (
+            workflow = Mark_Supplier_Invoice_Paid
+            show action for each record = true
+            column header = "Mark Paid"
+            condition = (Status == "New")
+        )
+    )
+    filters
+    (
+        Supplier
+        Purchase_Order
+        Invoice_Date
+        Currency
+        Status
+    )
+    sort by
+    (
+        Invoice_Date descending
+    )
+}

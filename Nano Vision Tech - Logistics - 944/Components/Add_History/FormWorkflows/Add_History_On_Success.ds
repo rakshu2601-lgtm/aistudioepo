@@ -1,0 +1,36 @@
+Add_History_On_Success as "Finalize History Action"
+{
+    type = form
+    form = Add_History
+    record event = on add
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Action_Type == "Purchase Order Approved" && input.Purchase_Order_Lookup != null)
+                {
+                    po_record = Create_Purchase_Order[ID == input.Purchase_Order_Lookup];
+                    po_record.Status = "Approved";
+                    sales_order_record = Create_Sales_Order[ID == po_record.Sales_Order];
+                    sales_order_record.Status = "Purchase Order Approved";
+                    insert into Add_History
+                    [
+                        Action_Type = "Status Changed"
+                        Status = "Purchase Order Approved"
+                        Previous_Status = "Purchase Order Created"
+                        New_Status = "Purchase Order Approved"
+                        Comments = input.Comments
+                        Sales_Order_Lookup = po_record.Sales_Order
+                        Purchase_Order_Lookup = input.Purchase_Order_Lookup
+                        Updated_By = input.Updated_By
+                        Updated_By_Email = input.Updated_By_Email
+                        Updated_Date_Time = zoho.currenttime
+                    ];
+                }
+            )
+        }
+    }
+}

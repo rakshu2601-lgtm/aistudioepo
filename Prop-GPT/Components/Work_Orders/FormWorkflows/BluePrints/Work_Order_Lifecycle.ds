@@ -1,0 +1,137 @@
+Work_Order_Lifecycle as "Work Order Lifecycle"
+{
+    type = blueprint
+    form = Work_Orders
+    start
+    {
+        start stage = "New"
+    }
+    stages
+    {
+        "New" { }
+        "Assigned" { }
+        "In Progress" { }
+        "On Hold" { }
+        "Resolved" { }
+        "Closed" { }
+        "Cancelled" { }
+    }
+    transitions
+    {
+        Assign as "Assign"
+        {
+            type = normal
+            from stage = "New"
+            to stage = "Assigned"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Property Superadmin"}
+                )
+            }
+            after { }
+        }
+        Start_Work as "Start Work"
+        {
+            type = normal
+            from stage = "Assigned"
+            to stage = "In Progress"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Property Superadmin"}
+                )
+            }
+            after { }
+        }
+        Put_On_Hold as "Put On Hold"
+        {
+            type = common
+            from stage = "Assigned"
+            to stage = "On Hold"
+            common stages = {"In Progress"}
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Property Superadmin"}
+                )
+            }
+            after { }
+        }
+        Resume as "Resume"
+        {
+            type = normal
+            from stage = "On Hold"
+            to stage = "In Progress"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Property Superadmin"}
+                )
+            }
+            after { }
+        }
+        Resolve as "Resolve"
+        {
+            type = common
+            from stage = "In Progress"
+            to stage = "Resolved"
+            common stages = {"On Hold"}
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Property Superadmin"}
+                )
+            }
+            after { }
+        }
+        Reopen as "Reopen"
+        {
+            type = normal
+            from stage = "Resolved"
+            to stage = "In Progress"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Property Superadmin"}
+                )
+            }
+            after { }
+        }
+        Close as "Close"
+        {
+            type = normal
+            from stage = "Resolved"
+            to stage = "Closed"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Property Superadmin"}
+                )
+            }
+            after { }
+        }
+        Cancel_Work_Order as "Cancel"
+        {
+            type = common
+            from stage = "New"
+            to stage = "Cancelled"
+            common stages = {"Assigned","In Progress","On Hold","Resolved"}
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Property Superadmin"}
+                )
+            }
+            after { }
+        }
+    }
+}

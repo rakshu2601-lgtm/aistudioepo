@@ -1,0 +1,5 @@
+report All_Status_History
+{
+ quickview(layout(type = -1 datablock1(layout type = -1 fields(History_ID Work_Order Previous_Status New_Status Changed_At Changed_By Change_Source Notes))) menu(header(Edit Duplicate Delete) record(Edit Duplicate Delete)) action(on click(View Record) on right click(Edit Delete Duplicate View Record)))
+ detailview(layout(type = 1 datablock1(layout type = -2 fields(History_ID Work_Order Previous_Status New_Status Changed_At Changed_By Change_Source Notes))) menu(header(Edit Duplicate Delete)))
+}

@@ -1,0 +1,25 @@
+default list All_Status_History
+{
+    displayName = "All Status History"
+    show all rows from Work_Order_Status_History
+    (
+        History_ID
+        Work_Order
+        Previous_Status
+        New_Status
+        Changed_At
+        Changed_By
+        Change_Source
+        Notes
+    )
+    filters
+    (
+        Work_Order
+        New_Status
+        Change_Source
+    )
+    sort by
+    (
+        Changed_At descending
+    )
+}

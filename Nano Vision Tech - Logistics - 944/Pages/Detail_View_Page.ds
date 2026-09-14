@@ -1,0 +1,19 @@
+<page linkname = "Detail_View_Page" parameters = "int recID, string reportName" displayname = "Record Preview"/>
+<content>
+<zml webDeviceConfig='{"layout":{"displayType":"plain","design":"fluid","style":"padding-right:0px;padding-top:0px;padding-bottom:0px;padding-left:0px;"}}'>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Detail_View_Snippet' elementName='Detail View Snippet' bgColor='transparent'>
+          <![CDATA[htmlpage Detail_View_Snippet()
+            content
+            <%{%>
+              <file name:HTML_Snippet.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

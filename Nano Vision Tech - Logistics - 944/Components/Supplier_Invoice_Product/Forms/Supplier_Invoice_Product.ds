@@ -1,0 +1,163 @@
+form Supplier_Invoice_Product
+{
+    displayname = "Supplier Invoice Product"
+    Invoice_Product_Information
+    (
+        type = section
+        displayname = "Invoice Product Information"
+        row = 1
+        column = 0
+        width = medium
+    )
+    Parent_Supplier_Invoice
+    (
+        type = picklist
+        displayname = "Parent Supplier Invoice"
+        values = Add_Supplier_Invoice.ID
+        displayformat = [Supplier_Invoice_ID]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Purchase_Order_Product
+    (
+        type = picklist
+        displayname = "Purchase Order Product"
+        values = Purchase_Order_Product.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product
+    (
+        type = picklist
+        values = Add_Product.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Product_ID
+    (
+        type = text
+        displayname = "Product ID"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product_Name
+    (
+        type = text
+        displayname = "Product Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Manufacturer_Part_Number
+    (
+        type = text
+        displayname = "Manufacturer Part Number"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Brand_Make
+    (
+        type = text
+        displayname = "Brand / Make"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Model
+    (
+        type = text
+        row = 1
+        column = 2
+        width = medium
+    )
+    Configuration
+    (
+        type = textarea
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Unit_of_Measure
+    (
+        type = text
+        displayname = "Unit of Measure"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Quantity
+    (
+        type = decimal
+        decimalplace = 2
+        row = 1
+        column = 1
+        width = medium
+    )
+    Unit_Price
+    (
+        type = USD
+        displayname = "Unit Price"
+        decimalplace = 2
+        maxchar = 16
+        row = 1
+        column = 2
+        width = medium
+    )
+    Total_Price
+    (
+        type = USD
+        displayname = "Total Price"
+        decimalplace = 2
+        maxchar = 16
+        row = 1
+        column = 1
+        width = medium
+    )
+    Currency
+    (
+        type = picklist
+        values = {"USD","EUR"}
+        initial value = "USD"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Remarks
+    (
+        type = textarea
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+        }
+    }
+}

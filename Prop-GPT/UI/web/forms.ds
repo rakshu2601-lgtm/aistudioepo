@@ -1,0 +1,12 @@
+forms
+{
+    form Properties { label placement = top }
+    form Units { label placement = top }
+    form Tenants { label placement = top }
+    form Leases { label placement = top }
+    form Rental_Payments { label placement = top }
+    form Work_Orders { label placement = top }
+    form Work_Order_Status_History { label placement = top }
+    form Work_Order_Tracker_Filter { label placement = top }
+    form API_Configuration { label placement = top }
+}

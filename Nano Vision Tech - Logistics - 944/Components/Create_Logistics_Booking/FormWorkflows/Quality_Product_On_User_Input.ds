@@ -1,0 +1,31 @@
+Quality_Product_On_User_Input as "Load Quality Check Product"
+{
+    type = form
+    form = Create_Logistics_Booking
+    record event = on add or edit
+
+    on user input of Logistics_Quality_Check_Products.Logistics_Booking_Product
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(row.Logistics_Booking_Product != null)
+                {
+                    receipt_record = Logistics_Booking_Product[ID == row.Logistics_Booking_Product];
+                    row.Purchase_Order = receipt_record.Purchase_Order;
+                    row.Purchase_Order_Product = receipt_record.Purchase_Order_Product;
+                    row.Product = receipt_record.Product;
+                    row.Product_ID = receipt_record.Product_ID;
+                    row.Product_Name = receipt_record.Product_Name;
+                    row.Manufacturer_Part_Number = receipt_record.Manufacturer_Part_Number;
+                    row.Brand_Make = receipt_record.Brand_Make;
+                    row.Model = receipt_record.Model;
+                    row.Configuration = receipt_record.Configuration;
+                    row.Serial_Number = receipt_record.Serial_Number_Details;
+                    row.Received_Quantity = receipt_record.Received_Quantity;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,54 @@
+Selected_Supplier_Quote_On_User_Input as "Load Selected Supplier Quote"
+{
+    type = form
+    form = Create_Purchase_Order
+    record event = on add or edit
+
+    on user input of Selected_Supplier_Quote
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Purchase_Order_Products.clear();
+                if(input.Selected_Supplier_Quote != null)
+                {
+                    quote_record = Add_Supplier_Quote[ID == input.Selected_Supplier_Quote];
+                    input.Supplier = quote_record.Supplier;
+                    input.Sales_Order = quote_record.Sales_Order;
+                    input.Currency = quote_record.Currency;
+                    input.Dispatch_Location = quote_record.Dispatch_Location;
+                    sales_order_record = Create_Sales_Order[ID == quote_record.Sales_Order];
+                    input.Customer = sales_order_record.Customer;
+                    po_rows = Collection();
+                    for each quote_item in Supplier_Quote_Product[Parent_Supplier_Quote == input.Selected_Supplier_Quote]
+                    {
+                        po_row = Create_Purchase_Order.Purchase_Order_Products();
+                        po_row.Sales_Order_Product = quote_item.Sales_Order_Product;
+                        po_row.Supplier_Quote_Product = quote_item.ID;
+                        po_row.Product = quote_item.Product;
+                        po_row.Product_ID = quote_item.Product_ID;
+                        po_row.Product_Name = quote_item.Product_Name;
+                        po_row.Product_Category = quote_item.Product_Category;
+                        po_row.Product_Type = quote_item.Product_Type;
+                        po_row.Product_Description = quote_item.Product_Description;
+                        po_row.Manufacturer_Part_Number = quote_item.Manufacturer_Part_Number;
+                        po_row.Internal_Part_Number = quote_item.Internal_Part_Number;
+                        po_row.Brand_Make = quote_item.Brand_Make;
+                        po_row.Model = quote_item.Model;
+                        po_row.Approved_Configuration = quote_item.Offered_Configuration;
+                        po_row.Unit_of_Measure = quote_item.Unit_of_Measure;
+                        po_row.Quantity = quote_item.Quoted_Quantity;
+                        po_row.Supplier_Unit_Price = quote_item.Supplier_Unit_Price;
+                        po_row.Supplier_Total_Price = quote_item.Supplier_Total_Price;
+                        po_row.Customer_Unit_Price = quote_item.Supplier_Unit_Price;
+                        po_row.Customer_Total_Price = quote_item.Supplier_Total_Price;
+                        po_row.Currency = quote_item.Currency;
+                        po_rows.insert(po_row);
+                    }
+                    input.Purchase_Order_Products.insert(po_rows);
+                }
+            )
+        }
+    }
+}

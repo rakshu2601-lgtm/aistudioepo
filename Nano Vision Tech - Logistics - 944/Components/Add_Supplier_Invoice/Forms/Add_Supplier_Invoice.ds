@@ -1,0 +1,202 @@
+form Add_Supplier_Invoice
+{
+    displayname = "Add Supplier Invoice"
+    success message = "Supplier invoice saved successfully"
+    Invoice_Information
+    (
+        type = section
+        displayname = "Invoice Information"
+        row = 1
+        column = 0
+        width = medium
+    )
+    must have Supplier
+    (
+        type = picklist
+        values = Add_Supplier.ID
+        displayformat = [Supplier_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Purchase_Order
+    (
+        type = picklist
+        displayname = "Purchase Order"
+        values = Create_Purchase_Order[Status == "Customer Approved"].ID
+        displayformat = [Purchase_Order_ID]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Sales_Order
+    (
+        type = picklist
+        displayname = "Sales Order"
+        values = Create_Sales_Order.ID
+        displayformat = [Sales_Order_ID]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Supplier_Invoice_Number
+    (
+        type = text
+        displayname = "Supplier Invoice Number"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Invoice_Date
+    (
+        type = date
+        displayname = "Invoice Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Currency
+    (
+        type = picklist
+        values = {"USD","EUR"}
+        initial value = "USD"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Invoice_Attachment
+    (
+        type = upload file
+        displayname = "Invoice Attachment"
+        browse = local_drive, google_docs, zoho_docs
+        row = 1
+        column = 1
+        width = medium
+    )
+    Invoice_Products
+    (
+        type = section
+        displayname = "Invoice Products"
+        visibility = false
+        row = 2
+        column = 1
+        width = medium
+    )
+    Supplier_Invoice_Products
+    (
+        type = grid
+        displayname = "Supplier Invoice Products"
+        values = Supplier_Invoice_Product.ID
+        bidirectional = Parent_Supplier_Invoice
+        row = 2
+        column = 1
+        width = medium
+    )
+    Payment
+    (
+        type = section
+        displayname = "Payment"
+        visibility = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Invoice_Amount
+    (
+        type = USD
+        displayname = "Invoice Amount"
+        decimalplace = 2
+        maxchar = 16
+        row = 3
+        column = 1
+        width = medium
+    )
+    Paid_Date
+    (
+        type = date
+        displayname = "Paid Date"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Payment_Reference
+    (
+        type = text
+        displayname = "Payment Reference"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Payment_Remarks
+    (
+        type = textarea
+        displayname = "Payment Remarks"
+        height = 100px
+        row = 3
+        column = 2
+        width = medium
+    )
+    Hidden
+    (
+        type = section
+        displayname = "Hidden"
+        visibility = true
+        row = 4
+        column = 1
+        width = medium
+    )
+    Supplier_Invoice_ID
+    (
+        type = autonumber
+        displayname = "Supplier Invoice ID"
+        start index = 1
+        row = 4
+        column = 1
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        values = {"New","Paid"}
+        initial value = "New"
+        row = 4
+        column = 1
+        width = medium
+    )
+    Action_Mode
+    (
+        type = text
+        displayname = "Action Mode"
+        row = 4
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Create"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

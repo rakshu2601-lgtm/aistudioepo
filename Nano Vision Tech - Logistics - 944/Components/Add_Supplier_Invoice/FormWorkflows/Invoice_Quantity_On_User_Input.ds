@@ -1,0 +1,17 @@
+Invoice_Quantity_On_User_Input as "Calculate Invoice Line Total"
+{
+    type = form
+    form = Add_Supplier_Invoice
+    record event = on add or edit
+
+    on user input of Supplier_Invoice_Products.Quantity
+    {
+        actions
+        {
+            custom deluge script
+            (
+                row.Total_Price = ifnull(row.Quantity,0) * ifnull(row.Unit_Price,0);
+            )
+        }
+    }
+}

@@ -1,0 +1,171 @@
+form Add_Supplier_Quote
+{
+    displayname = "Add Supplier Quote"
+    success message = "Supplier quote submitted successfully"
+    Quote_Information
+    (
+        type = section
+        displayname = "Quote Information"
+        row = 1
+        column = 0
+        width = medium
+    )
+    must have Supplier
+    (
+        type = picklist
+        values = Add_Supplier[Active == true].ID
+        displayformat = [Supplier_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Sales_Order
+    (
+        type = picklist
+        displayname = "Sales Order"
+        values = Create_Sales_Order[Status == "New" || Status == "Quotes Received"].ID
+        displayformat = [Sales_Order_ID]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Quote_Date
+    (
+        type = date
+        displayname = "Quote Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Currency
+    (
+        type = picklist
+        values = {"USD","EUR"}
+        initial value = "USD"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Availability
+    (
+        type = text
+        row = 1
+        column = 1
+        width = medium
+    )
+    Lead_Time
+    (
+        type = text
+        displayname = "Lead Time"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Dispatch_Location
+    (
+        type = text
+        displayname = "Dispatch Location"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Supplier_Remarks
+    (
+        type = textarea
+        displayname = "Supplier Remarks"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Quote_Attachment
+    (
+        type = upload file
+        displayname = "Quote Attachment"
+        browse = local_drive, google_docs, zoho_docs
+        row = 1
+        column = 1
+        width = medium
+    )
+    Quoted_Products
+    (
+        type = section
+        displayname = "Quoted Products"
+        visibility = false
+        row = 2
+        column = 1
+        width = medium
+    )
+    Supplier_Quote_Products
+    (
+        type = grid
+        displayname = "Supplier Quote Products"
+        values = Supplier_Quote_Product.ID
+        bidirectional = Parent_Supplier_Quote
+        row = 2
+        column = 1
+        width = medium
+    )
+    Hidden
+    (
+        type = section
+        displayname = "Hidden"
+        visibility = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Supplier_Quote_ID
+    (
+        type = autonumber
+        displayname = "Supplier Quote ID"
+        start index = 1
+        row = 3
+        column = 1
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        values = {"Received","Selected","Rejected"}
+        initial value = "Received"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Action_Mode
+    (
+        type = text
+        displayname = "Action Mode"
+        row = 3
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit Quote"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Quote"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

@@ -1,0 +1,61 @@
+Leases_On_Validate as "Validate Lease"
+{
+    type = form
+    form = Leases
+    record event = on add or edit
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Lease_End_Date != null && input.Lease_End_Date < input.Lease_Start_Date)
+                {
+                    alert "Lease end date cannot be before the start date.";
+                    cancel submit;
+                }
+                if(input.Payment_Due_Day < 1 || input.Payment_Due_Day > 28)
+                {
+                    alert "Payment due day must be between 1 and 28.";
+                    cancel submit;
+                }
+                property_record = Properties[ID == input.Property];
+                if(property_record.Property_Type == "Multi-Unit Property")
+                {
+                    if(input.Unit == null)
+                    {
+                        alert "A unit is required for a multi-unit property.";
+                        cancel submit;
+                    }
+                    unit_record = Units[ID == input.Unit];
+                    if(unit_record.count() == 0 || unit_record.Property != input.Property)
+                    {
+                        alert "The selected unit does not belong to the selected property.";
+                        cancel submit;
+                    }
+                }
+                else if(input.Unit != null)
+                {
+                    alert "Individual villa leases must not have a unit.";
+                    cancel submit;
+                }
+                if(input.Lease_Status == "Active")
+                {
+                    if(input.Unit != null)
+                    {
+                        overlaps = Leases[ID != input.ID && Lease_Status == "Active" && Unit == input.Unit && Lease_Start_Date <= ifnull(input.Lease_End_Date,'31-Dec-2999') && (Lease_End_Date is null || Lease_End_Date >= input.Lease_Start_Date)];
+                    }
+                    else
+                    {
+                        overlaps = Leases[ID != input.ID && Lease_Status == "Active" && Property == input.Property && Unit is null && Lease_Start_Date <= ifnull(input.Lease_End_Date,'31-Dec-2999') && (Lease_End_Date is null || Lease_End_Date >= input.Lease_Start_Date)];
+                    }
+                    if(overlaps.count() > 0)
+                    {
+                        alert "An overlapping active lease already exists for this residence.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

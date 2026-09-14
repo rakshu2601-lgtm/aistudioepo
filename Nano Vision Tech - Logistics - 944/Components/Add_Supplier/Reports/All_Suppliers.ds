@@ -1,0 +1,21 @@
+default list All_Suppliers
+{
+    displayName = "All Suppliers"
+    show all rows from Add_Supplier
+    (
+        Supplier_ID as "Supplier ID"
+        Supplier_Name as "Supplier Name"
+        Contact_Person as "Contact Person"
+        Email
+        Phone
+        (
+            displayformat = plainnumber
+        )
+        Country
+        Active
+    )
+    sort by
+    (
+        Supplier_Name ascending
+    )
+}

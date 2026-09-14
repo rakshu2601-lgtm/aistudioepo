@@ -1,0 +1,40 @@
+Rental_Payments_On_Success as "Reconcile Rental Payment"
+{
+    type = form
+    form = Rental_Payments
+    record event = on add or edit
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                payment_record = Rental_Payments[ID == input.ID];
+                amount_paid = ifnull(input.Amount_Paid,0);
+                if(input.Payment_Status != "Waived")
+                {
+                    if(amount_paid >= input.Amount_Due)
+                    {
+                        payment_record.Payment_Status = "Paid";
+                        if(input.Paid_Date == null)
+                        {
+                            payment_record.Paid_Date = zoho.currentdate;
+                        }
+                    }
+                    else if(amount_paid > 0)
+                    {
+                        payment_record.Payment_Status = "Partially Paid";
+                    }
+                    else if(input.Due_Date < zoho.currentdate)
+                    {
+                        payment_record.Payment_Status = "Overdue";
+                    }
+                    else
+                    {
+                        payment_record.Payment_Status = "Due";
+                    }
+                }
+            )
+        }
+    }
+}

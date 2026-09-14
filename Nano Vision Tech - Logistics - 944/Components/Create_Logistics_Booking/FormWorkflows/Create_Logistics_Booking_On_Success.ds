@@ -1,0 +1,86 @@
+Create_Logistics_Booking_On_Success as "Process Logistics Booking"
+{
+    type = form
+    form = Create_Logistics_Booking
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                booking_record = Create_Logistics_Booking[ID == input.ID];
+                if(input.Status == "New" && input.Action_Mode == null)
+                {
+                    insert into Add_History
+                    [
+                        Action_Type = "Logistics Booking Created"
+                        Status = "New"
+                        New_Status = "New"
+                        Comments = "Logistics booking created"
+                        Logistics_Booking_Lookup = input.ID
+                        Updated_By_Email = zoho.loginuserid
+                        Updated_Date_Time = zoho.currenttime
+                    ];
+                    for each booking_po in Logistics_Booking_Purchase_Order[Parent_Logistics_Booking == input.ID]
+                    {
+                        po_record = Create_Purchase_Order[ID == booking_po.Purchase_Order];
+                        po_record.Status = "Logistics Pending";
+                        sales_order_record = Create_Sales_Order[ID == booking_po.Sales_Order];
+                        sales_order_record.Status = "Logistics Pending";
+                        insert into Add_History
+                        [
+                            Action_Type = "Logistics Pending"
+                            Status = "Logistics Pending"
+                            Previous_Status = "Invoice Paid"
+                            New_Status = "Logistics Pending"
+                            Comments = "Purchase order added to logistics booking"
+                            Sales_Order_Lookup = booking_po.Sales_Order
+                            Purchase_Order_Lookup = booking_po.Purchase_Order
+                            Logistics_Booking_Lookup = input.ID
+                            Updated_By_Email = zoho.loginuserid
+                            Updated_Date_Time = zoho.currenttime
+                        ];
+                    }
+                }
+                if(input.Action_Mode == "Products Received" && input.Status == "New")
+                {
+                    booking_record.Status = "Products Received";
+                    for each booking_po in Logistics_Booking_Purchase_Order[Parent_Logistics_Booking == input.ID]
+                    {
+                        po_record = Create_Purchase_Order[ID == booking_po.Purchase_Order];
+                        po_record.Status = "Products Received";
+                        sales_order_record = Create_Sales_Order[ID == booking_po.Sales_Order];
+                        sales_order_record.Status = "Products Received";
+                        insert into Add_History
+                        [
+                            Action_Type = "Products Received and Quality Checked"
+                            Status = "Products Received"
+                            Previous_Status = "Logistics Pending"
+                            New_Status = "Products Received"
+                            Comments = input.Quality_Check_Summary
+                            Sales_Order_Lookup = booking_po.Sales_Order
+                            Purchase_Order_Lookup = booking_po.Purchase_Order
+                            Logistics_Booking_Lookup = input.ID
+                            Updated_By_Email = zoho.loginuserid
+                            Updated_Date_Time = zoho.currenttime
+                        ];
+                        supplier_record = Add_Supplier[ID == booking_po.Supplier];
+                        if(supplier_record.Email != null && supplier_record.Email != "")
+                        {
+                            sendmail
+                            (
+                                from : zoho.adminuserid
+                                to : supplier_record.Email
+                                subject : "Products received"
+                                message : "Products for purchase order " + po_record.Purchase_Order_ID + " have been received and quality checked."
+                            )
+                        }
+                    }
+                }
+                booking_record.Action_Mode = "";
+            )
+        }
+    }
+}

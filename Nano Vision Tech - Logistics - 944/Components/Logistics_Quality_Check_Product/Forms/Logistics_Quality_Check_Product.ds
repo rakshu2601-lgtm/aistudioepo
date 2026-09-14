@@ -1,0 +1,203 @@
+form Logistics_Quality_Check_Product
+{
+    displayname = "Logistics Quality Check Product"
+    Quality_Check_Information
+    (
+        type = section
+        displayname = "Quality Check Information"
+        row = 1
+        column = 0
+        width = medium
+    )
+    Parent_Logistics_Booking
+    (
+        type = picklist
+        displayname = "Parent Logistics Booking"
+        values = Create_Logistics_Booking.ID
+        displayformat = [Logistics_Booking_ID]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Logistics_Booking_Product
+    (
+        type = picklist
+        displayname = "Logistics Booking Product"
+        values = Logistics_Booking_Product.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Purchase_Order
+    (
+        type = picklist
+        displayname = "Purchase Order"
+        values = Create_Purchase_Order.ID
+        displayformat = [Purchase_Order_ID]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Purchase_Order_Product
+    (
+        type = picklist
+        displayname = "Purchase Order Product"
+        values = Purchase_Order_Product.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product
+    (
+        type = picklist
+        values = Add_Product.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Product_ID
+    (
+        type = text
+        displayname = "Product ID"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product_Name
+    (
+        type = text
+        displayname = "Product Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Manufacturer_Part_Number
+    (
+        type = text
+        displayname = "Manufacturer Part Number"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Brand_Make
+    (
+        type = text
+        displayname = "Brand / Make"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Model
+    (
+        type = text
+        row = 1
+        column = 2
+        width = medium
+    )
+    Configuration
+    (
+        type = textarea
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Serial_Number
+    (
+        type = text
+        displayname = "Serial Number"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Received_Quantity
+    (
+        type = decimal
+        displayname = "Received Quantity"
+        decimalplace = 2
+        row = 1
+        column = 1
+        width = medium
+    )
+    Inspected_Quantity
+    (
+        type = decimal
+        displayname = "Inspected Quantity"
+        decimalplace = 2
+        row = 1
+        column = 2
+        width = medium
+    )
+    Accepted_Quantity
+    (
+        type = decimal
+        displayname = "Accepted Quantity"
+        decimalplace = 2
+        row = 1
+        column = 1
+        width = medium
+    )
+    Rejected_Quantity
+    (
+        type = decimal
+        displayname = "Rejected Quantity"
+        decimalplace = 2
+        row = 1
+        column = 2
+        width = medium
+    )
+    Quality_Result
+    (
+        type = picklist
+        displayname = "Quality Result"
+        values = {"Passed","Failed","Partially Passed"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    Defect_Details
+    (
+        type = textarea
+        displayname = "Defect Details"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Inspection_Remarks
+    (
+        type = textarea
+        displayname = "Inspection Remarks"
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+        }
+    }
+}

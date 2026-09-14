@@ -1,0 +1,27 @@
+Rental_Payments_On_Load as "Configure Payment Lease Data"
+{
+    type = form
+    form = Rental_Payments
+    record event = on add or edit
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Tenant;
+                disable Property;
+                disable Unit;
+                disable Amount_Due;
+                if(input.Lease != null)
+                {
+                    lease_record = Leases[ID == input.Lease];
+                    input.Tenant = lease_record.Tenant;
+                    input.Property = lease_record.Property;
+                    input.Unit = lease_record.Unit;
+                    input.Amount_Due = lease_record.Monthly_Rent;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,142 @@
+form Properties
+{
+    title
+    {
+        displayname = "Properties"
+        on add = "Add Property"
+        on edit = "Edit Property"
+    }
+    record owner = Added_User
+    Property_Details
+    (
+        type = section
+        displayname = "Property Details"
+        row = 1
+        column = 0
+    )
+    Property_ID
+    (
+        type = autonumber
+        displayname = "Property ID"
+        start index = 1001
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Property_Name
+    (
+        type = text
+        displayname = "Property Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Property_Type
+    (
+        type = picklist
+        displayname = "Property Type"
+        values = {"Multi-Unit Property","Individual Villa"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Address
+    (
+        type = address
+        displayname = "Address"
+        capture_coordinates = true
+        adjust_using_map = true
+        address_line_1
+        (
+            type = address_line_1
+            displayname = "Street Address"
+        )
+        address_line_2
+        (
+            type = address_line_2
+            displayname = "Apartment / Suite"
+        )
+        district_city
+        (
+            type = district_city
+            displayname = "City"
+        )
+        state_province
+        (
+            type = state_province
+            displayname = "State"
+        )
+        postal_Code
+        (
+            type = postal_Code
+            displayname = "ZIP Code"
+        )
+        country
+        (
+            type = country
+            displayname = "Country"
+        )
+        latitude
+        (
+            type = latitude
+            displayname = "Latitude"
+            visibility = false
+        )
+        longitude
+        (
+            type = longitude
+            displayname = "Longitude"
+            visibility = false
+        )
+        row = 1
+        column = 1
+        width = medium
+    )
+    Description
+    (
+        type = textarea
+        displayname = "Description"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Property"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Property"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

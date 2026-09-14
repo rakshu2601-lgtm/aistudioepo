@@ -1,0 +1,19 @@
+<page linkname = "Return_Requests" displayname = "Return Requests"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Return_Requests_List' elementName='Return_Requests_List'>
+          <![CDATA[htmlpage Return_Requests_List()
+            content
+            <%{%>
+              <file name:Return_Requests_List.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

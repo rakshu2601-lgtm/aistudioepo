@@ -1,0 +1,115 @@
+form Logistics_Booking_Purchase_Order
+{
+    displayname = "Logistics Booking Purchase Order"
+    Purchase_Order_Information
+    (
+        type = section
+        displayname = "Purchase Order Information"
+        row = 1
+        column = 0
+        width = medium
+    )
+    Parent_Logistics_Booking
+    (
+        type = picklist
+        displayname = "Parent Logistics Booking"
+        values = Create_Logistics_Booking.ID
+        displayformat = [Logistics_Booking_ID]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Purchase_Order
+    (
+        type = picklist
+        displayname = "Purchase Order"
+        values = Create_Purchase_Order[Status == "Invoice Paid"].ID
+        displayformat = [Purchase_Order_ID]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Supplier
+    (
+        type = picklist
+        values = Add_Supplier.ID
+        displayformat = [Supplier_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Sales_Order
+    (
+        type = picklist
+        displayname = "Sales Order"
+        values = Create_Sales_Order.ID
+        displayformat = [Sales_Order_ID]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Purchase_Order_Date
+    (
+        type = date
+        displayname = "Purchase Order Date"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Invoice_Paid_Date
+    (
+        type = date
+        displayname = "Invoice Paid Date"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Purchase_Order_Amount
+    (
+        type = USD
+        displayname = "Purchase Order Amount"
+        decimalplace = 2
+        maxchar = 16
+        row = 1
+        column = 1
+        width = medium
+    )
+    Currency
+    (
+        type = text
+        row = 1
+        column = 2
+        width = medium
+    )
+    Remarks
+    (
+        type = textarea
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+        }
+    }
+}

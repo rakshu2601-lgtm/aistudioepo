@@ -1,0 +1,101 @@
+<%
+workOrder = Work_Orders[ID == input.Work_Order_ID];
+%>
+<style>
+.wot-page{background:var(--zcs_page_bg_color,#f5f6f8);padding:20px;color:var(--zcs_primary_text_color);font-family:inherit}.wot-shell{max-width:1180px;margin:0 auto}.wot-card{background:#fff;border:1px solid var(--zcs_tertiary_border_color,#e3e6eb);border-radius:12px;padding:20px}.wot-header{background:var(--zcs_brand_color,#2563eb);color:var(--zcs_brand_foreground_color,#fff);border-radius:12px;padding:24px}.wot-header h1{margin:5px 0 8px;font-size:25px}.wot-muted{opacity:.82;font-size:13px}.wot-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:16px}.wot-stack{display:grid;gap:16px}.wot-details{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}.wot-field{padding:11px 0;border-bottom:1px solid var(--zcs_tertiary_border_color,#e3e6eb)}.wot-field label{display:block;color:var(--zcs_secondary_text_color,#68707d);font-size:12px;margin-bottom:4px}.wot-field span{font-size:14px;font-weight:500;overflow-wrap:anywhere}.wot-card h2{font-size:17px;margin:0 0 12px}.wot-description{white-space:pre-wrap;line-height:1.6;margin:0}.wot-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.wot-badge{border:1px solid currentColor;border-radius:4px;padding:3px 9px;font-size:12px}.wot-event{border-left:3px solid var(--zcs_brand_color,#2563eb);padding:2px 0 14px 14px;margin-top:12px}.wot-event:last-child{padding-bottom:2px}.wot-event-title{font-weight:600}.wot-event-meta{color:var(--zcs_secondary_text_color,#68707d);font-size:12px;margin-top:4px}.wot-event-notes{font-size:14px;margin:7px 0 0}.wot-empty{text-align:center;padding:48px 20px}.wot-empty i{display:block;font-size:28px;color:var(--zcs_brand_color,#2563eb);margin-bottom:10px}.wot-link{display:inline-block;margin-top:14px;color:var(--zcs_brand_color,#2563eb);text-decoration:none}.wot-resolution{border-left:4px solid #179e6c}@media(max-width:760px){.wot-page{padding:10px}.wot-grid,.wot-details{grid-template-columns:1fr}}
+</style>
+<div class='wot-page'>
+ <div class='wot-shell'>
+<% if(workOrder.count() == 0) { %>
+  <section class='wot-card wot-empty'>
+   <i class='zc-li-outline ui-1-circle-remove'></i>
+   <h2>Work order not found</h2>
+   <p>The supplied work order ID is missing or invalid.</p>
+   <a class='wot-link' href='#Report:All_Work_Orders'>Open all work orders</a>
+  </section>
+<% } else { %>
+<%
+wo = workOrder;
+historyRows = Work_Order_Status_History[Work_Order == wo.ID] sort by Changed_At;
+resolutionText = ifnull(wo.Resolution_Notes,"");
+statusNotesText = ifnull(wo.Status_Notes,"");
+assigneeText = ifnull(wo.Assigned_To_Email,"Unassigned");
+accessText = ifnull(wo.Preferred_Access_Time,"Not specified");
+externalIdText = ifnull(wo.External_Request_ID,"Not applicable");
+%>
+  <header class='wot-header'>
+   <div class='wot-muted'>Work order <%=wo.Work_Order_ID%></div>
+   <h1><%=wo.Request_Title%></h1>
+   <div class='wot-muted'>Raised <%=wo.Raised_On.toString("dd-MMM-yyyy hh:mm a")%></div>
+   <div class='wot-badges'>
+    <span class='wot-badge'><%=wo.Priority%> priority</span>
+    <span class='wot-badge'><%=wo.Status%></span>
+   </div>
+  </header>
+  <div class='wot-grid'>
+   <main class='wot-stack'>
+    <section class='wot-card'>
+     <h2><i class='zc-li-outline education-notepad'></i> Request details</h2>
+     <p class='wot-description'><%=wo.Request_Description%></p>
+     <div class='wot-details'>
+      <div class='wot-field'><label>Category</label><span><%=wo.Category%></span></div>
+      <div class='wot-field'><label>Preferred access time</label><span><%=accessText%></span></div>
+      <div class='wot-field'><label>Source</label><span><%=wo.Source%></span></div>
+      <div class='wot-field'><label>External request ID</label><span><%=externalIdText%></span></div>
+<% if(statusNotesText != "") { %>
+      <div class='wot-field'><label>Status notes</label><span><%=statusNotesText%></span></div>
+<% } %>
+     </div>
+    </section>
+    <section class='wot-card'>
+     <h2><i class='zc-li-outline arrows-2-time'></i> Status history</h2>
+<% if(historyRows.count() == 0) { %>
+     <p>No status history has been recorded yet.</p>
+<% } else { %>
+<% for each historyRow in historyRows { %>
+<%
+previousStatusText = ifnull(historyRow.Previous_Status,"Created");
+changedByText = ifnull(historyRow.Changed_By,"System");
+historyNotesText = ifnull(historyRow.Notes,"");
+%>
+     <div class='wot-event'>
+      <div class='wot-event-title'><%=previousStatusText%> to <%=historyRow.New_Status%></div>
+      <div class='wot-event-meta'><%=historyRow.Changed_At.toString("dd-MMM-yyyy hh:mm a")%> by <%=changedByText%> via <%=historyRow.Change_Source%></div>
+<% if(historyNotesText != "") { %>
+      <p class='wot-event-notes'><%=historyNotesText%></p>
+<% } %>
+     </div>
+<% } %>
+<% } %>
+    </section>
+<% if(resolutionText != "") { %>
+    <section class='wot-card wot-resolution'>
+     <h2><i class='zc-li-outline ui-1-check-circle-08'></i> Resolution</h2>
+     <p class='wot-description'><%=resolutionText%></p>
+    </section>
+<% } %>
+   </main>
+   <aside class='wot-stack'>
+    <section class='wot-card'>
+     <h2>Current state</h2>
+     <div class='wot-field'><label>Status</label><span><%=wo.Status%></span></div>
+     <div class='wot-field'><label>Priority</label><span><%=wo.Priority%></span></div>
+     <div class='wot-field'><label>Assignee</label><span><%=assigneeText%></span></div>
+    </section>
+    <section class='wot-card'>
+     <h2>Location and tenant</h2>
+     <div class='wot-field'><label>Tenant</label><span><%=wo.Tenant.Tenant_Name%></span></div>
+     <div class='wot-field'><label>Property</label><span><%=wo.Property.Property_Name%></span></div>
+<% if(wo.Unit != null) { %>
+     <div class='wot-field'><label>Unit</label><span><%=wo.Unit.Unit_Number%></span></div>
+<% } %>
+    </section>
+    <section class='wot-card'>
+     <h2>Actions</h2>
+     <a class='wot-link' href='#Report:All_Work_Orders'>Back to all work orders</a>
+    </section>
+   </aside>
+  </div>
+<% } %>
+ </div>
+</div>

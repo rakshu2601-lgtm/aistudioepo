@@ -1,0 +1,57 @@
+default list All_Products
+{
+    displayName = "All Products"
+    show all rows from Add_Product
+    (
+        Product_ID as "Product ID"
+        Product_Name as "Product Name"
+        Product_Category as "Product Category"
+        Product_Type as "Product Type"
+        Brand_Make as "Brand / Make"
+        Model
+        Internal_Part_Number as "Internal Part Number"
+        Unit_of_Measure as "Unit of Measure"
+        Default_Currency as "Default Currency"
+        Reference_Cost as "Reference Cost"
+        Reference_Selling_Price as "Reference Selling Price"
+        Active
+        custom action "Activate"
+        (
+            workflow = Activate_Product
+            show action for each record = true
+            column header = "Activate"
+            success message = "Product activated"
+            condition = (Active == false)
+            confirmation before execution
+            (
+                message for individual record = "Activate this product?"
+                confirm button text = "Activate"
+                cancel button text = "Cancel"
+            )
+        )
+        custom action "Deactivate"
+        (
+            workflow = Deactivate_Product
+            show action for each record = true
+            column header = "Deactivate"
+            success message = "Product deactivated"
+            condition = (Active == true)
+            confirmation before execution
+            (
+                message for individual record = "Deactivate this product?"
+                confirm button text = "Deactivate"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Product_Category
+        Product_Type
+        Active
+    )
+    sort by
+    (
+        Product_Name ascending
+    )
+}

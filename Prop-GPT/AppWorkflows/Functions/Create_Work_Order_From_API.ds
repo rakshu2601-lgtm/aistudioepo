@@ -1,0 +1,116 @@
+map Create_Work_Order_From_API(string secret_key, map request_payload)
+{
+    response = Map();
+    response.put("success",false);
+    response.put("code","INVALID_REQUEST");
+    response.put("message","The request could not be processed.");
+    response.put("work_order_id",null);
+    active_configs = API_Configuration[Active == true];
+    if(active_configs.count() != 1 || secret_key == null || secret_key != active_configs.Secret_Key)
+    {
+        response.put("code","UNAUTHORIZED");
+        response.put("message","Authentication failed.");
+        return response;
+    }
+    tenant_phone = ifnull(request_payload.get("tenant_phone"),"").toString().trim();
+    title = ifnull(request_payload.get("title"),"").toString().trim();
+    description = ifnull(request_payload.get("description"),"").toString().trim();
+    external_request_id = ifnull(request_payload.get("external_request_id"),"").toString().trim();
+    if(tenant_phone == "" || title == "" || description == "")
+    {
+        response.put("code","MISSING_FIELDS");
+        response.put("message","tenant_phone, title and description are required.");
+        return response;
+    }
+    tenant_phone = tenant_phone.replaceAll("[^0-9+]","");
+    if(tenant_phone.matches("^\\+[1-9][0-9]{7,14}$") == false)
+    {
+        response.put("code","INVALID_PHONE");
+        response.put("message","tenant_phone must be in E.164 format.");
+        return response;
+    }
+    if(external_request_id != "")
+    {
+        existing_order = Work_Orders[External_Request_ID == external_request_id];
+        if(existing_order.count() > 0)
+        {
+            response.put("success",true);
+            response.put("code","ALREADY_EXISTS");
+            response.put("message","The external request was already processed.");
+            response.put("work_order_id",existing_order.Work_Order_ID);
+            return response;
+        }
+    }
+    tenant_records = Tenants[Phone == tenant_phone && Active == true];
+    if(tenant_records.count() != 1)
+    {
+        response.put("code","TENANT_NOT_FOUND");
+        response.put("message","Exactly one active tenant must match tenant_phone.");
+        return response;
+    }
+    tenant_id = null;
+    for each tenant_record in tenant_records
+    {
+        tenant_id = tenant_record.ID;
+    }
+    active_leases = Leases[Tenant == tenant_id && Lease_Status == "Active" && Lease_Start_Date <= zoho.currentdate && (Lease_End_Date is null || Lease_End_Date >= zoho.currentdate)];
+    if(active_leases.count() != 1)
+    {
+        response.put("code","LEASE_NOT_RESOLVED");
+        response.put("message","Exactly one current active lease is required for the tenant.");
+        return response;
+    }
+    property_id = null;
+    unit_id = null;
+    for each active_lease in active_leases
+    {
+        property_id = active_lease.Property;
+        unit_id = active_lease.Unit;
+    }
+    category = ifnull(request_payload.get("category"),"Other").toString();
+    if(category not in {"Plumbing","Electrical","HVAC","Appliance","Structural","Security","Cleaning","Other"})
+    {
+        category = "Other";
+    }
+    priority = ifnull(request_payload.get("priority"),"Medium").toString();
+    if(priority not in {"Low","Medium","High","Emergency"})
+    {
+        priority = "Medium";
+    }
+    preferred_access_time = ifnull(request_payload.get("preferred_access_time"),"").toString();
+    if(external_request_id == "")
+    {
+        external_request_id = "API-" + zoho.currenttime.toLong();
+    }
+    work_order_record_id = insert into Work_Orders
+    [
+        Source = "External API"
+        External_Request_ID = external_request_id
+        Tenant = tenant_id
+        Property = property_id
+        Unit = unit_id
+        Request_Title = title
+        Request_Description = description
+        Category = category
+        Priority = priority
+        Status = "New"
+        Raised_On = zoho.currenttime
+        Preferred_Access_Time = preferred_access_time
+    ];
+    created_order = Work_Orders[ID == work_order_record_id];
+    history_id = insert into Work_Order_Status_History
+    [
+        Work_Order = work_order_record_id
+        Previous_Status = ""
+        New_Status = "New"
+        Changed_At = zoho.currenttime
+        Changed_By = zoho.adminuserid
+        Change_Source = "External API"
+        Notes = "Created through custom API"
+    ];
+    response.put("success",true);
+    response.put("code","CREATED");
+    response.put("message","Work order created successfully.");
+    response.put("work_order_id",created_order.Work_Order_ID);
+    return response;
+}

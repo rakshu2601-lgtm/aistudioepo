@@ -1,0 +1,23 @@
+View_Tracking as "View Work Order Tracking"
+{
+    type = form
+    form = Work_Order_Tracker_Filter
+    button = View_Tracking
+    on click
+    {
+        actions
+        {
+            on click
+            (
+                if(input.Work_Order == null)
+                {
+                    alert "Select a work order before viewing tracking.";
+                }
+                else
+                {
+                    openUrl("#Page:Work_Order_Tracking?Work_Order_ID=" + input.Work_Order,"same window");
+                }
+            )
+        }
+    }
+}

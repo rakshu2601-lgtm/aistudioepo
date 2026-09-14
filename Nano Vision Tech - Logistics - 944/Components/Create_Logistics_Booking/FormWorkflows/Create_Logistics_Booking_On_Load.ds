@@ -1,0 +1,42 @@
+Create_Logistics_Booking_On_Load as "Create Logistics Booking On Load"
+{
+    type = form
+    form = Create_Logistics_Booking
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                hide Hidden;
+                disable Suppliers;
+                disable Status;
+                disable Action_Mode;
+                disable Logistics_Booking_Purchase_Orders.Supplier;
+                disable Logistics_Booking_Purchase_Orders.Sales_Order;
+                disable Logistics_Booking_Purchase_Orders.Purchase_Order_Date;
+                disable Logistics_Booking_Purchase_Orders.Invoice_Paid_Date;
+                disable Logistics_Booking_Purchase_Orders.Purchase_Order_Amount;
+                disable Logistics_Booking_Purchase_Orders.Currency;
+                disable Logistics_Booking_Products.Purchase_Order;
+                disable Logistics_Booking_Products.Purchase_Order_Product;
+                disable Logistics_Booking_Products.Supplier;
+                disable Logistics_Booking_Products.Product;
+                disable Logistics_Booking_Products.Product_ID;
+                disable Logistics_Booking_Products.Product_Name;
+                disable Logistics_Booking_Products.Product_Category;
+                disable Logistics_Booking_Products.Product_Type;
+                disable Logistics_Booking_Products.Manufacturer_Part_Number;
+                disable Logistics_Booking_Products.Brand_Make;
+                disable Logistics_Booking_Products.Model;
+                disable Logistics_Booking_Products.Configuration;
+                disable Logistics_Booking_Products.Expected_Quantity;
+                disable Logistics_Booking_Products.Unit_of_Measure;
+                disable Logistics_Booking_Products.Accepted_Quantity;
+                disable Logistics_Booking_Products.Rejected_Quantity;
+            )
+        }
+    }
+}

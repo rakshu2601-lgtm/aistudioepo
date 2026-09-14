@@ -1,0 +1,72 @@
+menu
+{
+    space Property_Operations
+    {
+        displayname = "Property Operations"
+        icon = "business-building"
+        section Overview
+        {
+            displayname = "Overview"
+            icon = "business-chart"
+            page Operations_Dashboard { icon = "business-chart-bar-33" }
+        }
+        section Portfolio
+        {
+            displayname = "Portfolio"
+            icon = "location-map"
+            form Properties { icon = "business-building" }
+            form Units { icon = "furniture-door" }
+            report All_Properties { icon = "business-notes" }
+            report Property_Map { icon = "location-map-pin" }
+            report All_Units { icon = "business-stock" }
+            report Unit_Availability_Board { icon = "business-board-30" }
+        }
+        section Leasing
+        {
+            displayname = "Leasing & Rent"
+            icon = "business-handshake"
+            form Tenants { icon = "users-single-body" }
+            form Leases { icon = "business-agenda" }
+            form Rental_Payments { icon = "business-payment" }
+            report All_Tenants { icon = "users-contacts" }
+            report All_Leases { icon = "business-notes" }
+            report Active_Leases { icon = "business-badge" }
+            report All_Rental_Payments { icon = "business-money-time" }
+            report Outstanding_Rent { icon = "business-money-growth" }
+        }
+        section Maintenance
+        {
+            displayname = "Maintenance"
+            icon = "business-progress"
+            form Work_Orders { icon = "business-briefcase-24" }
+            form Work_Order_Tracker_Filter { icon = "business-goal-65" }
+            form Work_Order_Status_History { icon = "business-agenda" }
+            page Work_Order_Tracking { icon = "business-strategy" }
+            report All_Work_Orders { icon = "business-notes" }
+            report Work_Order_Board { icon = "business-board-30" }
+            report All_Status_History { icon = "business-agenda" }
+            report Work_Order_Status_Timeline { icon = "business-progress" }
+        }
+        section Administration
+        {
+            displayname = "Administration"
+            icon = "business-safe"
+            form API_Configuration { icon = "business-plug" }
+            report API_Configurations { icon = "business-connect" }
+        }
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space,section,component}
+        }
+    }
+}

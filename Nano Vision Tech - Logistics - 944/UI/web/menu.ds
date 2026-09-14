@@ -1,0 +1,114 @@
+menu
+{
+    unused
+    {
+        form Add_Approval_Setup { icon = "business-signature" }
+        form Add_Customer { icon = "business-business-contact-85" }
+        form Add_Employee { icon = "business-business-contact-89" }
+        form Add_History { icon = "business-notes" }
+        form Add_Lead { icon = "business-goal-65" }
+        form Add_Preference { icon = "business-strategy" }
+        form Add_Product { icon = "tech-computer" }
+        form Add_Role { icon = "business-hat" }
+        form Add_Supplier { icon = "business-building" }
+        form Add_Supplier_Invoice { icon = "shopping-receipt" }
+        form Add_Supplier_Quote { icon = "shopping-tag-content" }
+        form Alert { icon = "business-bulb-63" }
+        form Approval_Setup_For { icon = "business-hierarchy-54" }
+        form Create_Logistics_Booking { icon = "transportation-truck-front" }
+        form Create_Purchase_Order { icon = "shopping-cart" }
+        form Create_Return_Request { icon = "shopping-box" }
+        form Create_Sales_Order { icon = "shopping-list" }
+        form Create_Template { icon = "business-notes" }
+        form Lead_Product { icon = "shopping-bag-17" }
+        form Logistics_Booking_Product { icon = "shopping-box-3d-67" }
+        form Logistics_Booking_Purchase_Order { icon = "shopping-delivery-track" }
+        form Logistics_Quality_Check_Product { icon = "business-badge" }
+        form Navigation { icon = "tech-navigation" }
+        form Purchase_Order_Product { icon = "shopping-basket" }
+        form Request_Access { icon = "business-safe" }
+        form Return_Request_Product { icon = "shopping-box-ribbon" }
+        form Sales_Order_Product { icon = "shopping-cart-modern" }
+        form Supplier_Invoice_Product { icon = "shopping-receipt-list-42" }
+        form Supplier_Quote_Product { icon = "shopping-tag-line" }
+        report All_Approval_Setups { icon = "business-signature" }
+        report All_Employees { icon = "business-contacts" }
+        report All_Preferences { icon = "business-strategy" }
+        report All_Roles { icon = "business-hat" }
+        report Approval_Setup_For_Report { icon = "business-hierarchy-54" }
+        report Create_Template_Report { icon = "business-notes" }
+        report Request_Access_Report { icon = "business-safe" }
+        page All_Approval_Setup { icon = "business-signature" }
+        page All_Mail_Templates { icon = "business-notes" }
+        page All_Mail_Templates1 { icon = "business-agenda" }
+        page Approval_Setup { icon = "business-hierarchy-54" }
+        page Confirmation_Page { icon = "business-badge" }
+        page Detail_View_Page { icon = "tech-desktop-screen" }
+        page Lead_Detail { icon = "business-goal-65" }
+        page Other_Config { icon = "business-strategy" }
+        page Preference { icon = "business-strategy" }
+        page Product_Detail { icon = "tech-computer-monitor" }
+        page Sales_Order_Detail { icon = "shopping-receipt-list-43" }
+        page Purchase_Order_Detail { icon = "shopping-receipt" }
+        page Supplier_Invoice_Detail { icon = "business-cheque" }
+        page Logistics_Booking_Detail { icon = "shopping-delivery-track" }
+        page Return_Request_Detail { icon = "shopping-box-ribbon" }
+        page History { icon = "business-notes" }
+        systemcomponent { type = localization displayname = "Language Selection" icon = "education-language" }
+        systemcomponent { type = connection displayname = "Connection" icon = "tech-sync" }
+        systemcomponent { type = approval approval status = pending displayname = "Pending Tasks" icon = "business-progress" }
+        systemcomponent { type = approval approval status = completed displayname = "Completed Tasks" icon = "business-badge" }
+    }
+    space Admin
+    {
+        displayname = "Admin"
+        icon = "business-building"
+        section Admin_Dashboard_Section { displayname = "Dashboard" icon = "business-chart" page Admin_Dashboard { icon = "business-chart-pie-36" } }
+        section Masters { displayname = "Masters" icon = "business-contacts" report All_Customers { icon = "business-business-contact-85" } report All_Suppliers { icon = "business-handshake" } report All_Products { icon = "tech-computer" } }
+        section Operations { displayname = "Operations" icon = "business-progress" report All_Leads { icon = "business-goal-65" } report All_Sales_Orders { icon = "shopping-list" } report All_Histories { icon = "business-notes" } }
+        section SharedAnalytics_Section { type = shared_user_report_section displayname = "Reports" icon = "business-chart-bar-33" }
+    }
+    space Sales
+    {
+        displayname = "Sales"
+        icon = "business-money-growth"
+        section Sales_Dashboard_Section { displayname = "Dashboard" icon = "business-chart" page Sales_Dashboard { icon = "business-chart-bar-32" } }
+        section Sales_Work { displayname = "Sales Work" icon = "business-goal-64" page Leads { icon = "business-goal-65" } page Sales_Orders { icon = "shopping-list" } page Purchase_Orders { icon = "shopping-cart" } page Supplier_Invoices { icon = "business-cheque" } page Return_Requests { icon = "shopping-box-ribbon" } }
+    }
+    space RD
+    {
+        displayname = "R&D"
+        icon = "business-bulb-61"
+        section RD_Dashboard_Section { displayname = "Dashboard" icon = "business-chart" page RD_Dashboard { icon = "business-board-29" } }
+        section Market_Requirements { displayname = "Market Requirements" icon = "business-bulb-63" page Products { icon = "tech-computer" } page Quote_Comparison { icon = "business-chart-bar-32" } }
+    }
+    space Sourcing
+    {
+        displayname = "Sourcing"
+        icon = "business-handshake"
+        section Sourcing_Dashboard_Section { displayname = "Dashboard" icon = "business-chart" page Sourcing_Dashboard { icon = "business-chart-bar-32" } }
+        section Sourcing_Work { displayname = "Sourcing" icon = "shopping-tag" page Supplier_Quotes { icon = "shopping-tag-content" } report All_Supplier_Quotes { icon = "shopping-tag-line" } report All_Purchase_Orders { icon = "shopping-cart-modern" } }
+    }
+    space Logistics
+    {
+        displayname = "Logistics"
+        icon = "transportation-truck-front"
+        section Logistics_Dashboard_Section { displayname = "Dashboard" icon = "business-chart" page Logistics_Dashboard { icon = "shopping-delivery-track" } }
+        section Logistics_Work { displayname = "Logistics Work" icon = "shopping-delivery" page Logistics_Bookings { icon = "transportation-truck-front" } report All_Logistics_Bookings { icon = "shopping-delivery-time" } report All_Supplier_Invoices { icon = "shopping-receipt" } report All_Return_Requests { icon = "shopping-box" } }
+    }
+    space Supplier
+    {
+        displayname = "Supplier"
+        icon = "business-factory"
+        section Supplier_Dashboard_Section { displayname = "Dashboard" icon = "business-chart" page Supplier_Dashboard { icon = "business-laptop-71" } }
+        section Supplier_Work { displayname = "Supplier Work" icon = "business-handshake" page Requests_For_Quote { icon = "shopping-tag" } }
+    }
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space,section,component}
+        }
+    }
+}

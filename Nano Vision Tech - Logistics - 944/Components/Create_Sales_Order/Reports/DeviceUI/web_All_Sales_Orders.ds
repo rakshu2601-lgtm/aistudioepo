@@ -1,0 +1,5 @@
+report All_Sales_Orders
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Sales_Order_ID Customer Requirement_Source Sales_Order_Date Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Sales_Order_ID Customer Lead Requirement_Source Sales_Order_Date Requested_Delivery_Date Recommended_Supplier Selected_Supplier_Quote Status ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

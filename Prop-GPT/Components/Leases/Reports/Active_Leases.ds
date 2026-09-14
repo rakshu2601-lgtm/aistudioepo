@@ -1,0 +1,27 @@
+list Active_Leases
+{
+    displayName = "Active Leases"
+    show all rows from Leases [Lease_Status == "Active"]
+    (
+        Lease_ID
+        Tenant
+        Property
+        Unit
+        Lease_Start_Date
+        Lease_End_Date
+        Monthly_Rent
+        Payment_Due_Day
+        Lease_Status
+    )
+    filters
+    (
+        Tenant
+        Property
+        Unit
+        Lease_Status
+    )
+    sort by
+    (
+        Lease_Start_Date descending
+    )
+}

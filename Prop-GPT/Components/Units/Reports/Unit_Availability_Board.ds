@@ -1,0 +1,26 @@
+kanban Unit_Availability_Board
+{
+    displayName = "Unit Availability Board"
+    show all rows from Units
+    (
+        Unit_ID
+        Property
+        Unit_Number
+        Unit_Type
+        Default_Monthly_Rent
+        Occupancy_Status
+        Active
+    )
+    filters
+    (
+        Property
+        Active
+    )
+    options
+    (
+        display field = Occupancy_Status
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

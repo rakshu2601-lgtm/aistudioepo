@@ -1,0 +1,33 @@
+default list All_Logistics_Bookings
+{
+    displayName = "All Logistics Bookings"
+    show all rows from Create_Logistics_Booking
+    (
+        Logistics_Booking_ID as "Logistics Booking ID"
+        Booking_Date as "Booking Date"
+        Logistics_Provider as "Logistics Provider"
+        Suppliers
+        Pickup_Location as "Pickup Location"
+        Warehouse_Destination as "Warehouse Destination"
+        Expected_Arrival_Date as "Expected Arrival Date"
+        Actual_Arrival_Date as "Actual Arrival Date"
+        Tracking_Reference as "Tracking Reference"
+        Received_By as "Received By"
+        Received_Date as "Received Date"
+        Quality_Checked_By as "Quality Checked By"
+        Quality_Check_Date as "Quality Check Date"
+        Status
+    )
+    filters
+    (
+        Booking_Date
+        Logistics_Provider
+        Suppliers
+        Expected_Arrival_Date
+        Status
+    )
+    sort by
+    (
+        Booking_Date descending
+    )
+}

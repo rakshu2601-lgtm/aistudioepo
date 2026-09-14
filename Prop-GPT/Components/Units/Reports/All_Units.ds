@@ -1,0 +1,27 @@
+default list All_Units
+{
+    displayName = "All Units"
+    show all rows from Units
+    (
+        Unit_ID
+        Property
+        Unit_Number
+        Unit_Type
+        Floor
+        Default_Monthly_Rent
+        Occupancy_Status
+        Active
+    )
+    filters
+    (
+        Property
+        Unit_Type
+        Occupancy_Status
+        Active
+    )
+    sort by
+    (
+        Property ascending
+        Unit_Number ascending
+    )
+}

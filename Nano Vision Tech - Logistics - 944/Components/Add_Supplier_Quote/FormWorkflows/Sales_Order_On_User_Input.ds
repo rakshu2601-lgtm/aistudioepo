@@ -1,0 +1,43 @@
+Sales_Order_On_User_Input as "Load Sales Order Products"
+{
+    type = form
+    form = Add_Supplier_Quote
+    record event = on add or edit
+
+    on user input of Sales_Order
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Supplier_Quote_Products.clear();
+                if(input.Sales_Order != null)
+                {
+                    quoted_rows = Collection();
+                    for each requested_item in Sales_Order_Product[Parent_Sales_Order == input.Sales_Order]
+                    {
+                        quoted_row = Add_Supplier_Quote.Supplier_Quote_Products();
+                        quoted_row.Sales_Order_Product = requested_item.ID;
+                        quoted_row.Product = requested_item.Product;
+                        quoted_row.Product_ID = requested_item.Product_ID;
+                        quoted_row.Product_Name = requested_item.Product_Name;
+                        quoted_row.Product_Category = requested_item.Product_Category;
+                        quoted_row.Product_Type = requested_item.Product_Type;
+                        quoted_row.Product_Description = requested_item.Product_Description;
+                        quoted_row.Manufacturer_Part_Number = requested_item.Manufacturer_Part_Number;
+                        quoted_row.Internal_Part_Number = requested_item.Internal_Part_Number;
+                        quoted_row.Brand_Make = requested_item.Brand_Make;
+                        quoted_row.Model = requested_item.Model;
+                        quoted_row.Requested_Configuration = requested_item.Configuration;
+                        quoted_row.Requested_Quantity = requested_item.Quantity;
+                        quoted_row.Quoted_Quantity = requested_item.Quantity;
+                        quoted_row.Unit_of_Measure = requested_item.Unit_of_Measure;
+                        quoted_row.Currency = input.Currency;
+                        quoted_rows.insert(quoted_row);
+                    }
+                    input.Supplier_Quote_Products.insert(quoted_rows);
+                }
+            )
+        }
+    }
+}

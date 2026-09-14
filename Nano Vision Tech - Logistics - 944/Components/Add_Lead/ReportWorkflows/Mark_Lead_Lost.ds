@@ -1,0 +1,29 @@
+Mark_Lead_Lost as "Mark Lead Lost"
+{
+    type = functions
+    form = Add_Lead
+    execution type = for each record
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                previous_status = input.Status;
+                input.Status = "Lost";
+                insert into Add_History
+                [
+                    Action_Type = "Lead Marked Lost"
+                    Status = "Lost"
+                    Previous_Status = previous_status
+                    New_Status = "Lost"
+                    Comments = "Lead marked lost"
+                    Lead_Lookup = input.ID
+                    Updated_By_Email = zoho.loginuserid
+                    Updated_Date_Time = zoho.currenttime
+                ];
+            )
+        }
+    }
+}

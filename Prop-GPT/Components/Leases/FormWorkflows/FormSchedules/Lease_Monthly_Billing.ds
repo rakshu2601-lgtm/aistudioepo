@@ -1,0 +1,40 @@
+Lease_Monthly_Billing as "Generate Monthly Rent"
+{
+    type = schedule
+    form = Leases[Lease_Status == "Active"]
+    start = Billing_Start_Date at "00:15:00"
+    frequency = monthly
+    time zone = "America/New_York"
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                cycle_month = zoho.currentdate.toStartOfMonth();
+                if(input.Lease_Start_Date <= zoho.currentdate && (input.Lease_End_Date == null || input.Lease_End_Date >= zoho.currentdate))
+                {
+                    existing_payment = Rental_Payments[Lease == input.ID && Billing_Month == cycle_month];
+                    if(existing_payment.count() == 0)
+                    {
+                        due_date = cycle_month.addDay(input.Payment_Due_Day - 1);
+                        reminder_date = cycle_month.addDay(26);
+                        payment_record = insert into Rental_Payments
+                        [
+                            Lease = input.ID
+                            Tenant = input.Tenant
+                            Property = input.Property
+                            Unit = input.Unit
+                            Billing_Month = cycle_month
+                            Due_Date = due_date
+                            Reminder_Date = reminder_date
+                            Amount_Due = input.Monthly_Rent
+                            Amount_Paid = 0
+                            Payment_Status = "Due"
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

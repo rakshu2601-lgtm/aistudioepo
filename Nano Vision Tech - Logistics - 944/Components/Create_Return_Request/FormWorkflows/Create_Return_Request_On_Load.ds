@@ -1,0 +1,44 @@
+Create_Return_Request_On_Load as "Create Return Request On Load"
+{
+    type = form
+    form = Create_Return_Request
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                hide Hidden;
+                disable Customer;
+                disable Sales_Order;
+                disable Created_By;
+                disable Created_By_Email;
+                disable Created_Date_Time;
+                disable Return_Request_Products.Product;
+                disable Return_Request_Products.Product_ID;
+                disable Return_Request_Products.Product_Name;
+                disable Return_Request_Products.Product_Category;
+                disable Return_Request_Products.Product_Type;
+                disable Return_Request_Products.Product_Description;
+                disable Return_Request_Products.Manufacturer_Part_Number;
+                disable Return_Request_Products.Internal_Part_Number;
+                disable Return_Request_Products.Brand_Make;
+                disable Return_Request_Products.Model;
+                disable Return_Request_Products.Configuration;
+                disable Return_Request_Products.Serial_Number;
+                disable Return_Request_Products.Delivered_Quantity;
+                disable Return_Request_Products.Unit_of_Measure;
+                if(input.ID == null)
+                {
+                    employee_record = Add_Employee[Email == zoho.loginuserid];
+                    if(employee_record.count() > 0)
+                    {
+                        input.Created_By = employee_record.ID;
+                    }
+                }
+            )
+        }
+    }
+}

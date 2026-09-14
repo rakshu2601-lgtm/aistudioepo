@@ -1,0 +1,5 @@
+report All_Supplier_Quotes
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Supplier_Quote_ID Supplier Sales_Order Quote_Date Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Supplier_Quote_ID Supplier Sales_Order Quote_Date Currency Availability Lead_Time Dispatch_Location Status ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

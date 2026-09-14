@@ -1,0 +1,60 @@
+Logistics_PO_On_User_Input as "Load Logistics Purchase Order"
+{
+    type = form
+    form = Create_Logistics_Booking
+    record event = on add or edit
+
+    on user input of Logistics_Booking_Purchase_Orders.Purchase_Order
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(row.Purchase_Order != null)
+                {
+                    po_record = Create_Purchase_Order[ID == row.Purchase_Order];
+                    row.Supplier = po_record.Supplier;
+                    row.Sales_Order = po_record.Sales_Order;
+                    row.Purchase_Order_Date = po_record.PO_Date;
+                    row.Purchase_Order_Amount = po_record.Total_Customer_Price;
+                    row.Currency = po_record.Currency;
+                    invoice_record = Add_Supplier_Invoice[Purchase_Order == row.Purchase_Order && Status == "Paid"];
+                    if(invoice_record.count() > 0)
+                    {
+                        row.Invoice_Paid_Date = invoice_record.Paid_Date;
+                    }
+                    supplier_values = List();
+                    for each booking_po in input.Logistics_Booking_Purchase_Orders
+                    {
+                        if(booking_po.Supplier != null && !supplier_values.contains(booking_po.Supplier))
+                        {
+                            supplier_values.add(booking_po.Supplier);
+                        }
+                    }
+                    input.Suppliers = supplier_values;
+                    product_rows = Collection();
+                    for each po_item in Purchase_Order_Product[Parent_Purchase_Order == row.Purchase_Order]
+                    {
+                        product_row = Create_Logistics_Booking.Logistics_Booking_Products();
+                        product_row.Purchase_Order = row.Purchase_Order;
+                        product_row.Purchase_Order_Product = po_item.ID;
+                        product_row.Supplier = po_record.Supplier;
+                        product_row.Product = po_item.Product;
+                        product_row.Product_ID = po_item.Product_ID;
+                        product_row.Product_Name = po_item.Product_Name;
+                        product_row.Product_Category = po_item.Product_Category;
+                        product_row.Product_Type = po_item.Product_Type;
+                        product_row.Manufacturer_Part_Number = po_item.Manufacturer_Part_Number;
+                        product_row.Brand_Make = po_item.Brand_Make;
+                        product_row.Model = po_item.Model;
+                        product_row.Configuration = po_item.Approved_Configuration;
+                        product_row.Expected_Quantity = po_item.Quantity;
+                        product_row.Unit_of_Measure = po_item.Unit_of_Measure;
+                        product_rows.insert(product_row);
+                    }
+                    input.Logistics_Booking_Products.insert(product_rows);
+                }
+            )
+        }
+    }
+}

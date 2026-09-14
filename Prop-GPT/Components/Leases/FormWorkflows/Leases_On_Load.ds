@@ -1,0 +1,35 @@
+Leases_On_Load as "Configure Lease Unit"
+{
+    type = form
+    form = Leases
+    record event = on add or edit
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Property != null)
+                {
+                    property_record = Properties[ID == input.Property];
+                    if(property_record.Property_Type == "Individual Villa")
+                    {
+                        input.Unit = null;
+                        hide Unit;
+                        disable Unit;
+                    }
+                    else
+                    {
+                        show Unit;
+                        enable Unit;
+                    }
+                }
+                else
+                {
+                    hide Unit;
+                    disable Unit;
+                }
+            )
+        }
+    }
+}

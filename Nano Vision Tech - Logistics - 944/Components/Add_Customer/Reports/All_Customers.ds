@@ -1,0 +1,21 @@
+default list All_Customers
+{
+    displayName = "All Customers"
+    show all rows from Add_Customer
+    (
+        Customer_ID as "Customer ID"
+        Customer_Name as "Customer Name"
+        Contact_Person as "Contact Person"
+        Email
+        Phone
+        (
+            displayformat = plainnumber
+        )
+        Country
+        Active
+    )
+    sort by
+    (
+        Customer_Name ascending
+    )
+}

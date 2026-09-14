@@ -1,0 +1,29 @@
+Add_History_On_Load as "Add History On Load"
+{
+    type = form
+    form = Add_History
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                hide Audit_Context;
+                disable Action_Type;
+                disable Status;
+                disable Previous_Status;
+                disable New_Status;
+                disable Updated_By;
+                disable Updated_By_Email;
+                disable Updated_Date_Time;
+                employee_record = Add_Employee[Email == zoho.loginuserid];
+                if(employee_record.count() > 0)
+                {
+                    input.Updated_By = employee_record.ID;
+                }
+            )
+        }
+    }
+}

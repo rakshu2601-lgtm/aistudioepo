@@ -1,0 +1,272 @@
+form Create_Logistics_Booking
+{
+    displayname = "Create Logistics Booking"
+    success message = "Logistics booking saved successfully"
+    Booking_Information
+    (
+        type = section
+        displayname = "Booking Information"
+        row = 1
+        column = 0
+        width = medium
+    )
+    Booking_Date
+    (
+        type = date
+        displayname = "Booking Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Logistics_Provider
+    (
+        type = text
+        displayname = "Logistics Provider"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Suppliers
+    (
+        type = list
+        values = Add_Supplier.ID
+        displayformat = [Supplier_Name]
+        searchable = true
+        height = 120px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Pickup_Location
+    (
+        type = text
+        displayname = "Pickup Location"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Warehouse_Destination
+    (
+        type = text
+        displayname = "Warehouse Destination"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Expected_Arrival_Date
+    (
+        type = date
+        displayname = "Expected Arrival Date"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Actual_Arrival_Date
+    (
+        type = date
+        displayname = "Actual Arrival Date"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Tracking_Reference
+    (
+        type = text
+        displayname = "Tracking Reference"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Transport_Documents
+    (
+        type = upload file
+        displayname = "Transport Documents"
+        file count = 10
+        browse = local_drive, google_docs, zoho_docs
+        row = 1
+        column = 1
+        width = medium
+    )
+    Purchase_Orders
+    (
+        type = section
+        displayname = "Purchase Orders"
+        visibility = false
+        row = 2
+        column = 1
+        width = medium
+    )
+    Logistics_Booking_Purchase_Orders
+    (
+        type = grid
+        displayname = "Logistics Booking Purchase Orders"
+        values = Logistics_Booking_Purchase_Order.ID
+        bidirectional = Parent_Logistics_Booking
+        row = 2
+        column = 1
+        width = medium
+    )
+    Products
+    (
+        type = section
+        displayname = "Products"
+        visibility = false
+        row = 3
+        column = 1
+        width = medium
+    )
+    Logistics_Booking_Products
+    (
+        type = grid
+        displayname = "Logistics Booking Products"
+        values = Logistics_Booking_Product.ID
+        bidirectional = Parent_Logistics_Booking
+        row = 3
+        column = 1
+        width = medium
+    )
+    Receiving
+    (
+        type = section
+        displayname = "Receiving"
+        visibility = true
+        row = 4
+        column = 1
+        width = medium
+    )
+    Received_By
+    (
+        type = picklist
+        displayname = "Received By"
+        values = Add_Employee.ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 4
+        column = 1
+        width = medium
+    )
+    Received_Date
+    (
+        type = datetime
+        displayname = "Received Date"
+        row = 4
+        column = 2
+        width = medium
+    )
+    Quality_Checked_By
+    (
+        type = picklist
+        displayname = "Quality Checked By"
+        values = Add_Employee.ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 4
+        column = 1
+        width = medium
+    )
+    Quality_Check_Date
+    (
+        type = datetime
+        displayname = "Quality Check Date"
+        row = 4
+        column = 2
+        width = medium
+    )
+    Quality_Check_Summary
+    (
+        type = textarea
+        displayname = "Quality Check Summary"
+        height = 100px
+        row = 4
+        column = 1
+        width = medium
+    )
+    Receiving_Remarks
+    (
+        type = textarea
+        displayname = "Receiving Remarks"
+        height = 100px
+        row = 4
+        column = 2
+        width = medium
+    )
+    Quality_Checks
+    (
+        type = section
+        displayname = "Quality Checks"
+        visibility = false
+        row = 5
+        column = 1
+        width = medium
+    )
+    Logistics_Quality_Check_Products
+    (
+        type = grid
+        displayname = "Logistics Quality Check Products"
+        values = Logistics_Quality_Check_Product.ID
+        bidirectional = Parent_Logistics_Booking
+        row = 5
+        column = 1
+        width = medium
+    )
+    Hidden
+    (
+        type = section
+        displayname = "Hidden"
+        visibility = true
+        row = 6
+        column = 1
+        width = medium
+    )
+    Logistics_Booking_ID
+    (
+        type = autonumber
+        displayname = "Logistics Booking ID"
+        start index = 1
+        row = 6
+        column = 1
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        values = {"New","Products Received"}
+        initial value = "New"
+        row = 6
+        column = 1
+        width = medium
+    )
+    Action_Mode
+    (
+        type = text
+        displayname = "Action Mode"
+        row = 6
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Create"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

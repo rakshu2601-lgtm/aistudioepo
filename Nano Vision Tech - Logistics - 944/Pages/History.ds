@@ -1,0 +1,19 @@
+<page linkname = "History" parameters = "int Sales_Order_ID" displayname = "History"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='History_Timeline' elementName='History_Timeline'>
+          <![CDATA[htmlpage History_Timeline()
+            content
+             <%{%>
+                 <file name:History_Timeline.dshtml/>
+             <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

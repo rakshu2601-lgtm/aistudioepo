@@ -1,0 +1,200 @@
+form Lead_Product
+{
+    displayname = "Lead Product"
+    Product_Details
+    (
+        type = section
+        displayname = "Product Details"
+        row = 1
+        column = 0
+        width = medium
+    )
+    Parent_Lead
+    (
+        type = picklist
+        displayname = "Parent Lead"
+        values = Add_Lead.ID
+        bidirectional = Lead_Products
+        displayformat = [Customer_Company_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Product
+    (
+        type = picklist
+        values = Add_Product[Active == true].ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product_ID
+    (
+        type = text
+        displayname = "Product ID"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Product_Name
+    (
+        type = text
+        displayname = "Product Name"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product_Category
+    (
+        type = text
+        displayname = "Product Category"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Product_Type
+    (
+        type = text
+        displayname = "Product Type"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product_Description
+    (
+        type = textarea
+        displayname = "Product Description"
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Manufacturer_Part_Number
+    (
+        type = text
+        displayname = "Manufacturer Part Number"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Internal_Part_Number
+    (
+        type = text
+        displayname = "Internal Part Number"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Brand_Make
+    (
+        type = text
+        displayname = "Brand / Make"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Model
+    (
+        type = text
+        row = 1
+        column = 1
+        width = medium
+    )
+    Unit_of_Measure
+    (
+        type = text
+        displayname = "Unit of Measure"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Requirements_and_Pricing
+    (
+        type = section
+        displayname = "Requirements and Pricing"
+        visibility = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Configuration
+    (
+        type = textarea
+        height = 100px
+        row = 2
+        column = 1
+        width = medium
+    )
+    Technical_Requirements
+    (
+        type = textarea
+        displayname = "Technical Requirements"
+        height = 100px
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Quantity
+    (
+        type = decimal
+        decimalplace = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+    Expected_Unit_Price
+    (
+        type = USD
+        displayname = "Expected Unit Price"
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 2
+        width = medium
+    )
+    Expected_Total_Price
+    (
+        type = USD
+        displayname = "Expected Total Price"
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 1
+        width = medium
+    )
+    Remarks
+    (
+        type = textarea
+        height = 100px
+        row = 2
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Add"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

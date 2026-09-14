@@ -1,0 +1,223 @@
+<%
+  requestedReport = ifnull(input.reportName,"");
+  allowedReports = {"Create_Template_Report"};
+  validTarget = allowedReports.contains(requestedReport);
+  validRecord = input.recID != null && input.recID > 0;
+  heading = "Mail template details";
+%>
+<style>
+  /* ZCS global theme tokens and utilities used by this single-snippet page. */
+  :root {
+    --zcs-theme-brand-color: var(--zcs_brand_color);
+    --zcs-light-bg-color: var(--zcs_brand_light_color);
+    --zcs-page-bg-color: #f5f6f8;
+    --zcs-primary-text-color: var(--zcs_primary_text_color);
+    --zcs-secondary-text-color: var(--zcs_secondary_text_color);
+    --zcs-teritiary-text-color: var(--zcs_tertiary_text_color);
+    --zcs-border-color: var(--zcs_tertiary_border_color);
+    --zcs-white-color: #ffffff;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  * { box-sizing: border-box; }
+  .zcs-flex { display: flex; }
+  .zcs-inline-flex { display: inline-flex; }
+  .zcs-direction-column { flex-direction: column; }
+  .zcs-align-items-center { align-items: center; }
+  .zcs-justify-center { justify-content: center; }
+  .zcs-justify-space-between { justify-content: space-between; }
+  .zcs-gap-4 { gap: .25rem; }
+  .zcs-gap-8 { gap: .5rem; }
+  .zcs-gap-12 { gap: .75rem; }
+  .zcs-w-full { width: 100%; }
+  .zcs-wh-full { width: 100%; height: 100%; }
+  .zcs-p-20 { padding: 1.25rem; }
+  .zcs-px-16 { padding-left: 1rem; padding-right: 1rem; }
+  .zcs-py-12 { padding-top: .75rem; padding-bottom: .75rem; }
+  .zcs-m-0 { margin: 0; }
+  .zcs-mt-6 { margin-top: .375rem; }
+  .zcs-mt-10 { margin-top: .625rem; }
+  .zcs-rounded-md { border-radius: .375rem; }
+  .zcs-rounded-lg { border-radius: .5rem; }
+  .zcs-rounded-half { border-radius: 50%; }
+  .zcs-font-12 { font-size: .75rem; }
+  .zcs-font-14 { font-size: .875rem; }
+  .zcs-font-18 { font-size: 1.125rem; }
+  .zcs-font-20 { font-size: 1.25rem; }
+  .zcs-font-normal { font-weight: 400; }
+  .zcs-font-medium { font-weight: 500; }
+  .zcs-font-semibold { font-weight: 600; }
+  .zcs-lh-body { line-height: 1.5; }
+  .zcs-lh-heading { line-height: 1.25; }
+  .zcs-color-primary { color: var(--zcs-primary-text-color); }
+  .zcs-color-secondary { color: var(--zcs-secondary-text-color); }
+  .zcs-color-tertiary { color: var(--zcs-teritiary-text-color); }
+  .zcs-color-theme { color: var(--zcs-theme-brand-color); }
+  .zcs-ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .zcs-text-center { text-align: center; }
+  .zcs-overflow-hidden { overflow: hidden; }
+  .zcs-box-border { box-sizing: border-box; }
+  .zcs-card { background: var(--zcs-white-color); border: 1px solid var(--zcs-border-color); border-radius: 8px; }
+
+  .zc-pb-page-content-wrapper div#zppagesLive,
+  .zc-pb-page-content-wrapper div#elementsContainer,
+  .zc-pb-page-content-wrapper .elemContainment,
+  .zc-pb-page-content-wrapper .zcpage-elemContainer,
+  .Layout.elemContainment,
+  .column-container .zc-pb-tile-container {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .zc-container-wrapper .zc-main-content .inner .zc-page-content-wrapper .zc-pb-page-content-wrapper .elemContainment,
+  .zc-full-height .zc-page-content-wrapper .zc-pb-page-content-wrapper .elemContainment,
+  .zc-pb-page-content-wrapper .zc-pb-tile-container,
+  .column-container .zc-pb-tile-container,
+  .Layout.elemContainment { padding: 0 !important; }
+  .zc-page-content-wrapper .zc-pb-page-content-wrapper .zc-pb-tile-card {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  #splash-screen { display: none !important; }
+
+  .detail-page {
+    width: 100%;
+    height: 100vh;
+    min-height: 360px;
+    padding: 12px;
+    background: var(--zcs-page-bg-color);
+  }
+  .detail-shell {
+    width: min(100%, 1180px);
+    height: 100%;
+    min-height: 0;
+    margin: 0 auto;
+  }
+  .zcs-page-header {
+    flex: 0 0 auto;
+    min-height: 56px;
+    border-bottom: 1px solid var(--zcs-border-color);
+  }
+  .header-main { min-width: 0; }
+  .zcs-back {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    color: var(--zcs-teritiary-text-color);
+    background: var(--zcs-light-bg-color);
+    text-decoration: none;
+  }
+  .zcs-back:hover { color: var(--zcs-primary-text-color); }
+  .detail-title { min-width: 0; }
+  .detail-status {
+    flex: 0 0 auto;
+    padding: 3px 8px;
+    color: var(--zcs-theme-brand-color);
+    background: var(--zcs-light-bg-color);
+  }
+  .detail-content {
+    min-height: 0;
+    flex: 1 1 auto;
+    padding: 8px;
+    background: var(--zcs-page-bg-color);
+  }
+  .detail-frame-wrap {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    overflow: hidden;
+    background: var(--zcs-white-color);
+    border: 1px solid var(--zcs-border-color);
+    border-radius: 6px;
+  }
+  .detail-frame {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: var(--zcs-white-color);
+  }
+  .detail-state {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    background: var(--zcs-white-color);
+  }
+  .detail-state-content { width: min(100%, 430px); }
+  .detail-state-icon {
+    width: 44px;
+    height: 44px;
+    margin: 0 auto;
+    color: var(--zcs-theme-brand-color);
+    background: var(--zcs-light-bg-color);
+  }
+  @media (max-width: 576px) {
+    .detail-page { padding: 0; min-height: 320px; }
+    .detail-shell { border: 0; border-radius: 0; }
+    .zcs-page-header { padding: 10px 12px; }
+    .detail-content { padding: 0; }
+    .detail-frame-wrap { border-width: 0; border-radius: 0; }
+    .detail-status { display: none; }
+  }
+  .zc-rtl-wrapper .zcs-back-icon { rotate: 180deg; }
+</style>
+
+<main class='detail-page zcs-box-border'>
+  <section class='detail-shell zcs-card zcs-flex zcs-direction-column zcs-overflow-hidden'>
+    <header class='zcs-page-header zcs-w-full zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-12 zcs-px-16 zcs-py-12 zcs-box-border'>
+      <div class='header-main zcs-flex zcs-align-items-center zcs-gap-12 zcs-ellipsis'>
+        <a href='#Script:page.parent.back' class='zcs-back zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-md' aria-label='Go back' title='Go back'>
+          <i class='zcs-back-icon zcs-font-20 zc-li-outline arrows-1-tail-left'></i>
+        </a>
+        <div class='detail-title zcs-flex zcs-direction-column zcs-gap-4 zcs-ellipsis'>
+          <span class='zcs-font-12 zcs-font-medium zcs-lh-body zcs-color-tertiary'>Record preview</span>
+          <h1 class='zcs-font-18 zcs-font-medium zcs-lh-heading zcs-color-primary zcs-ellipsis zcs-m-0'><%=heading%></h1>
+        </div>
+      </div>
+<%
+  if(validTarget && validRecord)
+  {
+%>
+      <span class='detail-status zcs-inline-flex zcs-align-items-center zcs-gap-4 zcs-rounded-md zcs-font-12 zcs-font-semibold'>
+        <i class='zc-li-outline ui-1-check-circle-08'></i>
+        Approved preview
+      </span>
+<%
+  }
+%>
+    </header>
+    <div class='detail-content zcs-flex zcs-direction-column zcs-box-border'>
+<%
+  if(validTarget && validRecord)
+  {
+    summaryUrl = zoho.appuri + "record-summary/Create_Template_Report/" + input.recID + "/";
+%>
+      <div class='detail-frame-wrap'>
+        <iframe class='detail-frame' src='<%=summaryUrl%>' title='<%=heading%>'></iframe>
+      </div>
+<%
+  }
+  else
+  {
+    stateHeading = "Invalid record reference";
+    stateMessage = "A valid record ID is required to open this approved preview.";
+    if(!validTarget)
+    {
+      stateHeading = "Unsupported preview target";
+      stateMessage = "This utility can only open the approved mail template report.";
+    }
+%>
+      <div class='detail-state zcs-card zcs-flex zcs-align-items-center zcs-justify-center zcs-text-center'>
+        <div class='detail-state-content zcs-p-20 zcs-box-border'>
+          <span class='detail-state-icon zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-half'>
+            <i class='zc-li-outline ui-1-circle-remove zcs-font-20'></i>
+          </span>
+          <h2 class='zcs-font-18 zcs-font-medium zcs-lh-heading zcs-color-primary zcs-mt-10 zcs-m-0'><%=stateHeading%></h2>
+          <p class='zcs-font-14 zcs-font-normal zcs-lh-body zcs-color-secondary zcs-mt-6 zcs-m-0'><%=stateMessage%></p>
+        </div>
+      </div>
+<%
+  }
+%>
+    </div>
+  </section>
+</main>

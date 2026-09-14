@@ -1,0 +1,36 @@
+Rent_Reminder_27th as "Rent Reminder on 27th"
+{
+    type = schedule
+    form = Rental_Payments[Payment_Status == "Due" || Payment_Status == "Partially Paid" || Payment_Status == "Overdue"]
+    start = Reminder_Date at "09:00:00"
+    time zone = "America/New_York"
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                lease_record = Leases[ID == input.Lease && Lease_Status == "Active"];
+                tenant_record = Tenants[ID == input.Tenant && Active == true];
+                if(lease_record.count() > 0 && tenant_record.count() > 0 && lease_record.Lease_Start_Date <= zoho.currentdate && (lease_record.Lease_End_Date == null || lease_record.Lease_End_Date >= zoho.currentdate))
+                {
+                    property_record = Properties[ID == input.Property];
+                    unit_text = "";
+                    if(input.Unit != null)
+                    {
+                        unit_record = Units[ID == input.Unit];
+                        unit_text = "<br><b>Unit:</b> " + unit_record.Unit_Number;
+                    }
+                    balance = input.Amount_Due - ifnull(input.Amount_Paid,0);
+                    sendmail
+                    (
+                        from : zoho.adminuserid
+                        to : tenant_record.Email
+                        subject : "Rent payment reminder - " + property_record.Property_Name
+                        message : "Hello " + tenant_record.Tenant_Name + ",<br><br>This is your rent payment reminder for " + input.Billing_Month.toString("MMMM yyyy") + ".<br><b>Property:</b> " + property_record.Property_Name + unit_text + "<br><b>Due date:</b> " + input.Due_Date + "<br><b>Amount due:</b> $" + input.Amount_Due + "<br><b>Amount paid:</b> $" + ifnull(input.Amount_Paid,0) + "<br><b>Balance:</b> $" + balance + "<br><br>Please arrange payment by the due date."
+                    )
+                }
+            )
+        }
+    }
+}

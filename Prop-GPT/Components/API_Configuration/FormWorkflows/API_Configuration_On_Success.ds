@@ -1,0 +1,17 @@
+API_Configuration_On_Success as "Track API Key Rotation"
+{
+    type = form
+    form = API_Configuration
+    record event = on add or edit
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                config_record = API_Configuration[ID == input.ID];
+                config_record.Last_Rotated_On = zoho.currenttime;
+            )
+        }
+    }
+}

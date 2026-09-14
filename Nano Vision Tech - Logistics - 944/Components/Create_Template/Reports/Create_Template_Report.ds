@@ -1,0 +1,17 @@
+custom Create_Template_Report
+{
+    displayName = "All Mail Templates"
+    show all rows from Create_Template
+    (
+        Select_Template.Template_1
+        Select_Template.Active
+    )
+    customlayouts
+    (
+        template
+        (
+            displayname = "Custom Layout 1"
+            content = "<panel><pr width='fill' height='fill'><pc padding='16px' bgColor='#F9FAFE' width='100%' hAlign='left' vAlign='middle'><pr width='fill' height='fill'><pc width='90%' hAlign='left' vAlign='middle'><text color='#000000' size='16px' type='field' lineHeight='24' numOfLines='3' value='Select_Template.Template_1'></text></pc><pc width='10%' hAlign='right' vAlign='middle'><image color='#828286' width='24px' height='24px' type='icon' value='arrows-2-small-right' size='22px' cornerRadius='12px' iconType='outline'/></pc></pr></pc></pr></panel>"
+        )
+    )
+}

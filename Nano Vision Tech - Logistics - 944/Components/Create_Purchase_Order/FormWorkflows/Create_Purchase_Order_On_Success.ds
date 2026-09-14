@@ -1,0 +1,124 @@
+Create_Purchase_Order_On_Success as "Process Purchase Order"
+{
+    type = form
+    form = Create_Purchase_Order
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                po_record = Create_Purchase_Order[ID == input.ID];
+                supplier_total = 0;
+                customer_subtotal = 0;
+                for each po_item in Purchase_Order_Product[Parent_Purchase_Order == input.ID]
+                {
+                    supplier_total = supplier_total + ifnull(po_item.Supplier_Total_Price,0);
+                    customer_subtotal = customer_subtotal + ifnull(po_item.Customer_Total_Price,0);
+                }
+                po_record.Supplier_Price = supplier_total;
+                po_record.Subtotal = customer_subtotal;
+                po_record.Total_Customer_Price = customer_subtotal + ifnull(input.Shipping_Charge,0) + ifnull(input.Customs_Duty_Via_Freight,0) + ifnull(input.Additional_Margin,0);
+                if(input.Status == "New" && input.Action_Mode == null)
+                {
+                    sales_order_record = Create_Sales_Order[ID == input.Sales_Order];
+                    previous_so_status = sales_order_record.Status;
+                    sales_order_record.Status = "Purchase Order Created";
+                    insert into Add_History
+                    [
+                        Action_Type = "Purchase Order Created"
+                        Status = "New"
+                        New_Status = "New"
+                        Comments = "Purchase order created"
+                        Sales_Order_Lookup = input.Sales_Order
+                        Purchase_Order_Lookup = input.ID
+                        Updated_By_Email = zoho.loginuserid
+                        Updated_Date_Time = zoho.currenttime
+                    ];
+                    insert into Add_History
+                    [
+                        Action_Type = "Status Changed"
+                        Status = "Purchase Order Created"
+                        Previous_Status = previous_so_status
+                        New_Status = "Purchase Order Created"
+                        Comments = "Purchase order created for sales order"
+                        Sales_Order_Lookup = input.Sales_Order
+                        Purchase_Order_Lookup = input.ID
+                        Updated_By_Email = zoho.loginuserid
+                        Updated_Date_Time = zoho.currenttime
+                    ];
+                }
+                if(input.Action_Mode == "Share With Customer" && input.Status == "Approved")
+                {
+                    po_record.Shared_With_Customer = true;
+                    po_record.Shared_With_Customer_Date = zoho.currenttime;
+                    insert into Add_History
+                    [
+                        Action_Type = "Purchase Order Shared with Customer"
+                        Status = input.Status
+                        Previous_Status = input.Status
+                        New_Status = input.Status
+                        Comments = "Purchase order shared with customer"
+                        Sales_Order_Lookup = input.Sales_Order
+                        Purchase_Order_Lookup = input.ID
+                        Updated_By_Email = zoho.loginuserid
+                        Updated_Date_Time = zoho.currenttime
+                    ];
+                }
+                if(input.Action_Mode == "Customer Approval" && input.Status == "Approved" && input.Shared_With_Customer == true)
+                {
+                    po_record.Status = "Customer Approved";
+                    po_record.Customer_Approval_Date = zoho.currenttime;
+                    sales_order_record = Create_Sales_Order[ID == input.Sales_Order];
+                    sales_order_record.Status = "Customer Approved";
+                    quote_record = Add_Supplier_Quote[ID == input.Selected_Supplier_Quote];
+                    supplier_record = Add_Supplier[ID == input.Supplier];
+                    insert into Add_History
+                    [
+                        Action_Type = "Customer Approval Recorded"
+                        Status = "Customer Approved"
+                        Previous_Status = "Approved"
+                        New_Status = "Customer Approved"
+                        Comments = input.Customer_Approval_Comments
+                        Sales_Order_Lookup = input.Sales_Order
+                        Supplier_Quote_Lookup = quote_record.ID
+                        Purchase_Order_Lookup = input.ID
+                        Updated_By_Email = zoho.loginuserid
+                        Updated_Date_Time = zoho.currenttime
+                    ];
+                    if(supplier_record.Email != null && supplier_record.Email != "")
+                    {
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : supplier_record.Email
+                            subject : "Customer approved purchase order"
+                            message : "The customer has approved purchase order " + input.Purchase_Order_ID + "."
+                        )
+                    }
+                }
+                if(input.Action_Mode == "Confirm Delivery" && input.Status == "Products Received")
+                {
+                    po_record.Status = "Delivered";
+                    sales_order_record = Create_Sales_Order[ID == input.Sales_Order];
+                    sales_order_record.Status = "Delivered";
+                    insert into Add_History
+                    [
+                        Action_Type = "Delivery Confirmed"
+                        Status = "Delivered"
+                        Previous_Status = "Products Received"
+                        New_Status = "Delivered"
+                        Comments = input.Delivery_Remarks
+                        Sales_Order_Lookup = input.Sales_Order
+                        Purchase_Order_Lookup = input.ID
+                        Updated_By_Email = zoho.loginuserid
+                        Updated_Date_Time = zoho.currenttime
+                    ];
+                }
+                po_record.Action_Mode = "";
+            )
+        }
+    }
+}

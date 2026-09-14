@@ -1,0 +1,17 @@
+PO_Supplier_Price_On_User_Input as "Calculate Supplier Line Total"
+{
+    type = form
+    form = Create_Purchase_Order
+    record event = on add or edit
+
+    on user input of Purchase_Order_Products.Supplier_Unit_Price
+    {
+        actions
+        {
+            custom deluge script
+            (
+                row.Supplier_Total_Price = ifnull(row.Quantity,0) * ifnull(row.Supplier_Unit_Price,0);
+            )
+        }
+    }
+}

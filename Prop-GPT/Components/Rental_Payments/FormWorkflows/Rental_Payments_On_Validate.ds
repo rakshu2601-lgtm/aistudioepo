@@ -1,0 +1,25 @@
+Rental_Payments_On_Validate as "Validate Rental Payment"
+{
+    type = form
+    form = Rental_Payments
+    record event = on add or edit
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                amount_paid = ifnull(input.Amount_Paid,0);
+                if(amount_paid < 0 || amount_paid > input.Amount_Due)
+                {
+                    alert "Amount paid must be between zero and the amount due.";
+                    cancel submit;
+                }
+                if(input.Payment_Status == "Paid" && input.Paid_Date == null)
+                {
+                    input.Paid_Date = zoho.currentdate;
+                }
+            )
+        }
+    }
+}

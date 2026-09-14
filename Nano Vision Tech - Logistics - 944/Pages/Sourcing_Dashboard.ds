@@ -1,0 +1,19 @@
+<page linkname = "Sourcing_Dashboard" displayname = "Sourcing Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Sourcing_Operations' elementName='Sourcing Operations'>
+          <![CDATA[htmlpage Sourcing_Operations()
+             content
+             <%{%>
+                 <file name:Sourcing_Operations.dshtml/>
+             <%}%>
+         ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

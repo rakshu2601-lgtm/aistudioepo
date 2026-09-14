@@ -1,0 +1,28 @@
+default list All_Supplier_Quotes
+{
+    displayName = "All Supplier Quotes"
+    show all rows from Add_Supplier_Quote
+    (
+        Supplier_Quote_ID as "Supplier Quote ID"
+        Supplier
+        Sales_Order as "Sales Order"
+        Quote_Date as "Quote Date"
+        Currency
+        Availability
+        Lead_Time as "Lead Time"
+        Dispatch_Location as "Dispatch Location"
+        Status
+    )
+    filters
+    (
+        Supplier
+        Sales_Order
+        Quote_Date
+        Currency
+        Status
+    )
+    sort by
+    (
+        Quote_Date descending
+    )
+}

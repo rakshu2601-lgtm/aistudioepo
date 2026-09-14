@@ -1,0 +1,101 @@
+"Property Superadmin"
+{
+    name = "Property Superadmin"
+    type = Users_Permissions
+    permissions = {Chat:false,Predefined:false,ApiAccess:true,PIIAccess:true,ePHIAccess:false}
+    description = "Full administrative access for the property owner and application superadmin."
+    ModulePermissions
+    {
+        Properties
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search,create_new_report
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Properties={"View","Edit","Delete"}
+                Property_Map={"View","Edit","Delete"}
+            }
+        }
+        Units
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search,create_new_report
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Units={"View","Edit","Delete"}
+                Unit_Availability_Board={"View","Edit","Delete"}
+            }
+        }
+        Tenants
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search,create_new_report
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Tenants={"View","Edit","Delete"}
+            }
+        }
+        Leases
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search,create_new_report
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Leases={"View","Edit","Delete"}
+                Active_Leases={"View","Edit","Delete"}
+            }
+        }
+        Rental_Payments
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search,create_new_report
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Rental_Payments={"View","Edit","Delete"}
+                Outstanding_Rent={"View","Edit","Delete"}
+            }
+        }
+        Work_Orders
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search,create_new_report
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Work_Orders={"View","Edit","Delete"}
+                Work_Order_Board={"View","Edit","Delete"}
+            }
+        }
+        API_Configuration
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                API_Configurations={"View","Edit","Delete"}
+            }
+        }
+        Work_Order_Status_History
+        {
+            enabled = Viewall,Export,Tab,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Status_History={"View"}
+                Work_Order_Status_Timeline={"View"}
+            }
+        }
+        Work_Order_Tracker_Filter
+        {
+            enabled = Create,Tab,View,Search
+            allFieldsVisible = true
+        }
+        Operations_Dashboard
+        {
+            enabled = tab
+        }
+        Work_Order_Tracking
+        {
+            enabled = tab
+        }
+    }
+}

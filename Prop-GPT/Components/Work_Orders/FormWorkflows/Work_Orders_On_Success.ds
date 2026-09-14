@@ -1,0 +1,62 @@
+Work_Orders_On_Success as "Log and Notify Work Order Status"
+{
+    type = form
+    form = Work_Orders
+    record event = on add or edit
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                previous_status = "";
+                latest_history = Work_Order_Status_History[Work_Order == input.ID] sort by Changed_At desc;
+                history_needed = true;
+                if(latest_history.count() > 0)
+                {
+                    previous_status = latest_history.New_Status;
+                    if(previous_status == input.Status)
+                    {
+                        history_needed = false;
+                    }
+                }
+                if(history_needed)
+                {
+                    change_source = "Internal";
+                    if(input.Source == "External API" && latest_history.count() == 0)
+                    {
+                        change_source = "External API";
+                    }
+                    history_id = insert into Work_Order_Status_History
+                    [
+                        Work_Order = input.ID
+                        Previous_Status = previous_status
+                        New_Status = input.Status
+                        Changed_At = zoho.currenttime
+                        Changed_By = zoho.loginuserid
+                        Change_Source = change_source
+                        Notes = input.Status_Notes
+                    ];
+                    tenant_record = Tenants[ID == input.Tenant];
+                    property_record = Properties[ID == input.Property];
+                    if(tenant_record.count() > 0 && tenant_record.Email != null)
+                    {
+                        unit_text = "";
+                        if(input.Unit != null)
+                        {
+                            unit_record = Units[ID == input.Unit];
+                            unit_text = "<br><b>Unit:</b> " + unit_record.Unit_Number;
+                        }
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : tenant_record.Email
+                            subject : "Work order " + input.Work_Order_ID + " status: " + input.Status
+                            message : "Hello " + tenant_record.Tenant_Name + ",<br><br>Your work order has been updated.<br><b>Work Order:</b> " + input.Work_Order_ID + "<br><b>Title:</b> " + input.Request_Title + "<br><b>Property:</b> " + property_record.Property_Name + unit_text + "<br><b>New status:</b> " + input.Status + "<br><b>Notes:</b> " + ifnull(input.Status_Notes,"") + "<br><b>Updated:</b> " + zoho.currenttime
+                        )
+                    }
+                }
+            )
+        }
+    }
+}

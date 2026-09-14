@@ -1,0 +1,190 @@
+form Create_Return_Request
+{
+    displayname = "Create Return Request"
+    success message = "Return request created successfully"
+    Return_Information
+    (
+        type = section
+        displayname = "Return Information"
+        row = 1
+        column = 0
+        width = medium
+    )
+    Customer
+    (
+        type = picklist
+        values = Add_Customer.ID
+        displayformat = [Customer_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Sales_Order
+    (
+        type = picklist
+        displayname = "Sales Order"
+        values = Create_Sales_Order.ID
+        displayformat = [Sales_Order_ID]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Purchase_Order
+    (
+        type = picklist
+        displayname = "Purchase Order"
+        values = Create_Purchase_Order[Status == "Delivered"].ID
+        displayformat = [Purchase_Order_ID]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Return_Date
+    (
+        type = date
+        displayname = "Return Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Issue_Description
+    (
+        type = textarea
+        displayname = "Issue Description"
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Damage_Responsibility
+    (
+        type = radiobuttons
+        displayname = "Damage Responsibility"
+        values = {"Supplier","Company"}
+        layout = 2
+        row = 1
+        column = 2
+        width = medium
+    )
+    Attachments
+    (
+        type = upload file
+        file count = 10
+        browse = local_drive, google_docs, zoho_docs
+        row = 1
+        column = 1
+        width = medium
+    )
+    Return_Remarks
+    (
+        type = textarea
+        displayname = "Return Remarks"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Return_Products
+    (
+        type = section
+        displayname = "Return Products"
+        visibility = false
+        row = 2
+        column = 1
+        width = medium
+    )
+    Return_Request_Products
+    (
+        type = grid
+        displayname = "Return Request Products"
+        values = Return_Request_Product.ID
+        bidirectional = Parent_Return_Request
+        row = 2
+        column = 1
+        width = medium
+    )
+    Audit_Information
+    (
+        type = section
+        displayname = "Audit Information"
+        visibility = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Created_By
+    (
+        type = picklist
+        displayname = "Created By"
+        values = Add_Employee.ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Created_By_Email
+    (
+        type = email
+        displayname = "Created By Email"
+        initial value = "${zoho.loginuserid}"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Created_Date_Time
+    (
+        type = datetime
+        displayname = "Created Date Time"
+        initial value = "${zoho.currenttime}"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Hidden
+    (
+        type = section
+        displayname = "Hidden"
+        visibility = true
+        row = 4
+        column = 1
+        width = medium
+    )
+    Return_Request_ID
+    (
+        type = autonumber
+        displayname = "Return Request ID"
+        start index = 1
+        row = 4
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Create"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

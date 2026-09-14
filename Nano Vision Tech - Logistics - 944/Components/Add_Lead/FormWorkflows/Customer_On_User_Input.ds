@@ -1,0 +1,25 @@
+Customer_On_User_Input as "Prefill Lead Customer"
+{
+    type = form
+    form = Add_Lead
+    record event = on add or edit
+
+    on user input of Customer
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Customer != null)
+                {
+                    customer_record = Add_Customer[ID == input.Customer];
+                    input.Customer_Company_Name = customer_record.Customer_Name;
+                    input.Contact_Person = customer_record.Contact_Person;
+                    input.Email = customer_record.Email;
+                    input.Phone = customer_record.Phone;
+                    input.Country = customer_record.Country;
+                }
+            )
+        }
+    }
+}

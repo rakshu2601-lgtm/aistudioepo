@@ -1,0 +1,19 @@
+Add_Customer_On_Load as "Add Customer On Load"
+{
+    type = form
+    form = Add_Customer
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                hide Hidden_Section;
+                disable Created_Date_Time;
+                disable Last_Updated_Date_Time;
+            )
+        }
+    }
+}

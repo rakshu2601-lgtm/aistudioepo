@@ -1,0 +1,5 @@
+report All_Histories
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Action_Type Status Comments Updated_By Updated_Date_Time ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Action_Type Status Previous_Status New_Status Comments Lead_Lookup Sales_Order_Lookup Supplier_Quote_Lookup Purchase_Order_Lookup Supplier_Invoice_Lookup Logistics_Booking_Lookup Return_Request_Lookup Updated_By Updated_By_Email Updated_Date_Time ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

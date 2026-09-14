@@ -1,0 +1,195 @@
+form Add_Lead
+{
+    displayname = "Add Lead"
+    success message = "Lead saved successfully"
+    Lead_Information
+    (
+        type = section
+        displayname = "Lead Information"
+        row = 1
+        column = 0
+        width = medium
+    )
+    must have Lead_Source
+    (
+        type = picklist
+        displayname = "Lead Source"
+        values = {"eBay","Alibaba","Other Online Platform","Direct","Other"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Customer
+    (
+        type = picklist
+        values = Add_Customer.ID
+        displayformat = [Customer_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Customer_Company_Name
+    (
+        type = text
+        displayname = "Customer Company Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Contact_Person
+    (
+        type = text
+        displayname = "Contact Person"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Email
+    (
+        type = email
+        row = 1
+        column = 1
+        width = medium
+    )
+    Phone
+    (
+        type = phonenumber
+        row = 1
+        column = 2
+        width = medium
+    )
+    Country
+    (
+        type = text
+        row = 1
+        column = 1
+        width = medium
+    )
+    Lead_Date
+    (
+        type = date
+        displayname = "Lead Date"
+        initial value = "${zoho.currentdate}"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Sales_Agent
+    (
+        type = picklist
+        displayname = "Sales Agent"
+        values = Add_Employee.ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Requirement
+    (
+        type = textarea
+        height = 120px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Expected_Price
+    (
+        type = USD
+        displayname = "Expected Price"
+        decimalplace = 2
+        maxchar = 16
+        row = 1
+        column = 1
+        width = medium
+    )
+    Attachments
+    (
+        type = upload file
+        file count = 10
+        browse = local_drive, google_docs, zoho_docs
+        row = 1
+        column = 2
+        width = medium
+    )
+    Lead_Product_Requirements
+    (
+        type = section
+        displayname = "Lead Product Requirements"
+        visibility = false
+        row = 2
+        column = 1
+        width = medium
+    )
+    Lead_Products
+    (
+        type = grid
+        displayname = "Lead Products"
+        values = Lead_Product.ID
+        bidirectional = Parent_Lead
+        defaultrow = 1
+        row = 2
+        column = 1
+        width = medium
+    )
+    Hidden
+    (
+        type = section
+        displayname = "Hidden"
+        visibility = true
+        row = 3
+        column = 1
+        width = medium
+    )
+    Lead_ID
+    (
+        type = autonumber
+        displayname = "Lead ID"
+        start index = 1
+        row = 3
+        column = 1
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        values = {"New","Sales Order Created","Lost"}
+        initial value = "New"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Action_Mode
+    (
+        type = text
+        displayname = "Action Mode"
+        row = 3
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Add"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

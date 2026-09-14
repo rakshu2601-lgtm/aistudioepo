@@ -1,0 +1,30 @@
+default list All_Rental_Payments
+{
+    displayName = "All Rental Payments"
+    show all rows from Rental_Payments
+    (
+        Payment_ID
+        Lease
+        Tenant
+        Property
+        Unit
+        Billing_Month
+        Due_Date
+        Amount_Due
+        Amount_Paid
+        Payment_Status
+        Paid_Date
+    )
+    filters
+    (
+        Tenant
+        Property
+        Unit
+        Billing_Month
+        Payment_Status
+    )
+    sort by
+    (
+        Due_Date descending
+    )
+}

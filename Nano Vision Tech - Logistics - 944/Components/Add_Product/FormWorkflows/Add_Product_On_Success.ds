@@ -1,0 +1,18 @@
+Add_Product_On_Success as "Update Product Timestamp"
+{
+    type = form
+    form = Add_Product
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                product_record = Add_Product[ID == input.ID];
+                product_record.Last_Updated_Date_Time = zoho.currenttime;
+            )
+        }
+    }
+}

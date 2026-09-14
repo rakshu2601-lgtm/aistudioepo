@@ -1,0 +1,33 @@
+default list All_Work_Orders
+{
+    displayName = "All Work Orders"
+    show all rows from Work_Orders
+    (
+        Work_Order_ID
+        Source
+        External_Request_ID
+        Tenant
+        Property
+        Unit
+        Request_Title
+        Category
+        Priority
+        Status
+        Assigned_To_Email
+        Raised_On
+    )
+    filters
+    (
+        Source
+        Tenant
+        Property
+        Unit
+        Category
+        Priority
+        Status
+    )
+    sort by
+    (
+        Raised_On descending
+    )
+}

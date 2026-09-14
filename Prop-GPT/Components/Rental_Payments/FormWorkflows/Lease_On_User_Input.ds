@@ -1,0 +1,34 @@
+Payment_Lease_On_User_Input as "Populate Payment Lease Data"
+{
+    type = form
+    form = Rental_Payments
+    record event = on add or edit
+    on user input of Lease
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Lease != null)
+                {
+                    lease_record = Leases[ID == input.Lease];
+                    input.Tenant = lease_record.Tenant;
+                    input.Property = lease_record.Property;
+                    input.Unit = lease_record.Unit;
+                    input.Amount_Due = lease_record.Monthly_Rent;
+                }
+                else
+                {
+                    input.Tenant = null;
+                    input.Property = null;
+                    input.Unit = null;
+                    input.Amount_Due = null;
+                }
+                disable Tenant;
+                disable Property;
+                disable Unit;
+                disable Amount_Due;
+            )
+        }
+    }
+}

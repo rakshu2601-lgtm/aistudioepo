@@ -1,0 +1,44 @@
+Supplier_Invoice_Purchase_Order_On_User_Input as "Load Purchase Order Products"
+{
+    type = form
+    form = Add_Supplier_Invoice
+    record event = on add or edit
+
+    on user input of Purchase_Order
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Supplier_Invoice_Products.clear();
+                if(input.Purchase_Order != null)
+                {
+                    po_record = Create_Purchase_Order[ID == input.Purchase_Order];
+                    input.Supplier = po_record.Supplier;
+                    input.Sales_Order = po_record.Sales_Order;
+                    input.Currency = po_record.Currency;
+                    invoice_rows = Collection();
+                    for each po_item in Purchase_Order_Product[Parent_Purchase_Order == input.Purchase_Order]
+                    {
+                        invoice_row = Add_Supplier_Invoice.Supplier_Invoice_Products();
+                        invoice_row.Purchase_Order_Product = po_item.ID;
+                        invoice_row.Product = po_item.Product;
+                        invoice_row.Product_ID = po_item.Product_ID;
+                        invoice_row.Product_Name = po_item.Product_Name;
+                        invoice_row.Manufacturer_Part_Number = po_item.Manufacturer_Part_Number;
+                        invoice_row.Brand_Make = po_item.Brand_Make;
+                        invoice_row.Model = po_item.Model;
+                        invoice_row.Configuration = po_item.Approved_Configuration;
+                        invoice_row.Unit_of_Measure = po_item.Unit_of_Measure;
+                        invoice_row.Quantity = po_item.Quantity;
+                        invoice_row.Unit_Price = po_item.Supplier_Unit_Price;
+                        invoice_row.Total_Price = po_item.Supplier_Total_Price;
+                        invoice_row.Currency = po_item.Currency;
+                        invoice_rows.insert(invoice_row);
+                    }
+                    input.Supplier_Invoice_Products.insert(invoice_rows);
+                }
+            )
+        }
+    }
+}

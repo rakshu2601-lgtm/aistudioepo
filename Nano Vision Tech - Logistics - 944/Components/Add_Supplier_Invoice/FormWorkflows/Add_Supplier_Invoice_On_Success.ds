@@ -1,0 +1,94 @@
+Add_Supplier_Invoice_On_Success as "Process Supplier Invoice"
+{
+    type = form
+    form = Add_Supplier_Invoice
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                invoice_record = Add_Supplier_Invoice[ID == input.ID];
+                invoice_total = 0;
+                for each invoice_item in Supplier_Invoice_Product[Parent_Supplier_Invoice == input.ID]
+                {
+                    invoice_total = invoice_total + ifnull(invoice_item.Total_Price,0);
+                }
+                invoice_record.Invoice_Amount = invoice_total;
+                if(input.Status == "New" && input.Action_Mode == null)
+                {
+                    po_record = Create_Purchase_Order[ID == input.Purchase_Order];
+                    po_record.Status = "Invoice Created";
+                    sales_order_record = Create_Sales_Order[ID == input.Sales_Order];
+                    sales_order_record.Status = "Invoice Created";
+                    insert into Add_History
+                    [
+                        Action_Type = "Supplier Invoice Created"
+                        Status = "New"
+                        Previous_Status = "Customer Approved"
+                        New_Status = "Invoice Created"
+                        Comments = "Supplier invoice created"
+                        Sales_Order_Lookup = input.Sales_Order
+                        Purchase_Order_Lookup = input.Purchase_Order
+                        Supplier_Invoice_Lookup = input.ID
+                        Updated_By_Email = zoho.loginuserid
+                        Updated_Date_Time = zoho.currenttime
+                    ];
+                    if(sales_order_record.Lead != null)
+                    {
+                        lead_record = Add_Lead[ID == sales_order_record.Lead];
+                        if(lead_record.Sales_Agent != null)
+                        {
+                            employee_record = Add_Employee[ID == lead_record.Sales_Agent];
+                            if(employee_record.Email != null && employee_record.Email != "")
+                            {
+                                sendmail
+                                (
+                                    from : zoho.adminuserid
+                                    to : employee_record.Email
+                                    subject : "Supplier invoice created"
+                                    message : "Supplier invoice " + input.Supplier_Invoice_Number + " has been recorded."
+                                )
+                            }
+                        }
+                    }
+                }
+                if(input.Action_Mode == "Mark Paid" && input.Status == "New")
+                {
+                    invoice_record.Status = "Paid";
+                    po_record = Create_Purchase_Order[ID == input.Purchase_Order];
+                    po_record.Status = "Invoice Paid";
+                    sales_order_record = Create_Sales_Order[ID == input.Sales_Order];
+                    sales_order_record.Status = "Invoice Paid";
+                    insert into Add_History
+                    [
+                        Action_Type = "Supplier Invoice Paid"
+                        Status = "Paid"
+                        Previous_Status = "New"
+                        New_Status = "Paid"
+                        Comments = input.Payment_Remarks
+                        Sales_Order_Lookup = input.Sales_Order
+                        Purchase_Order_Lookup = input.Purchase_Order
+                        Supplier_Invoice_Lookup = input.ID
+                        Updated_By_Email = zoho.loginuserid
+                        Updated_Date_Time = zoho.currenttime
+                    ];
+                    supplier_record = Add_Supplier[ID == input.Supplier];
+                    if(supplier_record.Email != null && supplier_record.Email != "")
+                    {
+                        sendmail
+                        (
+                            from : zoho.adminuserid
+                            to : supplier_record.Email
+                            subject : "Supplier invoice payment recorded"
+                            message : "Payment has been recorded for invoice " + input.Supplier_Invoice_Number + "."
+                        )
+                    }
+                }
+                invoice_record.Action_Mode = "";
+            )
+        }
+    }
+}

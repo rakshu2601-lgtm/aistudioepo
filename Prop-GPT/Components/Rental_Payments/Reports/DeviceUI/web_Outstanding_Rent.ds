@@ -1,0 +1,5 @@
+report Outstanding_Rent
+{
+ quickview(layout(type = -1 datablock1(layout type = -1 fields(Payment_ID Lease Tenant Property Unit Billing_Month Due_Date Amount_Due Amount_Paid Payment_Status))) menu(header(Edit Duplicate Delete) record(Edit Duplicate Delete)) action(on click(View Record) on right click(Edit Delete Duplicate View Record)))
+ detailview(layout(type = 1 datablock1(layout type = -2 fields(Payment_ID Lease Tenant Property Unit Billing_Month Due_Date Amount_Due Amount_Paid Payment_Status))) menu(header(Edit Duplicate Delete)))
+}

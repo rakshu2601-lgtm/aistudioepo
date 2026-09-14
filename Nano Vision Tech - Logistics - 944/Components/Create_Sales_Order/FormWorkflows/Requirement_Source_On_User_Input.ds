@@ -1,0 +1,25 @@
+Requirement_Source_On_User_Input as "Toggle Sales Order Lead"
+{
+    type = form
+    form = Create_Sales_Order
+    record event = on add or edit
+
+    on user input of Requirement_Source
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Requirement_Source == "Customer Request")
+                {
+                    show Lead;
+                }
+                else
+                {
+                    input.Lead = null;
+                    hide Lead;
+                }
+            )
+        }
+    }
+}

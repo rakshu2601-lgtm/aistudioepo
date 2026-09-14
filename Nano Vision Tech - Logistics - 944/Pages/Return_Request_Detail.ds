@@ -1,0 +1,19 @@
+<page linkname = "Return_Request_Detail" parameters = "int Return_Request_ID" displayname = "Return Request Detail"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Return_Request_Detail_Snippet' elementName='Return_Request_Detail'>
+          <![CDATA[htmlpage Return_Request_Detail_Snippet()
+            content
+            <%{%>
+              <file name:Return_Request_Detail.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

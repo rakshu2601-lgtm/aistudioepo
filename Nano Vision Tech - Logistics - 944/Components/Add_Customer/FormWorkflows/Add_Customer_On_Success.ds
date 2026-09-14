@@ -1,0 +1,18 @@
+Add_Customer_On_Success as "Update Customer Timestamp"
+{
+    type = form
+    form = Add_Customer
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                customer_record = Add_Customer[ID == input.ID];
+                customer_record.Last_Updated_Date_Time = zoho.currenttime;
+            )
+        }
+    }
+}

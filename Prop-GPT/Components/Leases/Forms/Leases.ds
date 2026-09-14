@@ -1,0 +1,159 @@
+form Leases
+{
+    title
+    {
+        displayname = "Leases"
+        on add = "Add Lease"
+        on edit = "Edit Lease"
+    }
+    Lease_Details
+    (
+        type = section
+        displayname = "Lease Details"
+        row = 1
+        column = 0
+    )
+    Lease_ID
+    (
+        type = autonumber
+        displayname = "Lease ID"
+        start index = 1001
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Tenant
+    (
+        type = picklist
+        displayname = "Tenant"
+        values = Tenants.ID
+        displayformat = [Tenant_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Property
+    (
+        type = picklist
+        displayname = "Property"
+        values = Properties.ID
+        displayformat = [Property_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Unit
+    (
+        type = picklist
+        displayname = "Unit"
+        values = Units.ID
+        displayformat = [Unit_Number]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Lease_Start_Date
+    (
+        type = date
+        displayname = "Lease Start Date"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Lease_End_Date
+    (
+        type = date
+        displayname = "Lease End Date"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Monthly_Rent
+    (
+        type = USD
+        displayname = "Monthly Rent"
+        decimalplace = 2
+        maxchar = 12
+        row = 1
+        column = 2
+        width = medium
+    )
+    Security_Deposit
+    (
+        type = USD
+        displayname = "Security Deposit"
+        decimalplace = 2
+        maxchar = 12
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Billing_Start_Date
+    (
+        type = date
+        displayname = "Billing Start Date"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Payment_Due_Day
+    (
+        type = number
+        displayname = "Payment Due Day"
+        initial value = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Lease_Status
+    (
+        type = picklist
+        displayname = "Lease Status"
+        values = {"Draft","Active","Expired","Terminated"}
+        initial value = "Draft"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Notes
+    (
+        type = textarea
+        displayname = "Notes"
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Lease"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Lease"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

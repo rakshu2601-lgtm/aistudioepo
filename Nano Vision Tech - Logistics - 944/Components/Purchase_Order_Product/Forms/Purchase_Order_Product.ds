@@ -1,0 +1,243 @@
+form Purchase_Order_Product
+{
+    displayname = "Purchase Order Product"
+    Product_Selection
+    (
+        type = section
+        displayname = "Product Selection"
+        row = 1
+        column = 0
+        width = medium
+    )
+    Parent_Purchase_Order
+    (
+        type = picklist
+        displayname = "Parent Purchase Order"
+        values = Create_Purchase_Order.ID
+        bidirectional = Purchase_Order_Products
+        displayformat = [Purchase_Order_ID]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Sales_Order_Product
+    (
+        type = picklist
+        displayname = "Sales Order Product"
+        values = Sales_Order_Product.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Supplier_Quote_Product
+    (
+        type = picklist
+        displayname = "Supplier Quote Product"
+        values = Supplier_Quote_Product.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Product
+    (
+        type = picklist
+        values = Add_Product.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product_ID
+    (
+        type = text
+        displayname = "Product ID"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Product_Name
+    (
+        type = text
+        displayname = "Product Name"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product_Category
+    (
+        type = text
+        displayname = "Product Category"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Product_Type
+    (
+        type = text
+        displayname = "Product Type"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product_Description
+    (
+        type = textarea
+        displayname = "Product Description"
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Manufacturer_Part_Number
+    (
+        type = text
+        displayname = "Manufacturer Part Number"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Internal_Part_Number
+    (
+        type = text
+        displayname = "Internal Part Number"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Brand_Make
+    (
+        type = text
+        displayname = "Brand / Make"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Model
+    (
+        type = text
+        row = 1
+        column = 1
+        width = medium
+    )
+    Approved_Configuration
+    (
+        type = textarea
+        displayname = "Approved Configuration"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Unit_of_Measure
+    (
+        type = text
+        displayname = "Unit of Measure"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Pricing
+    (
+        type = section
+        displayname = "Pricing"
+        visibility = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Quantity
+    (
+        type = decimal
+        decimalplace = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+    Supplier_Unit_Price
+    (
+        type = USD
+        displayname = "Supplier Unit Price"
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 2
+        width = medium
+    )
+    Supplier_Total_Price
+    (
+        type = USD
+        displayname = "Supplier Total Price"
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 1
+        width = medium
+    )
+    Customer_Unit_Price
+    (
+        type = USD
+        displayname = "Customer Unit Price"
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 2
+        width = medium
+    )
+    Customer_Total_Price
+    (
+        type = USD
+        displayname = "Customer Total Price"
+        decimalplace = 2
+        maxchar = 16
+        row = 2
+        column = 1
+        width = medium
+    )
+    Currency
+    (
+        type = picklist
+        values = {"USD","EUR"}
+        initial value = "USD"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Remarks
+    (
+        type = textarea
+        height = 100px
+        row = 2
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Add"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

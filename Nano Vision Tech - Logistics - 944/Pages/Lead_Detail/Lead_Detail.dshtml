@@ -1,0 +1,78 @@
+<style>
+/* ZCS global utility subset used by this page; included once. */
+:root{--zcs-theme-brand-color:var(--zcs_brand_color);--zcs-light-bg-color:var(--zcs_brand_light_color);--zcs-page-bg-color:#f3f3f4;--zcs-white-color:#fff;--zcs-primary-text-color:var(--zcs_primary_text_color);--zcs-secondary-text-color:var(--zcs_secondary_text_color);font-size:16px;line-height:1.5}*{box-sizing:border-box}.zcs-flex{display:flex}.zcs-inline-flex{display:inline-flex}.zcs-row{display:flex;flex-wrap:wrap}.zcs-direction-column{flex-direction:column}.zcs-row-wrap{flex-wrap:wrap}.zcs-align-items-center{align-items:center}.zcs-align-items-start{align-items:flex-start}.zcs-justify-center{justify-content:center}.zcs-justify-space-between{justify-content:space-between}.zcs-gap-4{gap:.25rem}.zcs-gap-8{gap:.5rem}.zcs-gap-12{gap:.75rem}.zcs-gap-16{gap:1rem}.zcs-gap-24{gap:1.5rem}.zcs-p-0{padding:0}.zcs-p-12{padding:.75rem}.zcs-p-16{padding:1rem}.zcs-p-20{padding:1.25rem}.zcs-px-10{padding-left:.625rem;padding-right:.625rem}.zcs-px-16{padding-left:1rem;padding-right:1rem}.zcs-py-2{padding-top:.125rem;padding-bottom:.125rem}.zcs-py-8{padding-top:.5rem;padding-bottom:.5rem}.zcs-m-0{margin:0}.zcs-mt-4{margin-top:.25rem}.zcs-mt-8{margin-top:.5rem}.zcs-mt-12{margin-top:.75rem}.zcs-mb-0{margin-bottom:0}.zcs-w-full{width:100%}.zcs-rounded-sm{border-radius:.25rem}.zcs-rounded-md{border-radius:.375rem}.zcs-rounded-xl{border-radius:.75rem}.zcs-rounded-half{border-radius:50%}.zcs-box-border{box-sizing:border-box}.zcs-font-12{font-size:.75rem}.zcs-font-14{font-size:.875rem}.zcs-font-15{font-size:.9375rem}.zcs-font-16{font-size:1rem}.zcs-font-18{font-size:1.125rem}.zcs-font-22{font-size:1.375rem}.zcs-font-normal{font-weight:400}.zcs-font-medium{font-weight:500}.zcs-font-semibold{font-weight:600}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-secondary,.zcs-color-tertiary{color:var(--zcs-secondary-text-color)}.zcs-color-theme{color:var(--zcs_brand_color)}.zcs-card{background:var(--zcs-white-color);border:1px solid var(--zcs_tertiary_border_color);border-radius:12px}a{text-decoration:none}
+/* ZCS components: Leads CRM, Heading with Actions, Badge with Icon, Quick Actions. */
+.zcs-button{width:auto;min-width:5rem;min-height:36px;border:0}.zcs-primary-button{background:var(--zcs_brand_color);color:var(--zcs_brand_foreground_color)}.zcs-primary-outline-button{border:1px solid var(--zcs_brand_color);background:var(--zcs-white-color);color:var(--zcs_brand_color)}.zcs-secondary-button{border:1px solid var(--zcs_primary_border_color);background:var(--zcs_light_grey_color);color:var(--zcs_primary_text_color)}.zcs-button:hover{filter:brightness(.97)}.zcs-badge{width:auto;white-space:nowrap}.zcs-badge-filled-outline{border:1px solid}.zcs-badge-filled-outline.zcs-badge-blue{background:#e8efff;border-color:#2a6ffc;color:#2a6ffc}.zcs-quick-action-item{list-style:none}.zcs-quick-action-item:hover .zcs-quick-action-link{color:var(--zcs_brand_color)}.zcs-icon-wrapper{width:36px;height:36px;background:#f5f4fa;color:#4b4274}.zcs-bg-blue{background:#f8f8ff}
+.lead-page{min-height:100%;padding:16px;background:var(--zcs-page-bg-color);font:14px/1.5 Arial,sans-serif;color:var(--zcs-primary-text-color)}.lead-shell{max-width:1320px;margin:auto}.page-header{padding:0 0 12px}.back-link{color:var(--zcs-secondary-text-color)}.back-link:hover{color:var(--zcs_brand_color)}.actions{display:flex;flex-wrap:wrap;gap:8px}.identity{display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,340px);gap:18px;padding:18px;margin-bottom:14px}.identity-main{display:flex;align-items:center;gap:14px;min-width:0}.identity-icon{width:46px;height:46px;flex:0 0 46px;background:var(--zcs_component_hover_color);color:var(--zcs_brand_color);font-size:21px}.eyebrow,.label{color:var(--zcs-secondary-text-color);font-size:12px}.identity-title{margin:1px 0 0;font-size:22px;letter-spacing:-.01em}.identity-copy{margin:5px 0 0;color:var(--zcs-secondary-text-color)}.reference-panel{padding:13px 14px;border:1px solid var(--zcs_tertiary_border_color);border-radius:9px}.reference-row{display:flex;justify-content:space-between;gap:16px}.reference-row+.reference-row{margin-top:8px;padding-top:8px;border-top:1px solid var(--zcs_tertiary_border_color)}.reference-value{font-weight:600;text-align:right;word-break:break-word}.content-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px}.main-stack,.side-stack{display:grid;gap:14px;align-content:start}.section{padding:18px}.section-head{display:flex;align-items:flex-start;gap:11px;margin-bottom:14px}.section-head h2{margin:0;font-size:17px}.section-head p{margin:3px 0 0;color:var(--zcs-secondary-text-color)}.step-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.step{padding:13px;border:1px solid var(--zcs_tertiary_border_color);border-radius:9px;background:#fff}.step-number{width:25px;height:25px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:var(--zcs_component_hover_color);color:var(--zcs_brand_color);font-weight:600}.step h3{margin:9px 0 3px;font-size:14px}.step p{margin:0;color:var(--zcs-secondary-text-color);font-size:13px}.check-list,.quick-list{list-style:none;margin:0;padding:0;display:grid;gap:12px}.check-list li{display:flex;gap:10px;align-items:flex-start}.check-list i{margin-top:3px;color:var(--zcs_brand_color)}.soft-note{padding:13px;border-left:3px solid var(--zcs_brand_color);background:var(--zcs_component_hover_color);border-radius:0 8px 8px 0;color:var(--zcs-secondary-text-color)}.quick-list a{display:flex;align-items:center;gap:10px;color:var(--zcs-primary-text-color)}.quick-list i{color:var(--zcs_brand_color)}.footer-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+@media(max-width:900px){.identity,.content-grid{grid-template-columns:1fr}.step-list{grid-template-columns:1fr}.side-stack{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:620px){.lead-page{padding:10px}.page-header{align-items:flex-start}.actions{width:100%}.actions a{flex:1}.identity{padding:14px}.identity-main{align-items:flex-start}.side-stack{grid-template-columns:1fr}.reference-row{align-items:flex-start}.footer-actions a{width:100%}}
+</style>
+<div class='lead-page'>
+  <div class='lead-shell'>
+    <header class='page-header zcs-flex zcs-align-items-center zcs-justify-space-between zcs-row-wrap zcs-gap-12'>
+      <div>
+        <a class='back-link zcs-inline-flex zcs-align-items-center zcs-gap-8' href='#Page:Leads'><i class='zc-li-outline arrows-1-tail-left'></i><span>Leads</span></a>
+        <div class='zcs-font-18 zcs-font-medium zcs-mt-4'>Lead handoff</div>
+      </div>
+      <div class='actions'>
+        <a class='zcs-button zcs-primary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md' href='#Report:All_Leads?ID=<%=input.Lead_ID%>'><i class='zc-li-outline files-single'></i><span>Open lead record</span></a>
+      </div>
+    </header>
+
+    <section class='zcs-card identity'>
+      <div class='identity-main'>
+        <div class='identity-icon zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-xl'><i class='zc-li-outline business-goal-65'></i></div>
+        <div>
+          <div class='eyebrow'>Operational lead reference</div>
+          <h1 class='identity-title'>Lead <%=input.Lead_ID%></h1>
+          <p class='identity-copy'>Use this handoff view to confirm ownership, prepare the next action, and continue in the authoritative lead report.</p>
+        </div>
+      </div>
+      <div class='reference-panel zcs-bg-blue'>
+        <div class='reference-row'><span class='label'>Lead ID</span><span class='reference-value'><%=input.Lead_ID%></span></div>
+        <div class='reference-row'><span class='label'>Source of truth</span><span class='reference-value'>All Leads report</span></div>
+        <div class='reference-row'><span class='label'>Workspace state</span><span class='zcs-badge zcs-badge-filled-outline zcs-badge-blue zcs-inline-flex zcs-align-items-center zcs-gap-8 zcs-rounded-sm zcs-px-10 zcs-py-2'><i class='zc-li-outline loader-dots-06'></i><span>Ready for review</span></span></div>
+      </div>
+    </section>
+
+    <div class='content-grid'>
+      <main class='main-stack'>
+        <section class='zcs-card section'>
+          <div class='section-head'><div class='zcs-icon-wrapper zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-half'><i class='zc-li-outline ui-1-check-circle-08'></i></div><div><h2>Review before handoff</h2><p>Complete the shortest path from lead review to operational ownership.</p></div></div>
+          <div class='step-list'>
+            <article class='step'><span class='step-number'>1</span><h3>Validate the record</h3><p>Confirm customer, contact, requirement, requested products, assignment, and current status in All Leads.</p></article>
+            <article class='step'><span class='step-number'>2</span><h3>Confirm ownership</h3><p>Make sure the responsible team and immediate follow-up are clear before work moves forward.</p></article>
+            <article class='step'><span class='step-number'>3</span><h3>Advance the workflow</h3><p>Update the lead in the report, then continue to sales-order processing when the lead is ready.</p></article>
+          </div>
+        </section>
+
+        <section class='zcs-card section'>
+          <div class='section-head'><div class='zcs-icon-wrapper zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-half'><i class='zc-li-outline business-progress'></i></div><div><h2>Operational handoff</h2><p>Use these checkpoints to keep sales and operations aligned.</p></div></div>
+          <ul class='check-list'>
+            <li><i class='zc-li-outline ui-1-check-circle-08'></i><span><strong>Commercial context:</strong> confirm the requirement and requested product scope are understandable to the receiving team.</span></li>
+            <li><i class='zc-li-outline ui-1-check-circle-08'></i><span><strong>Responsibility:</strong> confirm who owns the next contact, update, or conversion step.</span></li>
+            <li><i class='zc-li-outline ui-1-check-circle-08'></i><span><strong>Readiness:</strong> use the lead report to make status changes before opening downstream sales-order work.</span></li>
+          </ul>
+          <div class='footer-actions'>
+            <a class='zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md' href='#Report:All_Leads?ID=<%=input.Lead_ID%>'><i class='zc-li-outline ui-1-edit-72'></i><span>Review or update lead</span></a>
+            <a class='zcs-button zcs-secondary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md' href='#Page:Sales_Orders'><i class='zc-li-outline shopping-list'></i><span>View sales orders</span></a>
+          </div>
+        </section>
+      </main>
+
+      <aside class='side-stack'>
+        <section class='zcs-card section zcs-quick-actions-wrapper'>
+          <h2 class='zcs-font-16 zcs-font-semibold zcs-m-0'>Record actions</h2>
+          <ul class='quick-list zcs-mt-12'>
+            <li class='zcs-quick-action-item'><a class='zcs-quick-action-link' href='#Report:All_Leads?ID=<%=input.Lead_ID%>'><i class='zc-li-outline files-single'></i><span>Open authoritative record</span></a></li>
+            <li class='zcs-quick-action-item'><a class='zcs-quick-action-link' href='#Page:Leads'><i class='zc-li-outline arrows-1-tail-left'></i><span>Return to lead pipeline</span></a></li>
+            <li class='zcs-quick-action-item'><a class='zcs-quick-action-link' href='#Page:Sales_Orders'><i class='zc-li-outline shopping-list'></i><span>Open sales orders</span></a></li>
+          </ul>
+        </section>
+        <section class='zcs-card section'>
+          <h2 class='zcs-font-16 zcs-font-semibold zcs-m-0'>Working guidance</h2>
+          <div class='soft-note zcs-mt-12'><i class='zc-li-outline ui-3-alert'></i> This page intentionally shows only the parameter-driven lead reference. Review and change record data in All Leads.</div>
+        </section>
+      </aside>
+    </div>
+  </div>
+</div>

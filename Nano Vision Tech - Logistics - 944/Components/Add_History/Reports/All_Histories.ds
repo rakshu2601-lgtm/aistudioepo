@@ -1,0 +1,33 @@
+default list All_Histories
+{
+    displayName = "All Histories"
+    show all rows from Add_History
+    (
+        Action_Type as "Action Type"
+        Status
+        Previous_Status as "Previous Status"
+        New_Status as "New Status"
+        Comments
+        Lead_Lookup as "Lead"
+        Sales_Order_Lookup as "Sales Order"
+        Supplier_Quote_Lookup as "Supplier Quote"
+        Purchase_Order_Lookup as "Purchase Order"
+        Supplier_Invoice_Lookup as "Supplier Invoice"
+        Logistics_Booking_Lookup as "Logistics Booking"
+        Return_Request_Lookup as "Return Request"
+        Updated_By as "Updated By"
+        Updated_By_Email as "Updated By Email"
+        Updated_Date_Time as "Updated Date Time"
+    )
+    filters
+    (
+        Action_Type
+        Status
+        Updated_By
+        Updated_Date_Time
+    )
+    sort by
+    (
+        Updated_Date_Time descending
+    )
+}

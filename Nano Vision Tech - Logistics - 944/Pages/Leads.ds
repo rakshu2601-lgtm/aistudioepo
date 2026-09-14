@@ -1,0 +1,19 @@
+<page linkname = "Leads" displayname = "Leads"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Lead_Management' elementName='Lead_Management'>
+          <![CDATA[htmlpage Lead_Management()
+            content
+             <%{%>
+                 <file name:Lead_Management.dshtml/>
+             <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

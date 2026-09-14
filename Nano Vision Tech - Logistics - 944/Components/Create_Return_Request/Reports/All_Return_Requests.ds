@@ -1,0 +1,30 @@
+default list All_Return_Requests
+{
+    displayName = "All Return Requests"
+    show all rows from Create_Return_Request
+    (
+        Return_Request_ID as "Return Request ID"
+        Customer
+        Sales_Order as "Sales Order"
+        Purchase_Order as "Purchase Order"
+        Return_Date as "Return Date"
+        Damage_Responsibility as "Damage Responsibility"
+        Issue_Description as "Issue Description"
+        Created_By as "Created By"
+        Created_By_Email as "Created By Email"
+        Created_Date_Time as "Created Date Time"
+    )
+    filters
+    (
+        Customer
+        Sales_Order
+        Purchase_Order
+        Return_Date
+        Damage_Responsibility
+        Created_By
+    )
+    sort by
+    (
+        Return_Date descending
+    )
+}

@@ -1,0 +1,119 @@
+form Add_Supplier
+{
+    displayname = "Add Supplier"
+    success message = "Supplier saved successfully"
+    Supplier_Information
+    (
+        type = section
+        displayname = "Supplier Information"
+        row = 1
+        column = 0
+        width = medium
+    )
+    must have Supplier_Name
+    (
+        type = text
+        displayname = "Supplier Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Contact_Person
+    (
+        type = text
+        displayname = "Contact Person"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have unique Email
+    (
+        type = email
+        initial value = "${zoho.loginuserid}"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Phone
+    (
+        type = phonenumber
+        row = 1
+        column = 2
+        width = medium
+    )
+    Country
+    (
+        type = text
+        row = 1
+        column = 1
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        initial value = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Hidden_Section
+    (
+        type = section
+        displayname = "Hidden Section"
+        visibility = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Supplier_ID
+    (
+        type = autonumber
+        displayname = "Supplier ID"
+        start index = 1
+        row = 2
+        column = 1
+        width = medium
+    )
+    Created_Date_Time
+    (
+        type = datetime
+        displayname = "Created Date and Time"
+        initial value = "${zoho.currenttime}"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Last_Updated_Date_Time
+    (
+        type = datetime
+        displayname = "Last Updated Date and Time"
+        initial value = "${zoho.currenttime}"
+        row = 2
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Add"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

@@ -1,0 +1,19 @@
+<page linkname = "Requests_For_Quote" displayname = "Requests For Quote"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Requests_For_Quote_Snippet' elementName='Requests_For_Quote_Snippet'>
+          <![CDATA[htmlpage Requests_For_Quote_Snippet()
+            content
+            <%{%>
+              <file name:Requests_For_Quote_Snippet.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

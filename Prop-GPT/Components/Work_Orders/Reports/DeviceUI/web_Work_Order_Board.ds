@@ -1,0 +1,5 @@
+report Work_Order_Board
+{
+ quickview(layout(type = 1 datablock1(layout type = -1 fields(Work_Order_ID Request_Title Tenant Property Unit Priority Status Assigned_To_Email Raised_On))) menu(header(Edit Duplicate Delete) record(Edit Duplicate Delete)) action(on click(View Record) on right click(Edit Delete Duplicate View Record)))
+ detailview(layout(type = 1 datablock1(layout type = -2 fields(Work_Order_ID Request_Title Tenant Property Unit Priority Status Assigned_To_Email Raised_On))) menu(header(Edit Duplicate Delete)))
+}

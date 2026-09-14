@@ -1,0 +1,218 @@
+form Logistics_Booking_Product
+{
+    displayname = "Logistics Booking Product"
+    Receipt_Product_Information
+    (
+        type = section
+        displayname = "Receipt Product Information"
+        row = 1
+        column = 0
+        width = medium
+    )
+    Parent_Logistics_Booking
+    (
+        type = picklist
+        displayname = "Parent Logistics Booking"
+        values = Create_Logistics_Booking.ID
+        displayformat = [Logistics_Booking_ID]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Purchase_Order
+    (
+        type = picklist
+        displayname = "Purchase Order"
+        values = Create_Purchase_Order.ID
+        displayformat = [Purchase_Order_ID]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Purchase_Order_Product
+    (
+        type = picklist
+        displayname = "Purchase Order Product"
+        values = Purchase_Order_Product.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Supplier
+    (
+        type = picklist
+        values = Add_Supplier.ID
+        displayformat = [Supplier_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product
+    (
+        type = picklist
+        values = Add_Product.ID
+        displayformat = [Product_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Product_ID
+    (
+        type = text
+        displayname = "Product ID"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product_Name
+    (
+        type = text
+        displayname = "Product Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Product_Category
+    (
+        type = text
+        displayname = "Product Category"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Product_Type
+    (
+        type = text
+        displayname = "Product Type"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Manufacturer_Part_Number
+    (
+        type = text
+        displayname = "Manufacturer Part Number"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Brand_Make
+    (
+        type = text
+        displayname = "Brand / Make"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Model
+    (
+        type = text
+        row = 1
+        column = 2
+        width = medium
+    )
+    Configuration
+    (
+        type = textarea
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Expected_Quantity
+    (
+        type = decimal
+        displayname = "Expected Quantity"
+        decimalplace = 2
+        row = 1
+        column = 2
+        width = medium
+    )
+    Unit_of_Measure
+    (
+        type = text
+        displayname = "Unit of Measure"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Received_Quantity
+    (
+        type = decimal
+        displayname = "Received Quantity"
+        decimalplace = 2
+        row = 1
+        column = 2
+        width = medium
+    )
+    Damaged_Quantity
+    (
+        type = decimal
+        displayname = "Damaged Quantity"
+        decimalplace = 2
+        row = 1
+        column = 1
+        width = medium
+    )
+    Accepted_Quantity
+    (
+        type = decimal
+        displayname = "Accepted Quantity"
+        decimalplace = 2
+        row = 1
+        column = 2
+        width = medium
+    )
+    Rejected_Quantity
+    (
+        type = decimal
+        displayname = "Rejected Quantity"
+        decimalplace = 2
+        row = 1
+        column = 1
+        width = medium
+    )
+    Serial_Number_Details
+    (
+        type = textarea
+        displayname = "Serial Number Details"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Receiving_Remarks
+    (
+        type = textarea
+        displayname = "Receiving Remarks"
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+        }
+    }
+}

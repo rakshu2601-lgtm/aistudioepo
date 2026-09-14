@@ -1,0 +1,19 @@
+<page linkname = "Products" displayname = "Products"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Product_Catalog' elementName='Product_Catalog'>
+          <![CDATA[htmlpage Product_Catalog()
+            content
+            <%{%>
+              <file name:Product_Catalog.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

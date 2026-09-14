@@ -1,0 +1,5 @@
+report All_Logistics_Bookings
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Logistics_Booking_ID Booking_Date Logistics_Provider Tracking_Reference Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Logistics_Booking_ID Booking_Date Logistics_Provider Suppliers Pickup_Location Warehouse_Destination Expected_Arrival_Date Actual_Arrival_Date Tracking_Reference Received_By Received_Date Quality_Checked_By Quality_Check_Date Status ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

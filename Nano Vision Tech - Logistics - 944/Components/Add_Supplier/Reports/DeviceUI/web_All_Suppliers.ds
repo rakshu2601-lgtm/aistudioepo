@@ -1,0 +1,5 @@
+report All_Suppliers
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Supplier_ID Supplier_Name Email Phone Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Supplier_ID Supplier_Name Contact_Person Email Phone Country Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

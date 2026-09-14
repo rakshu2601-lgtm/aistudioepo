@@ -1,0 +1,80 @@
+form API_Configuration
+{
+    title
+    {
+        displayname = "API Configuration"
+        on add = "Add API Configuration"
+        on edit = "Edit API Configuration"
+    }
+    API_Settings
+    (
+        type = section
+        displayname = "API Settings"
+        row = 1
+        column = 0
+    )
+    must have unique Configuration_Name
+    (
+        type = text
+        displayname = "Configuration Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Secret_Key
+    (
+        type = text
+        displayname = "Secret Key"
+        private = true
+        isencrypted = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Last_Rotated_On
+    (
+        type = datetime
+        displayname = "Last Rotated On"
+        row = 1
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Configuration"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Configuration"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

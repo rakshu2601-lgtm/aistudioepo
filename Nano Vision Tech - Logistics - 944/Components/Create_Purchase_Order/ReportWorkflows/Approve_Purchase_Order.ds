@@ -1,0 +1,17 @@
+Approve_Purchase_Order as "Approve Purchase Order"
+{
+    type = functions
+    form = Create_Purchase_Order
+    execution type = for each record
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                openUrl("#Form:Add_History?Purchase_Order_Lookup=" + input.ID + "&Sales_Order_Lookup=" + input.Sales_Order + "&Action_Type=Purchase Order Approved&Status=New&Previous_Status=New&New_Status=Approved&Updated_By_Email=" + zoho.loginuserid, "popup window", "height=650px,width=700px");
+            )
+        }
+    }
+}

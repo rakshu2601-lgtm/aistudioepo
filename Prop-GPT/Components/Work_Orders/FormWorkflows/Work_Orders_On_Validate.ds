@@ -1,0 +1,48 @@
+Work_Orders_On_Validate as "Validate Work Order"
+{
+    type = form
+    form = Work_Orders
+    record event = on add or edit
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Source == "External API" && (input.External_Request_ID == null || input.External_Request_ID.trim() == ""))
+                {
+                    alert "External Request ID is required for API work orders.";
+                    cancel submit;
+                }
+                if(input.Unit != null)
+                {
+                    unit_record = Units[ID == input.Unit];
+                    if(unit_record.count() == 0 || unit_record.Property != input.Property)
+                    {
+                        alert "The selected unit does not belong to the selected property.";
+                        cancel submit;
+                    }
+                }
+                active_leases = Leases[Tenant == input.Tenant && Lease_Status == "Active" && Lease_Start_Date <= zoho.currentdate && (Lease_End_Date is null || Lease_End_Date >= zoho.currentdate)];
+                residence_matches = 0;
+                for each active_lease in active_leases
+                {
+                    if(active_lease.Property == input.Property && active_lease.Unit == input.Unit)
+                    {
+                        residence_matches = residence_matches + 1;
+                    }
+                }
+                if(residence_matches != 1)
+                {
+                    alert "Tenant, property and unit must match exactly one current active lease.";
+                    cancel submit;
+                }
+                if((input.Status == "Resolved" || input.Status == "Closed") && (input.Resolution_Notes == null || input.Resolution_Notes.trim() == ""))
+                {
+                    alert "Resolution Notes are required when resolving or closing a work order.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

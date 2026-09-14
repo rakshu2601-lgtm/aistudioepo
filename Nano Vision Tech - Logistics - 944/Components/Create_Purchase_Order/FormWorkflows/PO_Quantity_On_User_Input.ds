@@ -1,0 +1,18 @@
+PO_Quantity_On_User_Input as "Calculate Purchase Order Line Totals"
+{
+    type = form
+    form = Create_Purchase_Order
+    record event = on add or edit
+
+    on user input of Purchase_Order_Products.Quantity
+    {
+        actions
+        {
+            custom deluge script
+            (
+                row.Supplier_Total_Price = ifnull(row.Quantity,0) * ifnull(row.Supplier_Unit_Price,0);
+                row.Customer_Total_Price = ifnull(row.Quantity,0) * ifnull(row.Customer_Unit_Price,0);
+            )
+        }
+    }
+}

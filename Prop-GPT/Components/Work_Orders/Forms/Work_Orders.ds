@@ -1,0 +1,199 @@
+form Work_Orders
+{
+    title
+    {
+        displayname = "Work Orders"
+        on add = "Add Work Order"
+        on edit = "Edit Work Order"
+    }
+    Work_Order_Details
+    (
+        type = section
+        displayname = "Work Order Details"
+        row = 1
+        column = 0
+    )
+    Work_Order_ID
+    (
+        type = autonumber
+        displayname = "Work Order ID"
+        start index = 10001
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Source
+    (
+        type = picklist
+        displayname = "Source"
+        values = {"Internal","External API"}
+        initial value = "Internal"
+        row = 1
+        column = 1
+        width = medium
+    )
+    unique External_Request_ID
+    (
+        type = text
+        displayname = "External Request ID"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Tenant
+    (
+        type = picklist
+        displayname = "Tenant"
+        values = Tenants.ID
+        displayformat = [Tenant_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Property
+    (
+        type = picklist
+        displayname = "Property"
+        values = Properties.ID
+        displayformat = [Property_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Unit
+    (
+        type = picklist
+        displayname = "Unit"
+        values = Units.ID
+        displayformat = [Unit_Number]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Request_Title
+    (
+        type = text
+        displayname = "Request Title"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Request_Description
+    (
+        type = textarea
+        displayname = "Request Description"
+        height = 120px
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Category
+    (
+        type = picklist
+        displayname = "Category"
+        values = {"Plumbing","Electrical","HVAC","Appliance","Structural","Security","Cleaning","Other"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Priority
+    (
+        type = picklist
+        displayname = "Priority"
+        values = {"Low","Medium","High","Emergency"}
+        initial value = "Medium"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"New","Assigned","In Progress","On Hold","Resolved","Closed","Cancelled"}
+        initial value = "New"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Assigned_To_Email
+    (
+        type = email
+        displayname = "Assigned To Email"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Raised_On
+    (
+        type = datetime
+        displayname = "Raised On"
+        initial value = "${zoho.currenttime}"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Preferred_Access_Time
+    (
+        type = textarea
+        displayname = "Preferred Access Time"
+        height = 80px
+        row = 1
+        column = 1
+        width = medium
+    )
+    Resolution_Notes
+    (
+        type = textarea
+        displayname = "Resolution Notes"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Status_Notes
+    (
+        type = textarea
+        displayname = "Status Notes"
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Work Order"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Work Order"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+    blueprint components
+    {
+        stages = {"New","Assigned","In Progress","On Hold","Resolved","Closed","Cancelled"}
+    }
+}

@@ -1,0 +1,19 @@
+<page linkname = "Logistics_Booking_Detail" parameters = "int Logistics_Booking_ID" displayname = "Logistics Booking Detail"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Logistics_Booking_Detail_Snippet' elementName='Logistics_Booking_Detail'>
+          <![CDATA[htmlpage Logistics_Booking_Detail_Snippet()
+            content
+            <%{%>
+              <file name:Logistics_Booking_Detail.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

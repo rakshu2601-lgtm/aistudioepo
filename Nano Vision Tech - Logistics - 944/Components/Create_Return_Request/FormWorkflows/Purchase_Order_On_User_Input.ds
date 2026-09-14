@@ -1,0 +1,44 @@
+Return_Request_Purchase_Order_On_User_Input as "Load Delivered Purchase Order"
+{
+    type = form
+    form = Create_Return_Request
+    record event = on add or edit
+
+    on user input of Purchase_Order
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Return_Request_Products.clear();
+                if(input.Purchase_Order != null)
+                {
+                    po_record = Create_Purchase_Order[ID == input.Purchase_Order];
+                    input.Customer = po_record.Customer;
+                    input.Sales_Order = po_record.Sales_Order;
+                    return_rows = Collection();
+                    for each po_item in Purchase_Order_Product[Parent_Purchase_Order == input.Purchase_Order]
+                    {
+                        return_row = Create_Return_Request.Return_Request_Products();
+                        return_row.Purchase_Order_Product = po_item.ID;
+                        return_row.Product = po_item.Product;
+                        return_row.Product_ID = po_item.Product_ID;
+                        return_row.Product_Name = po_item.Product_Name;
+                        return_row.Product_Category = po_item.Product_Category;
+                        return_row.Product_Type = po_item.Product_Type;
+                        return_row.Product_Description = po_item.Product_Description;
+                        return_row.Manufacturer_Part_Number = po_item.Manufacturer_Part_Number;
+                        return_row.Internal_Part_Number = po_item.Internal_Part_Number;
+                        return_row.Brand_Make = po_item.Brand_Make;
+                        return_row.Model = po_item.Model;
+                        return_row.Configuration = po_item.Approved_Configuration;
+                        return_row.Delivered_Quantity = po_item.Quantity;
+                        return_row.Unit_of_Measure = po_item.Unit_of_Measure;
+                        return_rows.insert(return_row);
+                    }
+                    input.Return_Request_Products.insert(return_rows);
+                }
+            )
+        }
+    }
+}

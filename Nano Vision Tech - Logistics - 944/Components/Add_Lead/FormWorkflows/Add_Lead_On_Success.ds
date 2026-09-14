@@ -1,0 +1,26 @@
+Add_Lead_On_Success as "Create Lead History"
+{
+    type = form
+    form = Add_Lead
+    record event = on add
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                insert into Add_History
+                [
+                    Action_Type = "Record Created"
+                    Status = input.Status
+                    New_Status = input.Status
+                    Comments = "Lead created"
+                    Lead_Lookup = input.ID
+                    Updated_By_Email = zoho.loginuserid
+                    Updated_Date_Time = zoho.currenttime
+                ];
+            )
+        }
+    }
+}

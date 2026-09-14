@@ -1,0 +1,19 @@
+default list API_Configurations
+{
+    displayName = "API Configurations"
+    show all rows from API_Configuration
+    (
+        Configuration_Name
+        Active
+        Last_Rotated_On
+        Modified_Time
+    )
+    filters
+    (
+        Active
+    )
+    sort by
+    (
+        Modified_Time descending
+    )
+}

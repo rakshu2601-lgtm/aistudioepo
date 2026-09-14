@@ -1,0 +1,27 @@
+default list All_Sales_Orders
+{
+    displayName = "All Sales Orders"
+    show all rows from Create_Sales_Order
+    (
+        Sales_Order_ID as "Sales Order ID"
+        Customer
+        Lead
+        Requirement_Source as "Requirement Source"
+        Sales_Order_Date as "Sales Order Date"
+        Requested_Delivery_Date as "Requested Delivery Date"
+        Recommended_Supplier as "Recommended Supplier"
+        Selected_Supplier_Quote as "Selected Supplier Quote"
+        Status
+    )
+    filters
+    (
+        Customer
+        Requirement_Source
+        Sales_Order_Date
+        Status
+    )
+    sort by
+    (
+        Sales_Order_Date descending
+    )
+}

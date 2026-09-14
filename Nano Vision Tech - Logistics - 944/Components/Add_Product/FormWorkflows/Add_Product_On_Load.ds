@@ -1,0 +1,19 @@
+Add_Product_On_Load as "Add Product On Load"
+{
+    type = form
+    form = Add_Product
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                hide Hidden;
+                disable Created_Date_Time;
+                disable Last_Updated_Date_Time;
+            )
+        }
+    }
+}

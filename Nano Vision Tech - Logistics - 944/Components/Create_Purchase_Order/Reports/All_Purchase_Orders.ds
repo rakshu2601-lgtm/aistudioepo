@@ -1,0 +1,38 @@
+default list All_Purchase_Orders
+{
+    displayName = "All Purchase Orders"
+    show all rows from Create_Purchase_Order
+    (
+        Purchase_Order_ID as "Purchase Order ID"
+        Supplier
+        Sales_Order as "Sales Order"
+        Selected_Supplier_Quote as "Selected Supplier Quote"
+        Customer
+        PO_Date as "PO Date"
+        Expected_Delivery_Date as "Expected Delivery Date"
+        Currency
+        Supplier_Price as "Supplier Price"
+        Total_Customer_Price as "Total Customer Price"
+        Shared_With_Customer as "Shared with Customer"
+        Status
+        custom action "Approve Purchase Order"
+        (
+            workflow = Approve_Purchase_Order
+            show action for each record = true
+            column header = "Approve Purchase Order"
+            condition = (Status == "New")
+        )
+    )
+    filters
+    (
+        Supplier
+        Customer
+        PO_Date
+        Currency
+        Status
+    )
+    sort by
+    (
+        PO_Date descending
+    )
+}

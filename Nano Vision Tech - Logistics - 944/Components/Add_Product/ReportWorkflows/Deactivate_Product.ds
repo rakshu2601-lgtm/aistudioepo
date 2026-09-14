@@ -1,0 +1,18 @@
+Deactivate_Product as "Deactivate Product"
+{
+    type = functions
+    form = Add_Product
+    execution type = for each record
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                input.Active = false;
+                input.Last_Updated_Date_Time = zoho.currenttime;
+            )
+        }
+    }
+}

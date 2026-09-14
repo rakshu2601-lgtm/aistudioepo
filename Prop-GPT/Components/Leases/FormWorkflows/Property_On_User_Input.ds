@@ -1,0 +1,35 @@
+Lease_Property_On_User_Input as "Lease Property Selection"
+{
+    type = form
+    form = Leases
+    record event = on add or edit
+    on user input of Property
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Unit = null;
+                if(input.Property != null)
+                {
+                    property_record = Properties[ID == input.Property];
+                    if(property_record.Property_Type == "Multi-Unit Property")
+                    {
+                        show Unit;
+                        enable Unit;
+                    }
+                    else
+                    {
+                        hide Unit;
+                        disable Unit;
+                    }
+                }
+                else
+                {
+                    hide Unit;
+                    disable Unit;
+                }
+            )
+        }
+    }
+}

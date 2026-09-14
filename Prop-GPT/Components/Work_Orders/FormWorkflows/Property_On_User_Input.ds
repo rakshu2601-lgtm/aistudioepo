@@ -1,0 +1,19 @@
+Work_Order_Property_On_User_Input as "Validate Work Order Property"
+{
+    type = form
+    form = Work_Orders
+    record event = on add or edit
+    on user input of Property
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Property == null)
+                {
+                    input.Unit = null;
+                }
+            )
+        }
+    }
+}

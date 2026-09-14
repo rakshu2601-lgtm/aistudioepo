@@ -1,0 +1,33 @@
+kanban Work_Order_Board
+{
+    displayName = "Work Order Board"
+    show all rows from Work_Orders
+    (
+        Work_Order_ID
+        Request_Title
+        Tenant
+        Property
+        Unit
+        Priority
+        Status
+        Assigned_To_Email
+        Raised_On
+    )
+    filters
+    (
+        Priority
+        Property
+        Assigned_To_Email
+    )
+    sort by
+    (
+        Raised_On descending
+    )
+    options
+    (
+        display field = Status
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}
