@@ -1,0 +1,115 @@
+form Estimate_Line
+{
+    Details
+    (
+        type = section
+        displayname = "Details"
+        row = 1
+        column = 0
+    )
+    must have Estimate
+    (
+        type = picklist
+        values = Estimate.ID
+        displayformat = [Estimate_ID]
+        searchable = true
+        row = 1
+    )
+    must have Part
+    (
+        type = picklist
+        values = Part.ID
+        displayformat = [Part_Number]
+        searchable = true
+        row = 1
+    )
+    must have Quantity_Per_Vehicle
+    (
+        type = decimal
+        displayname = "Quantity Per Vehicle"
+        decimalplace = 2
+        row = 1
+    )
+    must have Unit_Price
+    (
+        type = decimal
+        displayname = "Unit Price"
+        decimalplace = 2
+        row = 1
+    )
+    must have Labor_Hours_Per_Vehicle
+    (
+        type = decimal
+        displayname = "Labor Hours Per Vehicle"
+        decimalplace = 2
+        initial value = 0
+        row = 1
+    )
+    Line_Parts_Total
+    (
+        type = decimal
+        displayname = "Line Parts Total"
+        decimalplace = 2
+        initial value = 0
+        row = 1
+    )
+    Line_Labor_Total
+    (
+        type = decimal
+        displayname = "Line Labor Total"
+        decimalplace = 2
+        initial value = 0
+        row = 1
+    )
+    Line_Total
+    (
+        type = decimal
+        displayname = "Line Total"
+        decimalplace = 2
+        initial value = 0
+        row = 1
+    )
+    must have Currency
+    (
+        type = picklist
+        values = Currency.ID
+        displayformat = [Currency_Code]
+        searchable = true
+        row = 1
+    )
+    Active
+    (
+        type = checkbox
+        initial value = true
+        row = 1
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

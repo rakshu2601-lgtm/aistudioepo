@@ -1,0 +1,20 @@
+"Internal_Coordinator"
+{
+    name        = "Internal_Coordinator"
+    type        = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+    description = "Internal operations profile with writable operational modules, append-only audit access, and read-only masters."
+    ModulePermissions
+    {
+        Currency { enabled = Viewall,Export,Tab,View,Search allFieldsVisible = true ReportPermissions { All_Currencies={"View"} } }
+        FMC_Client { enabled = Viewall,Export,Tab,View,Search allFieldsVisible = true ReportPermissions { All_FMC_Clients={"View"} Active_FMC_Clients={"View"} } }
+        Capability { enabled = Viewall,Export,Tab,View,Search allFieldsVisible = true ReportPermissions { All_Capabilities={"View"} } }
+        MTter { enabled = Viewall,Export,Tab,View,Search allFieldsVisible = true ReportPermissions { All_MTters={"View"} MTter_Locations={"View"} Insurance_Expiring={"View"} } }
+        Part { enabled = Viewall,Export,Tab,View,Search allFieldsVisible = true ReportPermissions { All_Parts={"View"} Active_Parts={"View"} } }
+        Service_Request { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Service_Requests={"View"} Service_Pipeline={"View"} Matching_Queue={"View"} } }
+        Estimate { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Estimates={"View"} Pending_Estimates={"View"} Declined_Estimate_Exceptions={"View"} } }
+        Estimate_Line { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Estimate_Lines={"View"} } }
+        Task { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Tasks={"View"} Task_Board={"View"} Open_Reassignment_Tasks={"View"} } }
+        Activity { enabled = Create,Viewall,Export,Tab,View,Search allFieldsVisible = true ReportPermissions { Activity_Log={"View"} Recent_Activity={"View"} } }
+    }
+}

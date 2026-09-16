@@ -1,0 +1,96 @@
+<%
+weekStart = zoho.currentdate.subDay(zoho.currentdate.getDayOfWeek() - 1);
+monthStart = ("01-" + zoho.currentdate.toString("MM-yyyy")).toDate("dd-MM-yyyy");
+activeServices = Service_Request[Service_ID != null && Status != "Draft" && Status != "Closed"].count();
+createdThisWeek = Service_Request[Received_At != null && Received_At >= weekStart].count();
+matchingCount = Service_Request[Status == "Matching"].count();
+pendingApprovals = Estimate[Status == "Pending"].count();
+oldestPendingAge = 0;
+oldestPending = Estimate[Status == "Pending" && Sent_At != null] sort by Sent_At asc range from 0 to 0;
+for each oldestEstimate in oldestPending
+{
+    oldestPendingAge = oldestEstimate.Sent_At.daysBetween(zoho.currenttime);
+}
+approvedValue = Estimate[Status == "Approved" && Responded_At >= monthStart].sum(Estimate_Total);
+if(approvedValue == null)
+{
+    approvedValue = 0;
+}
+intakeCount = Service_Request[Status == "Intake"].count();
+estimatingCount = Service_Request[Status == "Estimating"].count();
+readyCount = Service_Request[Status == "Ready for quote"].count();
+pipelineTotal = intakeCount + matchingCount + estimatingCount + readyCount;
+if(pipelineTotal == 0)
+{
+    pipelineTotal = 1;
+}
+intakePct = (intakeCount * 100.0 / pipelineTotal).round(0);
+matchingPct = (matchingCount * 100.0 / pipelineTotal).round(0);
+estimatingPct = (estimatingCount * 100.0 / pipelineTotal).round(0);
+readyPct = (readyCount * 100.0 / pipelineTotal).round(0);
+declinedTasks = Task[Task_Type == "Reassignment" && Status != "Completed" && Status != "Cancelled" && Related_Estimate.Status == "Declined"] sort by Due_Date asc range from 0 to 4;
+agedPending = Estimate[Status == "Pending" && Sent_At != null && Sent_At < zoho.currenttime.subDay(2)] sort by Sent_At asc range from 0 to 4;
+agedMatching = Service_Request[Status == "Matching" && Matching_Started_At != null && Matching_Started_At < zoho.currenttime.subDay(3)] sort by Matching_Started_At asc range from 0 to 4;
+insuranceSoon = MTter[Active == true && Insurance_Expiry >= zoho.currentdate && Insurance_Expiry <= zoho.currentdate.addDay(30)] sort by Insurance_Expiry asc range from 0 to 4;
+geoExceptions = Service_Request[(Geocoding_Status == "Failed" || Geocoding_Status == "Pending Integration")] sort by Received_At asc range from 0 to 4;
+recentEvents = Activity[ID != 0] sort by Event_Timestamp desc range from 0 to 19;
+%>
+<style>
+/* ZCS global utility subset used by this page; sourced from zcs-global. */
+:root{--zcs-theme-brand-color:var(--zcs_brand_color);--zcs-page-bg-color:#F3F3F4;--zcs-white-color:#fff;--zcs-primary-text-color:var(--zcs_primary_text_color);--zcs-teritiary-text-color:var(--zcs_tertiary_text_color);--zcs-border-color:var(--zcs_tertiary_border_color);font-size:16px;line-height:1.5}
+.zcs-flex{display:flex}.zcs-inline-flex{display:inline-flex}.zcs-direction-column{flex-direction:column}.zcs-align-items-center{align-items:center}.zcs-justify-space-between{justify-content:space-between}.zcs-justify-center{justify-content:center}.zcs-row{display:flex;flex-wrap:wrap}.zcs-w-full{width:100%}.zcs-wh-full{width:100%;height:100%}.zcs-box-border{box-sizing:border-box}.zcs-relative{position:relative}.zcs-absolute{position:absolute}.zcs-sticky{position:sticky}.zcs-p-0{padding:0}.zcs-p-16{padding:1rem}.zcs-p-24{padding:1.5rem}.zcs-px-10{padding-left:.625rem;padding-right:.625rem}.zcs-px-12{padding-left:.75rem;padding-right:.75rem}.zcs-px-16{padding-left:1rem;padding-right:1rem}.zcs-py-2{padding-top:.125rem;padding-bottom:.125rem}.zcs-py-8{padding-top:.5rem;padding-bottom:.5rem}.zcs-m-0{margin:0}.zcs-gap-8{gap:.5rem}.zcs-gap-10{gap:.625rem}.zcs-gap-12{gap:.75rem}.zcs-gap-16{gap:1rem}.zcs-gap-20{gap:1.25rem}.zcs-gap-24{gap:1.5rem}.zcs-rounded-sm{border-radius:.25rem}.zcs-rounded-md{border-radius:.375rem}.zcs-rounded-lg{border-radius:.5rem}.zcs-rounded-xl{border-radius:.75rem}.zcs-font-12{font-size:.75rem}.zcs-font-13{font-size:.8125rem}.zcs-font-14{font-size:.875rem}.zcs-font-15{font-size:.9375rem}.zcs-font-18{font-size:1.125rem}.zcs-font-20{font-size:1.25rem}.zcs-font-24{font-size:1.5rem}.zcs-font-normal{font-weight:400}.zcs-font-medium{font-weight:500}.zcs-font-semibold{font-weight:600}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-tertiary{color:var(--zcs-teritiary-text-color)}.zcs-text-left{text-align:left}.zcs-text-right{text-align:right}.zcs-card{background:var(--zcs-white-color);border:1px solid var(--zcs_tertiary_border_color);border-radius:12px}.zcs-page-container{background:var(--zcs-page-bg-color)}a{text-decoration:none}
+.fleet-shell{font-family:Arial,sans-serif;min-height:100%;padding:24px 30px}.fleet-header{background:linear-gradient(120deg,var(--zcs_brand_dark_color),var(--zcs_brand_color));color:var(--zcs_brand_foreground_color);padding:24px;border-radius:14px}.fleet-header h1{font-size:24px;margin:0 0 4px}.fleet-header p{margin:0;opacity:.86}.fleet-kpis{display:grid;grid-template-columns:repeat(5,minmax(170px,1fr));gap:16px}.fleet-kpi{padding:18px;min-height:112px}.fleet-kpi-top{display:flex;align-items:center;gap:10px}.fleet-icon{width:40px;height:40px;border-radius:8px;background:var(--zcs_component_hover_color);color:var(--zcs_brand_color);display:flex;align-items:center;justify-content:center;font-size:22px}.fleet-value{font-size:26px;font-weight:600;color:var(--zcs_primary_text_color)}.fleet-label{font-size:13px;color:var(--zcs_tertiary_text_color);margin-top:9px}.fleet-sub{font-size:12px;color:#b8770d;margin-top:3px}.fleet-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:20px}.fleet-section{padding:20px}.fleet-section h2{font-size:18px;margin:0}.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.pipeline-list{list-style:none}.zcs-progress-bar{height:10px;background:var(--zcs_component_hover_color);border-radius:4px}.zcs-progress-bar-indicator{height:inherit;border-radius:inherit;background:var(--zcs_brand_color)}.exception-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.exception-grid .wide{grid-column:1/-1}.zcs-table-wrapper{border:1px solid var(--zcs_tertiary_border_color);background:var(--zcs-white-color);overflow:auto;border-radius:6px}.zcs-table-wrapper table{border-collapse:collapse;width:100%}.zcs-table-wrapper th{background:#F9FAFE;white-space:nowrap}.zcs-table-wrapper td{border-top:1px solid var(--zcs_tertiary_border_color)}.zcs-table-wrapper tr:hover td{background:#F9FAFE}.zcs-badge{width:auto;border:1px solid}.zcs-badge-green{background:#E4FCF3;border-color:#179E6C;color:#179E6C}.zcs-badge-red{background:#FDE3E6;border-color:#FE455D;color:#FE455D}.zcs-badge-yellow{background:#FCF4E6;border-color:#FAAE13;color:#b8770d}.zcs-badge-blue{background:#E8EFFF;border-color:#2A6FFC;color:#2A6FFC}.zcs-badge-grey{background:#e8e8e8;border-color:#666;color:#444}.zcs-quick-action-item{list-style:none;border-radius:8px}.zcs-quick-action-item:hover{border-color:var(--zcs_brand_color)}.zcs-quick-action-link{color:var(--zcs_primary_text_color)}.zcs-quick-action-item:hover .zcs-quick-action-link{color:var(--zcs_brand_color)}.empty{padding:14px;color:var(--zcs_tertiary_text_color);font-size:13px}.note{font-size:12px;color:var(--zcs_tertiary_text_color)}
+@media(max-width:1200px){.fleet-kpis{grid-template-columns:repeat(3,1fr)}}@media(max-width:850px){.fleet-kpis,.fleet-grid,.exception-grid{grid-template-columns:1fr}.exception-grid .wide{grid-column:auto}.fleet-shell{padding:16px}}
+</style>
+<div class="zcs-page-container fleet-shell zcs-box-border">
+  <div class="zcs-flex zcs-direction-column zcs-gap-20">
+    <header class="fleet-header">
+      <h1>Fleet operations command center</h1>
+      <p>Workload, lifecycle progress, aged approvals and operational exceptions as of <%=zoho.currenttime.toString("dd MMM yyyy HH:mm")%>.</p>
+    </header>
+
+    <section class="fleet-kpis">
+      <a href="#Report:All_Service_Requests" class="zcs-card fleet-kpi"><div class="fleet-kpi-top"><span class="fleet-icon"><i class="zc-li-outline transportation-car-simple"></i></span><span class="fleet-value"><%=activeServices%></span></div><div class="fleet-label">Active Service IDs</div></a>
+      <a href="#Report:All_Service_Requests" class="zcs-card fleet-kpi"><div class="fleet-kpi-top"><span class="fleet-icon"><i class="zc-li-outline ui-1-calendar-60"></i></span><span class="fleet-value"><%=createdThisWeek%></span></div><div class="fleet-label">Requests created this week</div></a>
+      <a href="#Report:Matching_Queue" class="zcs-card fleet-kpi"><div class="fleet-kpi-top"><span class="fleet-icon"><i class="zc-li-outline arrows-2-split"></i></span><span class="fleet-value"><%=matchingCount%></span></div><div class="fleet-label">Requests pending Matching</div></a>
+      <a href="#Report:Pending_Estimates" class="zcs-card fleet-kpi"><div class="fleet-kpi-top"><span class="fleet-icon"><i class="zc-li-outline ui-2-time"></i></span><span class="fleet-value"><%=pendingApprovals%></span></div><div class="fleet-label">Pending MTter approvals</div><div class="fleet-sub">Oldest: <%=oldestPendingAge%> calendar days</div></a>
+      <a href="#Report:All_Estimates" class="zcs-card fleet-kpi"><div class="fleet-kpi-top"><span class="fleet-icon"><i class="zc-li-outline business-money-coins"></i></span><span class="fleet-value"><%=approvedValue.round(2)%></span></div><div class="fleet-label">Approved estimate value this month</div><div class="fleet-sub">Recorded currencies; not FX-normalized</div></a>
+    </section>
+
+    <section class="fleet-grid">
+      <div class="zcs-card fleet-section">
+        <div class="section-head"><h2>Lifecycle pipeline</h2><span class="note">Current Phase 1 stages</span></div>
+        <ul class="pipeline-list zcs-flex zcs-direction-column zcs-gap-16 zcs-p-0 zcs-m-0">
+          <li><p class="zcs-flex zcs-justify-space-between zcs-m-0 zcs-font-14"><span>Intake</span><strong><%=intakeCount%></strong></p><div class="zcs-progress-bar"><div class="zcs-progress-bar-indicator" style="width:<%=intakePct%>%;"></div></div></li>
+          <li><p class="zcs-flex zcs-justify-space-between zcs-m-0 zcs-font-14"><span>Matching</span><strong><%=matchingCount%></strong></p><div class="zcs-progress-bar"><div class="zcs-progress-bar-indicator" style="width:<%=matchingPct%>%;"></div></div></li>
+          <li><p class="zcs-flex zcs-justify-space-between zcs-m-0 zcs-font-14"><span>Estimating</span><strong><%=estimatingCount%></strong></p><div class="zcs-progress-bar"><div class="zcs-progress-bar-indicator" style="width:<%=estimatingPct%>%;"></div></div></li>
+          <li><p class="zcs-flex zcs-justify-space-between zcs-m-0 zcs-font-14"><span>Ready for quote</span><strong><%=readyCount%></strong></p><div class="zcs-progress-bar"><div class="zcs-progress-bar-indicator" style="width:<%=readyPct%>%;"></div></div></li>
+        </ul>
+      </div>
+      <aside class="zcs-quick-actions-wrapper zcs-card zcs-flex zcs-direction-column zcs-gap-16 zcs-p-16 zcs-box-border">
+        <h2 class="zcs-font-18 zcs-font-semibold zcs-m-0">Shortcuts</h2>
+        <ul class="zcs-flex zcs-direction-column zcs-gap-12 zcs-p-0 zcs-m-0">
+          <li class="zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8"><a class="zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8" href="#Report:Matching_Queue"><i class="zc-li-outline arrows-2-split"></i><span>Matching Queue</span></a></li>
+          <li class="zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8"><a class="zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8" href="#Report:Pending_Estimates"><i class="zc-li-outline ui-2-time"></i><span>Pending Estimates</span></a></li>
+          <li class="zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8"><a class="zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8" href="#Report:All_Tasks"><i class="zc-li-outline files-2-task"></i><span>Tasks</span></a></li>
+          <li class="zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8"><a class="zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8" href="#Report:All_Service_Requests"><i class="zc-li-outline files-2-doc"></i><span>Service Request master</span></a></li>
+          <li class="zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8"><a class="zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8" href="#Report:All_MTters"><i class="zc-li-outline business-badge"></i><span>MTter master</span></a></li>
+          <li class="zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8"><a class="zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8" href="#Report:All_Parts"><i class="zc-li-outline design-tool-hand"></i><span>Parts master</span></a></li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="exception-grid">
+      <div class="zcs-card fleet-section"><div class="section-head"><h2>Declined estimates needing reassignment</h2><a href="#Report:Open_Reassignment_Tasks" class="note">Open report</a></div><div class="zcs-table-wrapper"><table><thead><tr><th class="zcs-px-16 zcs-py-8 zcs-text-left">Estimate</th><th class="zcs-px-16 zcs-py-8 zcs-text-left">Service ID</th><th class="zcs-px-16 zcs-py-8 zcs-text-left">Due</th></tr></thead><tbody><% for each t in declinedTasks { %><tr><td class="zcs-px-16 zcs-py-8"><%=ifnull(t.Related_Estimate.Estimate_ID,"Not linked")%></td><td class="zcs-px-16 zcs-py-8"><%=ifnull(t.Service_Request.Service_ID,"Not assigned")%></td><td class="zcs-px-16 zcs-py-8"><%=ifnull(t.Due_Date.toString("dd MMM yyyy"),"Not set")%></td></tr><% } %></tbody></table><% if(declinedTasks.count() == 0) { %><div class="empty">No open reassignment tasks tied to declined estimates.</div><% } %></div></div>
+      <div class="zcs-card fleet-section"><div class="section-head"><h2>Pending estimates over 2 days</h2><a href="#Report:Pending_Estimates" class="note">Calendar-day approximation</a></div><div class="zcs-table-wrapper"><table><thead><tr><th class="zcs-px-16 zcs-py-8 zcs-text-left">Estimate</th><th class="zcs-px-16 zcs-py-8 zcs-text-left">MTter</th><th class="zcs-px-16 zcs-py-8 zcs-text-right">Age</th></tr></thead><tbody><% for each e in agedPending { age = e.Sent_At.daysBetween(zoho.currenttime); %><tr><td class="zcs-px-16 zcs-py-8"><%=ifnull(e.Estimate_ID,"Pending ID")%></td><td class="zcs-px-16 zcs-py-8"><%=ifnull(e.MTter.MTter_Name,"Not assigned")%></td><td class="zcs-px-16 zcs-py-8 zcs-text-right"><%=age%> days</td></tr><% } %></tbody></table><% if(agedPending.count() == 0) { %><div class="empty">No pending estimates exceed the 2 calendar-day approximation.</div><% } %></div></div>
+      <div class="zcs-card fleet-section"><div class="section-head"><h2>Matching over 3 days</h2><a href="#Report:Matching_Queue" class="note">Calendar days</a></div><div class="zcs-table-wrapper"><table><thead><tr><th class="zcs-px-16 zcs-py-8 zcs-text-left">Service ID</th><th class="zcs-px-16 zcs-py-8 zcs-text-left">Program</th><th class="zcs-px-16 zcs-py-8 zcs-text-right">Age</th></tr></thead><tbody><% for each r in agedMatching { matchAge = r.Matching_Started_At.daysBetween(zoho.currenttime); %><tr><td class="zcs-px-16 zcs-py-8"><%=ifnull(r.Service_ID,"Pending ID")%></td><td class="zcs-px-16 zcs-py-8"><%=ifnull(r.Program_Name,"Not set")%></td><td class="zcs-px-16 zcs-py-8 zcs-text-right"><%=matchAge%> days</td></tr><% } %></tbody></table><% if(agedMatching.count() == 0) { %><div class="empty">No Matching requests exceed 3 calendar days.</div><% } %></div></div>
+      <div class="zcs-card fleet-section"><div class="section-head"><h2>Insurance expiring within 30 days</h2><a href="#Report:Insurance_Expiring" class="note">Active MTters</a></div><div class="zcs-table-wrapper"><table><thead><tr><th class="zcs-px-16 zcs-py-8 zcs-text-left">MTter</th><th class="zcs-px-16 zcs-py-8 zcs-text-left">Type</th><th class="zcs-px-16 zcs-py-8 zcs-text-left">Expiry</th></tr></thead><tbody><% for each m in insuranceSoon { %><tr><td class="zcs-px-16 zcs-py-8"><%=ifnull(m.MTter_Name,"Not set")%></td><td class="zcs-px-16 zcs-py-8"><%=ifnull(m.MTter_Type,"Not set")%></td><td class="zcs-px-16 zcs-py-8"><%=m.Insurance_Expiry.toString("dd MMM yyyy")%></td></tr><% } %></tbody></table><% if(insuranceSoon.count() == 0) { %><div class="empty">No active MTter insurance expires in the next 30 days.</div><% } %></div></div>
+      <div class="zcs-card fleet-section wide"><div class="section-head"><h2>Geocoding and integration exceptions</h2><a href="#Report:All_Service_Requests" class="note">Failed or pending integration</a></div><div class="zcs-table-wrapper"><table><thead><tr><th class="zcs-px-16 zcs-py-8 zcs-text-left">Service ID</th><th class="zcs-px-16 zcs-py-8 zcs-text-left">Program</th><th class="zcs-px-16 zcs-py-8 zcs-text-left">Status</th><th class="zcs-px-16 zcs-py-8 zcs-text-left">Warning</th></tr></thead><tbody><% for each g in geoExceptions { geoClass = "zcs-badge-yellow"; if(g.Geocoding_Status == "Failed") { geoClass = "zcs-badge-red"; } %><tr><td class="zcs-px-16 zcs-py-8"><%=ifnull(g.Service_ID,"Pending ID")%></td><td class="zcs-px-16 zcs-py-8"><%=ifnull(g.Program_Name,"Not set")%></td><td class="zcs-px-16 zcs-py-8"><span class="zcs-badge <%=geoClass%> zcs-inline-flex zcs-rounded-sm zcs-px-10 zcs-py-2"><%=g.Geocoding_Status%></span></td><td class="zcs-px-16 zcs-py-8"><%=ifnull(g.Geocoding_Warning,"No warning supplied")%></td></tr><% } %></tbody></table><% if(geoExceptions.count() == 0) { %><div class="empty">No geocoding failures or pending-integration requests.</div><% } %></div></div>
+    </section>
+
+    <section class="zcs-card fleet-section">
+      <div class="section-head"><h2>Latest activity</h2><a href="#Report:Activity_Log" class="note">Latest 20 events</a></div>
+      <div class="zcs-table-wrapper"><table><thead><tr><th class="zcs-px-16 zcs-py-8 zcs-text-left">Time</th><th class="zcs-px-16 zcs-py-8 zcs-text-left">Service ID</th><th class="zcs-px-16 zcs-py-8 zcs-text-left">Event</th><th class="zcs-px-16 zcs-py-8 zcs-text-left">User</th><th class="zcs-px-16 zcs-py-8 zcs-text-left">Description</th></tr></thead><tbody><% for each a in recentEvents { badgeClass = "zcs-badge-blue"; if(a.Event_Type.contains("Declined")) { badgeClass = "zcs-badge-red"; } else if(a.Event_Type.contains("Approved") || a.Event_Type.contains("Completed")) { badgeClass = "zcs-badge-green"; } else if(a.Event_Type.contains("Sent") || a.Event_Type.contains("Task")) { badgeClass = "zcs-badge-yellow"; } %><tr><td class="zcs-px-16 zcs-py-8"><%=a.Event_Timestamp.toString("dd MMM HH:mm")%></td><td class="zcs-px-16 zcs-py-8"><%=ifnull(a.Service_Request.Service_ID,"Not linked")%></td><td class="zcs-px-16 zcs-py-8"><span class="zcs-badge <%=badgeClass%> zcs-inline-flex zcs-rounded-sm zcs-px-10 zcs-py-2"><%=a.Event_Type%></span></td><td class="zcs-px-16 zcs-py-8"><%=ifnull(a.User_Email,"System")%></td><td class="zcs-px-16 zcs-py-8"><%=ifnull(a.Description,"No description")%></td></tr><% } %></tbody></table><% if(recentEvents.count() == 0) { %><div class="empty">No activity events are available.</div><% } %></div>
+    </section>
+  </div>
+</div>

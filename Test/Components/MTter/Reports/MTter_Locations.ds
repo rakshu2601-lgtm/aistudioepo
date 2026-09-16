@@ -1,0 +1,19 @@
+map MTter_Locations
+{
+    displayName = "MTter Locations"
+    show all rows from MTter [Active == true]
+    (
+        MTter_ID
+        MTter_Name
+        MTter_Type
+        Location_Address
+        Service_Radius
+        Radius_Unit
+        Capabilities
+        Active
+    )
+    options
+    (
+        display field = Location_Address
+    )
+}

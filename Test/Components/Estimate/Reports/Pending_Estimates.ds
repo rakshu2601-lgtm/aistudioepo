@@ -1,0 +1,28 @@
+list Pending_Estimates
+{
+    displayName = "Pending Estimates"
+    show all rows from Estimate [Status == "Pending"]
+    (
+        Estimate_ID
+        Service_Request
+        MTter
+        Assigned_Portal_Email
+        Vehicles_Assigned
+        Estimate_Total
+        Currency
+        Status
+        Sent_At
+        Reminder_Sent
+        Matching_Warning
+    )
+    filters
+    (
+        MTter
+        Service_Request
+        Reminder_Sent
+    )
+    sort by
+    (
+        Sent_At ascending
+    )
+}

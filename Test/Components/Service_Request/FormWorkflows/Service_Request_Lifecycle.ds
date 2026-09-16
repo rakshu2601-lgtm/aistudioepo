@@ -1,0 +1,154 @@
+Service_Request_Lifecycle as "Service Request Lifecycle"
+{
+    type = blueprint
+    form = Service_Request[Status != "Draft"]
+
+    start
+    {
+        start stage = "Intake"
+    }
+
+    stages
+    {
+        "Intake" { }
+        "Matching" { }
+        "Estimating" { }
+        "Ready for quote" { }
+        "Quote sent" { }
+        "PO received" { }
+        "In progress" { }
+        "Completed" { }
+        "Invoiced" { }
+        "Closed" { }
+    }
+
+    transitions
+    {
+        Begin_Matching as "Begin Matching"
+        {
+            type = normal
+            from stage = "Intake"
+            to stage = "Matching"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Internal_Admin","Internal_Coordinator"}
+                )
+            }
+            after { }
+        }
+        Begin_Estimating as "Begin Estimating"
+        {
+            type = normal
+            from stage = "Matching"
+            to stage = "Estimating"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Internal_Admin","Internal_Coordinator"}
+                )
+            }
+            after { }
+        }
+        Ready_For_Quote as "Ready for Quote"
+        {
+            type = normal
+            from stage = "Estimating"
+            to stage = "Ready for quote"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Internal_Admin","Internal_Coordinator"}
+                )
+            }
+            after { }
+        }
+        Send_Quote as "Send Quote"
+        {
+            type = normal
+            from stage = "Ready for quote"
+            to stage = "Quote sent"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Internal_Admin","Internal_Coordinator"}
+                )
+            }
+            after { }
+        }
+        Receive_PO as "Receive PO"
+        {
+            type = normal
+            from stage = "Quote sent"
+            to stage = "PO received"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Internal_Admin","Internal_Coordinator"}
+                )
+            }
+            after { }
+        }
+        Start_Work as "Start Work"
+        {
+            type = normal
+            from stage = "PO received"
+            to stage = "In progress"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Internal_Admin","Internal_Coordinator"}
+                )
+            }
+            after { }
+        }
+        Complete_Work as "Complete Work"
+        {
+            type = normal
+            from stage = "In progress"
+            to stage = "Completed"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Internal_Admin","Internal_Coordinator"}
+                )
+            }
+            after { }
+        }
+        Mark_Invoiced as "Mark Invoiced"
+        {
+            type = normal
+            from stage = "Completed"
+            to stage = "Invoiced"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Internal_Admin","Internal_Coordinator"}
+                )
+            }
+            after { }
+        }
+        Close_Request as "Close Request"
+        {
+            type = normal
+            from stage = "Invoiced"
+            to stage = "Closed"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Internal_Admin","Internal_Coordinator"}
+                )
+            }
+            after { }
+        }
+    }
+}

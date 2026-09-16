@@ -1,0 +1,36 @@
+Estimate_Protected_Fields_Validate as "Validate Estimate Protected Fields"
+{
+    type = form
+    form = Estimate
+    record event = on edit
+    description = "Prevents MTters from mutating assignment, ownership, ranking, identifier, and calculated total fields."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                portal_profile = thisapp.portal.loginUserProfile();
+                if(portal_profile == "MTter")
+                {
+                    if(input.Assigned_Portal_Email != zoho.loginuser)
+                    {
+                        alert "You may update only your assigned estimate slices.";
+                        cancel submit;
+                    }
+                    if(old.Service_Request != input.Service_Request || old.MTter != input.MTter || old.Capability_Slice != input.Capability_Slice || old.Vehicles_Assigned != input.Vehicles_Assigned || old.Currency != input.Currency || old.Estimate_ID != input.Estimate_ID || old.Assigned_Portal_Email != input.Assigned_Portal_Email || old.Ranking_Override != input.Ranking_Override || old.Override_Reason != input.Override_Reason || old.Parts_Total != input.Parts_Total || old.Labor_Total != input.Labor_Total || old.Estimate_Total != input.Estimate_Total)
+                    {
+                        alert "Protected assignment, ownership, ranking, ID, and total fields cannot be changed by MTters.";
+                        cancel submit;
+                    }
+                    if(old.Status != "Pending")
+                    {
+                        alert "Only pending estimate slices may be edited by MTters.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

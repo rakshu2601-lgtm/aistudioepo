@@ -1,0 +1,29 @@
+list MTter_Assigned_Estimates
+{
+    displayName = "MTter Assigned Estimates"
+    show all rows from Estimate [Assigned_Portal_Email == zoho.loginuser]
+    (
+        Service_Request
+        Estimate_ID
+        MTter
+        Capability_Slice
+        Vehicles_Assigned
+        Currency
+        Labor_Hours
+        Labor_Rate
+        Parts_Total
+        Labor_Total
+        Estimate_Total
+        Status
+        Sent_At
+        Responded_At
+    )
+    filters
+    (
+        Status
+    )
+    sort by
+    (
+        Sent_At descending
+    )
+}

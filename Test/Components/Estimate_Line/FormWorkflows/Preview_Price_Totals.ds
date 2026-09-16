@@ -1,0 +1,28 @@
+Preview_Price_Totals as "Preview Price Totals"
+{
+    type = form
+    form = Estimate_Line
+    record event = on add or edit
+    description = "Recomputes line preview totals when unit price changes."
+
+    on user input of Unit_Price
+    {
+        actions
+        {
+            custom deluge script
+            (
+                vehicles = 0;
+                labor_rate = 0;
+                if(input.Estimate != null)
+                {
+                    parent_estimate = Estimate[ID == input.Estimate];
+                    vehicles = ifNull(parent_estimate.Vehicles_Assigned,0);
+                    labor_rate = ifNull(parent_estimate.Labor_Rate,0);
+                }
+                input.Line_Parts_Total = ifNull(input.Quantity_Per_Vehicle,0) * ifNull(input.Unit_Price,0) * vehicles;
+                input.Line_Labor_Total = ifNull(input.Labor_Hours_Per_Vehicle,0) * labor_rate * vehicles;
+                input.Line_Total = input.Line_Parts_Total + input.Line_Labor_Total;
+            )
+        }
+    }
+}

@@ -1,0 +1,18 @@
+list FMC_My_Requests
+{
+    displayName = "FMC My Requests"
+    show all rows from Service_Request [Created_By_Email == zoho.loginuser]
+    (
+        Service_ID
+        Program_Name
+        Vehicle_Count
+        Vehicle_Type
+        Received_At
+        Target_Completion_Date
+        Status
+    )
+    sort by
+    (
+        Received_At descending
+    )
+}

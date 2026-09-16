@@ -1,0 +1,21 @@
+default list All_Currencies
+{
+    displayName = "All Currencies"
+    show all rows from Currency
+    (
+        Currency_Code
+        Currency_Name
+        Symbol
+        Decimal_Places
+        Active
+    )
+    filters
+    (
+        Active
+        Currency_Code
+    )
+    sort by
+    (
+        Currency_Code ascending
+    )
+}

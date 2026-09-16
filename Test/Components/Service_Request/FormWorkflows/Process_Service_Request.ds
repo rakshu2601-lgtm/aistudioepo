@@ -1,0 +1,93 @@
+Process_Service_Request as "Process Service Request"
+{
+    type = form
+    form = Service_Request
+    record event = on add or edit
+    description = "Keeps drafts unqueued and initializes first-time submitted requests for Phase 1 matching."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                request_record = Service_Request[ID == input.ID];
+                if(input.Submission_Action == "Save as Draft" && (input.Service_ID == null || input.Service_ID == ""))
+                {
+                    request_record.Status = "Draft";
+                }
+                else if(input.Submission_Action == "Submit Request" && (input.Service_ID == null || input.Service_ID == ""))
+                {
+                    id_text = input.ID.toString();
+                    if(id_text.length() == 1)
+                    {
+                        padded_id = "000" + id_text;
+                    }
+                    else if(id_text.length() == 2)
+                    {
+                        padded_id = "00" + id_text;
+                    }
+                    else if(id_text.length() == 3)
+                    {
+                        padded_id = "0" + id_text;
+                    }
+                    else
+                    {
+                        padded_id = id_text;
+                    }
+                    request_record.Service_ID = "SVC-" + zoho.currentdate.getYear() + "-" + padded_id;
+                    request_record.Received_At = zoho.currenttime;
+                    if(request_record.Source == null || request_record.Source == "")
+                    {
+                        request_record.Source = "Internal";
+                    }
+                    if(request_record.Created_By_Email == null || request_record.Created_By_Email == "")
+                    {
+                        request_record.Created_By_Email = zoho.loginuser;
+                    }
+                    request_record.Geocoding_Status = "Pending Integration";
+                    request_record.Geocoding_Warning = "External geocoding connector is not configured.";
+                    request_record.Approved_Estimates_Count = 0;
+                    request_record.Assigned_Vehicle_Count = 0;
+                    request_record.Remaining_Unassigned_Vehicles = input.Vehicle_Count;
+                    request_record.Status = "Intake";
+                    request_record.Status = "Matching";
+                    request_record.Matching_Started_At = zoho.currenttime;
+                    insert into Activity
+                    [
+                        Service_Request = input.ID
+                        Event_Timestamp = zoho.currenttime
+                        User_Email = zoho.loginuser
+                        Event_Type = "Request Submitted"
+                        Description = "Service request submitted and queued for matching."
+                        Internal_Only = true
+                    ];
+                    insert into Activity
+                    [
+                        Service_Request = input.ID
+                        Event_Timestamp = zoho.currenttime
+                        User_Email = zoho.loginuser
+                        Event_Type = "Status Changed"
+                        Description = "Status advanced from Intake to Matching."
+                        Internal_Only = true
+                    ];
+                    admin_emails = thisapp.permissions.adminEmailIds();
+                    sendmail
+                    (
+                        from : zoho.adminuserid
+                        to : request_record.Created_By_Email
+                        subject : "Service request received"
+                        message : "Your fleet-service request " + request_record.Service_ID + " has been received and queued for matching."
+                    );
+                    sendmail
+                    (
+                        from : zoho.adminuserid
+                        to : admin_emails
+                        subject : "New service request in Matching"
+                        message : request_record.Service_ID + " has entered the matching queue."
+                    );
+                }
+            )
+        }
+    }
+}

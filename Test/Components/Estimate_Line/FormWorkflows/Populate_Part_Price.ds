@@ -1,0 +1,30 @@
+Populate_Part_Price as "Populate Part Price"
+{
+    type = form
+    form = Estimate_Line
+    record event = on add or edit
+    description = "Copies the current approved catalog price and currency when a part is selected."
+
+    on user input of Part
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Part != null)
+                {
+                    selected_part = Part[ID == input.Part];
+                    if(selected_part.ID != null && selected_part.Active == true)
+                    {
+                        input.Unit_Price = selected_part.Unit_Price;
+                        input.Currency = selected_part.Currency;
+                    }
+                    else
+                    {
+                        alert "Select an active approved catalog part.";
+                    }
+                }
+            )
+        }
+    }
+}

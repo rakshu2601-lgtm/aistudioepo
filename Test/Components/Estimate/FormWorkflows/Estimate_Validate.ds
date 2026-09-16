@@ -1,0 +1,78 @@
+Estimate_Validate as "Validate Estimate"
+{
+    type = form
+    form = Estimate
+    record event = on add or edit
+    description = "Validates slice capacity, assignment ownership, active MTter, capability match, overrides, and decline details."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Vehicles_Assigned == null || input.Vehicles_Assigned < 1)
+                {
+                    alert(Vehicles_Assigned, "Vehicles assigned must be at least 1.");
+                    cancel submit;
+                }
+                request_rec = Service_Request[ID == input.Service_Request];
+                other_vehicles = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status != "Superseded" && ID != input.ID].sum(Vehicles_Assigned);
+                if(other_vehicles == null)
+                {
+                    other_vehicles = 0;
+                }
+                if(other_vehicles + input.Vehicles_Assigned > request_rec.Vehicle_Count)
+                {
+                    alert(Vehicles_Assigned, "Active estimate slices cannot exceed the service request vehicle count.");
+                    cancel submit;
+                }
+                mtter_rec = MTter[ID == input.MTter];
+                if(mtter_rec.Active != true)
+                {
+                    alert(MTter, "Select an active MTter.");
+                    cancel submit;
+                }
+                capability_match = false;
+                for each capability_id in input.Capability_Slice
+                {
+                    if(mtter_rec.Capabilities.contains(capability_id) && request_rec.Requested_Capabilities.contains(capability_id))
+                    {
+                        capability_match = true;
+                    }
+                }
+                profile_name = thisapp.permissions.loginUserProfile();
+                portal_profile = thisapp.portal.loginUserProfile();
+                override_allowed = (profile_name == "Internal_Admin" || profile_name == "Internal_Coordinator") && input.Ranking_Override == true && input.Override_Reason != null && input.Override_Reason.trim() != "";
+                if(capability_match != true && override_allowed != true)
+                {
+                    alert(Capability_Slice, "The MTter must cover at least one requested capability, or an authorized ranking override and reason are required.");
+                    cancel submit;
+                }
+                if(input.Ranking_Override == true && (input.Override_Reason == null || input.Override_Reason.trim() == ""))
+                {
+                    alert(Override_Reason, "Supply the ranking override reason.");
+                    cancel submit;
+                }
+                if(input.Status == "Declined" && input.Decline_Reason == null)
+                {
+                    alert(Decline_Reason, "Select a decline reason.");
+                    cancel submit;
+                }
+                if(input.Status == "Declined" && input.Decline_Reason == "Other" && (input.Decline_Details == null || input.Decline_Details.trim() == ""))
+                {
+                    alert(Decline_Details, "Provide decline details when the reason is Other.");
+                    cancel submit;
+                }
+                if(portal_profile == "MTter")
+                {
+                    if(input.Assigned_Portal_Email != zoho.loginuser)
+                    {
+                        alert "You may update only your assigned estimate slices.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

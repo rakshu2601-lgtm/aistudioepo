@@ -1,0 +1,5 @@
+report Declined_Estimate_Exceptions
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Estimate_ID Service_Request MTter Vehicles_Assigned Decline_Reason Responded_At ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Estimate_ID Service_Request MTter Vehicles_Assigned Decline_Reason Decline_Details Responded_At Active_Slice Matching_Warning ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

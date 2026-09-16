@@ -1,0 +1,38 @@
+Load_Service_Request as "Load Service Request"
+{
+    type = form
+    form = Service_Request
+    record event = on add or edit
+    description = "Applies portal defaults and protects generated and operational fields."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                app_profile = thisapp.permissions.loginUserProfile();
+                portal_profile = thisapp.portal.loginUserProfile();
+                if(portal_profile == "FMC_Client")
+                {
+                    client_record = FMC_Client[Portal_Login_Email == zoho.loginuser];
+                    if(client_record.count() > 0)
+                    {
+                        input.FMC_Client = client_record.ID;
+                    }
+                    input.Source = "FMC Portal";
+                    input.Created_By_Email = zoho.loginuser;
+                    disable FMC_Client;
+                }
+                if(app_profile != "Internal_Admin")
+                {
+                    disable Service_ID, Status, Received_At, Source, Created_By_Email, Geocoding_Status, Geocoding_Warning, Matching_Started_At, Approved_Estimates_Count, Assigned_Vehicle_Count, Remaining_Unassigned_Vehicles;
+                }
+                if(input.Service_ID != null && input.Service_ID != "")
+                {
+                    disable Service_ID;
+                }
+            )
+        }
+    }
+}

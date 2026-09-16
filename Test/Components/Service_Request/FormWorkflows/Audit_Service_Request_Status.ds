@@ -1,0 +1,26 @@
+Audit_Service_Request_Status as "Audit Service Request Status"
+{
+    type = form
+    form = Service_Request
+    record event = on edit
+    description = "Records substantive lifecycle status changes for submitted requests."
+
+    on update of Status
+    {
+        actions ( Service_ID != null && Service_ID != "" )
+        {
+            custom deluge script
+            (
+                insert into Activity
+                [
+                    Service_Request = input.ID
+                    Event_Timestamp = zoho.currenttime
+                    User_Email = zoho.loginuser
+                    Event_Type = "Status Changed"
+                    Description = "Service request status changed to " + input.Status + "."
+                    Internal_Only = true
+                ];
+            )
+        }
+    }
+}

@@ -1,0 +1,25 @@
+Submission_Action_Guidance as "Submission Action Guidance"
+{
+    type = form
+    form = Service_Request
+    record event = on add or edit
+    description = "Explains draft versus submission behavior without changing lifecycle data."
+
+    on user input of Submission_Action
+    {
+        actions ( Submission_Action == "Save as Draft" )
+        {
+            custom deluge script
+            (
+                alert "Drafts are saved without entering the matching queue.";
+            )
+        }
+        actions ( Submission_Action == "Submit Request" )
+        {
+            custom deluge script
+            (
+                alert "Submitting validates intake data and queues the request for matching.";
+            )
+        }
+    }
+}

@@ -1,0 +1,37 @@
+"FMC_Client"
+{
+    name        = "FMC_Client"
+    type        = customer_portal
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+    description = "FMC client portal access limited to the authenticated client's profile and draft/request tracking."
+    ModulePermissions
+    {
+        FMC_Client
+        {
+            enabled = View,Search
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Client_ID{visibility:true,readonly:true} Company_Name{visibility:true,readonly:true} Billing_Address{visibility:true,readonly:true}
+                Contact_Name{visibility:true,readonly:true} Contact_Email{visibility:true,readonly:true} Contact_Phone{visibility:true,readonly:true}
+                Portal_Login_Email{visibility:true,readonly:true} Payment_Terms{visibility:true,readonly:true} Default_Currency{visibility:true,readonly:true} Active{visibility:true,readonly:true}
+            }
+        }
+        Service_Request
+        {
+            enabled = Create,View,Edit,Search,Tab
+            allFieldsVisible = false
+            FieldPermissions
+            {
+                Service_ID{visibility:true,readonly:true} FMC_Client{visibility:true,readonly:true} Program_Name{visibility:true,readonly:false}
+                Vehicle_Count{visibility:true,readonly:false} Vehicle_Type{visibility:true,readonly:false} Drop_Off_Address{visibility:true,readonly:false}
+                Requested_Capabilities{visibility:true,readonly:false} Target_Completion_Date{visibility:true,readonly:false} Notes{visibility:true,readonly:false}
+                Submission_Action{visibility:true,readonly:false} Status{visibility:true,readonly:true} Received_At{visibility:true,readonly:true}
+                Drop_Off_Latitude{visibility:false} Drop_Off_Longitude{visibility:false} Source{visibility:false} Created_By_Email{visibility:false}
+                Geocoding_Status{visibility:false} Geocoding_Warning{visibility:false} Matching_Started_At{visibility:false}
+                Approved_Estimates_Count{visibility:false} Assigned_Vehicle_Count{visibility:false} Remaining_Unassigned_Vehicles{visibility:false}
+            }
+            ReportPermissions { FMC_My_Requests={"View"} }
+        }
+    }
+}

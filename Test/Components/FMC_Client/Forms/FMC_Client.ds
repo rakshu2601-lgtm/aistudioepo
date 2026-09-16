@@ -1,0 +1,188 @@
+form FMC_Client
+{
+    title
+    {
+        on add = "Add FMC Client"
+        on edit = "Edit FMC Client"
+    }
+    Client_Details
+    (
+        type = section
+        displayname = "Client Details"
+        row = 1
+        column = 0
+    )
+    unique Client_ID
+    (
+        type = text
+        displayname = "Client ID"
+        row = 1
+        column = 1
+    )
+    must have Company_Name
+    (
+        type = text
+        displayname = "Company Name"
+        row = 1
+        column = 2
+    )
+    must have Billing_Address
+    (
+        type = address
+        displayname = "Billing Address"
+        capture_coordinates = false
+        adjust_using_map = false
+        address_line_1
+        (
+            type = address_line_1
+            displayname = "Address Line 1"
+        )
+        address_line_2
+        (
+            type = address_line_2
+            displayname = "Address Line 2"
+        )
+        district_city
+        (
+            type = district_city
+            displayname = "City"
+        )
+        state_province
+        (
+            type = state_province
+            displayname = "State / Province"
+        )
+        postal_Code
+        (
+            type = postal_Code
+            displayname = "Postal Code"
+        )
+        country
+        (
+            type = country
+            displayname = "Country"
+        )
+        latitude
+        (
+            type = latitude
+            displayname = "Latitude"
+            visibility = false
+        )
+        longitude
+        (
+            type = longitude
+            displayname = "Longitude"
+            visibility = false
+        )
+        row = 1
+        column = 1
+    )
+    must have Contact_Name
+    (
+        type = name
+        displayname = "Contact Name"
+        prefix
+        (
+            type = prefix
+            displayname = "Title"
+            value = {"Mr.","Mrs.","Ms.","Dr."}
+        )
+        first_name
+        (
+            type = first_name
+            displayname = "First Name"
+        )
+        last_name
+        (
+            type = last_name
+            displayname = "Last Name"
+        )
+        suffix
+        (
+            type = suffix
+            displayname = "Suffix"
+            visibility = false
+        )
+        row = 1
+        column = 2
+    )
+    must have unique Contact_Email
+    (
+        type = email
+        displayname = "Contact Email"
+        personal data = true
+        row = 1
+        column = 1
+    )
+    Contact_Phone
+    (
+        type = phonenumber
+        displayname = "Contact Phone"
+        personal data = true
+        row = 1
+        column = 2
+    )
+    must have unique Portal_Login_Email
+    (
+        type = email
+        displayname = "Portal Login Email"
+        personal data = true
+        row = 1
+        column = 1
+    )
+    Payment_Terms
+    (
+        type = picklist
+        displayname = "Payment Terms"
+        values = {"Net 15","Net 30","Net 45","Net 60","Due on Receipt"}
+        row = 1
+        column = 2
+    )
+    must have Default_Currency
+    (
+        type = picklist
+        displayname = "Default Currency"
+        values = Currency.ID
+        displayformat = [Currency_Code]
+        searchable = true
+        row = 1
+        column = 1
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 1
+        column = 2
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

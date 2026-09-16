@@ -1,0 +1,26 @@
+default list All_Parts
+{
+    displayName = "All Parts"
+    show all rows from Part
+    (
+        Part_Number
+        Description
+        Brand
+        Capability
+        Sourcing
+        Unit_Price
+        Currency
+        Active
+    )
+    filters
+    (
+        Active
+        Capability
+        Brand
+        Sourcing
+    )
+    sort by
+    (
+        Part_Number ascending
+    )
+}

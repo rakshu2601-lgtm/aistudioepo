@@ -1,0 +1,28 @@
+default list All_Service_Requests
+{
+    displayName = "All Service Requests"
+    show all rows from Service_Request
+    (
+        Service_ID
+        FMC_Client
+        Program_Name
+        Vehicle_Count
+        Vehicle_Type
+        Drop_Off_Address
+        Received_At
+        Target_Completion_Date
+        Status
+        Source
+        Remaining_Unassigned_Vehicles
+    )
+    filters
+    (
+        Status
+        FMC_Client
+        Source
+    )
+    sort by
+    (
+        Received_At descending
+    )
+}

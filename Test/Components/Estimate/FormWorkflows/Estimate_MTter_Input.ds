@@ -1,0 +1,38 @@
+Estimate_MTter_Input as "Estimate MTter Input"
+{
+    type = form
+    form = Estimate
+    record event = on add or edit
+    description = "Populates portal ownership and stored-coordinate matching indicators."
+
+    on user input of MTter
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Assigned_Portal_Email = null;
+                input.Distance_Value = null;
+                input.Within_Radius = false;
+                input.Matching_Warning = "";
+                if(input.MTter != null)
+                {
+                    mtter_rec = MTter[ID == input.MTter];
+                    input.Assigned_Portal_Email = mtter_rec.Portal_Login_Email;
+                    if(input.Service_Request != null)
+                    {
+                        request_rec = Service_Request[ID == input.Service_Request];
+                        if(mtter_rec.Latitude != null && mtter_rec.Longitude != null && request_rec.Drop_Off_Latitude != null && request_rec.Drop_Off_Longitude != null)
+                        {
+                            input.Matching_Warning = "Stored coordinates are available; distance calculation requires the configured matching connector.";
+                        }
+                        else
+                        {
+                            input.Matching_Warning = "Matching distance unavailable because stored coordinates are incomplete and no geocoding connector is configured.";
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

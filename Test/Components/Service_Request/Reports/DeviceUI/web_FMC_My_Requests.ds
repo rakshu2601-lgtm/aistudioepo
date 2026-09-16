@@ -1,0 +1,5 @@
+report FMC_My_Requests
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Service_ID Program_Name Vehicle_Count Vehicle_Type Received_At Target_Completion_Date Status ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Service_ID Program_Name Vehicle_Count Vehicle_Type Received_At Target_Completion_Date Status ) ) ) menu ( header ( Edit ) ) )
+}

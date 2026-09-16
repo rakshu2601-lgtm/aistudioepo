@@ -1,0 +1,18 @@
+list Insurance_Expiring
+{
+    displayName = "Insurance Expiring"
+    show all rows from MTter [Active == true && Insurance_Expiry in next 30 days]
+    (
+        MTter_ID
+        MTter_Name
+        MTter_Type
+        Contact_Name
+        Contact_Email
+        Insurance_Expiry
+        Active
+    )
+    sort by
+    (
+        Insurance_Expiry ascending
+    )
+}

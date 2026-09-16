@@ -1,0 +1,57 @@
+Load_Estimate_Line as "Load Estimate Line"
+{
+    type = form
+    form = Estimate_Line
+    record event = on add or edit
+    description = "Loads approved catalog pricing, protects calculated fields, and enforces MTter parent ownership while editing."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Currency;
+                disable Line_Parts_Total;
+                disable Line_Labor_Total;
+                disable Line_Total;
+                is_mtter = false;
+                try
+                {
+                    is_mtter = thisapp.portal.isUserInProfile("MTter");
+                }
+                catch (permission_error)
+                {
+                    is_mtter = false;
+                }
+                if(input.Part != null)
+                {
+                    selected_part = Part[ID == input.Part];
+                    if(selected_part.ID != null)
+                    {
+                        input.Unit_Price = selected_part.Unit_Price;
+                        input.Currency = selected_part.Currency;
+                    }
+                }
+                if(is_mtter && input.ID != null)
+                {
+                    disable Estimate;
+                }
+                if(is_mtter && input.Estimate != null)
+                {
+                    parent_estimate = Estimate[ID == input.Estimate];
+                    if(parent_estimate.ID == null || parent_estimate.Assigned_Portal_Email != zoho.loginuser || parent_estimate.Status != "Pending")
+                    {
+                        alert "You may access estimate lines only for your assigned Pending estimate.";
+                        disable Estimate;
+                        disable Part;
+                        disable Quantity_Per_Vehicle;
+                        disable Unit_Price;
+                        disable Labor_Hours_Per_Vehicle;
+                        disable Active;
+                    }
+                }
+            )
+        }
+    }
+}

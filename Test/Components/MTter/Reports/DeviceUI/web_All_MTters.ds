@@ -1,0 +1,5 @@
+report All_MTters
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( MTter_ID MTter_Name MTter_Type Location_Address Service_Radius Capabilities Insurance_Expiry Completed_Jobs Rating Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( MTter_ID MTter_Name MTter_Type Location_Address Service_Radius Capabilities Insurance_Expiry Completed_Jobs Rating Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

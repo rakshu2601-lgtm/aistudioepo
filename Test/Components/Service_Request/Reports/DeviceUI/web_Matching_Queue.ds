@@ -1,0 +1,5 @@
+report Matching_Queue
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Service_ID FMC_Client Program_Name Vehicle_Count Requested_Capabilities Received_At Target_Completion_Date Remaining_Unassigned_Vehicles Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Service_ID FMC_Client Program_Name Vehicle_Count Vehicle_Type Drop_Off_Address Requested_Capabilities Received_At Target_Completion_Date Remaining_Unassigned_Vehicles Status ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

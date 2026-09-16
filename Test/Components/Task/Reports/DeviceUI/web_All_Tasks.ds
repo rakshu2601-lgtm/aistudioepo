@@ -1,0 +1,5 @@
+report All_Tasks
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Service_Request Task_Type Related_Estimate Assigned_To_Email Due_Date Priority Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Service_Request Task_Type Related_Estimate Assigned_To_Email Due_Date Priority Status ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

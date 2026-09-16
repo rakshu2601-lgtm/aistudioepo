@@ -1,0 +1,69 @@
+menu
+{
+    unused
+    {
+        page Fleet_Dashboard { icon = "business-chart-pie-36" }
+        form Task { icon = "business-agenda" }
+        form Currency { icon = "business-money-11" }
+        form FMC_Client { icon = "business-building" }
+        form Capability { icon = "business-badge" }
+        form MTter { icon = "transportation-car-simple" }
+        form Part { icon = "business-stock" }
+        form Activity { icon = "business-notes" }
+        report All_Service_Requests { icon = "files-paper" }
+        report Service_Pipeline { icon = "business-chart-bar-33" }
+        report Matching_Queue { icon = "business-strategy" }
+        report All_Estimates { icon = "files-money" }
+        report Pending_Estimates { icon = "business-money-time" }
+        report Declined_Estimate_Exceptions { icon = "files-exclamation" }
+        report All_Tasks { icon = "files-check" }
+        report Task_Board { icon = "business-board-30" }
+        report Open_Reassignment_Tasks { icon = "files-folder-time" }
+        report All_Currencies { icon = "business-money-11" }
+        report All_FMC_Clients { icon = "users-multiple-11" }
+        report Active_FMC_Clients { icon = "users-contacts" }
+        report All_Capabilities { icon = "files-check" }
+        report All_MTters { icon = "users-multiple-19" }
+        report MTter_Locations { icon = "transportation-road" }
+        report Insurance_Expiring { icon = "files-time" }
+        report All_Parts { icon = "files-box" }
+        report Active_Parts { icon = "files-archive-check" }
+        report Activity_Log { icon = "files-archive-paper" }
+        report Recent_Activity { icon = "files-time" }
+    }
+    space Portal_Work
+    {
+        displayname = "Fleet Portal"
+        icon = "transportation-car-simple"
+        section Requests
+        {
+            displayname = "My Requests"
+            icon = "files-user"
+            form Service_Request { icon = "files-add" }
+            report FMC_My_Requests { icon = "files-paper" }
+        }
+        section Assigned_Estimates
+        {
+            displayname = "Assigned Estimates"
+            icon = "business-calculator"
+            form Estimate { icon = "business-sign" }
+            report MTter_Assigned_Estimates { icon = "files-user" }
+            form Estimate_Line { icon = "files-edit" }
+            report Estimate_Lines { icon = "files-single-content-03" }
+        }
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space,section,component}
+        }
+    }
+}

@@ -1,0 +1,28 @@
+Estimate_Service_Request_Input as "Estimate Service Request Input"
+{
+    type = form
+    form = Estimate
+    record event = on add or edit
+    description = "Calculates and displays the request's remaining assignable vehicle count."
+
+    on user input of Service_Request
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Service_Request != null)
+                {
+                    request_rec = Service_Request[ID == input.Service_Request];
+                    assigned_count = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status != "Superseded" && ID != input.ID].sum(Vehicles_Assigned);
+                    if(assigned_count == null)
+                    {
+                        assigned_count = 0;
+                    }
+                    remaining_count = request_rec.Vehicle_Count - assigned_count;
+                    alert "Remaining unassigned vehicles before this slice: " + remaining_count;
+                }
+            )
+        }
+    }
+}

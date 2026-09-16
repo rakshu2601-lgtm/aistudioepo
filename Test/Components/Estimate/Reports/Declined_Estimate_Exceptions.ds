@@ -1,0 +1,26 @@
+list Declined_Estimate_Exceptions
+{
+    displayName = "Declined Estimate Exceptions"
+    show all rows from Estimate [Status == "Declined"]
+    (
+        Estimate_ID
+        Service_Request
+        MTter
+        Vehicles_Assigned
+        Decline_Reason
+        Decline_Details
+        Responded_At
+        Active_Slice
+        Matching_Warning
+    )
+    filters
+    (
+        Service_Request
+        MTter
+        Decline_Reason
+    )
+    sort by
+    (
+        Responded_At descending
+    )
+}

@@ -1,0 +1,76 @@
+menu
+{
+    space Fleet_Hub
+    {
+        displayname = "Fleet Hub"
+        icon = "transportation-truck-front"
+        section Dashboard
+        {
+            displayname = "Dashboard"
+            icon = "business-chart"
+            page Fleet_Dashboard { icon = "business-chart-pie-36" }
+        }
+        section Operations
+        {
+            displayname = "Operations"
+            icon = "business-progress"
+            form Service_Request { icon = "files-add" }
+            report All_Service_Requests { icon = "files-paper" }
+            report FMC_My_Requests { icon = "files-user" }
+            report Service_Pipeline { icon = "business-chart-bar-33" }
+            report Matching_Queue { icon = "business-strategy" }
+            form Estimate { icon = "business-calculator" }
+            report All_Estimates { icon = "files-money" }
+            report MTter_Assigned_Estimates { icon = "files-user" }
+            report Pending_Estimates { icon = "business-money-time" }
+            report Declined_Estimate_Exceptions { icon = "files-exclamation" }
+            form Estimate_Line { icon = "files-single-content-03" }
+            report Estimate_Lines { icon = "files-single-copies" }
+            form Task { icon = "business-agenda" }
+            report All_Tasks { icon = "files-check" }
+            report Task_Board { icon = "business-board-30" }
+            report Open_Reassignment_Tasks { icon = "files-folder-time" }
+        }
+        section Masters
+        {
+            displayname = "Masters"
+            icon = "files-folder-14"
+            form Currency { icon = "business-money-11" }
+            report All_Currencies { icon = "files-money" }
+            form FMC_Client { icon = "business-building" }
+            report All_FMC_Clients { icon = "users-multiple-11" }
+            report Active_FMC_Clients { icon = "users-contacts" }
+            form Capability { icon = "business-badge" }
+            report All_Capabilities { icon = "files-check" }
+            form MTter { icon = "transportation-car-simple" }
+            report All_MTters { icon = "users-multiple-19" }
+            report MTter_Locations { icon = "transportation-road" }
+            report Insurance_Expiring { icon = "files-time" }
+            form Part { icon = "business-stock" }
+            report All_Parts { icon = "files-box" }
+            report Active_Parts { icon = "files-archive-check" }
+        }
+        section Audit
+        {
+            displayname = "Audit"
+            icon = "business-law"
+            form Activity { icon = "business-notes" }
+            report Activity_Log { icon = "files-archive-paper" }
+            report Recent_Activity { icon = "files-time" }
+        }
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space,section,component}
+        }
+    }
+}

@@ -1,0 +1,19 @@
+<page linkname = "Fleet_Dashboard" displayname = "Fleet Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Fleet_Command_Center' elementName='Fleet_Command_Center'>
+          <![CDATA[htmlpage Fleet_Command_Center()
+            content
+            <%{%>
+              <file name:Fleet_Command_Center.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

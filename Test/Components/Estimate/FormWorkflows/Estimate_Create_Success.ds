@@ -1,0 +1,112 @@
+Estimate_Create_Success as "Create Estimate Slice"
+{
+    type = form
+    form = Estimate
+    record event = on add
+    description = "Initializes a slice, supersedes a declined predecessor, updates request counts, logs activity, and notifies the MTter."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                id_text = input.ID.toString();
+                if(id_text.length() == 1)
+                {
+                    estimate_code = "EST-000" + id_text;
+                }
+                else if(id_text.length() == 2)
+                {
+                    estimate_code = "EST-00" + id_text;
+                }
+                else if(id_text.length() == 3)
+                {
+                    estimate_code = "EST-0" + id_text;
+                }
+                else
+                {
+                    estimate_code = "EST-" + id_text;
+                }
+                update Estimate[ID == input.ID]
+                [
+                    Estimate_ID = estimate_code
+                    Status = "Pending"
+                    Sent_At = zoho.currenttime
+                    Active_Slice = true
+                    Reminder_Sent = false
+                ];
+                if(input.Supersedes_Estimate != null)
+                {
+                    old_estimate = Estimate[ID == input.Supersedes_Estimate];
+                    if(old_estimate.Status == "Declined")
+                    {
+                        update Estimate[ID == input.Supersedes_Estimate]
+                        [
+                            Status = "Superseded"
+                            Active_Slice = false
+                        ];
+                        superseded_activity = insert into Activity
+                        [
+                            Service_Request = input.Service_Request
+                            Related_Estimate = input.Supersedes_Estimate
+                            Event_Timestamp = zoho.currenttime
+                            User_Email = zoho.loginuser
+                            Event_Type = "Estimate Superseded"
+                            Description = "Declined estimate replaced by " + estimate_code
+                            Internal_Only = true
+                        ];
+                    }
+                }
+                assigned_count = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status != "Superseded"].sum(Vehicles_Assigned);
+                if(assigned_count == null)
+                {
+                    assigned_count = 0;
+                }
+                request_rec = Service_Request[ID == input.Service_Request];
+                remaining_count = request_rec.Vehicle_Count - assigned_count;
+                request_status = request_rec.Status;
+                if(request_status == "Matching")
+                {
+                    request_status = "Estimating";
+                }
+                update Service_Request[ID == input.Service_Request]
+                [
+                    Status = request_status
+                    Assigned_Vehicle_Count = assigned_count
+                    Remaining_Unassigned_Vehicles = remaining_count
+                ];
+                sent_activity = insert into Activity
+                [
+                    Service_Request = input.Service_Request
+                    Related_Estimate = input.ID
+                    Event_Timestamp = zoho.currenttime
+                    User_Email = zoho.loginuser
+                    Event_Type = "Estimate Sent"
+                    Description = estimate_code + " assigned for " + input.Vehicles_Assigned + " vehicle(s)."
+                    Internal_Only = true
+                ];
+                if(input.Ranking_Override == true)
+                {
+                    override_activity = insert into Activity
+                    [
+                        Service_Request = input.Service_Request
+                        Related_Estimate = input.ID
+                        Event_Timestamp = zoho.currenttime
+                        User_Email = zoho.loginuser
+                        Event_Type = "Ranking Override"
+                        Description = input.Override_Reason
+                        Internal_Only = true
+                    ];
+                }
+                sendmail
+                (
+                    from : zoho.adminuserid
+                    to : input.Assigned_Portal_Email
+                    subject : "Estimate slice " + estimate_code + " requires review"
+                    message : "A vehicle-count estimate slice has been assigned to you. Sign in to review labor, related lines, and approve or decline."
+                )
+            )
+        }
+    }
+}

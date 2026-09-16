@@ -1,0 +1,25 @@
+default list All_Tasks
+{
+    displayName = "All Tasks"
+    show all rows from Task
+    (
+        Service_Request
+        Task_Type
+        Related_Estimate
+        Assigned_To_Email
+        Due_Date
+        Priority
+        Status
+    )
+    filters
+    (
+        Status
+        Task_Type
+        Priority
+        Assigned_To_Email
+    )
+    sort by
+    (
+        Due_Date ascending
+    )
+}

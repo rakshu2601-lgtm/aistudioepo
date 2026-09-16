@@ -1,0 +1,88 @@
+Estimate_Approved_Success as "Approve Estimate Slice"
+{
+    type = form
+    form = Estimate[Status == "Approved"]
+    record event = on edit
+    description = "Records approval, recomputes request totals, and advances fully approved requests to Ready for quote."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                update Estimate[ID == input.ID]
+                [
+                    Responded_At = zoho.currenttime
+                    Active_Slice = true
+                ];
+                approved_activity = insert into Activity
+                [
+                    Service_Request = input.Service_Request
+                    Related_Estimate = input.ID
+                    Event_Timestamp = zoho.currenttime
+                    User_Email = zoho.loginuser
+                    Event_Type = "Estimate Approved"
+                    Description = input.Estimate_ID + " approved."
+                    Internal_Only = true
+                ];
+                active_count = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status != "Superseded"].count(ID);
+                approved_count = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status == "Approved"].count(ID);
+                approved_vehicles = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status == "Approved"].sum(Vehicles_Assigned);
+                assigned_count = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status != "Superseded"].sum(Vehicles_Assigned);
+                if(approved_vehicles == null)
+                {
+                    approved_vehicles = 0;
+                }
+                if(assigned_count == null)
+                {
+                    assigned_count = 0;
+                }
+                request_rec = Service_Request[ID == input.Service_Request];
+                remaining_count = request_rec.Vehicle_Count - assigned_count;
+                next_status = request_rec.Status;
+                if(active_count > 0 && active_count == approved_count && approved_vehicles == request_rec.Vehicle_Count)
+                {
+                    next_status = "Ready for quote";
+                }
+                update Service_Request[ID == input.Service_Request]
+                [
+                    Status = next_status
+                    Approved_Estimates_Count = approved_count
+                    Assigned_Vehicle_Count = assigned_count
+                    Remaining_Unassigned_Vehicles = remaining_count
+                ];
+                totals_activity = insert into Activity
+                [
+                    Service_Request = input.Service_Request
+                    Related_Estimate = input.ID
+                    Event_Timestamp = zoho.currenttime
+                    User_Email = zoho.loginuser
+                    Event_Type = "Totals Recalculated"
+                    Description = "Approved slices: " + approved_count + "; approved vehicles: " + approved_vehicles + "."
+                    Internal_Only = true
+                ];
+                if(next_status == "Ready for quote")
+                {
+                    ready_activity = insert into Activity
+                    [
+                        Service_Request = input.Service_Request
+                        Related_Estimate = input.ID
+                        Event_Timestamp = zoho.currenttime
+                        User_Email = zoho.loginuser
+                        Event_Type = "Status Changed"
+                        Description = "All active slices approved; service request advanced to Ready for quote."
+                        Internal_Only = true
+                    ];
+                }
+                sendmail
+                (
+                    from : zoho.adminuserid
+                    to : zoho.adminuserid
+                    subject : "Estimate approved: " + input.Estimate_ID
+                    message : "Operations notification: the assigned MTter approved this estimate slice. Request status: " + next_status
+                )
+            )
+        }
+    }
+}

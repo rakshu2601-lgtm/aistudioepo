@@ -1,0 +1,90 @@
+form Part
+{
+    Details
+    (
+        type = section
+        displayname = "Details"
+        row = 1
+        column = 0
+    )
+    must have unique Part_Number
+    (
+        type = text
+        displayname = "Part Number"
+        row = 1
+    )
+    must have Description
+    (
+        type = text
+        row = 1
+    )
+    Brand
+    (
+        type = text
+        row = 1
+    )
+    must have Capability
+    (
+        type = picklist
+        values = Capability.ID
+        displayformat = [Capability_Name]
+        searchable = true
+        row = 1
+    )
+    must have Sourcing
+    (
+        type = picklist
+        values = {"Stocked","Local Supplier","Special Order","Client Supplied"}
+        row = 1
+    )
+    must have Unit_Price
+    (
+        type = decimal
+        displayname = "Unit Price"
+        decimalplace = 2
+        row = 1
+    )
+    must have Currency
+    (
+        type = picklist
+        values = Currency.ID
+        displayformat = [Currency_Code]
+        searchable = true
+        row = 1
+    )
+    Active
+    (
+        type = checkbox
+        initial value = true
+        row = 1
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

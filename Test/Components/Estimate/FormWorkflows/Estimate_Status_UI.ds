@@ -1,0 +1,25 @@
+Estimate_Status_UI as "Estimate Status UI"
+{
+    type = form
+    form = Estimate
+    record event = on add or edit
+    description = "Shows decline inputs only for a declined decision."
+
+    on user input of Status
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Status == "Declined")
+                {
+                    show Decline_Reason, Decline_Details;
+                }
+                else
+                {
+                    hide Decline_Reason, Decline_Details;
+                }
+            )
+        }
+    }
+}

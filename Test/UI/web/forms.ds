@@ -1,0 +1,13 @@
+forms
+{
+    form Currency { label placement = left }
+    form FMC_Client { label placement = left }
+    form Capability { label placement = left }
+    form MTter { label placement = left }
+    form Part { label placement = left }
+    form Service_Request { label placement = left }
+    form Estimate { label placement = left }
+    form Estimate_Line { label placement = left }
+    form Task { label placement = left }
+    form Activity { label placement = left }
+}

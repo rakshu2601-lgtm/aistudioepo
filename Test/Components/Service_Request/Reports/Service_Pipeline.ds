@@ -1,0 +1,26 @@
+kanban Service_Pipeline
+{
+    displayName = "Service Pipeline"
+    show all rows from Service_Request [Status == "Intake" || Status == "Matching" || Status == "Estimating" || Status == "Ready for quote"]
+    (
+        Service_ID
+        FMC_Client
+        Program_Name
+        Vehicle_Count
+        Target_Completion_Date
+        Remaining_Unassigned_Vehicles
+        Status
+        Received_At
+    )
+    sort by
+    (
+        Received_At descending
+    )
+    options
+    (
+        display field = Status
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

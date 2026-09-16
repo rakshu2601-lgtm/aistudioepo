@@ -1,0 +1,39 @@
+Sync_Estimate_Totals_On_Delete as "Sync Estimate Totals On Delete"
+{
+    type = form
+    form = Estimate_Line
+    record event = on delete
+    description = "Re-aggregates active estimate lines after deletion and records the recalculation."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                parent_estimate = Estimate[ID == input.Estimate];
+                vehicles = ifNull(parent_estimate.Vehicles_Assigned,0);
+                estimate_parts = ifNull(Estimate_Line[Estimate == input.Estimate && Active == true].sum(Line_Parts_Total),0);
+                estimate_hours = ifNull(Estimate_Line[Estimate == input.Estimate && Active == true].sum(Labor_Hours_Per_Vehicle),0) * vehicles;
+                estimate_labor = ifNull(Estimate_Line[Estimate == input.Estimate && Active == true].sum(Line_Labor_Total),0);
+                update Estimate[ID == input.Estimate]
+                [
+                    Parts_Total = estimate_parts
+                    Labor_Hours = estimate_hours
+                    Labor_Total = estimate_labor
+                    Estimate_Total = estimate_parts + estimate_labor
+                ];
+                activity_id = insert into Activity
+                [
+                    Service_Request = parent_estimate.Service_Request
+                    Related_Estimate = input.Estimate
+                    Event_Timestamp = zoho.currenttime
+                    User_Email = zoho.loginuser
+                    Event_Type = "Totals Recalculated"
+                    Description = "Estimate totals recalculated after an estimate line was deleted."
+                    Internal_Only = true
+                ];
+            )
+        }
+    }
+}

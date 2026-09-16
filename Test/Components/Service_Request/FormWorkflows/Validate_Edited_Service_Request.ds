@@ -1,0 +1,48 @@
+Validate_Edited_Service_Request as "Validate Edited Service Request"
+{
+    type = form
+    form = Service_Request
+    record event = on edit
+    description = "Validates edits and blocks unauthorized mutation of generated and lifecycle fields."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Vehicle_Count == null || input.Vehicle_Count < 1)
+                {
+                    alert(Vehicle_Count, "Vehicle count must be at least 1.");
+                    cancel submit;
+                }
+                if(input.Target_Completion_Date != null && input.Target_Completion_Date < zoho.currentdate)
+                {
+                    alert(Target_Completion_Date, "Target completion date cannot be before today.");
+                    cancel submit;
+                }
+                if(input.Submission_Action == "Submit Request" && (input.FMC_Client == null || input.Program_Name == null || input.Program_Name == "" || input.Vehicle_Count == null || input.Drop_Off_Address.address_line_1 == null || input.Requested_Capabilities == null || input.Target_Completion_Date == null))
+                {
+                    alert "Complete all required P0 intake data before submitting the request.";
+                    cancel submit;
+                }
+                app_profile = thisapp.permissions.loginUserProfile();
+                portal_profile = thisapp.portal.loginUserProfile();
+                if(portal_profile == "FMC_Client")
+                {
+                    selected_client = FMC_Client[ID == input.FMC_Client];
+                    if(selected_client.count() == 0 || selected_client.Portal_Login_Email != zoho.loginuser)
+                    {
+                        alert "The selected FMC client does not match the logged-in portal account.";
+                        cancel submit;
+                    }
+                }
+                if(app_profile != "Internal_Admin" && (old.Service_ID != input.Service_ID || old.Status != input.Status || old.Received_At != input.Received_At || old.Source != input.Source || old.Created_By_Email != input.Created_By_Email || old.Geocoding_Status != input.Geocoding_Status || old.Geocoding_Warning != input.Geocoding_Warning || old.Matching_Started_At != input.Matching_Started_At || old.Approved_Estimates_Count != input.Approved_Estimates_Count || old.Assigned_Vehicle_Count != input.Assigned_Vehicle_Count || old.Remaining_Unassigned_Vehicles != input.Remaining_Unassigned_Vehicles))
+                {
+                    alert "Generated identifiers and protected lifecycle fields cannot be changed.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

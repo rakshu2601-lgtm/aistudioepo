@@ -1,0 +1,22 @@
+list Matching_Queue
+{
+    displayName = "Matching Queue"
+    show all rows from Service_Request [Status == "Matching"]
+    (
+        Service_ID
+        FMC_Client
+        Program_Name
+        Vehicle_Count
+        Vehicle_Type
+        Drop_Off_Address
+        Requested_Capabilities
+        Received_At
+        Target_Completion_Date
+        Remaining_Unassigned_Vehicles
+        Status
+    )
+    sort by
+    (
+        Received_At ascending
+    )
+}

@@ -1,0 +1,35 @@
+Generate_Client_ID as "Generate Client ID"
+{
+    type = form
+    form = FMC_Client
+    record event = on add or edit
+    description = "Generates the client identifier after a successful save when it is blank."
+
+    on success
+    {
+        actions ( Client_ID == null || Client_ID == "" )
+        {
+            custom deluge script
+            (
+                if(input.ID < 10)
+                {
+                    client_code = "CLI-000" + input.ID;
+                }
+                else if(input.ID < 100)
+                {
+                    client_code = "CLI-00" + input.ID;
+                }
+                else if(input.ID < 1000)
+                {
+                    client_code = "CLI-0" + input.ID;
+                }
+                else
+                {
+                    client_code = "CLI-" + input.ID;
+                }
+                client_record = FMC_Client[ID == input.ID];
+                client_record.Client_ID = client_code;
+            )
+        }
+    }
+}

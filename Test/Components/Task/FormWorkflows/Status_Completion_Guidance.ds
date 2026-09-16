@@ -1,0 +1,25 @@
+Status_Completion_Guidance as "Status Completion Guidance"
+{
+    type = form
+    form = Task
+    record event = on add or edit
+    description = "Shows operational guidance when a task status is selected."
+
+    on user input of Status
+    {
+        actions ( Status == "Completed" )
+        {
+            custom deluge script
+            (
+                alert "Confirm the work is finished before saving. Completion time will be recorded automatically.";
+            )
+        }
+        actions ( Status == "Cancelled" )
+        {
+            custom deluge script
+            (
+                alert "Use Cancelled only when no further operational work is required; explain the reason in Description.";
+            )
+        }
+    }
+}

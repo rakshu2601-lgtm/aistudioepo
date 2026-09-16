@@ -1,0 +1,35 @@
+Validate_Estimate_Line_Delete as "Validate Estimate Line Delete"
+{
+    type = form
+    form = Estimate_Line
+    record event = on delete
+    description = "Restricts MTter deletion to lines under the logged-in MTter's assigned Pending estimate."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                is_mtter = false;
+                try
+                {
+                    is_mtter = thisapp.portal.isUserInProfile("MTter");
+                }
+                catch (permission_error)
+                {
+                    is_mtter = false;
+                }
+                if(is_mtter)
+                {
+                    parent_estimate = Estimate[ID == input.Estimate];
+                    if(parent_estimate.ID == null || parent_estimate.Assigned_Portal_Email != zoho.loginuser || parent_estimate.Status != "Pending")
+                    {
+                        alert "MTters may delete lines only under their assigned Pending estimate.";
+                        cancel delete;
+                    }
+                }
+            )
+        }
+    }
+}

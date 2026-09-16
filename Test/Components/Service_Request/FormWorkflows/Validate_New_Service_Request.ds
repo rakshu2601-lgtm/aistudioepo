@@ -1,0 +1,42 @@
+Validate_New_Service_Request as "Validate New Service Request"
+{
+    type = form
+    form = Service_Request
+    record event = on add
+    description = "Validates new draft and submitted intake records and portal ownership."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Vehicle_Count == null || input.Vehicle_Count < 1)
+                {
+                    alert(Vehicle_Count, "Vehicle count must be at least 1.");
+                    cancel submit;
+                }
+                if(input.Target_Completion_Date != null && input.Target_Completion_Date < zoho.currentdate)
+                {
+                    alert(Target_Completion_Date, "Target completion date cannot be before today.");
+                    cancel submit;
+                }
+                if(input.Submission_Action == "Submit Request" && (input.FMC_Client == null || input.Program_Name == null || input.Program_Name == "" || input.Vehicle_Count == null || input.Drop_Off_Address.address_line_1 == null || input.Requested_Capabilities == null || input.Target_Completion_Date == null))
+                {
+                    alert "Complete all required P0 intake data before submitting the request.";
+                    cancel submit;
+                }
+                portal_profile = thisapp.portal.loginUserProfile();
+                if(portal_profile == "FMC_Client")
+                {
+                    selected_client = FMC_Client[ID == input.FMC_Client];
+                    if(selected_client.count() == 0 || selected_client.Portal_Login_Email != zoho.loginuser)
+                    {
+                        alert "The selected FMC client does not match the logged-in portal account.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

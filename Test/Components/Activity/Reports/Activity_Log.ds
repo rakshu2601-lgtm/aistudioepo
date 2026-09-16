@@ -1,0 +1,24 @@
+default list Activity_Log
+{
+    displayName = "Activity Log"
+    show all rows from Activity
+    (
+        Service_Request
+        Related_Estimate as "Estimate"
+        Event_Timestamp as "Timestamp"
+        User_Email as "User"
+        Event_Type as "Event Type"
+        Description
+        Internal_Only as "Internal Flag"
+    )
+    filters
+    (
+        Service_Request
+        Event_Type
+        User_Email
+    )
+    sort by
+    (
+        Event_Timestamp descending
+    )
+}

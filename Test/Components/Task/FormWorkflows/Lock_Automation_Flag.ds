@@ -1,0 +1,15 @@
+Lock_Automation_Flag as "Lock Automation Flag"
+{
+    type = form
+    form = Task
+    record event = on add or edit
+    description = "Prevents users from changing the system-managed automatic creation flag."
+
+    on load
+    {
+        actions
+        {
+            disable Created_Automatically;
+        }
+    }
+}

@@ -1,0 +1,25 @@
+customize
+{
+    layout
+    {
+        theme = "theme_2"
+        variant = "variant_2"
+    }
+    font = "lato"
+    color options
+    {
+        name = "Fleet Navy"
+        brand color = "#1F4E5F"
+        type = "custom"
+        dark mode color = "#86B8C7"
+    }
+    logo
+    {
+        preference = "app_icon"
+        placement = "left"
+    }
+    custom css
+    {
+        content = ".zc-app-header { border-bottom: 2px solid #D7A84B; } .zc-nav { letter-spacing: .01em; }"
+    }
+}

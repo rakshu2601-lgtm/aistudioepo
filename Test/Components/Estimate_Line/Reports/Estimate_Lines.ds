@@ -1,0 +1,28 @@
+default list Estimate_Lines
+{
+    displayName = "Estimate Lines"
+    show all rows from Estimate_Line
+    (
+        Estimate
+        Part
+        Quantity_Per_Vehicle
+        Unit_Price
+        Currency
+        Labor_Hours_Per_Vehicle
+        Line_Parts_Total
+        Line_Labor_Total
+        Line_Total
+        Active
+    )
+    filters
+    (
+        Estimate
+        Part
+        Active
+    )
+    sort by
+    (
+        Estimate ascending
+        Part ascending
+    )
+}

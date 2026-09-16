@@ -1,0 +1,38 @@
+Estimate_On_Load as "Estimate On Load"
+{
+    type = form
+    form = Estimate
+    record event = on add or edit
+    description = "Applies ownership-aware field locking and decline-field visibility."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                profile_name = thisapp.permissions.loginUserProfile();
+                portal_profile = thisapp.portal.loginUserProfile();
+                hide Decline_Reason, Decline_Details;
+                disable Estimate_ID, Parts_Total, Labor_Total, Estimate_Total, Sent_At, Responded_At, Assigned_Portal_Email, Distance_Value, Within_Radius, Matching_Warning, Reminder_Sent;
+                if(input.Status == "Declined")
+                {
+                    show Decline_Reason, Decline_Details;
+                }
+                if(portal_profile == "MTter")
+                {
+                    disable Service_Request, MTter, Capability_Slice, Vehicles_Assigned, Currency, Supersedes_Estimate, Active_Slice, Ranking_Override, Override_Reason;
+                    if(input.Assigned_Portal_Email != zoho.loginuser)
+                    {
+                        disable Status, Labor_Hours, Labor_Rate, Decline_Reason, Decline_Details;
+                        alert "This estimate slice is assigned to another MTter.";
+                    }
+                }
+                if(profile_name != "Internal_Admin" && profile_name != "Internal_Coordinator" && portal_profile != "MTter")
+                {
+                    disable Service_Request, MTter, Capability_Slice, Vehicles_Assigned, Currency, Labor_Hours, Labor_Rate, Status, Decline_Reason, Decline_Details, Supersedes_Estimate, Active_Slice, Ranking_Override, Override_Reason;
+                }
+            )
+        }
+    }
+}

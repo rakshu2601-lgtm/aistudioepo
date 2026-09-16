@@ -1,0 +1,5 @@
+report Estimate_Lines
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Estimate Part Quantity_Per_Vehicle Unit_Price Currency Labor_Hours_Per_Vehicle Line_Total Active ) ) ) menu ( header ( Edit Delete ) record ( Edit Delete ) ) action ( on tap ( View Record ) on long press ( Edit Delete View Record ) on left swipe ( Delete ) on right swipe ( Edit ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Estimate Part Quantity_Per_Vehicle Unit_Price Currency Labor_Hours_Per_Vehicle Line_Parts_Total Line_Labor_Total Line_Total Active ) ) ) menu ( header ( Edit Delete ) ) )
+}

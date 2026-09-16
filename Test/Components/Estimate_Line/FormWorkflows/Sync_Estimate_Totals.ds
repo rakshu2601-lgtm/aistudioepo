@@ -1,0 +1,48 @@
+Sync_Estimate_Totals as "Sync Estimate Totals"
+{
+    type = form
+    form = Estimate_Line
+    record event = on add or edit
+    description = "Persists line totals, aggregates active lines to the estimate, and records the recalculation."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                parent_estimate = Estimate[ID == input.Estimate];
+                vehicles = ifNull(parent_estimate.Vehicles_Assigned,0);
+                labor_rate = ifNull(parent_estimate.Labor_Rate,0);
+                parts_total = ifNull(input.Quantity_Per_Vehicle,0) * ifNull(input.Unit_Price,0) * vehicles;
+                labor_total = ifNull(input.Labor_Hours_Per_Vehicle,0) * labor_rate * vehicles;
+                update Estimate_Line[ID == input.ID]
+                [
+                    Line_Parts_Total = parts_total
+                    Line_Labor_Total = labor_total
+                    Line_Total = parts_total + labor_total
+                ];
+                estimate_parts = ifNull(Estimate_Line[Estimate == input.Estimate && Active == true].sum(Line_Parts_Total),0);
+                estimate_hours = ifNull(Estimate_Line[Estimate == input.Estimate && Active == true].sum(Labor_Hours_Per_Vehicle),0) * vehicles;
+                estimate_labor = ifNull(Estimate_Line[Estimate == input.Estimate && Active == true].sum(Line_Labor_Total),0);
+                update Estimate[ID == input.Estimate]
+                [
+                    Parts_Total = estimate_parts
+                    Labor_Hours = estimate_hours
+                    Labor_Total = estimate_labor
+                    Estimate_Total = estimate_parts + estimate_labor
+                ];
+                activity_id = insert into Activity
+                [
+                    Service_Request = parent_estimate.Service_Request
+                    Related_Estimate = input.Estimate
+                    Event_Timestamp = zoho.currenttime
+                    User_Email = zoho.loginuser
+                    Event_Type = "Totals Recalculated"
+                    Description = "Estimate totals recalculated after an estimate line was added or edited."
+                    Internal_Only = true
+                ];
+            )
+        }
+    }
+}

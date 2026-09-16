@@ -1,0 +1,24 @@
+list Open_Reassignment_Tasks
+{
+    displayName = "Open Reassignment Tasks"
+    show all rows from Task [Task_Type == "Reassignment" && Status != "Completed" && Status != "Cancelled"]
+    (
+        Service_Request
+        Task_Type
+        Related_Estimate
+        Assigned_To_Email
+        Due_Date
+        Priority
+        Status
+    )
+    filters
+    (
+        Priority
+        Assigned_To_Email
+        Status
+    )
+    sort by
+    (
+        Due_Date ascending
+    )
+}

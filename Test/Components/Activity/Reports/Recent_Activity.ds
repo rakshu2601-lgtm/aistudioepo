@@ -1,0 +1,18 @@
+list Recent_Activity
+{
+    displayName = "Recent Activity"
+    show all rows from Activity
+    (
+        Service_Request
+        Related_Estimate as "Estimate"
+        Event_Timestamp as "Timestamp"
+        User_Email as "User"
+        Event_Type as "Event Type"
+        Description
+        Internal_Only as "Internal Flag"
+    )
+    sort by
+    (
+        Event_Timestamp descending
+    )
+}

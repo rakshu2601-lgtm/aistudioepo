@@ -1,0 +1,5 @@
+report All_Currencies
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Currency_Code Currency_Name Symbol Decimal_Places Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Currency_Code Currency_Name Symbol Decimal_Places Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

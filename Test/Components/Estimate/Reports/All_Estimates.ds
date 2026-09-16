@@ -1,0 +1,31 @@
+default list All_Estimates
+{
+    displayName = "All Estimates"
+    show all rows from Estimate
+    (
+        Estimate_ID
+        Service_Request
+        MTter
+        Vehicles_Assigned
+        Labor_Hours
+        Labor_Rate
+        Parts_Total
+        Labor_Total
+        Estimate_Total
+        Currency
+        Status
+        Sent_At
+        Responded_At
+        Matching_Warning
+    )
+    filters
+    (
+        Status
+        MTter
+        Service_Request
+    )
+    sort by
+    (
+        Sent_At descending
+    )
+}

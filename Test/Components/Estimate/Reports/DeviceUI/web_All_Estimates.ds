@@ -1,0 +1,5 @@
+report All_Estimates
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Estimate_ID Service_Request MTter Vehicles_Assigned Estimate_Total Currency Status Sent_At ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Estimate_ID Service_Request MTter Vehicles_Assigned Labor_Hours Labor_Rate Parts_Total Labor_Total Estimate_Total Currency Status Sent_At Responded_At Matching_Warning ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

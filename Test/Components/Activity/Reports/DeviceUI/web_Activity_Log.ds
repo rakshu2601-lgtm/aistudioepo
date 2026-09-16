@@ -1,0 +1,5 @@
+report Activity_Log
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Service_Request Related_Estimate Event_Timestamp User_Email Event_Type Description Internal_Only ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Service_Request Related_Estimate Event_Timestamp User_Email Event_Type Description Internal_Only ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

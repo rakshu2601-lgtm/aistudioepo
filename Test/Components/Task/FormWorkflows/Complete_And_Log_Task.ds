@@ -1,0 +1,27 @@
+Log_Task_Creation as "Log Task Creation"
+{
+    type = form
+    form = Task
+    record event = on add
+    description = "Writes an audit activity after a task is created."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                activity_id = insert into Activity
+                [
+                    Service_Request = input.Service_Request
+                    Related_Estimate = input.Related_Estimate
+                    Event_Timestamp = zoho.currenttime
+                    User_Email = zoho.loginuser
+                    Event_Type = "Task Created"
+                    Description = "Task " + input.Task_Type + " created with status " + input.Status + "."
+                    Internal_Only = true
+                ];
+            )
+        }
+    }
+}

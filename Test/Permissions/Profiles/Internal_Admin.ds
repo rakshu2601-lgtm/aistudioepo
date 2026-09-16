@@ -1,0 +1,50 @@
+"Internal_Admin"
+{
+    name        = "Internal_Admin"
+    type        = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+    description = "Internal administrator with full application access."
+    ModulePermissions
+    {
+        Currency { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions { All_Currencies={"View","Edit","Delete"} }
+        }
+        FMC_Client { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions { All_FMC_Clients={"View","Edit","Delete"} Active_FMC_Clients={"View","Edit","Delete"} }
+        }
+        Capability { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions { All_Capabilities={"View","Edit","Delete"} }
+        }
+        MTter { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions { All_MTters={"View","Edit","Delete"} MTter_Locations={"View","Edit","Delete"} Insurance_Expiring={"View","Edit","Delete"} }
+        }
+        Part { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions { All_Parts={"View","Edit","Delete"} Active_Parts={"View","Edit","Delete"} }
+        }
+        Service_Request { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions { All_Service_Requests={"View","Edit","Delete"} Service_Pipeline={"View","Edit","Delete"} FMC_My_Requests={"View","Edit","Delete"} Matching_Queue={"View","Edit","Delete"} }
+        }
+        Estimate { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions { All_Estimates={"View","Edit","Delete"} Pending_Estimates={"View","Edit","Delete"} MTter_Assigned_Estimates={"View","Edit","Delete"} Declined_Estimate_Exceptions={"View","Edit","Delete"} }
+        }
+        Estimate_Line { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions { Estimate_Lines={"View","Edit","Delete"} }
+        }
+        Task { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions { All_Tasks={"View","Edit","Delete"} Task_Board={"View","Edit","Delete"} Open_Reassignment_Tasks={"View","Edit","Delete"} }
+        }
+        Activity { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions { Activity_Log={"View","Edit","Delete"} Recent_Activity={"View","Edit","Delete"} }
+        }
+    }
+}

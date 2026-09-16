@@ -1,0 +1,5 @@
+report Active_FMC_Clients
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Client_ID Company_Name Contact_Name Contact_Email Payment_Terms Default_Currency Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Client_ID Company_Name Contact_Name Contact_Email Payment_Terms Default_Currency Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+}

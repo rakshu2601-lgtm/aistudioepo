@@ -1,0 +1,272 @@
+form Service_Request
+{
+    title
+    {
+        displayname = "Service Request"
+        on add = "New Service Request"
+        on edit = "Edit Service Request"
+    }
+
+    Intake
+    (
+        type = section
+        displayname = "Intake"
+        row = 1
+        column = 0
+    )
+    unique Service_ID
+    (
+        type = text
+        displayname = "Service ID"
+        row = 1
+        column = 1
+    )
+    must have FMC_Client
+    (
+        type = picklist
+        displayname = "FMC Client"
+        values = FMC_Client.ID
+        displayformat = [Company_Name]
+        searchable = true
+        row = 1
+        column = 1
+    )
+    must have Program_Name
+    (
+        type = text
+        displayname = "Program Name"
+        row = 1
+        column = 1
+    )
+    must have Vehicle_Count
+    (
+        type = number
+        displayname = "Vehicle Count"
+        row = 1
+        column = 1
+    )
+    Vehicle_Type
+    (
+        type = text
+        displayname = "Vehicle Type"
+        row = 1
+        column = 1
+    )
+    must have Drop_Off_Address
+    (
+        type = address
+        displayname = "Drop-Off Address"
+        capture_coordinates = true
+        adjust_using_map = true
+        address_line_1
+        (
+            type = address_line_1
+            displayname = "Street Address"
+        )
+        address_line_2
+        (
+            type = address_line_2
+            displayname = "Address Line 2"
+        )
+        district_city
+        (
+            type = district_city
+            displayname = "City"
+        )
+        state_province
+        (
+            type = state_province
+            displayname = "State / Province"
+        )
+        postal_Code
+        (
+            type = postal_Code
+            displayname = "Postal Code"
+        )
+        country
+        (
+            type = country
+            displayname = "Country"
+        )
+        latitude
+        (
+            type = latitude
+            displayname = "Latitude"
+            visibility = false
+        )
+        longitude
+        (
+            type = longitude
+            displayname = "Longitude"
+            visibility = false
+        )
+        row = 1
+        column = 1
+    )
+    Drop_Off_Latitude
+    (
+        type = decimal
+        displayname = "Drop-Off Latitude"
+        decimalplace = 6
+        row = 1
+        column = 1
+    )
+    Drop_Off_Longitude
+    (
+        type = decimal
+        displayname = "Drop-Off Longitude"
+        decimalplace = 6
+        row = 1
+        column = 1
+    )
+    must have Requested_Capabilities
+    (
+        type = list
+        displayname = "Requested Capabilities"
+        values = Capability.ID
+        displayformat = [Capability_Name]
+        searchable = true
+        height = 120px
+        row = 1
+        column = 1
+    )
+    must have Target_Completion_Date
+    (
+        type = date
+        displayname = "Target Completion Date"
+        row = 1
+        column = 1
+    )
+    Notes
+    (
+        type = textarea
+        displayname = "Notes"
+        height = 100px
+        row = 1
+        column = 1
+    )
+    must have Submission_Action
+    (
+        type = radiobuttons
+        displayname = "Submission Action"
+        values = {"Save as Draft","Submit Request"}
+        initial value = "Save as Draft"
+        layout = 1
+        row = 1
+        column = 1
+    )
+    Source
+    (
+        type = picklist
+        displayname = "Source"
+        values = {"Internal","FMC Portal"}
+        row = 1
+        column = 1
+    )
+    must have Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"Draft","Intake","Matching","Estimating","Ready for quote","Quote sent","PO received","In progress","Completed","Invoiced","Closed"}
+        initial value = "Draft"
+        row = 1
+        column = 1
+    )
+    Received_At
+    (
+        type = datetime
+        displayname = "Received At"
+        row = 1
+        column = 1
+    )
+    Created_By_Email
+    (
+        type = email
+        displayname = "Created By Email"
+        row = 1
+        column = 1
+    )
+    Geocoding_Status
+    (
+        type = picklist
+        displayname = "Geocoding Status"
+        values = {"Not Attempted","Pending Integration","Success","Failed"}
+        initial value = "Not Attempted"
+        row = 1
+        column = 1
+    )
+    Geocoding_Warning
+    (
+        type = textarea
+        displayname = "Geocoding Warning"
+        height = 80px
+        row = 1
+        column = 1
+    )
+    Matching_Started_At
+    (
+        type = datetime
+        displayname = "Matching Started At"
+        row = 1
+        column = 1
+    )
+    Approved_Estimates_Count
+    (
+        type = number
+        displayname = "Approved Estimates Count"
+        initial value = 0
+        row = 1
+        column = 1
+    )
+    Assigned_Vehicle_Count
+    (
+        type = number
+        displayname = "Assigned Vehicle Count"
+        initial value = 0
+        row = 1
+        column = 1
+    )
+    Remaining_Unassigned_Vehicles
+    (
+        type = number
+        displayname = "Remaining Unassigned Vehicles"
+        initial value = 0
+        row = 1
+        column = 1
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Request"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+
+    blueprint components
+    {
+        stages = {"Intake","Matching","Estimating","Ready for quote","Quote sent","PO received","In progress","Completed","Invoiced","Closed"}
+    }
+}

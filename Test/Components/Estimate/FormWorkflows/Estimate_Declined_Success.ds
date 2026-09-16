@@ -1,0 +1,76 @@
+Estimate_Declined_Success as "Decline Estimate Slice"
+{
+    type = form
+    form = Estimate[Status == "Declined"]
+    record event = on edit
+    description = "Closes a declined slice, creates reassignment work, returns the request to Matching, logs, and notifies operations."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                update Estimate[ID == input.ID]
+                [
+                    Responded_At = zoho.currenttime
+                    Active_Slice = false
+                ];
+                reassignment_task = insert into Task
+                [
+                    Service_Request = input.Service_Request
+                    Task_Type = "Reassignment"
+                    Related_Estimate = input.ID
+                    Assigned_To_Email = zoho.adminuserid
+                    Due_Date = zoho.currentdate.addDay(1)
+                    Priority = "High"
+                    Status = "Open"
+                    Description = "Reassign declined estimate " + input.Estimate_ID + ". Reason: " + input.Decline_Reason
+                    Created_Automatically = true
+                ];
+                assigned_count = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status != "Superseded"].sum(Vehicles_Assigned);
+                approved_count = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status == "Approved"].count(ID);
+                if(assigned_count == null)
+                {
+                    assigned_count = 0;
+                }
+                request_rec = Service_Request[ID == input.Service_Request];
+                remaining_count = request_rec.Vehicle_Count - assigned_count;
+                update Service_Request[ID == input.Service_Request]
+                [
+                    Status = "Matching"
+                    Approved_Estimates_Count = approved_count
+                    Assigned_Vehicle_Count = assigned_count
+                    Remaining_Unassigned_Vehicles = remaining_count
+                ];
+                decline_activity = insert into Activity
+                [
+                    Service_Request = input.Service_Request
+                    Related_Estimate = input.ID
+                    Event_Timestamp = zoho.currenttime
+                    User_Email = zoho.loginuser
+                    Event_Type = "Estimate Declined"
+                    Description = input.Estimate_ID + " declined: " + input.Decline_Reason + ". " + input.Decline_Details
+                    Internal_Only = true
+                ];
+                task_activity = insert into Activity
+                [
+                    Service_Request = input.Service_Request
+                    Related_Estimate = input.ID
+                    Event_Timestamp = zoho.currenttime
+                    User_Email = zoho.loginuser
+                    Event_Type = "Task Created"
+                    Description = "Automatic reassignment task created for declined estimate."
+                    Internal_Only = true
+                ];
+                sendmail
+                (
+                    from : zoho.adminuserid
+                    to : zoho.adminuserid
+                    subject : "Estimate declined: " + input.Estimate_ID
+                    message : "Operations notification: the estimate was declined and a reassignment task was created."
+                )
+            )
+        }
+    }
+}

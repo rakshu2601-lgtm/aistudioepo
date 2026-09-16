@@ -1,0 +1,68 @@
+Validate_Estimate_Line as "Validate Estimate Line"
+{
+    type = form
+    form = Estimate_Line
+    record event = on add or edit
+    description = "Validates approved parts, monetary values, currency consistency, and MTter ownership."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                validation_failed = false;
+                selected_part = Part[ID == input.Part];
+                parent_estimate = Estimate[ID == input.Estimate];
+                if(selected_part.ID == null || selected_part.Active != true)
+                {
+                    alert(Part,"Select an active approved catalog part.");
+                    validation_failed = true;
+                }
+                if(input.Quantity_Per_Vehicle == null || input.Quantity_Per_Vehicle <= 0)
+                {
+                    alert(Quantity_Per_Vehicle,"Quantity per vehicle must be greater than zero.");
+                    validation_failed = true;
+                }
+                if(input.Unit_Price == null || input.Unit_Price < 0)
+                {
+                    alert(Unit_Price,"Unit price cannot be negative.");
+                    validation_failed = true;
+                }
+                if(input.Labor_Hours_Per_Vehicle == null || input.Labor_Hours_Per_Vehicle < 0)
+                {
+                    alert(Labor_Hours_Per_Vehicle,"Labor hours cannot be negative.");
+                    validation_failed = true;
+                }
+                if(parent_estimate.ID == null || input.Currency != parent_estimate.Currency)
+                {
+                    alert(Currency,"Line currency must match the parent estimate currency.");
+                    validation_failed = true;
+                }
+                is_mtter = false;
+                try
+                {
+                    is_mtter = thisapp.portal.isUserInProfile("MTter");
+                }
+                catch (permission_error)
+                {
+                    is_mtter = false;
+                }
+                if(is_mtter && (parent_estimate.ID == null || parent_estimate.Assigned_Portal_Email != zoho.loginuser || parent_estimate.Status != "Pending"))
+                {
+                    alert "MTters may manage lines only under their assigned Pending estimate.";
+                    validation_failed = true;
+                }
+                if(validation_failed)
+                {
+                    cancel submit;
+                }
+                vehicles = ifNull(parent_estimate.Vehicles_Assigned,0);
+                labor_rate = ifNull(parent_estimate.Labor_Rate,0);
+                input.Line_Parts_Total = input.Quantity_Per_Vehicle * input.Unit_Price * vehicles;
+                input.Line_Labor_Total = input.Labor_Hours_Per_Vehicle * labor_rate * vehicles;
+                input.Line_Total = input.Line_Parts_Total + input.Line_Labor_Total;
+            )
+        }
+    }
+}

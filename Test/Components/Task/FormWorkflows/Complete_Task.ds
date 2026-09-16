@@ -1,0 +1,19 @@
+Complete_Task as "Complete Task"
+{
+    type = form
+    form = Task[Status == "Completed" && Completed_At == null]
+    record event = on add or edit
+    description = "Sets the completion timestamp the first time a task is saved as completed."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                task_record = Task[ID == input.ID];
+                task_record.Completed_At = zoho.currenttime;
+            )
+        }
+    }
+}

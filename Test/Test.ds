@@ -1,0 +1,4294 @@
+application "Test"
+{
+	date format = "dd-MMM-yyyy"
+	time zone = "Asia/Kolkata"
+	time format = "24-hr"
+
+
+
+	forms
+	{
+		form Activity
+		{
+		    title
+		    {
+		        on add = "Add Activity"
+		        on edit = "View Activity"
+		    }
+		    Audit
+		    (
+		        type = section
+		        displayname = "Audit"
+		        row = 1
+		        column = 0
+		    )
+		    must have Service_Request
+		    (
+		        type = picklist
+		        displayname = "Service Request"
+		        values = Service_Request.ID
+		        displayformat = [Service_ID]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Related_Estimate
+		    (
+		        type = picklist
+		        displayname = "Related Estimate"
+		        values = Estimate.ID
+		        displayformat = [Estimate_ID]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Event_Timestamp
+		    (
+		        type = datetime
+		        displayname = "Event Timestamp"
+		        initial value = "${zoho.currenttime}"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have User_Email
+		    (
+		        type = email
+		        displayname = "User Email"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Event_Type
+		    (
+		        type = picklist
+		        displayname = "Event Type"
+		        values = {"Request Submitted","Status Changed","Match Generated","Ranking Override","Estimate Sent","Estimate Approved","Estimate Declined","Estimate Superseded","Task Created","Task Updated","Totals Recalculated","Notification Sent","Note"}
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Description
+		    (
+		        type = textarea
+		        height = 100px
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Internal_Only
+		    (
+		        type = checkbox
+		        displayname = "Internal Only"
+		        initial value = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Capability
+		{
+		    title
+		    {
+		        on add = "Add Capability"
+		        on edit = "Edit Capability"
+		    }
+		    Details
+		    (
+		        type = section
+		        displayname = "Details"
+		        row = 1
+		        column = 0
+		    )
+		    must have unique Capability_Name
+		    (
+		        type = text
+		        displayname = "Capability Name"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Description
+		    (
+		        type = textarea
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Active
+		    (
+		        type = checkbox
+		        initial value = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Currency
+		{
+		    Details
+		    (
+		        type = section
+		        displayname = "Details"
+		        row = 1
+		        column = 0
+		    )
+		    must have unique Currency_Code
+		    (
+		        type = text
+		        displayname = "Currency Code"
+		        maxchar = 3
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Currency_Name
+		    (
+		        type = text
+		        displayname = "Currency Name"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Symbol
+		    (
+		        type = text
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Decimal_Places
+		    (
+		        type = number
+		        displayname = "Decimal Places"
+		        initial value = 2
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Active
+		    (
+		        type = checkbox
+		        initial value = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Estimate
+		{
+		    title
+		    {
+		        displayname = "Estimate"
+		        on add = "Assign Estimate Slice"
+		        on edit = "Review Estimate Slice"
+		    }
+		    Assignment
+		    (
+		        type = section
+		        displayname = "Assignment"
+		        row = 1
+		        column = 0
+		    )
+		    unique Estimate_ID
+		    (
+		        type = text
+		        displayname = "Estimate ID"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Service_Request
+		    (
+		        type = picklist
+		        displayname = "Service Request"
+		        values = Service_Request.ID
+		        displayformat = [Service_ID]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have MTter
+		    (
+		        type = picklist
+		        displayname = "MTter"
+		        values = MTter.ID
+		        displayformat = [MTter_Name]
+		        searchable = true
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Capability_Slice
+		    (
+		        type = checkboxes
+		        displayname = "Capability Slice"
+		        values = Capability.ID
+		        displayformat = [Capability_Name]
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Vehicles_Assigned
+		    (
+		        type = number
+		        displayname = "Vehicles Assigned"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Currency
+		    (
+		        type = picklist
+		        values = Currency.ID
+		        displayformat = [Currency_Code]
+		        searchable = true
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Labor_Hours
+		    (
+		        type = decimal
+		        displayname = "Labor Hours"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Labor_Rate
+		    (
+		        type = decimal
+		        displayname = "Labor Rate"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Parts_Total
+		    (
+		        type = decimal
+		        displayname = "Parts Total"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Labor_Total
+		    (
+		        type = decimal
+		        displayname = "Labor Total"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Estimate_Total
+		    (
+		        type = decimal
+		        displayname = "Estimate Total"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Status
+		    (
+		        type = picklist
+		        values = {"Pending","Approved","Declined","Superseded"}
+		        initial value = "Pending"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Sent_At
+		    (
+		        type = datetime
+		        displayname = "Sent At"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Responded_At
+		    (
+		        type = datetime
+		        displayname = "Responded At"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Decline_Reason
+		    (
+		        type = picklist
+		        displayname = "Decline Reason"
+		        values = {"Capacity","Capability Gap","Outside Radius","Scheduling","Commercial","Other"}
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Decline_Details
+		    (
+		        type = textarea
+		        displayname = "Decline Details"
+		        height = 100px
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Assigned_Portal_Email
+		    (
+		        type = email
+		        displayname = "Assigned Portal Email"
+		        personal data = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Supersedes_Estimate
+		    (
+		        type = picklist
+		        displayname = "Supersedes Estimate"
+		        values = Estimate.ID
+		        displayformat = [Estimate_ID]
+		        searchable = true
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Active_Slice
+		    (
+		        type = checkbox
+		        displayname = "Active Slice"
+		        initial value = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Ranking_Override
+		    (
+		        type = checkbox
+		        displayname = "Ranking Override"
+		        initial value = false
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Override_Reason
+		    (
+		        type = textarea
+		        displayname = "Override Reason"
+		        height = 100px
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Distance_Value
+		    (
+		        type = decimal
+		        displayname = "Distance Value"
+		        decimalplace = 2
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Within_Radius
+		    (
+		        type = checkbox
+		        displayname = "Within Radius"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Matching_Warning
+		    (
+		        type = textarea
+		        displayname = "Matching Warning"
+		        height = 100px
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Reminder_Sent
+		    (
+		        type = checkbox
+		        displayname = "Reminder Sent"
+		        initial value = false
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Assign Estimate"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Save Review"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Estimate_Line
+		{
+		    Details
+		    (
+		        type = section
+		        displayname = "Details"
+		        row = 1
+		        column = 0
+		    )
+		    must have Estimate
+		    (
+		        type = picklist
+		        values = Estimate.ID
+		        displayformat = [Estimate_ID]
+		        searchable = true
+		        row = 1
+		    )
+		    must have Part
+		    (
+		        type = picklist
+		        values = Part.ID
+		        displayformat = [Part_Number]
+		        searchable = true
+		        row = 1
+		    )
+		    must have Quantity_Per_Vehicle
+		    (
+		        type = decimal
+		        displayname = "Quantity Per Vehicle"
+		        decimalplace = 2
+		        row = 1
+		    )
+		    must have Unit_Price
+		    (
+		        type = decimal
+		        displayname = "Unit Price"
+		        decimalplace = 2
+		        row = 1
+		    )
+		    must have Labor_Hours_Per_Vehicle
+		    (
+		        type = decimal
+		        displayname = "Labor Hours Per Vehicle"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 1
+		    )
+		    Line_Parts_Total
+		    (
+		        type = decimal
+		        displayname = "Line Parts Total"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 1
+		    )
+		    Line_Labor_Total
+		    (
+		        type = decimal
+		        displayname = "Line Labor Total"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 1
+		    )
+		    Line_Total
+		    (
+		        type = decimal
+		        displayname = "Line Total"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 1
+		    )
+		    must have Currency
+		    (
+		        type = picklist
+		        values = Currency.ID
+		        displayformat = [Currency_Code]
+		        searchable = true
+		        row = 1
+		    )
+		    Active
+		    (
+		        type = checkbox
+		        initial value = true
+		        row = 1
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form FMC_Client
+		{
+		    title
+		    {
+		        on add = "Add FMC Client"
+		        on edit = "Edit FMC Client"
+		    }
+		    Client_Details
+		    (
+		        type = section
+		        displayname = "Client Details"
+		        row = 1
+		        column = 0
+		    )
+		    unique Client_ID
+		    (
+		        type = text
+		        displayname = "Client ID"
+		        row = 1
+		        column = 1
+		    )
+		    must have Company_Name
+		    (
+		        type = text
+		        displayname = "Company Name"
+		        row = 1
+		        column = 2
+		    )
+		    must have Billing_Address
+		    (
+		        type = address
+		        displayname = "Billing Address"
+		        capture_coordinates = false
+		        adjust_using_map = false
+		        address_line_1
+		        (
+		            type = address_line_1
+		            displayname = "Address Line 1"
+		        )
+		        address_line_2
+		        (
+		            type = address_line_2
+		            displayname = "Address Line 2"
+		        )
+		        district_city
+		        (
+		            type = district_city
+		            displayname = "City"
+		        )
+		        state_province
+		        (
+		            type = state_province
+		            displayname = "State / Province"
+		        )
+		        postal_Code
+		        (
+		            type = postal_Code
+		            displayname = "Postal Code"
+		        )
+		        country
+		        (
+		            type = country
+		            displayname = "Country"
+		        )
+		        latitude
+		        (
+		            type = latitude
+		            displayname = "Latitude"
+		            visibility = false
+		        )
+		        longitude
+		        (
+		            type = longitude
+		            displayname = "Longitude"
+		            visibility = false
+		        )
+		        row = 1
+		        column = 1
+		    )
+		    must have Contact_Name
+		    (
+		        type = name
+		        displayname = "Contact Name"
+		        prefix
+		        (
+		            type = prefix
+		            displayname = "Title"
+		            value = {"Mr.","Mrs.","Ms.","Dr."}
+		        )
+		        first_name
+		        (
+		            type = first_name
+		            displayname = "First Name"
+		        )
+		        last_name
+		        (
+		            type = last_name
+		            displayname = "Last Name"
+		        )
+		        suffix
+		        (
+		            type = suffix
+		            displayname = "Suffix"
+		            visibility = false
+		        )
+		        row = 1
+		        column = 2
+		    )
+		    must have unique Contact_Email
+		    (
+		        type = email
+		        displayname = "Contact Email"
+		        personal data = true
+		        row = 1
+		        column = 1
+		    )
+		    Contact_Phone
+		    (
+		        type = phonenumber
+		        displayname = "Contact Phone"
+		        personal data = true
+		        row = 1
+		        column = 2
+		    )
+		    must have unique Portal_Login_Email
+		    (
+		        type = email
+		        displayname = "Portal Login Email"
+		        personal data = true
+		        row = 1
+		        column = 1
+		    )
+		    Payment_Terms
+		    (
+		        type = picklist
+		        displayname = "Payment Terms"
+		        values = {"Net 15","Net 30","Net 45","Net 60","Due on Receipt"}
+		        row = 1
+		        column = 2
+		    )
+		    must have Default_Currency
+		    (
+		        type = picklist
+		        displayname = "Default Currency"
+		        values = Currency.ID
+		        displayformat = [Currency_Code]
+		        searchable = true
+		        row = 1
+		        column = 1
+		    )
+		    Active
+		    (
+		        type = checkbox
+		        displayname = "Active"
+		        initial value = true
+		        row = 1
+		        column = 2
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form MTter
+		{
+		    title
+		    {
+		        displayname = "MTter"
+		        on add = "Add MTter"
+		        on edit = "Edit MTter"
+		    }
+		    Identity
+		    (
+		        type = section
+		        displayname = "Identity"
+		        row = 1
+		        column = 0
+		    )
+		    unique MTter_ID
+		    (
+		        type = text
+		        displayname = "MTter ID"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have MTter_Name
+		    (
+		        type = text
+		        displayname = "MTter Name"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have MTter_Type
+		    (
+		        type = picklist
+		        displayname = "MTter Type"
+		        values = {"Member","Contracted"}
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Location_Address
+		    (
+		        type = address
+		        displayname = "Location Address"
+		        capture_coordinates = true
+		        adjust_using_map = true
+		        address_line_1
+		        (
+		            type = address_line_1
+		            displayname = "Address Line 1"
+		        )
+		        address_line_2
+		        (
+		            type = address_line_2
+		            displayname = "Address Line 2"
+		        )
+		        district_city
+		        (
+		            type = district_city
+		            displayname = "City"
+		        )
+		        state_province
+		        (
+		            type = state_province
+		            displayname = "State / Province"
+		        )
+		        postal_Code
+		        (
+		            type = postal_Code
+		            displayname = "Postal Code"
+		        )
+		        country
+		        (
+		            type = country
+		            displayname = "Country"
+		        )
+		        latitude
+		        (
+		            type = latitude
+		            displayname = "Captured Latitude"
+		            visibility = false
+		        )
+		        longitude
+		        (
+		            type = longitude
+		            displayname = "Captured Longitude"
+		            visibility = false
+		        )
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Latitude
+		    (
+		        type = decimal
+		        displayname = "Latitude"
+		        decimalplace = 6
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Longitude
+		    (
+		        type = decimal
+		        displayname = "Longitude"
+		        decimalplace = 6
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Service_Radius
+		    (
+		        type = decimal
+		        displayname = "Service Radius"
+		        decimalplace = 2
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Radius_Unit
+		    (
+		        type = picklist
+		        displayname = "Radius Unit"
+		        values = {"Miles","Kilometres"}
+		        initial value = "Miles"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Capabilities
+		    (
+		        type = checkboxes
+		        displayname = "Capabilities"
+		        values = Capability.ID
+		        displayformat = [Capability_Name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Contact_Name
+		    (
+		        type = name
+		        displayname = "Contact Name"
+		        prefix
+		        (
+		            type = prefix
+		            displayname = "Title"
+		            visibility = false
+		            value = {"Mr.","Mrs.","Ms.","Dr."}
+		        )
+		        first_name
+		        (
+		            type = first_name
+		            displayname = "First Name"
+		        )
+		        last_name
+		        (
+		            type = last_name
+		            displayname = "Last Name"
+		        )
+		        suffix
+		        (
+		            type = suffix
+		            displayname = "Suffix"
+		            visibility = false
+		        )
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Contact_Email
+		    (
+		        type = email
+		        displayname = "Contact Email"
+		        personal data = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Contact_Phone
+		    (
+		        type = phonenumber
+		        displayname = "Contact Phone"
+		        personal data = true
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have unique Portal_Login_Email
+		    (
+		        type = email
+		        displayname = "Portal Login Email"
+		        personal data = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Insurance_Expiry
+		    (
+		        type = date
+		        displayname = "Insurance Expiry"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Completed_Jobs
+		    (
+		        type = number
+		        displayname = "Completed Jobs"
+		        initial value = 0
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Rating
+		    (
+		        type = decimal
+		        displayname = "Rating"
+		        decimalplace = 2
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Active
+		    (
+		        type = checkbox
+		        displayname = "Active"
+		        initial value = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Part
+		{
+		    Details
+		    (
+		        type = section
+		        displayname = "Details"
+		        row = 1
+		        column = 0
+		    )
+		    must have unique Part_Number
+		    (
+		        type = text
+		        displayname = "Part Number"
+		        row = 1
+		    )
+		    must have Description
+		    (
+		        type = text
+		        row = 1
+		    )
+		    Brand
+		    (
+		        type = text
+		        row = 1
+		    )
+		    must have Capability
+		    (
+		        type = picklist
+		        values = Capability.ID
+		        displayformat = [Capability_Name]
+		        searchable = true
+		        row = 1
+		    )
+		    must have Sourcing
+		    (
+		        type = picklist
+		        values = {"Stocked","Local Supplier","Special Order","Client Supplied"}
+		        row = 1
+		    )
+		    must have Unit_Price
+		    (
+		        type = decimal
+		        displayname = "Unit Price"
+		        decimalplace = 2
+		        row = 1
+		    )
+		    must have Currency
+		    (
+		        type = picklist
+		        values = Currency.ID
+		        displayformat = [Currency_Code]
+		        searchable = true
+		        row = 1
+		    )
+		    Active
+		    (
+		        type = checkbox
+		        initial value = true
+		        row = 1
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Service_Request
+		{
+		    title
+		    {
+		        displayname = "Service Request"
+		        on add = "New Service Request"
+		        on edit = "Edit Service Request"
+		    }
+		
+		    Intake
+		    (
+		        type = section
+		        displayname = "Intake"
+		        row = 1
+		        column = 0
+		    )
+		    unique Service_ID
+		    (
+		        type = text
+		        displayname = "Service ID"
+		        row = 1
+		        column = 1
+		    )
+		    must have FMC_Client
+		    (
+		        type = picklist
+		        displayname = "FMC Client"
+		        values = FMC_Client.ID
+		        displayformat = [Company_Name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		    )
+		    must have Program_Name
+		    (
+		        type = text
+		        displayname = "Program Name"
+		        row = 1
+		        column = 1
+		    )
+		    must have Vehicle_Count
+		    (
+		        type = number
+		        displayname = "Vehicle Count"
+		        row = 1
+		        column = 1
+		    )
+		    Vehicle_Type
+		    (
+		        type = text
+		        displayname = "Vehicle Type"
+		        row = 1
+		        column = 1
+		    )
+		    must have Drop_Off_Address
+		    (
+		        type = address
+		        displayname = "Drop-Off Address"
+		        capture_coordinates = true
+		        adjust_using_map = true
+		        address_line_1
+		        (
+		            type = address_line_1
+		            displayname = "Street Address"
+		        )
+		        address_line_2
+		        (
+		            type = address_line_2
+		            displayname = "Address Line 2"
+		        )
+		        district_city
+		        (
+		            type = district_city
+		            displayname = "City"
+		        )
+		        state_province
+		        (
+		            type = state_province
+		            displayname = "State / Province"
+		        )
+		        postal_Code
+		        (
+		            type = postal_Code
+		            displayname = "Postal Code"
+		        )
+		        country
+		        (
+		            type = country
+		            displayname = "Country"
+		        )
+		        latitude
+		        (
+		            type = latitude
+		            displayname = "Latitude"
+		            visibility = false
+		        )
+		        longitude
+		        (
+		            type = longitude
+		            displayname = "Longitude"
+		            visibility = false
+		        )
+		        row = 1
+		        column = 1
+		    )
+		    Drop_Off_Latitude
+		    (
+		        type = decimal
+		        displayname = "Drop-Off Latitude"
+		        decimalplace = 6
+		        row = 1
+		        column = 1
+		    )
+		    Drop_Off_Longitude
+		    (
+		        type = decimal
+		        displayname = "Drop-Off Longitude"
+		        decimalplace = 6
+		        row = 1
+		        column = 1
+		    )
+		    must have Requested_Capabilities
+		    (
+		        type = list
+		        displayname = "Requested Capabilities"
+		        values = Capability.ID
+		        displayformat = [Capability_Name]
+		        searchable = true
+		        height = 120px
+		        row = 1
+		        column = 1
+		    )
+		    must have Target_Completion_Date
+		    (
+		        type = date
+		        displayname = "Target Completion Date"
+		        row = 1
+		        column = 1
+		    )
+		    Notes
+		    (
+		        type = textarea
+		        displayname = "Notes"
+		        height = 100px
+		        row = 1
+		        column = 1
+		    )
+		    must have Submission_Action
+		    (
+		        type = radiobuttons
+		        displayname = "Submission Action"
+		        values = {"Save as Draft","Submit Request"}
+		        initial value = "Save as Draft"
+		        layout = 1
+		        row = 1
+		        column = 1
+		    )
+		    Source
+		    (
+		        type = picklist
+		        displayname = "Source"
+		        values = {"Internal","FMC Portal"}
+		        row = 1
+		        column = 1
+		    )
+		    must have Status
+		    (
+		        type = picklist
+		        displayname = "Status"
+		        values = {"Draft","Intake","Matching","Estimating","Ready for quote","Quote sent","PO received","In progress","Completed","Invoiced","Closed"}
+		        initial value = "Draft"
+		        row = 1
+		        column = 1
+		    )
+		    Received_At
+		    (
+		        type = datetime
+		        displayname = "Received At"
+		        row = 1
+		        column = 1
+		    )
+		    Created_By_Email
+		    (
+		        type = email
+		        displayname = "Created By Email"
+		        row = 1
+		        column = 1
+		    )
+		    Geocoding_Status
+		    (
+		        type = picklist
+		        displayname = "Geocoding Status"
+		        values = {"Not Attempted","Pending Integration","Success","Failed"}
+		        initial value = "Not Attempted"
+		        row = 1
+		        column = 1
+		    )
+		    Geocoding_Warning
+		    (
+		        type = textarea
+		        displayname = "Geocoding Warning"
+		        height = 80px
+		        row = 1
+		        column = 1
+		    )
+		    Matching_Started_At
+		    (
+		        type = datetime
+		        displayname = "Matching Started At"
+		        row = 1
+		        column = 1
+		    )
+		    Approved_Estimates_Count
+		    (
+		        type = number
+		        displayname = "Approved Estimates Count"
+		        initial value = 0
+		        row = 1
+		        column = 1
+		    )
+		    Assigned_Vehicle_Count
+		    (
+		        type = number
+		        displayname = "Assigned Vehicle Count"
+		        initial value = 0
+		        row = 1
+		        column = 1
+		    )
+		    Remaining_Unassigned_Vehicles
+		    (
+		        type = number
+		        displayname = "Remaining Unassigned Vehicles"
+		        initial value = 0
+		        row = 1
+		        column = 1
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Save Request"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		
+		    blueprint components
+		    {
+		        stages = {"Intake","Matching","Estimating","Ready for quote","Quote sent","PO received","In progress","Completed","Invoiced","Closed"}
+		    }
+		}
+
+		form Task
+		{
+		    Details
+		    (
+		        type = section
+		        displayname = "Details"
+		        row = 1
+		        column = 0
+		    )
+		    must have Service_Request
+		    (
+		        type = picklist
+		        displayname = "Service Request"
+		        values = Service_Request.ID
+		        displayformat = [Service_ID]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Task_Type
+		    (
+		        type = picklist
+		        displayname = "Task Type"
+		        values = {"Reassignment","Follow-up","Geocoding","Insurance","Other"}
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Related_Estimate
+		    (
+		        type = picklist
+		        displayname = "Related Estimate"
+		        values = Estimate.ID
+		        displayformat = [Estimate_ID]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Assigned_To_Email
+		    (
+		        type = email
+		        displayname = "Assigned To Email"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Due_Date
+		    (
+		        type = date
+		        displayname = "Due Date"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Priority
+		    (
+		        type = picklist
+		        values = {"Low","Medium","High","Critical"}
+		        initial value = "High"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Status
+		    (
+		        type = picklist
+		        values = {"Open","In Progress","Completed","Cancelled"}
+		        initial value = "Open"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Description
+		    (
+		        type = textarea
+		        height = 120px
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Created_Automatically
+		    (
+		        type = checkbox
+		        displayname = "Created Automatically"
+		        initial value = false
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Completed_At
+		    (
+		        type = datetime
+		        displayname = "Completed At"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+	}
+
+	reports
+	{
+		default list Activity_Log
+		{
+		    displayName = "Activity Log"
+		    show all rows from Activity
+		    (
+		        Service_Request
+		        Related_Estimate as "Estimate"
+		        Event_Timestamp as "Timestamp"
+		        User_Email as "User"
+		        Event_Type as "Event Type"
+		        Description
+		        Internal_Only as "Internal Flag"
+		    )
+		    filters
+		    (
+		        Service_Request
+		        Event_Type
+		        User_Email
+		    )
+		    sort by
+		    (
+		        Event_Timestamp descending
+		    )
+		}
+
+		list Recent_Activity
+		{
+		    displayName = "Recent Activity"
+		    show all rows from Activity
+		    (
+		        Service_Request
+		        Related_Estimate as "Estimate"
+		        Event_Timestamp as "Timestamp"
+		        User_Email as "User"
+		        Event_Type as "Event Type"
+		        Description
+		        Internal_Only as "Internal Flag"
+		    )
+		    sort by
+		    (
+		        Event_Timestamp descending
+		    )
+		}
+
+		default list All_Capabilities
+		{
+		    displayName = "All Capabilities"
+		    show all rows from Capability
+		    (
+		        Capability_Name
+		        Description
+		        Active
+		    )
+		    filters
+		    (
+		        Active
+		    )
+		    sort by
+		    (
+		        Capability_Name ascending
+		    )
+		}
+
+		default list All_Currencies
+		{
+		    displayName = "All Currencies"
+		    show all rows from Currency
+		    (
+		        Currency_Code
+		        Currency_Name
+		        Symbol
+		        Decimal_Places
+		        Active
+		    )
+		    filters
+		    (
+		        Active
+		        Currency_Code
+		    )
+		    sort by
+		    (
+		        Currency_Code ascending
+		    )
+		}
+
+		default list All_Estimates
+		{
+		    displayName = "All Estimates"
+		    show all rows from Estimate
+		    (
+		        Estimate_ID
+		        Service_Request
+		        MTter
+		        Vehicles_Assigned
+		        Labor_Hours
+		        Labor_Rate
+		        Parts_Total
+		        Labor_Total
+		        Estimate_Total
+		        Currency
+		        Status
+		        Sent_At
+		        Responded_At
+		        Matching_Warning
+		    )
+		    filters
+		    (
+		        Status
+		        MTter
+		        Service_Request
+		    )
+		    sort by
+		    (
+		        Sent_At descending
+		    )
+		}
+
+		list Declined_Estimate_Exceptions
+		{
+		    displayName = "Declined Estimate Exceptions"
+		    show all rows from Estimate [Status == "Declined"]
+		    (
+		        Estimate_ID
+		        Service_Request
+		        MTter
+		        Vehicles_Assigned
+		        Decline_Reason
+		        Decline_Details
+		        Responded_At
+		        Active_Slice
+		        Matching_Warning
+		    )
+		    filters
+		    (
+		        Service_Request
+		        MTter
+		        Decline_Reason
+		    )
+		    sort by
+		    (
+		        Responded_At descending
+		    )
+		}
+
+		list MTter_Assigned_Estimates
+		{
+		    displayName = "MTter Assigned Estimates"
+		    show all rows from Estimate [Assigned_Portal_Email == zoho.loginuser]
+		    (
+		        Service_Request
+		        Estimate_ID
+		        MTter
+		        Capability_Slice
+		        Vehicles_Assigned
+		        Currency
+		        Labor_Hours
+		        Labor_Rate
+		        Parts_Total
+		        Labor_Total
+		        Estimate_Total
+		        Status
+		        Sent_At
+		        Responded_At
+		    )
+		    filters
+		    (
+		        Status
+		    )
+		    sort by
+		    (
+		        Sent_At descending
+		    )
+		}
+
+		list Pending_Estimates
+		{
+		    displayName = "Pending Estimates"
+		    show all rows from Estimate [Status == "Pending"]
+		    (
+		        Estimate_ID
+		        Service_Request
+		        MTter
+		        Assigned_Portal_Email
+		        Vehicles_Assigned
+		        Estimate_Total
+		        Currency
+		        Status
+		        Sent_At
+		        Reminder_Sent
+		        Matching_Warning
+		    )
+		    filters
+		    (
+		        MTter
+		        Service_Request
+		        Reminder_Sent
+		    )
+		    sort by
+		    (
+		        Sent_At ascending
+		    )
+		}
+
+		default list Estimate_Lines
+		{
+		    displayName = "Estimate Lines"
+		    show all rows from Estimate_Line
+		    (
+		        Estimate
+		        Part
+		        Quantity_Per_Vehicle
+		        Unit_Price
+		        Currency
+		        Labor_Hours_Per_Vehicle
+		        Line_Parts_Total
+		        Line_Labor_Total
+		        Line_Total
+		        Active
+		    )
+		    filters
+		    (
+		        Estimate
+		        Part
+		        Active
+		    )
+		    sort by
+		    (
+		        Estimate ascending
+		        Part ascending
+		    )
+		}
+
+		list Active_FMC_Clients
+		{
+		    displayName = "Active FMC Clients"
+		    show all rows from FMC_Client [Active == true]
+		    (
+		        Client_ID
+		        Company_Name
+		        Contact_Name
+		        Contact_Email
+		        Payment_Terms
+		        Default_Currency
+		        Active
+		    )
+		    sort by
+		    (
+		        Company_Name ascending
+		    )
+		}
+
+		default list All_FMC_Clients
+		{
+		    displayName = "All FMC Clients"
+		    show all rows from FMC_Client
+		    (
+		        Client_ID
+		        Company_Name
+		        Contact_Name
+		        Contact_Email
+		        Payment_Terms
+		        Default_Currency
+		        Active
+		    )
+		    filters
+		    (
+		        Active
+		        Payment_Terms
+		    )
+		    sort by
+		    (
+		        Company_Name ascending
+		    )
+		}
+
+		default list All_MTters
+		{
+		    displayName = "All MTters"
+		    show all rows from MTter
+		    (
+		        MTter_ID
+		        MTter_Name
+		        MTter_Type
+		        Location_Address
+		        Service_Radius
+		        Capabilities
+		        Insurance_Expiry
+		        Completed_Jobs
+		        Rating
+		        Active
+		    )
+		    filters
+		    (
+		        Active
+		        MTter_Type
+		        Capabilities
+		    )
+		    sort by
+		    (
+		        MTter_Type custom
+		        Rating descending
+		    )
+		}
+
+		list Insurance_Expiring
+		{
+		    displayName = "Insurance Expiring"
+		    show all rows from MTter [Active == true && Insurance_Expiry in next 30 days]
+		    (
+		        MTter_ID
+		        MTter_Name
+		        MTter_Type
+		        Contact_Name
+		        Contact_Email
+		        Insurance_Expiry
+		        Active
+		    )
+		    sort by
+		    (
+		        Insurance_Expiry ascending
+		    )
+		}
+
+		map MTter_Locations
+		{
+		    displayName = "MTter Locations"
+		    show all rows from MTter [Active == true]
+		    (
+		        MTter_ID
+		        MTter_Name
+		        MTter_Type
+		        Location_Address
+		        Service_Radius
+		        Radius_Unit
+		        Capabilities
+		        Active
+		    )
+		    options
+		    (
+		        display field = Location_Address
+		    )
+		}
+
+		list Active_Parts
+		{
+		    displayName = "Active Parts"
+		    show all rows from Part [Active == true]
+		    (
+		        Part_Number
+		        Description
+		        Brand
+		        Capability
+		        Sourcing
+		        Unit_Price
+		        Currency
+		        Active
+		    )
+		    sort by
+		    (
+		        Part_Number ascending
+		    )
+		}
+
+		default list All_Parts
+		{
+		    displayName = "All Parts"
+		    show all rows from Part
+		    (
+		        Part_Number
+		        Description
+		        Brand
+		        Capability
+		        Sourcing
+		        Unit_Price
+		        Currency
+		        Active
+		    )
+		    filters
+		    (
+		        Active
+		        Capability
+		        Brand
+		        Sourcing
+		    )
+		    sort by
+		    (
+		        Part_Number ascending
+		    )
+		}
+
+		default list All_Service_Requests
+		{
+		    displayName = "All Service Requests"
+		    show all rows from Service_Request
+		    (
+		        Service_ID
+		        FMC_Client
+		        Program_Name
+		        Vehicle_Count
+		        Vehicle_Type
+		        Drop_Off_Address
+		        Received_At
+		        Target_Completion_Date
+		        Status
+		        Source
+		        Remaining_Unassigned_Vehicles
+		    )
+		    filters
+		    (
+		        Status
+		        FMC_Client
+		        Source
+		    )
+		    sort by
+		    (
+		        Received_At descending
+		    )
+		}
+
+		list FMC_My_Requests
+		{
+		    displayName = "FMC My Requests"
+		    show all rows from Service_Request [Created_By_Email == zoho.loginuser]
+		    (
+		        Service_ID
+		        Program_Name
+		        Vehicle_Count
+		        Vehicle_Type
+		        Received_At
+		        Target_Completion_Date
+		        Status
+		    )
+		    sort by
+		    (
+		        Received_At descending
+		    )
+		}
+
+		list Matching_Queue
+		{
+		    displayName = "Matching Queue"
+		    show all rows from Service_Request [Status == "Matching"]
+		    (
+		        Service_ID
+		        FMC_Client
+		        Program_Name
+		        Vehicle_Count
+		        Vehicle_Type
+		        Drop_Off_Address
+		        Requested_Capabilities
+		        Received_At
+		        Target_Completion_Date
+		        Remaining_Unassigned_Vehicles
+		        Status
+		    )
+		    sort by
+		    (
+		        Received_At ascending
+		    )
+		}
+
+		kanban Service_Pipeline
+		{
+		    displayName = "Service Pipeline"
+		    show all rows from Service_Request [Status == "Intake" || Status == "Matching" || Status == "Estimating" || Status == "Ready for quote"]
+		    (
+		        Service_ID
+		        FMC_Client
+		        Program_Name
+		        Vehicle_Count
+		        Target_Completion_Date
+		        Remaining_Unassigned_Vehicles
+		        Status
+		        Received_At
+		    )
+		    sort by
+		    (
+		        Received_At descending
+		    )
+		    options
+		    (
+		        display field = Status
+		        filter type = manual
+		        sort order = custom
+		        record count = enable
+		    )
+		}
+
+		default list All_Tasks
+		{
+		    displayName = "All Tasks"
+		    show all rows from Task
+		    (
+		        Service_Request
+		        Task_Type
+		        Related_Estimate
+		        Assigned_To_Email
+		        Due_Date
+		        Priority
+		        Status
+		    )
+		    filters
+		    (
+		        Status
+		        Task_Type
+		        Priority
+		        Assigned_To_Email
+		    )
+		    sort by
+		    (
+		        Due_Date ascending
+		    )
+		}
+
+		list Open_Reassignment_Tasks
+		{
+		    displayName = "Open Reassignment Tasks"
+		    show all rows from Task [Task_Type == "Reassignment" && Status != "Completed" && Status != "Cancelled"]
+		    (
+		        Service_Request
+		        Task_Type
+		        Related_Estimate
+		        Assigned_To_Email
+		        Due_Date
+		        Priority
+		        Status
+		    )
+		    filters
+		    (
+		        Priority
+		        Assigned_To_Email
+		        Status
+		    )
+		    sort by
+		    (
+		        Due_Date ascending
+		    )
+		}
+
+		kanban Task_Board
+		{
+		    displayName = "Task Board"
+		    show all rows from Task
+		    (
+		        Service_Request
+		        Task_Type
+		        Related_Estimate
+		        Assigned_To_Email
+		        Due_Date
+		        Priority
+		        Status
+		    )
+		    filters
+		    (
+		        Task_Type
+		        Priority
+		        Assigned_To_Email
+		    )
+		    sort by
+		    (
+		        Due_Date ascending
+		    )
+		    options
+		    (
+		        display field = Status
+		        filter type = manual
+		        sort order = custom
+		        record count = enable
+		    )
+		}
+	}
+
+	pages
+	{
+		page Fleet_Dashboard
+		{
+					displayname = "Fleet Dashboard"
+					Content="<zml>\n\t<layout>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='Fleet_Command_Center' elementName='Fleet_Command_Center'>\n\t\t\t\t\t<![CDATA[htmlpage Fleet_Command_Center()\n\t\t\t\t\t\tcontent\n\t\t\t\t\t\t&lt;%{%&gt;\n\t\t\t\t\t\t\t&lt;%\nweekStart = zoho.currentdate.subDay(zoho.currentdate.getDayOfWeek() - 1);\nmonthStart = (&quot;01-&quot; + zoho.currentdate.toString(&quot;MM-yyyy&quot;)).toDate(&quot;dd-MM-yyyy&quot;);\nactiveServices = Service_Request[Service_ID != null &amp;&amp; Status != &quot;Draft&quot; &amp;&amp; Status != &quot;Closed&quot;].count();\ncreatedThisWeek = Service_Request[Received_At != null &amp;&amp; Received_At &gt;= weekStart].count();\nmatchingCount = Service_Request[Status == &quot;Matching&quot;].count();\npendingApprovals = Estimate[Status == &quot;Pending&quot;].count();\noldestPendingAge = 0;\noldestPending = Estimate[Status == &quot;Pending&quot; &amp;&amp; Sent_At != null] sort by Sent_At asc range from 0 to 0;\nfor each oldestEstimate in oldestPending\n{\n\t\toldestPendingAge = oldestEstimate.Sent_At.daysBetween(zoho.currenttime);\n}\napprovedValue = Estimate[Status == &quot;Approved&quot; &amp;&amp; Responded_At &gt;= monthStart].sum(Estimate_Total);\nif(approvedValue == null)\n{\n\t\tapprovedValue = 0;\n}\nintakeCount = Service_Request[Status == &quot;Intake&quot;].count();\nestimatingCount = Service_Request[Status == &quot;Estimating&quot;].count();\nreadyCount = Service_Request[Status == &quot;Ready for quote&quot;].count();\npipelineTotal = intakeCount + matchingCount + estimatingCount + readyCount;\nif(pipelineTotal == 0)\n{\n\t\tpipelineTotal = 1;\n}\nintakePct = (intakeCount * 100.0 / pipelineTotal).round(0);\nmatchingPct = (matchingCount * 100.0 / pipelineTotal).round(0);\nestimatingPct = (estimatingCount * 100.0 / pipelineTotal).round(0);\nreadyPct = (readyCount * 100.0 / pipelineTotal).round(0);\ndeclinedTasks = Task[Task_Type == &quot;Reassignment&quot; &amp;&amp; Status != &quot;Completed&quot; &amp;&amp; Status != &quot;Cancelled&quot; &amp;&amp; Related_Estimate.Status == &quot;Declined&quot;] sort by Due_Date asc range from 0 to 4;\nagedPending = Estimate[Status == &quot;Pending&quot; &amp;&amp; Sent_At != null &amp;&amp; Sent_At &lt; zoho.currenttime.subDay(2)] sort by Sent_At asc range from 0 to 4;\nagedMatching = Service_Request[Status == &quot;Matching&quot; &amp;&amp; Matching_Started_At != null &amp;&amp; Matching_Started_At &lt; zoho.currenttime.subDay(3)] sort by Matching_Started_At asc range from 0 to 4;\ninsuranceSoon = MTter[Active == true &amp;&amp; Insurance_Expiry &gt;= zoho.currentdate &amp;&amp; Insurance_Expiry &lt;= zoho.currentdate.addDay(30)] sort by Insurance_Expiry asc range from 0 to 4;\ngeoExceptions = Service_Request[(Geocoding_Status == &quot;Failed&quot; || Geocoding_Status == &quot;Pending Integration&quot;)] sort by Received_At asc range from 0 to 4;\nrecentEvents = Activity[ID != 0] sort by Event_Timestamp desc range from 0 to 19;\n%&gt;\n&lt;style&gt;\n/* ZCS global utility subset used by this page; sourced from zcs-global. */\n:root{--zcs-theme-brand-color:var(--zcs_brand_color);--zcs-page-bg-color:#F3F3F4;--zcs-white-color:#fff;--zcs-primary-text-color:var(--zcs_primary_text_color);--zcs-teritiary-text-color:var(--zcs_tertiary_text_color);--zcs-border-color:var(--zcs_tertiary_border_color);font-size:16px;line-height:1.5}\n.zcs-flex{display:flex}.zcs-inline-flex{display:inline-flex}.zcs-direction-column{flex-direction:column}.zcs-align-items-center{align-items:center}.zcs-justify-space-between{justify-content:space-between}.zcs-justify-center{justify-content:center}.zcs-row{display:flex;flex-wrap:wrap}.zcs-w-full{width:100%}.zcs-wh-full{width:100%;height:100%}.zcs-box-border{box-sizing:border-box}.zcs-relative{position:relative}.zcs-absolute{position:absolute}.zcs-sticky{position:sticky}.zcs-p-0{padding:0}.zcs-p-16{padding:1rem}.zcs-p-24{padding:1.5rem}.zcs-px-10{padding-left:.625rem;padding-right:.625rem}.zcs-px-12{padding-left:.75rem;padding-right:.75rem}.zcs-px-16{padding-left:1rem;padding-right:1rem}.zcs-py-2{padding-top:.125rem;padding-bottom:.125rem}.zcs-py-8{padding-top:.5rem;padding-bottom:.5rem}.zcs-m-0{margin:0}.zcs-gap-8{gap:.5rem}.zcs-gap-10{gap:.625rem}.zcs-gap-12{gap:.75rem}.zcs-gap-16{gap:1rem}.zcs-gap-20{gap:1.25rem}.zcs-gap-24{gap:1.5rem}.zcs-rounded-sm{border-radius:.25rem}.zcs-rounded-md{border-radius:.375rem}.zcs-rounded-lg{border-radius:.5rem}.zcs-rounded-xl{border-radius:.75rem}.zcs-font-12{font-size:.75rem}.zcs-font-13{font-size:.8125rem}.zcs-font-14{font-size:.875rem}.zcs-font-15{font-size:.9375rem}.zcs-font-18{font-size:1.125rem}.zcs-font-20{font-size:1.25rem}.zcs-font-24{font-size:1.5rem}.zcs-font-normal{font-weight:400}.zcs-font-medium{font-weight:500}.zcs-font-semibold{font-weight:600}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-tertiary{color:var(--zcs-teritiary-text-color)}.zcs-text-left{text-align:left}.zcs-text-right{text-align:right}.zcs-card{background:var(--zcs-white-color);border:1px solid var(--zcs_tertiary_border_color);border-radius:12px}.zcs-page-container{background:var(--zcs-page-bg-color)}a{text-decoration:none}\n.fleet-shell{font-family:Arial,sans-serif;min-height:100%;padding:24px 30px}.fleet-header{background:linear-gradient(120deg,var(--zcs_brand_dark_color),var(--zcs_brand_color));color:var(--zcs_brand_foreground_color);padding:24px;border-radius:14px}.fleet-header h1{font-size:24px;margin:0 0 4px}.fleet-header p{margin:0;opacity:.86}.fleet-kpis{display:grid;grid-template-columns:repeat(5,minmax(170px,1fr));gap:16px}.fleet-kpi{padding:18px;min-height:112px}.fleet-kpi-top{display:flex;align-items:center;gap:10px}.fleet-icon{width:40px;height:40px;border-radius:8px;background:var(--zcs_component_hover_color);color:var(--zcs_brand_color);display:flex;align-items:center;justify-content:center;font-size:22px}.fleet-value{font-size:26px;font-weight:600;color:var(--zcs_primary_text_color)}.fleet-label{font-size:13px;color:var(--zcs_tertiary_text_color);margin-top:9px}.fleet-sub{font-size:12px;color:#b8770d;margin-top:3px}.fleet-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:20px}.fleet-section{padding:20px}.fleet-section h2{font-size:18px;margin:0}.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.pipeline-list{list-style:none}.zcs-progress-bar{height:10px;background:var(--zcs_component_hover_color);border-radius:4px}.zcs-progress-bar-indicator{height:inherit;border-radius:inherit;background:var(--zcs_brand_color)}.exception-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.exception-grid .wide{grid-column:1/-1}.zcs-table-wrapper{border:1px solid var(--zcs_tertiary_border_color);background:var(--zcs-white-color);overflow:auto;border-radius:6px}.zcs-table-wrapper table{border-collapse:collapse;width:100%}.zcs-table-wrapper th{background:#F9FAFE;white-space:nowrap}.zcs-table-wrapper td{border-top:1px solid var(--zcs_tertiary_border_color)}.zcs-table-wrapper tr:hover td{background:#F9FAFE}.zcs-badge{width:auto;border:1px solid}.zcs-badge-green{background:#E4FCF3;border-color:#179E6C;color:#179E6C}.zcs-badge-red{background:#FDE3E6;border-color:#FE455D;color:#FE455D}.zcs-badge-yellow{background:#FCF4E6;border-color:#FAAE13;color:#b8770d}.zcs-badge-blue{background:#E8EFFF;border-color:#2A6FFC;color:#2A6FFC}.zcs-badge-grey{background:#e8e8e8;border-color:#666;color:#444}.zcs-quick-action-item{list-style:none;border-radius:8px}.zcs-quick-action-item:hover{border-color:var(--zcs_brand_color)}.zcs-quick-action-link{color:var(--zcs_primary_text_color)}.zcs-quick-action-item:hover .zcs-quick-action-link{color:var(--zcs_brand_color)}.empty{padding:14px;color:var(--zcs_tertiary_text_color);font-size:13px}.note{font-size:12px;color:var(--zcs_tertiary_text_color)}\n@media(max-width:1200px){.fleet-kpis{grid-template-columns:repeat(3,1fr)}}@media(max-width:850px){.fleet-kpis,.fleet-grid,.exception-grid{grid-template-columns:1fr}.exception-grid .wide{grid-column:auto}.fleet-shell{padding:16px}}\n&lt;/style&gt;\n&lt;div class=&quot;zcs-page-container fleet-shell zcs-box-border&quot;&gt;\n\t&lt;div class=&quot;zcs-flex zcs-direction-column zcs-gap-20&quot;&gt;\n\t\t&lt;header class=&quot;fleet-header&quot;&gt;\n\t\t\t&lt;h1&gt;Fleet operations command center&lt;/h1&gt;\n\t\t\t&lt;p&gt;Workload, lifecycle progress, aged approvals and operational exceptions as of &lt;%=zoho.currenttime.toString(&quot;dd MMM yyyy HH:mm&quot;)%&gt;.&lt;/p&gt;\n\t\t&lt;/header&gt;\n\n\t\t&lt;section class=&quot;fleet-kpis&quot;&gt;\n\t\t\t&lt;a href=&quot;#Report:All_Service_Requests&quot; class=&quot;zcs-card fleet-kpi&quot;&gt;&lt;div class=&quot;fleet-kpi-top&quot;&gt;&lt;span class=&quot;fleet-icon&quot;&gt;&lt;i class=&quot;zc-li-outline transportation-car-simple&quot;&gt;&lt;/i&gt;&lt;/span&gt;&lt;span class=&quot;fleet-value&quot;&gt;&lt;%=activeServices%&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;fleet-label&quot;&gt;Active Service IDs&lt;/div&gt;&lt;/a&gt;\n\t\t\t&lt;a href=&quot;#Report:All_Service_Requests&quot; class=&quot;zcs-card fleet-kpi&quot;&gt;&lt;div class=&quot;fleet-kpi-top&quot;&gt;&lt;span class=&quot;fleet-icon&quot;&gt;&lt;i class=&quot;zc-li-outline ui-1-calendar-60&quot;&gt;&lt;/i&gt;&lt;/span&gt;&lt;span class=&quot;fleet-value&quot;&gt;&lt;%=createdThisWeek%&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;fleet-label&quot;&gt;Requests created this week&lt;/div&gt;&lt;/a&gt;\n\t\t\t&lt;a href=&quot;#Report:Matching_Queue&quot; class=&quot;zcs-card fleet-kpi&quot;&gt;&lt;div class=&quot;fleet-kpi-top&quot;&gt;&lt;span class=&quot;fleet-icon&quot;&gt;&lt;i class=&quot;zc-li-outline arrows-2-split&quot;&gt;&lt;/i&gt;&lt;/span&gt;&lt;span class=&quot;fleet-value&quot;&gt;&lt;%=matchingCount%&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;fleet-label&quot;&gt;Requests pending Matching&lt;/div&gt;&lt;/a&gt;\n\t\t\t&lt;a href=&quot;#Report:Pending_Estimates&quot; class=&quot;zcs-card fleet-kpi&quot;&gt;&lt;div class=&quot;fleet-kpi-top&quot;&gt;&lt;span class=&quot;fleet-icon&quot;&gt;&lt;i class=&quot;zc-li-outline ui-2-time&quot;&gt;&lt;/i&gt;&lt;/span&gt;&lt;span class=&quot;fleet-value&quot;&gt;&lt;%=pendingApprovals%&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;fleet-label&quot;&gt;Pending MTter approvals&lt;/div&gt;&lt;div class=&quot;fleet-sub&quot;&gt;Oldest: &lt;%=oldestPendingAge%&gt; calendar days&lt;/div&gt;&lt;/a&gt;\n\t\t\t&lt;a href=&quot;#Report:All_Estimates&quot; class=&quot;zcs-card fleet-kpi&quot;&gt;&lt;div class=&quot;fleet-kpi-top&quot;&gt;&lt;span class=&quot;fleet-icon&quot;&gt;&lt;i class=&quot;zc-li-outline business-money-coins&quot;&gt;&lt;/i&gt;&lt;/span&gt;&lt;span class=&quot;fleet-value&quot;&gt;&lt;%=approvedValue.round(2)%&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;fleet-label&quot;&gt;Approved estimate value this month&lt;/div&gt;&lt;div class=&quot;fleet-sub&quot;&gt;Recorded currencies; not FX-normalized&lt;/div&gt;&lt;/a&gt;\n\t\t&lt;/section&gt;\n\n\t\t&lt;section class=&quot;fleet-grid&quot;&gt;\n\t\t\t&lt;div class=&quot;zcs-card fleet-section&quot;&gt;\n\t\t\t\t&lt;div class=&quot;section-head&quot;&gt;&lt;h2&gt;Lifecycle pipeline&lt;/h2&gt;&lt;span class=&quot;note&quot;&gt;Current Phase 1 stages&lt;/span&gt;&lt;/div&gt;\n\t\t\t\t&lt;ul class=&quot;pipeline-list zcs-flex zcs-direction-column zcs-gap-16 zcs-p-0 zcs-m-0&quot;&gt;\n\t\t\t\t\t&lt;li&gt;&lt;p class=&quot;zcs-flex zcs-justify-space-between zcs-m-0 zcs-font-14&quot;&gt;&lt;span&gt;Intake&lt;/span&gt;&lt;strong&gt;&lt;%=intakeCount%&gt;&lt;/strong&gt;&lt;/p&gt;&lt;div class=&quot;zcs-progress-bar&quot;&gt;&lt;div class=&quot;zcs-progress-bar-indicator&quot; style=&quot;width:&lt;%=intakePct%&gt;%;&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/li&gt;\n\t\t\t\t\t&lt;li&gt;&lt;p class=&quot;zcs-flex zcs-justify-space-between zcs-m-0 zcs-font-14&quot;&gt;&lt;span&gt;Matching&lt;/span&gt;&lt;strong&gt;&lt;%=matchingCount%&gt;&lt;/strong&gt;&lt;/p&gt;&lt;div class=&quot;zcs-progress-bar&quot;&gt;&lt;div class=&quot;zcs-progress-bar-indicator&quot; style=&quot;width:&lt;%=matchingPct%&gt;%;&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/li&gt;\n\t\t\t\t\t&lt;li&gt;&lt;p class=&quot;zcs-flex zcs-justify-space-between zcs-m-0 zcs-font-14&quot;&gt;&lt;span&gt;Estimating&lt;/span&gt;&lt;strong&gt;&lt;%=estimatingCount%&gt;&lt;/strong&gt;&lt;/p&gt;&lt;div class=&quot;zcs-progress-bar&quot;&gt;&lt;div class=&quot;zcs-progress-bar-indicator&quot; style=&quot;width:&lt;%=estimatingPct%&gt;%;&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/li&gt;\n\t\t\t\t\t&lt;li&gt;&lt;p class=&quot;zcs-flex zcs-justify-space-between zcs-m-0 zcs-font-14&quot;&gt;&lt;span&gt;Ready for quote&lt;/span&gt;&lt;strong&gt;&lt;%=readyCount%&gt;&lt;/strong&gt;&lt;/p&gt;&lt;div class=&quot;zcs-progress-bar&quot;&gt;&lt;div class=&quot;zcs-progress-bar-indicator&quot; style=&quot;width:&lt;%=readyPct%&gt;%;&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/li&gt;\n\t\t\t\t&lt;/ul&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;aside class=&quot;zcs-quick-actions-wrapper zcs-card zcs-flex zcs-direction-column zcs-gap-16 zcs-p-16 zcs-box-border&quot;&gt;\n\t\t\t\t&lt;h2 class=&quot;zcs-font-18 zcs-font-semibold zcs-m-0&quot;&gt;Shortcuts&lt;/h2&gt;\n\t\t\t\t&lt;ul class=&quot;zcs-flex zcs-direction-column zcs-gap-12 zcs-p-0 zcs-m-0&quot;&gt;\n\t\t\t\t\t&lt;li class=&quot;zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8&quot;&gt;&lt;a class=&quot;zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8&quot; href=&quot;#Report:Matching_Queue&quot;&gt;&lt;i class=&quot;zc-li-outline arrows-2-split&quot;&gt;&lt;/i&gt;&lt;span&gt;Matching Queue&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;\n\t\t\t\t\t&lt;li class=&quot;zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8&quot;&gt;&lt;a class=&quot;zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8&quot; href=&quot;#Report:Pending_Estimates&quot;&gt;&lt;i class=&quot;zc-li-outline ui-2-time&quot;&gt;&lt;/i&gt;&lt;span&gt;Pending Estimates&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;\n\t\t\t\t\t&lt;li class=&quot;zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8&quot;&gt;&lt;a class=&quot;zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8&quot; href=&quot;#Report:All_Tasks&quot;&gt;&lt;i class=&quot;zc-li-outline files-2-task&quot;&gt;&lt;/i&gt;&lt;span&gt;Tasks&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;\n\t\t\t\t\t&lt;li class=&quot;zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8&quot;&gt;&lt;a class=&quot;zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8&quot; href=&quot;#Report:All_Service_Requests&quot;&gt;&lt;i class=&quot;zc-li-outline files-2-doc&quot;&gt;&lt;/i&gt;&lt;span&gt;Service Request master&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;\n\t\t\t\t\t&lt;li class=&quot;zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8&quot;&gt;&lt;a class=&quot;zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8&quot; href=&quot;#Report:All_MTters&quot;&gt;&lt;i class=&quot;zc-li-outline business-badge&quot;&gt;&lt;/i&gt;&lt;span&gt;MTter master&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;\n\t\t\t\t\t&lt;li class=&quot;zcs-quick-action-item zcs-card zcs-px-12 zcs-py-8&quot;&gt;&lt;a class=&quot;zcs-quick-action-link zcs-flex zcs-align-items-center zcs-gap-8&quot; href=&quot;#Report:All_Parts&quot;&gt;&lt;i class=&quot;zc-li-outline design-tool-hand&quot;&gt;&lt;/i&gt;&lt;span&gt;Parts master&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;\n\t\t\t\t&lt;/ul&gt;\n\t\t\t&lt;/aside&gt;\n\t\t&lt;/section&gt;\n\n\t\t&lt;section class=&quot;exception-grid&quot;&gt;\n\t\t\t&lt;div class=&quot;zcs-card fleet-section&quot;&gt;&lt;div class=&quot;section-head&quot;&gt;&lt;h2&gt;Declined estimates needing reassignment&lt;/h2&gt;&lt;a href=&quot;#Report:Open_Reassignment_Tasks&quot; class=&quot;note&quot;&gt;Open report&lt;/a&gt;&lt;/div&gt;&lt;div class=&quot;zcs-table-wrapper&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;Estimate&lt;/th&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;Service ID&lt;/th&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;Due&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;% for each t in declinedTasks { %&gt;&lt;tr&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=ifnull(t.Related_Estimate.Estimate_ID,&quot;Not linked&quot;)%&gt;&lt;/td&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=ifnull(t.Service_Request.Service_ID,&quot;Not assigned&quot;)%&gt;&lt;/td&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=ifnull(t.Due_Date.toString(&quot;dd MMM yyyy&quot;),&quot;Not set&quot;)%&gt;&lt;/td&gt;&lt;/tr&gt;&lt;% } %&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;% if(declinedTasks.count() == 0) { %&gt;&lt;div class=&quot;empty&quot;&gt;No open reassignment tasks tied to declined estimates.&lt;/div&gt;&lt;% } %&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-card fleet-section&quot;&gt;&lt;div class=&quot;section-head&quot;&gt;&lt;h2&gt;Pending estimates over 2 days&lt;/h2&gt;&lt;a href=&quot;#Report:Pending_Estimates&quot; class=&quot;note&quot;&gt;Calendar-day approximation&lt;/a&gt;&lt;/div&gt;&lt;div class=&quot;zcs-table-wrapper&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;Estimate&lt;/th&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;MTter&lt;/th&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-right&quot;&gt;Age&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;% for each e in agedPending { age = e.Sent_At.daysBetween(zoho.currenttime); %&gt;&lt;tr&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=ifnull(e.Estimate_ID,&quot;Pending ID&quot;)%&gt;&lt;/td&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=ifnull(e.MTter.MTter_Name,&quot;Not assigned&quot;)%&gt;&lt;/td&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8 zcs-text-right&quot;&gt;&lt;%=age%&gt; days&lt;/td&gt;&lt;/tr&gt;&lt;% } %&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;% if(agedPending.count() == 0) { %&gt;&lt;div class=&quot;empty&quot;&gt;No pending estimates exceed the 2 calendar-day approximation.&lt;/div&gt;&lt;% } %&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-card fleet-section&quot;&gt;&lt;div class=&quot;section-head&quot;&gt;&lt;h2&gt;Matching over 3 days&lt;/h2&gt;&lt;a href=&quot;#Report:Matching_Queue&quot; class=&quot;note&quot;&gt;Calendar days&lt;/a&gt;&lt;/div&gt;&lt;div class=&quot;zcs-table-wrapper&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;Service ID&lt;/th&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;Program&lt;/th&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-right&quot;&gt;Age&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;% for each r in agedMatching { matchAge = r.Matching_Started_At.daysBetween(zoho.currenttime); %&gt;&lt;tr&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=ifnull(r.Service_ID,&quot;Pending ID&quot;)%&gt;&lt;/td&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=ifnull(r.Program_Name,&quot;Not set&quot;)%&gt;&lt;/td&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8 zcs-text-right&quot;&gt;&lt;%=matchAge%&gt; days&lt;/td&gt;&lt;/tr&gt;&lt;% } %&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;% if(agedMatching.count() == 0) { %&gt;&lt;div class=&quot;empty&quot;&gt;No Matching requests exceed 3 calendar days.&lt;/div&gt;&lt;% } %&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-card fleet-section&quot;&gt;&lt;div class=&quot;section-head&quot;&gt;&lt;h2&gt;Insurance expiring within 30 days&lt;/h2&gt;&lt;a href=&quot;#Report:Insurance_Expiring&quot; class=&quot;note&quot;&gt;Active MTters&lt;/a&gt;&lt;/div&gt;&lt;div class=&quot;zcs-table-wrapper&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;MTter&lt;/th&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;Type&lt;/th&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;Expiry&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;% for each m in insuranceSoon { %&gt;&lt;tr&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=ifnull(m.MTter_Name,&quot;Not set&quot;)%&gt;&lt;/td&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=ifnull(m.MTter_Type,&quot;Not set&quot;)%&gt;&lt;/td&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=m.Insurance_Expiry.toString(&quot;dd MMM yyyy&quot;)%&gt;&lt;/td&gt;&lt;/tr&gt;&lt;% } %&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;% if(insuranceSoon.count() == 0) { %&gt;&lt;div class=&quot;empty&quot;&gt;No active MTter insurance expires in the next 30 days.&lt;/div&gt;&lt;% } %&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-card fleet-section wide&quot;&gt;&lt;div class=&quot;section-head&quot;&gt;&lt;h2&gt;Geocoding and integration exceptions&lt;/h2&gt;&lt;a href=&quot;#Report:All_Service_Requests&quot; class=&quot;note&quot;&gt;Failed or pending integration&lt;/a&gt;&lt;/div&gt;&lt;div class=&quot;zcs-table-wrapper&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;Service ID&lt;/th&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;Program&lt;/th&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;Status&lt;/th&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;Warning&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;% for each g in geoExceptions { geoClass = &quot;zcs-badge-yellow&quot;; if(g.Geocoding_Status == &quot;Failed&quot;) { geoClass = &quot;zcs-badge-red&quot;; } %&gt;&lt;tr&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=ifnull(g.Service_ID,&quot;Pending ID&quot;)%&gt;&lt;/td&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=ifnull(g.Program_Name,&quot;Not set&quot;)%&gt;&lt;/td&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;span class=&quot;zcs-badge &lt;%=geoClass%&gt; zcs-inline-flex zcs-rounded-sm zcs-px-10 zcs-py-2&quot;&gt;&lt;%=g.Geocoding_Status%&gt;&lt;/span&gt;&lt;/td&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=ifnull(g.Geocoding_Warning,&quot;No warning supplied&quot;)%&gt;&lt;/td&gt;&lt;/tr&gt;&lt;% } %&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;% if(geoExceptions.count() == 0) { %&gt;&lt;div class=&quot;empty&quot;&gt;No geocoding failures or pending-integration requests.&lt;/div&gt;&lt;% } %&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t&lt;/section&gt;\n\n\t\t&lt;section class=&quot;zcs-card fleet-section&quot;&gt;\n\t\t\t&lt;div class=&quot;section-head&quot;&gt;&lt;h2&gt;Latest activity&lt;/h2&gt;&lt;a href=&quot;#Report:Activity_Log&quot; class=&quot;note&quot;&gt;Latest 20 events&lt;/a&gt;&lt;/div&gt;\n\t\t\t&lt;div class=&quot;zcs-table-wrapper&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;Time&lt;/th&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;Service ID&lt;/th&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;Event&lt;/th&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;User&lt;/th&gt;&lt;th class=&quot;zcs-px-16 zcs-py-8 zcs-text-left&quot;&gt;Description&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;% for each a in recentEvents { badgeClass = &quot;zcs-badge-blue&quot;; if(a.Event_Type.contains(&quot;Declined&quot;)) { badgeClass = &quot;zcs-badge-red&quot;; } else if(a.Event_Type.contains(&quot;Approved&quot;) || a.Event_Type.contains(&quot;Completed&quot;)) { badgeClass = &quot;zcs-badge-green&quot;; } else if(a.Event_Type.contains(&quot;Sent&quot;) || a.Event_Type.contains(&quot;Task&quot;)) { badgeClass = &quot;zcs-badge-yellow&quot;; } %&gt;&lt;tr&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=a.Event_Timestamp.toString(&quot;dd MMM HH:mm&quot;)%&gt;&lt;/td&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=ifnull(a.Service_Request.Service_ID,&quot;Not linked&quot;)%&gt;&lt;/td&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;span class=&quot;zcs-badge &lt;%=badgeClass%&gt; zcs-inline-flex zcs-rounded-sm zcs-px-10 zcs-py-2&quot;&gt;&lt;%=a.Event_Type%&gt;&lt;/span&gt;&lt;/td&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=ifnull(a.User_Email,&quot;System&quot;)%&gt;&lt;/td&gt;&lt;td class=&quot;zcs-px-16 zcs-py-8&quot;&gt;&lt;%=ifnull(a.Description,&quot;No description&quot;)%&gt;&lt;/td&gt;&lt;/tr&gt;&lt;% } %&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;% if(recentEvents.count() == 0) { %&gt;&lt;div class=&quot;empty&quot;&gt;No activity events are available.&lt;/div&gt;&lt;% } %&gt;&lt;/div&gt;\n\t\t&lt;/section&gt;\n\t&lt;/div&gt;\n&lt;/div&gt;\n\t\t\t\t\t\t&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t</layout>\n</zml>"
+		}
+	}
+
+	workflow
+	{
+		form
+		{
+			Estimate_Approved_Success as "Approve Estimate Slice"
+			{
+			    type = form
+			    form = Estimate[Status == "Approved"]
+			    record event = on edit
+			    description = "Records approval, recomputes request totals, and advances fully approved requests to Ready for quote."
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                update Estimate[ID == input.ID]
+			                [
+			                    Responded_At = zoho.currenttime
+			                    Active_Slice = true
+			                ];
+			                approved_activity = insert into Activity
+			                [
+			                    Service_Request = input.Service_Request
+			                    Related_Estimate = input.ID
+			                    Event_Timestamp = zoho.currenttime
+			                    User_Email = zoho.loginuser
+			                    Event_Type = "Estimate Approved"
+			                    Description = input.Estimate_ID + " approved."
+			                    Internal_Only = true
+			                ];
+			                active_count = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status != "Superseded"].count(ID);
+			                approved_count = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status == "Approved"].count(ID);
+			                approved_vehicles = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status == "Approved"].sum(Vehicles_Assigned);
+			                assigned_count = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status != "Superseded"].sum(Vehicles_Assigned);
+			                if(approved_vehicles == null)
+			                {
+			                    approved_vehicles = 0;
+			                }
+			                if(assigned_count == null)
+			                {
+			                    assigned_count = 0;
+			                }
+			                request_rec = Service_Request[ID == input.Service_Request];
+			                remaining_count = request_rec.Vehicle_Count - assigned_count;
+			                next_status = request_rec.Status;
+			                if(active_count > 0 && active_count == approved_count && approved_vehicles == request_rec.Vehicle_Count)
+			                {
+			                    next_status = "Ready for quote";
+			                }
+			                update Service_Request[ID == input.Service_Request]
+			                [
+			                    Status = next_status
+			                    Approved_Estimates_Count = approved_count
+			                    Assigned_Vehicle_Count = assigned_count
+			                    Remaining_Unassigned_Vehicles = remaining_count
+			                ];
+			                totals_activity = insert into Activity
+			                [
+			                    Service_Request = input.Service_Request
+			                    Related_Estimate = input.ID
+			                    Event_Timestamp = zoho.currenttime
+			                    User_Email = zoho.loginuser
+			                    Event_Type = "Totals Recalculated"
+			                    Description = "Approved slices: " + approved_count + "; approved vehicles: " + approved_vehicles + "."
+			                    Internal_Only = true
+			                ];
+			                if(next_status == "Ready for quote")
+			                {
+			                    ready_activity = insert into Activity
+			                    [
+			                        Service_Request = input.Service_Request
+			                        Related_Estimate = input.ID
+			                        Event_Timestamp = zoho.currenttime
+			                        User_Email = zoho.loginuser
+			                        Event_Type = "Status Changed"
+			                        Description = "All active slices approved; service request advanced to Ready for quote."
+			                        Internal_Only = true
+			                    ];
+			                }
+			                sendmail
+			                (
+			                    from : zoho.adminuserid
+			                    to : zoho.adminuserid
+			                    subject : "Estimate approved: " + input.Estimate_ID
+			                    message : "Operations notification: the assigned MTter approved this estimate slice. Request status: " + next_status
+			                )
+			            )
+			        }
+			    }
+			}
+
+			Estimate_Create_Success as "Create Estimate Slice"
+			{
+			    type = form
+			    form = Estimate
+			    record event = on add
+			    description = "Initializes a slice, supersedes a declined predecessor, updates request counts, logs activity, and notifies the MTter."
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                id_text = input.ID.toString();
+			                if(id_text.length() == 1)
+			                {
+			                    estimate_code = "EST-000" + id_text;
+			                }
+			                else if(id_text.length() == 2)
+			                {
+			                    estimate_code = "EST-00" + id_text;
+			                }
+			                else if(id_text.length() == 3)
+			                {
+			                    estimate_code = "EST-0" + id_text;
+			                }
+			                else
+			                {
+			                    estimate_code = "EST-" + id_text;
+			                }
+			                update Estimate[ID == input.ID]
+			                [
+			                    Estimate_ID = estimate_code
+			                    Status = "Pending"
+			                    Sent_At = zoho.currenttime
+			                    Active_Slice = true
+			                    Reminder_Sent = false
+			                ];
+			                if(input.Supersedes_Estimate != null)
+			                {
+			                    old_estimate = Estimate[ID == input.Supersedes_Estimate];
+			                    if(old_estimate.Status == "Declined")
+			                    {
+			                        update Estimate[ID == input.Supersedes_Estimate]
+			                        [
+			                            Status = "Superseded"
+			                            Active_Slice = false
+			                        ];
+			                        superseded_activity = insert into Activity
+			                        [
+			                            Service_Request = input.Service_Request
+			                            Related_Estimate = input.Supersedes_Estimate
+			                            Event_Timestamp = zoho.currenttime
+			                            User_Email = zoho.loginuser
+			                            Event_Type = "Estimate Superseded"
+			                            Description = "Declined estimate replaced by " + estimate_code
+			                            Internal_Only = true
+			                        ];
+			                    }
+			                }
+			                assigned_count = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status != "Superseded"].sum(Vehicles_Assigned);
+			                if(assigned_count == null)
+			                {
+			                    assigned_count = 0;
+			                }
+			                request_rec = Service_Request[ID == input.Service_Request];
+			                remaining_count = request_rec.Vehicle_Count - assigned_count;
+			                request_status = request_rec.Status;
+			                if(request_status == "Matching")
+			                {
+			                    request_status = "Estimating";
+			                }
+			                update Service_Request[ID == input.Service_Request]
+			                [
+			                    Status = request_status
+			                    Assigned_Vehicle_Count = assigned_count
+			                    Remaining_Unassigned_Vehicles = remaining_count
+			                ];
+			                sent_activity = insert into Activity
+			                [
+			                    Service_Request = input.Service_Request
+			                    Related_Estimate = input.ID
+			                    Event_Timestamp = zoho.currenttime
+			                    User_Email = zoho.loginuser
+			                    Event_Type = "Estimate Sent"
+			                    Description = estimate_code + " assigned for " + input.Vehicles_Assigned + " vehicle(s)."
+			                    Internal_Only = true
+			                ];
+			                if(input.Ranking_Override == true)
+			                {
+			                    override_activity = insert into Activity
+			                    [
+			                        Service_Request = input.Service_Request
+			                        Related_Estimate = input.ID
+			                        Event_Timestamp = zoho.currenttime
+			                        User_Email = zoho.loginuser
+			                        Event_Type = "Ranking Override"
+			                        Description = input.Override_Reason
+			                        Internal_Only = true
+			                    ];
+			                }
+			                sendmail
+			                (
+			                    from : zoho.adminuserid
+			                    to : input.Assigned_Portal_Email
+			                    subject : "Estimate slice " + estimate_code + " requires review"
+			                    message : "A vehicle-count estimate slice has been assigned to you. Sign in to review labor, related lines, and approve or decline."
+			                )
+			            )
+			        }
+			    }
+			}
+
+			Estimate_Declined_Success as "Decline Estimate Slice"
+			{
+			    type = form
+			    form = Estimate[Status == "Declined"]
+			    record event = on edit
+			    description = "Closes a declined slice, creates reassignment work, returns the request to Matching, logs, and notifies operations."
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                update Estimate[ID == input.ID]
+			                [
+			                    Responded_At = zoho.currenttime
+			                    Active_Slice = false
+			                ];
+			                reassignment_task = insert into Task
+			                [
+			                    Service_Request = input.Service_Request
+			                    Task_Type = "Reassignment"
+			                    Related_Estimate = input.ID
+			                    Assigned_To_Email = zoho.adminuserid
+			                    Due_Date = zoho.currentdate.addDay(1)
+			                    Priority = "High"
+			                    Status = "Open"
+			                    Description = "Reassign declined estimate " + input.Estimate_ID + ". Reason: " + input.Decline_Reason
+			                    Created_Automatically = true
+			                ];
+			                assigned_count = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status != "Superseded"].sum(Vehicles_Assigned);
+			                approved_count = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status == "Approved"].count(ID);
+			                if(assigned_count == null)
+			                {
+			                    assigned_count = 0;
+			                }
+			                request_rec = Service_Request[ID == input.Service_Request];
+			                remaining_count = request_rec.Vehicle_Count - assigned_count;
+			                update Service_Request[ID == input.Service_Request]
+			                [
+			                    Status = "Matching"
+			                    Approved_Estimates_Count = approved_count
+			                    Assigned_Vehicle_Count = assigned_count
+			                    Remaining_Unassigned_Vehicles = remaining_count
+			                ];
+			                decline_activity = insert into Activity
+			                [
+			                    Service_Request = input.Service_Request
+			                    Related_Estimate = input.ID
+			                    Event_Timestamp = zoho.currenttime
+			                    User_Email = zoho.loginuser
+			                    Event_Type = "Estimate Declined"
+			                    Description = input.Estimate_ID + " declined: " + input.Decline_Reason + ". " + input.Decline_Details
+			                    Internal_Only = true
+			                ];
+			                task_activity = insert into Activity
+			                [
+			                    Service_Request = input.Service_Request
+			                    Related_Estimate = input.ID
+			                    Event_Timestamp = zoho.currenttime
+			                    User_Email = zoho.loginuser
+			                    Event_Type = "Task Created"
+			                    Description = "Automatic reassignment task created for declined estimate."
+			                    Internal_Only = true
+			                ];
+			                sendmail
+			                (
+			                    from : zoho.adminuserid
+			                    to : zoho.adminuserid
+			                    subject : "Estimate declined: " + input.Estimate_ID
+			                    message : "Operations notification: the estimate was declined and a reassignment task was created."
+			                )
+			            )
+			        }
+			    }
+			}
+
+			Estimate_MTter_Input as "Estimate MTter Input"
+			{
+			    type = form
+			    form = Estimate
+			    record event = on add or edit
+			    description = "Populates portal ownership and stored-coordinate matching indicators."
+			
+			    on user input of MTter
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                input.Assigned_Portal_Email = null;
+			                input.Distance_Value = null;
+			                input.Within_Radius = false;
+			                input.Matching_Warning = "";
+			                if(input.MTter != null)
+			                {
+			                    mtter_rec = MTter[ID == input.MTter];
+			                    input.Assigned_Portal_Email = mtter_rec.Portal_Login_Email;
+			                    if(input.Service_Request != null)
+			                    {
+			                        request_rec = Service_Request[ID == input.Service_Request];
+			                        if(mtter_rec.Latitude != null && mtter_rec.Longitude != null && request_rec.Drop_Off_Latitude != null && request_rec.Drop_Off_Longitude != null)
+			                        {
+			                            input.Matching_Warning = "Stored coordinates are available; distance calculation requires the configured matching connector.";
+			                        }
+			                        else
+			                        {
+			                            input.Matching_Warning = "Matching distance unavailable because stored coordinates are incomplete and no geocoding connector is configured.";
+			                        }
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Estimate_On_Load as "Estimate On Load"
+			{
+			    type = form
+			    form = Estimate
+			    record event = on add or edit
+			    description = "Applies ownership-aware field locking and decline-field visibility."
+			
+			    on load
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                profile_name = thisapp.permissions.loginUserProfile();
+			                portal_profile = thisapp.portal.loginUserProfile();
+			                hide Decline_Reason, Decline_Details;
+			                disable Estimate_ID, Parts_Total, Labor_Total, Estimate_Total, Sent_At, Responded_At, Assigned_Portal_Email, Distance_Value, Within_Radius, Matching_Warning, Reminder_Sent;
+			                if(input.Status == "Declined")
+			                {
+			                    show Decline_Reason, Decline_Details;
+			                }
+			                if(portal_profile == "MTter")
+			                {
+			                    disable Service_Request, MTter, Capability_Slice, Vehicles_Assigned, Currency, Supersedes_Estimate, Active_Slice, Ranking_Override, Override_Reason;
+			                    if(input.Assigned_Portal_Email != zoho.loginuser)
+			                    {
+			                        disable Status, Labor_Hours, Labor_Rate, Decline_Reason, Decline_Details;
+			                        alert "This estimate slice is assigned to another MTter.";
+			                    }
+			                }
+			                if(profile_name != "Internal_Admin" && profile_name != "Internal_Coordinator" && portal_profile != "MTter")
+			                {
+			                    disable Service_Request, MTter, Capability_Slice, Vehicles_Assigned, Currency, Labor_Hours, Labor_Rate, Status, Decline_Reason, Decline_Details, Supersedes_Estimate, Active_Slice, Ranking_Override, Override_Reason;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Estimate_Protected_Fields_Validate as "Validate Estimate Protected Fields"
+			{
+			    type = form
+			    form = Estimate
+			    record event = on edit
+			    description = "Prevents MTters from mutating assignment, ownership, ranking, identifier, and calculated total fields."
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                portal_profile = thisapp.portal.loginUserProfile();
+			                if(portal_profile == "MTter")
+			                {
+			                    if(input.Assigned_Portal_Email != zoho.loginuser)
+			                    {
+			                        alert "You may update only your assigned estimate slices.";
+			                        cancel submit;
+			                    }
+			                    if(old.Service_Request != input.Service_Request || old.MTter != input.MTter || old.Capability_Slice != input.Capability_Slice || old.Vehicles_Assigned != input.Vehicles_Assigned || old.Currency != input.Currency || old.Estimate_ID != input.Estimate_ID || old.Assigned_Portal_Email != input.Assigned_Portal_Email || old.Ranking_Override != input.Ranking_Override || old.Override_Reason != input.Override_Reason || old.Parts_Total != input.Parts_Total || old.Labor_Total != input.Labor_Total || old.Estimate_Total != input.Estimate_Total)
+			                    {
+			                        alert "Protected assignment, ownership, ranking, ID, and total fields cannot be changed by MTters.";
+			                        cancel submit;
+			                    }
+			                    if(old.Status != "Pending")
+			                    {
+			                        alert "Only pending estimate slices may be edited by MTters.";
+			                        cancel submit;
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Estimate_Service_Request_Input as "Estimate Service Request Input"
+			{
+			    type = form
+			    form = Estimate
+			    record event = on add or edit
+			    description = "Calculates and displays the request's remaining assignable vehicle count."
+			
+			    on user input of Service_Request
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if(input.Service_Request != null)
+			                {
+			                    request_rec = Service_Request[ID == input.Service_Request];
+			                    assigned_count = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status != "Superseded" && ID != input.ID].sum(Vehicles_Assigned);
+			                    if(assigned_count == null)
+			                    {
+			                        assigned_count = 0;
+			                    }
+			                    remaining_count = request_rec.Vehicle_Count - assigned_count;
+			                    alert "Remaining unassigned vehicles before this slice: " + remaining_count;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Estimate_Status_UI as "Estimate Status UI"
+			{
+			    type = form
+			    form = Estimate
+			    record event = on add or edit
+			    description = "Shows decline inputs only for a declined decision."
+			
+			    on user input of Status
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if(input.Status == "Declined")
+			                {
+			                    show Decline_Reason, Decline_Details;
+			                }
+			                else
+			                {
+			                    hide Decline_Reason, Decline_Details;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Estimate_Validate as "Validate Estimate"
+			{
+			    type = form
+			    form = Estimate
+			    record event = on add or edit
+			    description = "Validates slice capacity, assignment ownership, active MTter, capability match, overrides, and decline details."
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if(input.Vehicles_Assigned == null || input.Vehicles_Assigned < 1)
+			                {
+			                    alert(Vehicles_Assigned, "Vehicles assigned must be at least 1.");
+			                    cancel submit;
+			                }
+			                request_rec = Service_Request[ID == input.Service_Request];
+			                other_vehicles = Estimate[Service_Request == input.Service_Request && Active_Slice == true && Status != "Superseded" && ID != input.ID].sum(Vehicles_Assigned);
+			                if(other_vehicles == null)
+			                {
+			                    other_vehicles = 0;
+			                }
+			                if(other_vehicles + input.Vehicles_Assigned > request_rec.Vehicle_Count)
+			                {
+			                    alert(Vehicles_Assigned, "Active estimate slices cannot exceed the service request vehicle count.");
+			                    cancel submit;
+			                }
+			                mtter_rec = MTter[ID == input.MTter];
+			                if(mtter_rec.Active != true)
+			                {
+			                    alert(MTter, "Select an active MTter.");
+			                    cancel submit;
+			                }
+			                capability_match = false;
+			                for each capability_id in input.Capability_Slice
+			                {
+			                    if(mtter_rec.Capabilities.contains(capability_id) && request_rec.Requested_Capabilities.contains(capability_id))
+			                    {
+			                        capability_match = true;
+			                    }
+			                }
+			                profile_name = thisapp.permissions.loginUserProfile();
+			                portal_profile = thisapp.portal.loginUserProfile();
+			                override_allowed = (profile_name == "Internal_Admin" || profile_name == "Internal_Coordinator") && input.Ranking_Override == true && input.Override_Reason != null && input.Override_Reason.trim() != "";
+			                if(capability_match != true && override_allowed != true)
+			                {
+			                    alert(Capability_Slice, "The MTter must cover at least one requested capability, or an authorized ranking override and reason are required.");
+			                    cancel submit;
+			                }
+			                if(input.Ranking_Override == true && (input.Override_Reason == null || input.Override_Reason.trim() == ""))
+			                {
+			                    alert(Override_Reason, "Supply the ranking override reason.");
+			                    cancel submit;
+			                }
+			                if(input.Status == "Declined" && input.Decline_Reason == null)
+			                {
+			                    alert(Decline_Reason, "Select a decline reason.");
+			                    cancel submit;
+			                }
+			                if(input.Status == "Declined" && input.Decline_Reason == "Other" && (input.Decline_Details == null || input.Decline_Details.trim() == ""))
+			                {
+			                    alert(Decline_Details, "Provide decline details when the reason is Other.");
+			                    cancel submit;
+			                }
+			                if(portal_profile == "MTter")
+			                {
+			                    if(input.Assigned_Portal_Email != zoho.loginuser)
+			                    {
+			                        alert "You may update only your assigned estimate slices.";
+			                        cancel submit;
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Load_Estimate_Line as "Load Estimate Line"
+			{
+			    type = form
+			    form = Estimate_Line
+			    record event = on add or edit
+			    description = "Loads approved catalog pricing, protects calculated fields, and enforces MTter parent ownership while editing."
+			
+			    on load
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                disable Currency;
+			                disable Line_Parts_Total;
+			                disable Line_Labor_Total;
+			                disable Line_Total;
+			                is_mtter = false;
+			                try
+			                {
+			                    is_mtter = thisapp.portal.isUserInProfile("MTter");
+			                }
+			                catch (permission_error)
+			                {
+			                    is_mtter = false;
+			                }
+			                if(input.Part != null)
+			                {
+			                    selected_part = Part[ID == input.Part];
+			                    if(selected_part.ID != null)
+			                    {
+			                        input.Unit_Price = selected_part.Unit_Price;
+			                        input.Currency = selected_part.Currency;
+			                    }
+			                }
+			                if(is_mtter && input.ID != null)
+			                {
+			                    disable Estimate;
+			                }
+			                if(is_mtter && input.Estimate != null)
+			                {
+			                    parent_estimate = Estimate[ID == input.Estimate];
+			                    if(parent_estimate.ID == null || parent_estimate.Assigned_Portal_Email != zoho.loginuser || parent_estimate.Status != "Pending")
+			                    {
+			                        alert "You may access estimate lines only for your assigned Pending estimate.";
+			                        disable Estimate;
+			                        disable Part;
+			                        disable Quantity_Per_Vehicle;
+			                        disable Unit_Price;
+			                        disable Labor_Hours_Per_Vehicle;
+			                        disable Active;
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Populate_Part_Price as "Populate Part Price"
+			{
+			    type = form
+			    form = Estimate_Line
+			    record event = on add or edit
+			    description = "Copies the current approved catalog price and currency when a part is selected."
+			
+			    on user input of Part
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if(input.Part != null)
+			                {
+			                    selected_part = Part[ID == input.Part];
+			                    if(selected_part.ID != null && selected_part.Active == true)
+			                    {
+			                        input.Unit_Price = selected_part.Unit_Price;
+			                        input.Currency = selected_part.Currency;
+			                    }
+			                    else
+			                    {
+			                        alert "Select an active approved catalog part.";
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Preview_Labor_Totals as "Preview Labor Totals"
+			{
+			    type = form
+			    form = Estimate_Line
+			    record event = on add or edit
+			    description = "Recomputes line preview totals when labor hours change."
+			
+			    on user input of Labor_Hours_Per_Vehicle
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                vehicles = 0;
+			                labor_rate = 0;
+			                if(input.Estimate != null)
+			                {
+			                    parent_estimate = Estimate[ID == input.Estimate];
+			                    vehicles = ifNull(parent_estimate.Vehicles_Assigned,0);
+			                    labor_rate = ifNull(parent_estimate.Labor_Rate,0);
+			                }
+			                input.Line_Parts_Total = ifNull(input.Quantity_Per_Vehicle,0) * ifNull(input.Unit_Price,0) * vehicles;
+			                input.Line_Labor_Total = ifNull(input.Labor_Hours_Per_Vehicle,0) * labor_rate * vehicles;
+			                input.Line_Total = input.Line_Parts_Total + input.Line_Labor_Total;
+			            )
+			        }
+			    }
+			}
+
+			Preview_Price_Totals as "Preview Price Totals"
+			{
+			    type = form
+			    form = Estimate_Line
+			    record event = on add or edit
+			    description = "Recomputes line preview totals when unit price changes."
+			
+			    on user input of Unit_Price
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                vehicles = 0;
+			                labor_rate = 0;
+			                if(input.Estimate != null)
+			                {
+			                    parent_estimate = Estimate[ID == input.Estimate];
+			                    vehicles = ifNull(parent_estimate.Vehicles_Assigned,0);
+			                    labor_rate = ifNull(parent_estimate.Labor_Rate,0);
+			                }
+			                input.Line_Parts_Total = ifNull(input.Quantity_Per_Vehicle,0) * ifNull(input.Unit_Price,0) * vehicles;
+			                input.Line_Labor_Total = ifNull(input.Labor_Hours_Per_Vehicle,0) * labor_rate * vehicles;
+			                input.Line_Total = input.Line_Parts_Total + input.Line_Labor_Total;
+			            )
+			        }
+			    }
+			}
+
+			Preview_Quantity_Totals as "Preview Quantity Totals"
+			{
+			    type = form
+			    form = Estimate_Line
+			    record event = on add or edit
+			    description = "Recomputes line preview totals when quantity changes."
+			
+			    on user input of Quantity_Per_Vehicle
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                vehicles = 0;
+			                labor_rate = 0;
+			                if(input.Estimate != null)
+			                {
+			                    parent_estimate = Estimate[ID == input.Estimate];
+			                    vehicles = ifNull(parent_estimate.Vehicles_Assigned,0);
+			                    labor_rate = ifNull(parent_estimate.Labor_Rate,0);
+			                }
+			                input.Line_Parts_Total = ifNull(input.Quantity_Per_Vehicle,0) * ifNull(input.Unit_Price,0) * vehicles;
+			                input.Line_Labor_Total = ifNull(input.Labor_Hours_Per_Vehicle,0) * labor_rate * vehicles;
+			                input.Line_Total = input.Line_Parts_Total + input.Line_Labor_Total;
+			            )
+			        }
+			    }
+			}
+
+			Sync_Estimate_Totals as "Sync Estimate Totals"
+			{
+			    type = form
+			    form = Estimate_Line
+			    record event = on add or edit
+			    description = "Persists line totals, aggregates active lines to the estimate, and records the recalculation."
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                parent_estimate = Estimate[ID == input.Estimate];
+			                vehicles = ifNull(parent_estimate.Vehicles_Assigned,0);
+			                labor_rate = ifNull(parent_estimate.Labor_Rate,0);
+			                parts_total = ifNull(input.Quantity_Per_Vehicle,0) * ifNull(input.Unit_Price,0) * vehicles;
+			                labor_total = ifNull(input.Labor_Hours_Per_Vehicle,0) * labor_rate * vehicles;
+			                update Estimate_Line[ID == input.ID]
+			                [
+			                    Line_Parts_Total = parts_total
+			                    Line_Labor_Total = labor_total
+			                    Line_Total = parts_total + labor_total
+			                ];
+			                estimate_parts = ifNull(Estimate_Line[Estimate == input.Estimate && Active == true].sum(Line_Parts_Total),0);
+			                estimate_hours = ifNull(Estimate_Line[Estimate == input.Estimate && Active == true].sum(Labor_Hours_Per_Vehicle),0) * vehicles;
+			                estimate_labor = ifNull(Estimate_Line[Estimate == input.Estimate && Active == true].sum(Line_Labor_Total),0);
+			                update Estimate[ID == input.Estimate]
+			                [
+			                    Parts_Total = estimate_parts
+			                    Labor_Hours = estimate_hours
+			                    Labor_Total = estimate_labor
+			                    Estimate_Total = estimate_parts + estimate_labor
+			                ];
+			                activity_id = insert into Activity
+			                [
+			                    Service_Request = parent_estimate.Service_Request
+			                    Related_Estimate = input.Estimate
+			                    Event_Timestamp = zoho.currenttime
+			                    User_Email = zoho.loginuser
+			                    Event_Type = "Totals Recalculated"
+			                    Description = "Estimate totals recalculated after an estimate line was added or edited."
+			                    Internal_Only = true
+			                ];
+			            )
+			        }
+			    }
+			}
+
+			Sync_Estimate_Totals_On_Delete as "Sync Estimate Totals On Delete"
+			{
+			    type = form
+			    form = Estimate_Line
+			    record event = on delete
+			    description = "Re-aggregates active estimate lines after deletion and records the recalculation."
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                parent_estimate = Estimate[ID == input.Estimate];
+			                vehicles = ifNull(parent_estimate.Vehicles_Assigned,0);
+			                estimate_parts = ifNull(Estimate_Line[Estimate == input.Estimate && Active == true].sum(Line_Parts_Total),0);
+			                estimate_hours = ifNull(Estimate_Line[Estimate == input.Estimate && Active == true].sum(Labor_Hours_Per_Vehicle),0) * vehicles;
+			                estimate_labor = ifNull(Estimate_Line[Estimate == input.Estimate && Active == true].sum(Line_Labor_Total),0);
+			                update Estimate[ID == input.Estimate]
+			                [
+			                    Parts_Total = estimate_parts
+			                    Labor_Hours = estimate_hours
+			                    Labor_Total = estimate_labor
+			                    Estimate_Total = estimate_parts + estimate_labor
+			                ];
+			                activity_id = insert into Activity
+			                [
+			                    Service_Request = parent_estimate.Service_Request
+			                    Related_Estimate = input.Estimate
+			                    Event_Timestamp = zoho.currenttime
+			                    User_Email = zoho.loginuser
+			                    Event_Type = "Totals Recalculated"
+			                    Description = "Estimate totals recalculated after an estimate line was deleted."
+			                    Internal_Only = true
+			                ];
+			            )
+			        }
+			    }
+			}
+
+			Validate_Estimate_Line as "Validate Estimate Line"
+			{
+			    type = form
+			    form = Estimate_Line
+			    record event = on add or edit
+			    description = "Validates approved parts, monetary values, currency consistency, and MTter ownership."
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                validation_failed = false;
+			                selected_part = Part[ID == input.Part];
+			                parent_estimate = Estimate[ID == input.Estimate];
+			                if(selected_part.ID == null || selected_part.Active != true)
+			                {
+			                    alert(Part,"Select an active approved catalog part.");
+			                    validation_failed = true;
+			                }
+			                if(input.Quantity_Per_Vehicle == null || input.Quantity_Per_Vehicle <= 0)
+			                {
+			                    alert(Quantity_Per_Vehicle,"Quantity per vehicle must be greater than zero.");
+			                    validation_failed = true;
+			                }
+			                if(input.Unit_Price == null || input.Unit_Price < 0)
+			                {
+			                    alert(Unit_Price,"Unit price cannot be negative.");
+			                    validation_failed = true;
+			                }
+			                if(input.Labor_Hours_Per_Vehicle == null || input.Labor_Hours_Per_Vehicle < 0)
+			                {
+			                    alert(Labor_Hours_Per_Vehicle,"Labor hours cannot be negative.");
+			                    validation_failed = true;
+			                }
+			                if(parent_estimate.ID == null || input.Currency != parent_estimate.Currency)
+			                {
+			                    alert(Currency,"Line currency must match the parent estimate currency.");
+			                    validation_failed = true;
+			                }
+			                is_mtter = false;
+			                try
+			                {
+			                    is_mtter = thisapp.portal.isUserInProfile("MTter");
+			                }
+			                catch (permission_error)
+			                {
+			                    is_mtter = false;
+			                }
+			                if(is_mtter && (parent_estimate.ID == null || parent_estimate.Assigned_Portal_Email != zoho.loginuser || parent_estimate.Status != "Pending"))
+			                {
+			                    alert "MTters may manage lines only under their assigned Pending estimate.";
+			                    validation_failed = true;
+			                }
+			                if(validation_failed)
+			                {
+			                    cancel submit;
+			                }
+			                vehicles = ifNull(parent_estimate.Vehicles_Assigned,0);
+			                labor_rate = ifNull(parent_estimate.Labor_Rate,0);
+			                input.Line_Parts_Total = input.Quantity_Per_Vehicle * input.Unit_Price * vehicles;
+			                input.Line_Labor_Total = input.Labor_Hours_Per_Vehicle * labor_rate * vehicles;
+			                input.Line_Total = input.Line_Parts_Total + input.Line_Labor_Total;
+			            )
+			        }
+			    }
+			}
+
+			Validate_Estimate_Line_Delete as "Validate Estimate Line Delete"
+			{
+			    type = form
+			    form = Estimate_Line
+			    record event = on delete
+			    description = "Restricts MTter deletion to lines under the logged-in MTter's assigned Pending estimate."
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                is_mtter = false;
+			                try
+			                {
+			                    is_mtter = thisapp.portal.isUserInProfile("MTter");
+			                }
+			                catch (permission_error)
+			                {
+			                    is_mtter = false;
+			                }
+			                if(is_mtter)
+			                {
+			                    parent_estimate = Estimate[ID == input.Estimate];
+			                    if(parent_estimate.ID == null || parent_estimate.Assigned_Portal_Email != zoho.loginuser || parent_estimate.Status != "Pending")
+			                    {
+			                        alert "MTters may delete lines only under their assigned Pending estimate.";
+			                        cancel delete;
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Generate_Client_ID as "Generate Client ID"
+			{
+			    type = form
+			    form = FMC_Client
+			    record event = on add or edit
+			    description = "Generates the client identifier after a successful save when it is blank."
+			
+			    on success
+			    {
+			        actions ( Client_ID == null || Client_ID == "" )
+			        {
+			            custom deluge script
+			            (
+			                if(input.ID < 10)
+			                {
+			                    client_code = "CLI-000" + input.ID;
+			                }
+			                else if(input.ID < 100)
+			                {
+			                    client_code = "CLI-00" + input.ID;
+			                }
+			                else if(input.ID < 1000)
+			                {
+			                    client_code = "CLI-0" + input.ID;
+			                }
+			                else
+			                {
+			                    client_code = "CLI-" + input.ID;
+			                }
+			                client_record = FMC_Client[ID == input.ID];
+			                client_record.Client_ID = client_code;
+			            )
+			        }
+			    }
+			}
+
+			Generate_MTter_ID as "Generate MTter ID"
+			{
+			    type = form
+			    form = MTter
+			    record event = on add
+			    description = "Generates the MTter identifier after record creation when it is blank."
+			
+			    on success
+			    {
+			        actions ( MTter_ID == null || MTter_ID == "" )
+			        {
+			            custom deluge script
+			            (
+			                id_text = input.ID.toString();
+			                if(id_text.length() == 1)
+			                {
+			                    input.MTter_ID = "MTT-000" + id_text;
+			                }
+			                else if(id_text.length() == 2)
+			                {
+			                    input.MTter_ID = "MTT-00" + id_text;
+			                }
+			                else if(id_text.length() == 3)
+			                {
+			                    input.MTter_ID = "MTT-0" + id_text;
+			                }
+			                else
+			                {
+			                    input.MTter_ID = "MTT-" + id_text;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Audit_Service_Request_Status as "Audit Service Request Status"
+			{
+			    type = form
+			    form = Service_Request
+			    record event = on edit
+			    description = "Records substantive lifecycle status changes for submitted requests."
+			
+			    on update of Status
+			    {
+			        actions ( Service_ID != null && Service_ID != "" )
+			        {
+			            custom deluge script
+			            (
+			                insert into Activity
+			                [
+			                    Service_Request = input.ID
+			                    Event_Timestamp = zoho.currenttime
+			                    User_Email = zoho.loginuser
+			                    Event_Type = "Status Changed"
+			                    Description = "Service request status changed to " + input.Status + "."
+			                    Internal_Only = true
+			                ];
+			            )
+			        }
+			    }
+			}
+
+			Load_Service_Request as "Load Service Request"
+			{
+			    type = form
+			    form = Service_Request
+			    record event = on add or edit
+			    description = "Applies portal defaults and protects generated and operational fields."
+			
+			    on load
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                app_profile = thisapp.permissions.loginUserProfile();
+			                portal_profile = thisapp.portal.loginUserProfile();
+			                if(portal_profile == "FMC_Client")
+			                {
+			                    client_record = FMC_Client[Portal_Login_Email == zoho.loginuser];
+			                    if(client_record.count() > 0)
+			                    {
+			                        input.FMC_Client = client_record.ID;
+			                    }
+			                    input.Source = "FMC Portal";
+			                    input.Created_By_Email = zoho.loginuser;
+			                    disable FMC_Client;
+			                }
+			                if(app_profile != "Internal_Admin")
+			                {
+			                    disable Service_ID, Status, Received_At, Source, Created_By_Email, Geocoding_Status, Geocoding_Warning, Matching_Started_At, Approved_Estimates_Count, Assigned_Vehicle_Count, Remaining_Unassigned_Vehicles;
+			                }
+			                if(input.Service_ID != null && input.Service_ID != "")
+			                {
+			                    disable Service_ID;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Process_Service_Request as "Process Service Request"
+			{
+			    type = form
+			    form = Service_Request
+			    record event = on add or edit
+			    description = "Keeps drafts unqueued and initializes first-time submitted requests for Phase 1 matching."
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                request_record = Service_Request[ID == input.ID];
+			                if(input.Submission_Action == "Save as Draft" && (input.Service_ID == null || input.Service_ID == ""))
+			                {
+			                    request_record.Status = "Draft";
+			                }
+			                else if(input.Submission_Action == "Submit Request" && (input.Service_ID == null || input.Service_ID == ""))
+			                {
+			                    id_text = input.ID.toString();
+			                    if(id_text.length() == 1)
+			                    {
+			                        padded_id = "000" + id_text;
+			                    }
+			                    else if(id_text.length() == 2)
+			                    {
+			                        padded_id = "00" + id_text;
+			                    }
+			                    else if(id_text.length() == 3)
+			                    {
+			                        padded_id = "0" + id_text;
+			                    }
+			                    else
+			                    {
+			                        padded_id = id_text;
+			                    }
+			                    request_record.Service_ID = "SVC-" + zoho.currentdate.getYear() + "-" + padded_id;
+			                    request_record.Received_At = zoho.currenttime;
+			                    if(request_record.Source == null || request_record.Source == "")
+			                    {
+			                        request_record.Source = "Internal";
+			                    }
+			                    if(request_record.Created_By_Email == null || request_record.Created_By_Email == "")
+			                    {
+			                        request_record.Created_By_Email = zoho.loginuser;
+			                    }
+			                    request_record.Geocoding_Status = "Pending Integration";
+			                    request_record.Geocoding_Warning = "External geocoding connector is not configured.";
+			                    request_record.Approved_Estimates_Count = 0;
+			                    request_record.Assigned_Vehicle_Count = 0;
+			                    request_record.Remaining_Unassigned_Vehicles = input.Vehicle_Count;
+			                    request_record.Status = "Intake";
+			                    request_record.Status = "Matching";
+			                    request_record.Matching_Started_At = zoho.currenttime;
+			                    insert into Activity
+			                    [
+			                        Service_Request = input.ID
+			                        Event_Timestamp = zoho.currenttime
+			                        User_Email = zoho.loginuser
+			                        Event_Type = "Request Submitted"
+			                        Description = "Service request submitted and queued for matching."
+			                        Internal_Only = true
+			                    ];
+			                    insert into Activity
+			                    [
+			                        Service_Request = input.ID
+			                        Event_Timestamp = zoho.currenttime
+			                        User_Email = zoho.loginuser
+			                        Event_Type = "Status Changed"
+			                        Description = "Status advanced from Intake to Matching."
+			                        Internal_Only = true
+			                    ];
+			                    admin_emails = thisapp.permissions.adminEmailIds();
+			                    sendmail
+			                    (
+			                        from : zoho.adminuserid
+			                        to : request_record.Created_By_Email
+			                        subject : "Service request received"
+			                        message : "Your fleet-service request " + request_record.Service_ID + " has been received and queued for matching."
+			                    );
+			                    sendmail
+			                    (
+			                        from : zoho.adminuserid
+			                        to : admin_emails
+			                        subject : "New service request in Matching"
+			                        message : request_record.Service_ID + " has entered the matching queue."
+			                    );
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Service_Request_Lifecycle as "Service Request Lifecycle"
+			{
+			    type = blueprint
+			    form = Service_Request[Status != "Draft"]
+			
+			    start
+			    {
+			        start stage = "Intake"
+			    }
+			
+			    stages
+			    {
+			        "Intake" { }
+			        "Matching" { }
+			        "Estimating" { }
+			        "Ready for quote" { }
+			        "Quote sent" { }
+			        "PO received" { }
+			        "In progress" { }
+			        "Completed" { }
+			        "Invoiced" { }
+			        "Closed" { }
+			    }
+			
+			    transitions
+			    {
+			        Begin_Matching as "Begin Matching"
+			        {
+			            type = normal
+			            from stage = "Intake"
+			            to stage = "Matching"
+			            before
+			            {
+			                transition owner
+			                (
+			                    permissions = {"Internal_Admin","Internal_Coordinator"}
+			                )
+			            }
+			            after { }
+			        }
+			        Begin_Estimating as "Begin Estimating"
+			        {
+			            type = normal
+			            from stage = "Matching"
+			            to stage = "Estimating"
+			            before
+			            {
+			                transition owner
+			                (
+			                    permissions = {"Internal_Admin","Internal_Coordinator"}
+			                )
+			            }
+			            after { }
+			        }
+			        Ready_For_Quote as "Ready for Quote"
+			        {
+			            type = normal
+			            from stage = "Estimating"
+			            to stage = "Ready for quote"
+			            before
+			            {
+			                transition owner
+			                (
+			                    permissions = {"Internal_Admin","Internal_Coordinator"}
+			                )
+			            }
+			            after { }
+			        }
+			        Send_Quote as "Send Quote"
+			        {
+			            type = normal
+			            from stage = "Ready for quote"
+			            to stage = "Quote sent"
+			            before
+			            {
+			                transition owner
+			                (
+			                    permissions = {"Internal_Admin","Internal_Coordinator"}
+			                )
+			            }
+			            after { }
+			        }
+			        Receive_PO as "Receive PO"
+			        {
+			            type = normal
+			            from stage = "Quote sent"
+			            to stage = "PO received"
+			            before
+			            {
+			                transition owner
+			                (
+			                    permissions = {"Internal_Admin","Internal_Coordinator"}
+			                )
+			            }
+			            after { }
+			        }
+			        Start_Work as "Start Work"
+			        {
+			            type = normal
+			            from stage = "PO received"
+			            to stage = "In progress"
+			            before
+			            {
+			                transition owner
+			                (
+			                    permissions = {"Internal_Admin","Internal_Coordinator"}
+			                )
+			            }
+			            after { }
+			        }
+			        Complete_Work as "Complete Work"
+			        {
+			            type = normal
+			            from stage = "In progress"
+			            to stage = "Completed"
+			            before
+			            {
+			                transition owner
+			                (
+			                    permissions = {"Internal_Admin","Internal_Coordinator"}
+			                )
+			            }
+			            after { }
+			        }
+			        Mark_Invoiced as "Mark Invoiced"
+			        {
+			            type = normal
+			            from stage = "Completed"
+			            to stage = "Invoiced"
+			            before
+			            {
+			                transition owner
+			                (
+			                    permissions = {"Internal_Admin","Internal_Coordinator"}
+			                )
+			            }
+			            after { }
+			        }
+			        Close_Request as "Close Request"
+			        {
+			            type = normal
+			            from stage = "Invoiced"
+			            to stage = "Closed"
+			            before
+			            {
+			                transition owner
+			                (
+			                    permissions = {"Internal_Admin","Internal_Coordinator"}
+			                )
+			            }
+			            after { }
+			        }
+			    }
+			}
+
+			Submission_Action_Guidance as "Submission Action Guidance"
+			{
+			    type = form
+			    form = Service_Request
+			    record event = on add or edit
+			    description = "Explains draft versus submission behavior without changing lifecycle data."
+			
+			    on user input of Submission_Action
+			    {
+			        actions ( Submission_Action == "Save as Draft" )
+			        {
+			            custom deluge script
+			            (
+			                alert "Drafts are saved without entering the matching queue.";
+			            )
+			        }
+			        actions ( Submission_Action == "Submit Request" )
+			        {
+			            custom deluge script
+			            (
+			                alert "Submitting validates intake data and queues the request for matching.";
+			            )
+			        }
+			    }
+			}
+
+			Validate_Edited_Service_Request as "Validate Edited Service Request"
+			{
+			    type = form
+			    form = Service_Request
+			    record event = on edit
+			    description = "Validates edits and blocks unauthorized mutation of generated and lifecycle fields."
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if(input.Vehicle_Count == null || input.Vehicle_Count < 1)
+			                {
+			                    alert(Vehicle_Count, "Vehicle count must be at least 1.");
+			                    cancel submit;
+			                }
+			                if(input.Target_Completion_Date != null && input.Target_Completion_Date < zoho.currentdate)
+			                {
+			                    alert(Target_Completion_Date, "Target completion date cannot be before today.");
+			                    cancel submit;
+			                }
+			                if(input.Submission_Action == "Submit Request" && (input.FMC_Client == null || input.Program_Name == null || input.Program_Name == "" || input.Vehicle_Count == null || input.Drop_Off_Address.address_line_1 == null || input.Requested_Capabilities == null || input.Target_Completion_Date == null))
+			                {
+			                    alert "Complete all required P0 intake data before submitting the request.";
+			                    cancel submit;
+			                }
+			                app_profile = thisapp.permissions.loginUserProfile();
+			                portal_profile = thisapp.portal.loginUserProfile();
+			                if(portal_profile == "FMC_Client")
+			                {
+			                    selected_client = FMC_Client[ID == input.FMC_Client];
+			                    if(selected_client.count() == 0 || selected_client.Portal_Login_Email != zoho.loginuser)
+			                    {
+			                        alert "The selected FMC client does not match the logged-in portal account.";
+			                        cancel submit;
+			                    }
+			                }
+			                if(app_profile != "Internal_Admin" && (old.Service_ID != input.Service_ID || old.Status != input.Status || old.Received_At != input.Received_At || old.Source != input.Source || old.Created_By_Email != input.Created_By_Email || old.Geocoding_Status != input.Geocoding_Status || old.Geocoding_Warning != input.Geocoding_Warning || old.Matching_Started_At != input.Matching_Started_At || old.Approved_Estimates_Count != input.Approved_Estimates_Count || old.Assigned_Vehicle_Count != input.Assigned_Vehicle_Count || old.Remaining_Unassigned_Vehicles != input.Remaining_Unassigned_Vehicles))
+			                {
+			                    alert "Generated identifiers and protected lifecycle fields cannot be changed.";
+			                    cancel submit;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Validate_New_Service_Request as "Validate New Service Request"
+			{
+			    type = form
+			    form = Service_Request
+			    record event = on add
+			    description = "Validates new draft and submitted intake records and portal ownership."
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if(input.Vehicle_Count == null || input.Vehicle_Count < 1)
+			                {
+			                    alert(Vehicle_Count, "Vehicle count must be at least 1.");
+			                    cancel submit;
+			                }
+			                if(input.Target_Completion_Date != null && input.Target_Completion_Date < zoho.currentdate)
+			                {
+			                    alert(Target_Completion_Date, "Target completion date cannot be before today.");
+			                    cancel submit;
+			                }
+			                if(input.Submission_Action == "Submit Request" && (input.FMC_Client == null || input.Program_Name == null || input.Program_Name == "" || input.Vehicle_Count == null || input.Drop_Off_Address.address_line_1 == null || input.Requested_Capabilities == null || input.Target_Completion_Date == null))
+			                {
+			                    alert "Complete all required P0 intake data before submitting the request.";
+			                    cancel submit;
+			                }
+			                portal_profile = thisapp.portal.loginUserProfile();
+			                if(portal_profile == "FMC_Client")
+			                {
+			                    selected_client = FMC_Client[ID == input.FMC_Client];
+			                    if(selected_client.count() == 0 || selected_client.Portal_Login_Email != zoho.loginuser)
+			                    {
+			                        alert "The selected FMC client does not match the logged-in portal account.";
+			                        cancel submit;
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Log_Task_Creation as "Log Task Creation"
+			{
+			    type = form
+			    form = Task
+			    record event = on add
+			    description = "Writes an audit activity after a task is created."
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                activity_id = insert into Activity
+			                [
+			                    Service_Request = input.Service_Request
+			                    Related_Estimate = input.Related_Estimate
+			                    Event_Timestamp = zoho.currenttime
+			                    User_Email = zoho.loginuser
+			                    Event_Type = "Task Created"
+			                    Description = "Task " + input.Task_Type + " created with status " + input.Status + "."
+			                    Internal_Only = true
+			                ];
+			            )
+			        }
+			    }
+			}
+
+			Complete_Task as "Complete Task"
+			{
+			    type = form
+			    form = Task[Status == "Completed" && Completed_At == null]
+			    record event = on add or edit
+			    description = "Sets the completion timestamp the first time a task is saved as completed."
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                task_record = Task[ID == input.ID];
+			                task_record.Completed_At = zoho.currenttime;
+			            )
+			        }
+			    }
+			}
+
+			Lock_Automation_Flag as "Lock Automation Flag"
+			{
+			    type = form
+			    form = Task
+			    record event = on add or edit
+			    description = "Prevents users from changing the system-managed automatic creation flag."
+			
+			    on load
+			    {
+			        actions
+			        {
+			            disable Created_Automatically;
+			        }
+			    }
+			}
+
+			Log_Task_Status_Change as "Log Task Status Change"
+			{
+			    type = form
+			    form = Task
+			    record event = on edit
+			    description = "Writes an audit activity when task status changes."
+			
+			    on update of Status
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                activity_id = insert into Activity
+			                [
+			                    Service_Request = input.Service_Request
+			                    Related_Estimate = input.Related_Estimate
+			                    Event_Timestamp = zoho.currenttime
+			                    User_Email = zoho.loginuser
+			                    Event_Type = "Task Updated"
+			                    Description = "Task status changed to " + input.Status + "."
+			                    Internal_Only = true
+			                ];
+			            )
+			        }
+			    }
+			}
+
+			Status_Completion_Guidance as "Status Completion Guidance"
+			{
+			    type = form
+			    form = Task
+			    record event = on add or edit
+			    description = "Shows operational guidance when a task status is selected."
+			
+			    on user input of Status
+			    {
+			        actions ( Status == "Completed" )
+			        {
+			            custom deluge script
+			            (
+			                alert "Confirm the work is finished before saving. Completion time will be recorded automatically.";
+			            )
+			        }
+			        actions ( Status == "Cancelled" )
+			        {
+			            custom deluge script
+			            (
+			                alert "Use Cancelled only when no further operational work is required; explain the reason in Description.";
+			            )
+			        }
+			    }
+			}
+		}
+	}
+
+	share_settings
+	{
+	"FMC_Client"
+	{
+	    name        = "FMC_Client"
+	    type        = customer_portal
+	    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+	    description = "FMC client portal access limited to the authenticated client's profile and draft/request tracking."
+	    ModulePermissions
+	    {
+	        FMC_Client
+	        {
+	            enabled = View,Search
+	            allFieldsVisible = false
+	            FieldPermissions
+	            {
+	                Client_ID{visibility:true,readonly:true} Company_Name{visibility:true,readonly:true} Billing_Address{visibility:true,readonly:true}
+	                Contact_Name{visibility:true,readonly:true} Contact_Email{visibility:true,readonly:true} Contact_Phone{visibility:true,readonly:true}
+	                Portal_Login_Email{visibility:true,readonly:true} Payment_Terms{visibility:true,readonly:true} Default_Currency{visibility:true,readonly:true} Active{visibility:true,readonly:true}
+	            }
+	        }
+	        Service_Request
+	        {
+	            enabled = Create,View,Edit,Search,Tab
+	            allFieldsVisible = false
+	            FieldPermissions
+	            {
+	                Service_ID{visibility:true,readonly:true} FMC_Client{visibility:true,readonly:true} Program_Name{visibility:true,readonly:false}
+	                Vehicle_Count{visibility:true,readonly:false} Vehicle_Type{visibility:true,readonly:false} Drop_Off_Address{visibility:true,readonly:false}
+	                Requested_Capabilities{visibility:true,readonly:false} Target_Completion_Date{visibility:true,readonly:false} Notes{visibility:true,readonly:false}
+	                Submission_Action{visibility:true,readonly:false} Status{visibility:true,readonly:true} Received_At{visibility:true,readonly:true}
+	                Drop_Off_Latitude{visibility:false} Drop_Off_Longitude{visibility:false} Source{visibility:false} Created_By_Email{visibility:false}
+	                Geocoding_Status{visibility:false} Geocoding_Warning{visibility:false} Matching_Started_At{visibility:false}
+	                Approved_Estimates_Count{visibility:false} Assigned_Vehicle_Count{visibility:false} Remaining_Unassigned_Vehicles{visibility:false}
+	            }
+	            ReportPermissions { FMC_My_Requests={"View"} }
+	        }
+	    }
+	}
+	"Internal_Admin"
+	{
+	    name        = "Internal_Admin"
+	    type        = Users_Permissions
+	    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+	    description = "Internal administrator with full application access."
+	    ModulePermissions
+	    {
+	        Currency { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions { All_Currencies={"View","Edit","Delete"} }
+	        }
+	        FMC_Client { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions { All_FMC_Clients={"View","Edit","Delete"} Active_FMC_Clients={"View","Edit","Delete"} }
+	        }
+	        Capability { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions { All_Capabilities={"View","Edit","Delete"} }
+	        }
+	        MTter { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions { All_MTters={"View","Edit","Delete"} MTter_Locations={"View","Edit","Delete"} Insurance_Expiring={"View","Edit","Delete"} }
+	        }
+	        Part { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions { All_Parts={"View","Edit","Delete"} Active_Parts={"View","Edit","Delete"} }
+	        }
+	        Service_Request { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions { All_Service_Requests={"View","Edit","Delete"} Service_Pipeline={"View","Edit","Delete"} FMC_My_Requests={"View","Edit","Delete"} Matching_Queue={"View","Edit","Delete"} }
+	        }
+	        Estimate { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions { All_Estimates={"View","Edit","Delete"} Pending_Estimates={"View","Edit","Delete"} MTter_Assigned_Estimates={"View","Edit","Delete"} Declined_Estimate_Exceptions={"View","Edit","Delete"} }
+	        }
+	        Estimate_Line { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions { Estimate_Lines={"View","Edit","Delete"} }
+	        }
+	        Task { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions { All_Tasks={"View","Edit","Delete"} Task_Board={"View","Edit","Delete"} Open_Reassignment_Tasks={"View","Edit","Delete"} }
+	        }
+	        Activity { enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions { Activity_Log={"View","Edit","Delete"} Recent_Activity={"View","Edit","Delete"} }
+	        }
+	    }
+	}
+	"Internal_Coordinator"
+	{
+	    name        = "Internal_Coordinator"
+	    type        = Users_Permissions
+	    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+	    description = "Internal operations profile with writable operational modules, append-only audit access, and read-only masters."
+	    ModulePermissions
+	    {
+	        Currency { enabled = Viewall,Export,Tab,View,Search allFieldsVisible = true ReportPermissions { All_Currencies={"View"} } }
+	        FMC_Client { enabled = Viewall,Export,Tab,View,Search allFieldsVisible = true ReportPermissions { All_FMC_Clients={"View"} Active_FMC_Clients={"View"} } }
+	        Capability { enabled = Viewall,Export,Tab,View,Search allFieldsVisible = true ReportPermissions { All_Capabilities={"View"} } }
+	        MTter { enabled = Viewall,Export,Tab,View,Search allFieldsVisible = true ReportPermissions { All_MTters={"View"} MTter_Locations={"View"} Insurance_Expiring={"View"} } }
+	        Part { enabled = Viewall,Export,Tab,View,Search allFieldsVisible = true ReportPermissions { All_Parts={"View"} Active_Parts={"View"} } }
+	        Service_Request { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Service_Requests={"View"} Service_Pipeline={"View"} Matching_Queue={"View"} } }
+	        Estimate { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Estimates={"View"} Pending_Estimates={"View"} Declined_Estimate_Exceptions={"View"} } }
+	        Estimate_Line { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { Estimate_Lines={"View"} } }
+	        Task { enabled = Create,Viewall,Modifyall,Export,Tab,View,Edit,Delete,Search allFieldsVisible = true ReportPermissions { All_Tasks={"View"} Task_Board={"View"} Open_Reassignment_Tasks={"View"} } }
+	        Activity { enabled = Create,Viewall,Export,Tab,View,Search allFieldsVisible = true ReportPermissions { Activity_Log={"View"} Recent_Activity={"View"} } }
+	    }
+	}
+	"MTter"
+	{
+	    name        = "MTter"
+	    type        = customer_portal
+	    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+	    description = "MTter portal access limited to owned assignments and their pending estimate lines."
+	    ModulePermissions
+	    {
+	        Currency { enabled = View,Search allFieldsVisible = false FieldPermissions { Currency_Code{visibility:true,readonly:true} Currency_Name{visibility:true,readonly:true} Symbol{visibility:true,readonly:true} Decimal_Places{visibility:true,readonly:true} Active{visibility:true,readonly:true} } ReportPermissions { All_Currencies={"View"} } }
+	        Capability { enabled = View,Search allFieldsVisible = false FieldPermissions { Capability_Name{visibility:true,readonly:true} Description{visibility:true,readonly:true} Active{visibility:true,readonly:true} } ReportPermissions { All_Capabilities={"View"} } }
+	        MTter { enabled = View,Search allFieldsVisible = false FieldPermissions { MTter_ID{visibility:true,readonly:true} MTter_Name{visibility:true,readonly:true} MTter_Type{visibility:true,readonly:true} Location_Address{visibility:true,readonly:true} Service_Radius{visibility:true,readonly:true} Radius_Unit{visibility:true,readonly:true} Capabilities{visibility:true,readonly:true} Contact_Name{visibility:true,readonly:true} Contact_Email{visibility:true,readonly:true} Contact_Phone{visibility:true,readonly:true} Portal_Login_Email{visibility:true,readonly:true} Insurance_Expiry{visibility:true,readonly:true} Completed_Jobs{visibility:true,readonly:true} Rating{visibility:true,readonly:true} Active{visibility:true,readonly:true} Latitude{visibility:false} Longitude{visibility:false} } ReportPermissions { All_MTters={"View"} } }
+	        Part { enabled = View,Search allFieldsVisible = false FieldPermissions { Part_Number{visibility:true,readonly:true} Description{visibility:true,readonly:true} Brand{visibility:true,readonly:true} Capability{visibility:true,readonly:true} Sourcing{visibility:true,readonly:true} Unit_Price{visibility:true,readonly:true} Currency{visibility:true,readonly:true} Active{visibility:true,readonly:true} } ReportPermissions { Active_Parts={"View"} } }
+	        Estimate { enabled = View,Edit,Search,Tab allFieldsVisible = false FieldPermissions { Estimate_ID{visibility:true,readonly:true} Service_Request{visibility:true,readonly:true} MTter{visibility:true,readonly:true} Capability_Slice{visibility:true,readonly:true} Vehicles_Assigned{visibility:true,readonly:true} Currency{visibility:true,readonly:true} Labor_Hours{visibility:true,readonly:false} Labor_Rate{visibility:true,readonly:false} Parts_Total{visibility:true,readonly:true} Labor_Total{visibility:true,readonly:true} Estimate_Total{visibility:true,readonly:true} Status{visibility:true,readonly:false} Sent_At{visibility:true,readonly:true} Responded_At{visibility:true,readonly:true} Decline_Reason{visibility:true,readonly:false} Decline_Details{visibility:true,readonly:false} Assigned_Portal_Email{visibility:true,readonly:true} Supersedes_Estimate{visibility:true,readonly:true} Active_Slice{visibility:true,readonly:true} Ranking_Override{visibility:false} Override_Reason{visibility:false} Distance_Value{visibility:false} Within_Radius{visibility:false} Matching_Warning{visibility:true,readonly:true} Reminder_Sent{visibility:false} } ReportPermissions { MTter_Assigned_Estimates={"View"} }
+	        }
+	        Estimate_Line { enabled = Create,View,Edit,Delete,Search,Tab allFieldsVisible = false FieldPermissions { Estimate{visibility:true,readonly:true} Part{visibility:true,readonly:false} Quantity_Per_Vehicle{visibility:true,readonly:false} Unit_Price{visibility:true,readonly:false} Labor_Hours_Per_Vehicle{visibility:true,readonly:false} Line_Parts_Total{visibility:true,readonly:true} Line_Labor_Total{visibility:true,readonly:true} Line_Total{visibility:true,readonly:true} Currency{visibility:true,readonly:true} Active{visibility:true,readonly:false} } ReportPermissions { Estimate_Lines={"View"} }
+	        }
+	    }
+	}
+	}
+
+	web
+	{
+	forms
+	{
+	    form Currency { label placement = left }
+	    form FMC_Client { label placement = left }
+	    form Capability { label placement = left }
+	    form MTter { label placement = left }
+	    form Part { label placement = left }
+	    form Service_Request { label placement = left }
+	    form Estimate { label placement = left }
+	    form Estimate_Line { label placement = left }
+	    form Task { label placement = left }
+	    form Activity { label placement = left }
+	}
+	reports
+	{
+		report Activity_Log
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Service_Request Related_Estimate Event_Timestamp User_Email Event_Type Description Internal_Only ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Service_Request Related_Estimate Event_Timestamp User_Email Event_Type Description Internal_Only ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Recent_Activity
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Service_Request Related_Estimate Event_Timestamp User_Email Event_Type Description Internal_Only ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Service_Request Related_Estimate Event_Timestamp User_Email Event_Type Description Internal_Only ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report All_Capabilities
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Capability_Name Description Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Capability_Name Description Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report All_Currencies
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Currency_Code Currency_Name Symbol Decimal_Places Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Currency_Code Currency_Name Symbol Decimal_Places Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report All_Estimates
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Estimate_ID Service_Request MTter Vehicles_Assigned Estimate_Total Currency Status Sent_At ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Estimate_ID Service_Request MTter Vehicles_Assigned Labor_Hours Labor_Rate Parts_Total Labor_Total Estimate_Total Currency Status Sent_At Responded_At Matching_Warning ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Declined_Estimate_Exceptions
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Estimate_ID Service_Request MTter Vehicles_Assigned Decline_Reason Responded_At ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Estimate_ID Service_Request MTter Vehicles_Assigned Decline_Reason Decline_Details Responded_At Active_Slice Matching_Warning ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report MTter_Assigned_Estimates
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Estimate_ID Service_Request Capability_Slice Vehicles_Assigned Estimate_Total Currency Status Sent_At ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Estimate_ID Service_Request MTter Capability_Slice Vehicles_Assigned Currency Labor_Hours Labor_Rate Parts_Total Labor_Total Estimate_Total Status Sent_At Responded_At ) ) ) menu ( header ( Edit ) ) )
+		}
+	
+		report Pending_Estimates
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Estimate_ID Service_Request MTter Vehicles_Assigned Estimate_Total Currency Status Sent_At Reminder_Sent ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Estimate_ID Service_Request MTter Assigned_Portal_Email Vehicles_Assigned Estimate_Total Currency Status Sent_At Reminder_Sent Matching_Warning ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Estimate_Lines
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Estimate Part Quantity_Per_Vehicle Unit_Price Currency Labor_Hours_Per_Vehicle Line_Total Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Estimate Part Quantity_Per_Vehicle Unit_Price Currency Labor_Hours_Per_Vehicle Line_Parts_Total Line_Labor_Total Line_Total Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Active_FMC_Clients
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Client_ID Company_Name Contact_Name Contact_Email Payment_Terms Default_Currency Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Client_ID Company_Name Contact_Name Contact_Email Payment_Terms Default_Currency Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report All_FMC_Clients
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Client_ID Company_Name Contact_Name Contact_Email Payment_Terms Default_Currency Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Client_ID Company_Name Contact_Name Contact_Email Payment_Terms Default_Currency Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report All_MTters
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( MTter_ID MTter_Name MTter_Type Location_Address Service_Radius Capabilities Insurance_Expiry Completed_Jobs Rating Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( MTter_ID MTter_Name MTter_Type Location_Address Service_Radius Capabilities Insurance_Expiry Completed_Jobs Rating Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Insurance_Expiring
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( MTter_ID MTter_Name MTter_Type Contact_Name Contact_Email Insurance_Expiry Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( MTter_ID MTter_Name MTter_Type Contact_Name Contact_Email Insurance_Expiry Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report MTter_Locations
+		{
+		 quickview ( layout ( type = 1 datablock1 ( layout type = -1 fields ( MTter_ID MTter_Name MTter_Type Location_Address Service_Radius Radius_Unit Capabilities Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( MTter_ID MTter_Name MTter_Type Location_Address Service_Radius Radius_Unit Capabilities Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Active_Parts
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Part_Number Description Brand Capability Sourcing Unit_Price Currency Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Part_Number Description Brand Capability Sourcing Unit_Price Currency Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report All_Parts
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Part_Number Description Brand Capability Sourcing Unit_Price Currency Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Part_Number Description Brand Capability Sourcing Unit_Price Currency Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report All_Service_Requests
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Service_ID FMC_Client Program_Name Vehicle_Count Received_At Target_Completion_Date Status Source Remaining_Unassigned_Vehicles ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Service_ID FMC_Client Program_Name Vehicle_Count Vehicle_Type Drop_Off_Address Received_At Target_Completion_Date Status Source Remaining_Unassigned_Vehicles ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report FMC_My_Requests
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Service_ID Program_Name Vehicle_Count Vehicle_Type Received_At Target_Completion_Date Status ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Service_ID Program_Name Vehicle_Count Vehicle_Type Received_At Target_Completion_Date Status ) ) ) menu ( header ( Edit ) ) )
+		}
+	
+		report Matching_Queue
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Service_ID FMC_Client Program_Name Vehicle_Count Requested_Capabilities Received_At Target_Completion_Date Remaining_Unassigned_Vehicles Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Service_ID FMC_Client Program_Name Vehicle_Count Vehicle_Type Drop_Off_Address Requested_Capabilities Received_At Target_Completion_Date Remaining_Unassigned_Vehicles Status ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Service_Pipeline
+		{
+		 quickview ( layout ( type = 1 datablock1 ( layout type = -1 fields ( Service_ID FMC_Client Program_Name Vehicle_Count Target_Completion_Date Remaining_Unassigned_Vehicles Status Received_At ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Service_ID FMC_Client Program_Name Vehicle_Count Target_Completion_Date Remaining_Unassigned_Vehicles Status Received_At ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report All_Tasks
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Service_Request Task_Type Related_Estimate Assigned_To_Email Due_Date Priority Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Service_Request Task_Type Related_Estimate Assigned_To_Email Due_Date Priority Status ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Open_Reassignment_Tasks
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Service_Request Task_Type Related_Estimate Assigned_To_Email Due_Date Priority Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Service_Request Task_Type Related_Estimate Assigned_To_Email Due_Date Priority Status ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report Task_Board
+		{
+		 quickview ( layout ( type = 1 datablock1 ( layout type = -1 fields ( Service_Request Task_Type Related_Estimate Assigned_To_Email Due_Date Priority Status ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Service_Request Task_Type Related_Estimate Assigned_To_Email Due_Date Priority Status ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	}
+	menu
+	{
+	    space Fleet_Hub
+	    {
+	        displayname = "Fleet Hub"
+	        icon = "transportation-truck-front"
+	        section Dashboard
+	        {
+	            displayname = "Dashboard"
+	            icon = "business-chart"
+	            page Fleet_Dashboard { icon = "business-chart-pie-36" }
+	        }
+	        section Operations
+	        {
+	            displayname = "Operations"
+	            icon = "business-progress"
+	            form Service_Request { icon = "files-add" }
+	            report All_Service_Requests { icon = "files-paper" }
+	            report FMC_My_Requests { icon = "files-user" }
+	            report Service_Pipeline { icon = "business-chart-bar-33" }
+	            report Matching_Queue { icon = "business-strategy" }
+	            form Estimate { icon = "business-calculator" }
+	            report All_Estimates { icon = "files-money" }
+	            report MTter_Assigned_Estimates { icon = "files-user" }
+	            report Pending_Estimates { icon = "business-money-time" }
+	            report Declined_Estimate_Exceptions { icon = "files-exclamation" }
+	            form Estimate_Line { icon = "files-single-content-03" }
+	            report Estimate_Lines { icon = "files-single-copies" }
+	            form Task { icon = "business-agenda" }
+	            report All_Tasks { icon = "files-check" }
+	            report Task_Board { icon = "business-board-30" }
+	            report Open_Reassignment_Tasks { icon = "files-folder-time" }
+	        }
+	        section Masters
+	        {
+	            displayname = "Masters"
+	            icon = "files-folder-14"
+	            form Currency { icon = "business-money-11" }
+	            report All_Currencies { icon = "files-money" }
+	            form FMC_Client { icon = "business-building" }
+	            report All_FMC_Clients { icon = "users-multiple-11" }
+	            report Active_FMC_Clients { icon = "users-contacts" }
+	            form Capability { icon = "business-badge" }
+	            report All_Capabilities { icon = "files-check" }
+	            form MTter { icon = "transportation-car-simple" }
+	            report All_MTters { icon = "users-multiple-19" }
+	            report MTter_Locations { icon = "transportation-road" }
+	            report Insurance_Expiring { icon = "files-time" }
+	            form Part { icon = "business-stock" }
+	            report All_Parts { icon = "files-box" }
+	            report Active_Parts { icon = "files-archive-check" }
+	        }
+	        section Audit
+	        {
+	            displayname = "Audit"
+	            icon = "business-law"
+	            form Activity { icon = "business-notes" }
+	            report Activity_Log { icon = "files-archive-paper" }
+	            report Recent_Activity { icon = "files-time" }
+	        }
+	        section SharedAnalytics_Section
+	        {
+	            type = shared_user_report_section
+	            displayname = "Reports"
+	            icon = "business-chart-bar-33"
+	        }
+	    }
+	    preference
+	    {
+	        icon
+	        {
+	            style = outline
+	            show = {space,section,component}
+	        }
+	    }
+	}
+	customize
+	{
+	    layout
+	    {
+	        theme = "theme_2"
+	        variant = "variant_2"
+	    }
+	    font = "lato"
+	    color options
+	    {
+	        name = "Fleet Navy"
+	        brand color = "#1F4E5F"
+	        type = "custom"
+	        dark mode color = "#86B8C7"
+	    }
+	    logo
+	    {
+	        preference = "app_icon"
+	        placement = "left"
+	    }
+	    custom css
+	    {
+	        content = ".zc-app-header { border-bottom: 2px solid #D7A84B; } .zc-nav { letter-spacing: .01em; }"
+	    }
+	}
+	}
+
+	phone
+	{
+	reports
+	{
+		report MTter_Assigned_Estimates
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Estimate_ID Service_Request Capability_Slice Vehicles_Assigned Estimate_Total Currency Status Sent_At ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on tap ( View Record ) on long press ( Edit View Record ) on right swipe ( Edit ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Estimate_ID Service_Request MTter Capability_Slice Vehicles_Assigned Currency Labor_Hours Labor_Rate Parts_Total Labor_Total Estimate_Total Status Sent_At Responded_At ) ) ) menu ( header ( Edit ) ) )
+		}
+	
+		report Estimate_Lines
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Estimate Part Quantity_Per_Vehicle Unit_Price Currency Labor_Hours_Per_Vehicle Line_Total Active ) ) ) menu ( header ( Edit Delete ) record ( Edit Delete ) ) action ( on tap ( View Record ) on long press ( Edit Delete View Record ) on left swipe ( Delete ) on right swipe ( Edit ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Estimate Part Quantity_Per_Vehicle Unit_Price Currency Labor_Hours_Per_Vehicle Line_Parts_Total Line_Labor_Total Line_Total Active ) ) ) menu ( header ( Edit Delete ) ) )
+		}
+	
+		report FMC_My_Requests
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Service_ID Program_Name Vehicle_Count Received_At Target_Completion_Date Status ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on tap ( View Record ) on long press ( Edit View Record ) on right swipe ( Edit ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Service_ID Program_Name Vehicle_Count Vehicle_Type Received_At Target_Completion_Date Status ) ) ) menu ( header ( Edit ) ) )
+		}
+	}
+	menu
+	{
+	    unused
+	    {
+	        page Fleet_Dashboard { icon = "business-chart-pie-36" }
+	        form Task { icon = "business-agenda" }
+	        form Currency { icon = "business-money-11" }
+	        form FMC_Client { icon = "business-building" }
+	        form Capability { icon = "business-badge" }
+	        form MTter { icon = "transportation-car-simple" }
+	        form Part { icon = "business-stock" }
+	        form Activity { icon = "business-notes" }
+	        report All_Service_Requests { icon = "files-paper" }
+	        report Service_Pipeline { icon = "business-chart-bar-33" }
+	        report Matching_Queue { icon = "business-strategy" }
+	        report All_Estimates { icon = "files-money" }
+	        report Pending_Estimates { icon = "business-money-time" }
+	        report Declined_Estimate_Exceptions { icon = "files-exclamation" }
+	        report All_Tasks { icon = "files-check" }
+	        report Task_Board { icon = "business-board-30" }
+	        report Open_Reassignment_Tasks { icon = "files-folder-time" }
+	        report All_Currencies { icon = "business-money-11" }
+	        report All_FMC_Clients { icon = "users-multiple-11" }
+	        report Active_FMC_Clients { icon = "users-contacts" }
+	        report All_Capabilities { icon = "files-check" }
+	        report All_MTters { icon = "users-multiple-19" }
+	        report MTter_Locations { icon = "transportation-road" }
+	        report Insurance_Expiring { icon = "files-time" }
+	        report All_Parts { icon = "files-box" }
+	        report Active_Parts { icon = "files-archive-check" }
+	        report Activity_Log { icon = "files-archive-paper" }
+	        report Recent_Activity { icon = "files-time" }
+	    }
+	    space Portal_Work
+	    {
+	        displayname = "Fleet Portal"
+	        icon = "transportation-car-simple"
+	        section Requests
+	        {
+	            displayname = "My Requests"
+	            icon = "files-user"
+	            form Service_Request { icon = "files-add" }
+	            report FMC_My_Requests { icon = "files-paper" }
+	        }
+	        section Assigned_Estimates
+	        {
+	            displayname = "Assigned Estimates"
+	            icon = "business-calculator"
+	            form Estimate { icon = "business-sign" }
+	            report MTter_Assigned_Estimates { icon = "files-user" }
+	            form Estimate_Line { icon = "files-edit" }
+	            report Estimate_Lines { icon = "files-single-content-03" }
+	        }
+	        section SharedAnalytics_Section
+	        {
+	            type = shared_user_report_section
+	            displayname = "Reports"
+	            icon = "business-chart-bar-33"
+	        }
+	    }
+	    preference
+	    {
+	        icon
+	        {
+	            style = outline
+	            show = {space,section,component}
+	        }
+	    }
+	}
+	}
+
+	tablet
+	{
+	reports
+	{
+		report MTter_Assigned_Estimates
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Estimate_ID Service_Request Capability_Slice Vehicles_Assigned Estimate_Total Currency Status Sent_At ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on tap ( View Record ) on long press ( Edit View Record ) on right swipe ( Edit ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Estimate_ID Service_Request MTter Capability_Slice Vehicles_Assigned Currency Labor_Hours Labor_Rate Parts_Total Labor_Total Estimate_Total Status Sent_At Responded_At ) ) ) menu ( header ( Edit ) ) )
+		}
+	
+		report Estimate_Lines
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Estimate Part Quantity_Per_Vehicle Unit_Price Currency Labor_Hours_Per_Vehicle Line_Total Active ) ) ) menu ( header ( Edit Delete ) record ( Edit Delete ) ) action ( on tap ( View Record ) on long press ( Edit Delete View Record ) on left swipe ( Delete ) on right swipe ( Edit ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Estimate Part Quantity_Per_Vehicle Unit_Price Currency Labor_Hours_Per_Vehicle Line_Parts_Total Line_Labor_Total Line_Total Active ) ) ) menu ( header ( Edit Delete ) ) )
+		}
+	
+		report FMC_My_Requests
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Service_ID Program_Name Vehicle_Count Received_At Target_Completion_Date Status ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on tap ( View Record ) on long press ( Edit View Record ) on right swipe ( Edit ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Service_ID Program_Name Vehicle_Count Vehicle_Type Received_At Target_Completion_Date Status ) ) ) menu ( header ( Edit ) ) )
+		}
+	}
+	menu
+	{
+	    unused
+	    {
+	        page Fleet_Dashboard { icon = "business-chart-pie-36" }
+	        form Task { icon = "business-agenda" }
+	        form Currency { icon = "business-money-11" }
+	        form FMC_Client { icon = "business-building" }
+	        form Capability { icon = "business-badge" }
+	        form MTter { icon = "transportation-car-simple" }
+	        form Part { icon = "business-stock" }
+	        form Activity { icon = "business-notes" }
+	        report All_Service_Requests { icon = "files-paper" }
+	        report Service_Pipeline { icon = "business-chart-bar-33" }
+	        report Matching_Queue { icon = "business-strategy" }
+	        report All_Estimates { icon = "files-money" }
+	        report Pending_Estimates { icon = "business-money-time" }
+	        report Declined_Estimate_Exceptions { icon = "files-exclamation" }
+	        report All_Tasks { icon = "files-check" }
+	        report Task_Board { icon = "business-board-30" }
+	        report Open_Reassignment_Tasks { icon = "files-folder-time" }
+	        report All_Currencies { icon = "business-money-11" }
+	        report All_FMC_Clients { icon = "users-multiple-11" }
+	        report Active_FMC_Clients { icon = "users-contacts" }
+	        report All_Capabilities { icon = "files-check" }
+	        report All_MTters { icon = "users-multiple-19" }
+	        report MTter_Locations { icon = "transportation-road" }
+	        report Insurance_Expiring { icon = "files-time" }
+	        report All_Parts { icon = "files-box" }
+	        report Active_Parts { icon = "files-archive-check" }
+	        report Activity_Log { icon = "files-archive-paper" }
+	        report Recent_Activity { icon = "files-time" }
+	    }
+	    space Portal_Work
+	    {
+	        displayname = "Fleet Portal"
+	        icon = "transportation-car-simple"
+	        section Requests
+	        {
+	            displayname = "My Requests"
+	            icon = "files-user"
+	            form Service_Request { icon = "files-add" }
+	            report FMC_My_Requests { icon = "files-paper" }
+	        }
+	        section Assigned_Estimates
+	        {
+	            displayname = "Assigned Estimates"
+	            icon = "business-calculator"
+	            form Estimate { icon = "business-sign" }
+	            report MTter_Assigned_Estimates { icon = "files-user" }
+	            form Estimate_Line { icon = "files-edit" }
+	            report Estimate_Lines { icon = "files-single-content-03" }
+	        }
+	        section SharedAnalytics_Section
+	        {
+	            type = shared_user_report_section
+	            displayname = "Reports"
+	            icon = "business-chart-bar-33"
+	        }
+	    }
+	    preference
+	    {
+	        icon
+	        {
+	            style = outline
+	            show = {space,section,component}
+	        }
+	    }
+	}
+	}
+}
