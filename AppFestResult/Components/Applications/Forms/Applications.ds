@@ -1,0 +1,223 @@
+form Applications
+{
+    displayname = "Applications"
+
+    Main_Section
+    (
+        type = section
+        displayname = "Application Concept"
+        row = 1
+        column = 0
+    )
+    must have Participant
+    (
+        type = picklist
+        displayname = "Participant"
+        values = Members[Member_Type == "Participant" && Is_Active == true].ID
+        displayformat = [Member_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have unique App_Name
+    (
+        type = text
+        displayname = "App Name"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Tagline
+    (
+        type = text
+        displayname = "Tagline"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Problem_Statement
+    (
+        type = textarea
+        displayname = "Problem Statement"
+        height = 140px
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Core_Functionality
+    (
+        type = richtext
+        displayname = "Core Functionality"
+        height = 220px
+        toolbar = enable
+        [
+            style, alignment, bullets-and-numbering, link, code, quote
+        ]
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Presentation_Summary
+    (
+        type = textarea
+        displayname = "Presentation Summary"
+        height = 160px
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    Proof_And_Integrations
+    (
+        type = section
+        displayname = "Proof And Integrations"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Beyond_Creator_Capability
+    (
+        type = richtext
+        displayname = "Beyond Creator Capability"
+        height = 220px
+        toolbar = enable
+        [
+            style, alignment, bullets-and-numbering, link, code, quote
+        ]
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Why_Not_Feasible_In_Creator
+    (
+        type = textarea
+        displayname = "Why Not Feasible In Creator"
+        height = 160px
+        row = 2
+        column = 2
+        width = medium
+    )
+    Evidence_URL
+    (
+        type = url
+        displayname = "Evidence URL"
+        target = new window
+        enable = linkname, title
+        row = 2
+        column = 1
+        width = medium
+    )
+    Demo_URL
+    (
+        type = url
+        displayname = "Demo URL"
+        target = new window
+        enable = linkname, title
+        row = 2
+        column = 2
+        width = medium
+    )
+    Evidence_File
+    (
+        type = upload file
+        displayname = "Evidence File"
+        browse = local_drive, google_docs, zoho_docs
+        row = 2
+        column = 1
+        width = medium
+    )
+    Catalyst_Connected
+    (
+        type = checkbox
+        displayname = "Catalyst Connected"
+        initial value = false
+        row = 2
+        column = 2
+        width = medium
+    )
+    Other_Integrations
+    (
+        type = textarea
+        displayname = "Other Integrations"
+        description [ type = tooltip  message = "Describe connected services, APIs, data stores, or Om.ai/Catalyst integration details." ]
+        height = 120px
+        row = 2
+        column = 1
+        width = medium
+    )
+
+    Submission_Metadata
+    (
+        type = section
+        displayname = "Submission Readiness"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Submission_Status
+    (
+        type = picklist
+        displayname = "Submission Status"
+        values = {"Draft","Submitted","Locked"}
+        initial value = "Draft"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Submitted_At
+    (
+        type = datetime
+        displayname = "Submitted At"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Readiness_Percent
+    (
+        type = decimal
+        displayname = "Readiness Percent"
+        decimalplace = 2
+        row = 3
+        column = 1
+        width = medium
+    )
+    must have Created_By_Email
+    (
+        type = email
+        displayname = "Created By Email"
+        initial value = "${zoho.loginuserid}"
+        row = 3
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Application"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Clear"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Application"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

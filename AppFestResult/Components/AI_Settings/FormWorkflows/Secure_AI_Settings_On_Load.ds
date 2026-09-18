@@ -1,0 +1,25 @@
+Secure_AI_Settings_On_Load as "Secure AI Settings On Load"
+{
+    type = form
+    form = AI_Settings
+    record event = on add or edit
+    description = "Keeps the API credential administrator-only and protects workflow-maintained test diagnostics."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(current_profile != "Administrator")
+                {
+                    hide API_Key;
+                    disable API_Key;
+                }
+                disable Last_Tested_At;
+                disable Last_Test_Status;
+            )
+        }
+    }
+}

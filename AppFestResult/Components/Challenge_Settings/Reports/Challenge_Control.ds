@@ -1,0 +1,41 @@
+default list Challenge_Control
+{
+    displayName = "Challenge Control"
+    show all rows from Challenge_Settings
+    (
+        Challenge_Title
+        Challenge_Status
+        Challenge_Start
+        Challenge_End
+        Voting_Opens
+        Voting_Closes
+        Judging_Closes
+        Showcase_Date_Time
+        Presentation_Minutes
+        Results_Visible_To_Participants
+        Current_Record
+        custom action "Advance Challenge Phase"
+        (
+            workflow = Advance_Challenge_Phase
+            show action for each record = true
+            column header = "Advance Challenge Phase"
+            success message = "Challenge phase advanced successfully."
+            condition = (Current_Record == true && Challenge_Status != "Results Published")
+            confirmation before execution
+            (
+                message for individual record = "Advance this challenge to its next phase?"
+                confirm button text = "Advance Phase"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+    filters
+    (
+        Challenge_Status
+        Current_Record
+    )
+    sort by
+    (
+        Challenge_Start descending
+    )
+}

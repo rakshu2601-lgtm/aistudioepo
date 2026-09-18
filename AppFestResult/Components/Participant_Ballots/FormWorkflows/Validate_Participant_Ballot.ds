@@ -1,0 +1,91 @@
+Validate_Participant_Ballot as "Validate Participant Ballot"
+{
+    type = form
+    form = Participant_Ballots
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                voter_record = Members[ID == input.Voter && Login_Email == zoho.loginuser && Member_Type == "Participant" && Is_Active == true];
+                if(voter_record.count() != 1 || input.Voter_Email != zoho.loginuser)
+                {
+                    alert "Only an active participant may submit a ballot using their mapped login identity.";
+                    cancel submit;
+                }
+                settings = Challenge_Settings[Current_Record == true];
+                if(settings.count() != 1 || settings.Challenge_Status != "Voting Open" || zoho.currenttime < settings.Voting_Opens || zoho.currenttime > settings.Voting_Closes)
+                {
+                    alert "Ballots can only be submitted during the configured voting window.";
+                    cancel submit;
+                }
+                if(input.Ballot_Status == "Submitted" || input.Ballot_Status == "Locked")
+                {
+                    alert "A submitted ballot is locked and cannot be changed.";
+                    cancel submit;
+                }
+                duplicate_ballots = 0;
+                if(input.ID == null)
+                {
+                    duplicate_ballots = Participant_Ballots[Voter_Email == zoho.loginuser].count();
+                }
+                else
+                {
+                    duplicate_ballots = Participant_Ballots[Voter_Email == zoho.loginuser && ID != input.ID].count();
+                }
+                if(duplicate_ballots > 0)
+                {
+                    alert "Only one ballot is allowed per active participant.";
+                    cancel submit;
+                }
+                ranked_apps = List();
+                ranked_apps.add(input.Rank_1);
+                ranked_apps.add(input.Rank_2);
+                ranked_apps.add(input.Rank_3);
+                ranked_apps.add(input.Rank_4);
+                ranked_apps.add(input.Rank_5);
+                ranked_apps.add(input.Rank_6);
+                ranked_apps.add(input.Rank_7);
+                ranked_apps.add(input.Rank_8);
+                unique_apps = ranked_apps.distinct();
+                if(ranked_apps.size() != 8 || unique_apps.size() != 8)
+                {
+                    alert "Rank all eight competing applications exactly once; duplicate ranks are not allowed.";
+                    cancel submit;
+                }
+                own_apps = Applications[Participant == input.Voter && (Submission_Status == "Submitted" || Submission_Status == "Locked")];
+                for each own_app in own_apps
+                {
+                    if(ranked_apps.contains(own_app.ID))
+                    {
+                        alert "You cannot rank your own application.";
+                        cancel submit;
+                    }
+                }
+                eligible_apps = Applications[Participant != input.Voter && (Submission_Status == "Submitted" || Submission_Status == "Locked")];
+                if(eligible_apps.count() != 8)
+                {
+                    alert "Voting requires exactly eight submitted applications other than your own.";
+                    cancel submit;
+                }
+                for each eligible_app in eligible_apps
+                {
+                    if(!ranked_apps.contains(eligible_app.ID))
+                    {
+                        alert "Every other submitted application must appear exactly once in your ranking.";
+                        cancel submit;
+                    }
+                }
+                if(input.Best_App_Explanation == null || input.Best_App_Explanation.trim().length() < 40)
+                {
+                    alert(Best_App_Explanation,"Please provide a meaningful explanation of at least 40 characters for your first-ranked app.");
+                    cancel submit;
+                }
+                input.Ballot_Status = "Submitted";
+            )
+        }
+    }
+}

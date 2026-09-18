@@ -1,0 +1,19 @@
+Validate_Audit_Log_Edit as "Validate Audit Log Edit"
+{
+    type = form
+    form = Audit_Log
+    record event = on edit
+    description = "Prevents modification of the immutable audit history."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                alert "Audit events are immutable and cannot be edited.";
+                cancel submit;
+            )
+        }
+    }
+}

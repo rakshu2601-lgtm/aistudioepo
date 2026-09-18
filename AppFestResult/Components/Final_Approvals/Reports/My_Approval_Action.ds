@@ -1,0 +1,22 @@
+list My_Approval_Action
+{
+    displayName = "My Approval Action"
+    show all rows from Final_Approvals [Judge_Email == zoho.loginuser]
+    (
+        Final_Ranking
+        Judge
+        Judge_Email
+        Decision
+        Approval_Comment
+        Decided_At
+    )
+    filters
+    (
+        Decision
+        Final_Ranking
+    )
+    sort by
+    (
+        Decided_At descending
+    )
+}

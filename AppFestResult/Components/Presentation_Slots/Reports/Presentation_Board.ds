@@ -1,0 +1,31 @@
+kanban Presentation_Board
+{
+    displayName = "Presentation Board"
+    show all rows from Presentation_Slots
+    (
+        Application
+        Presenter
+        Slot_Start
+        Slot_End
+        Room_Or_Link
+        Presentation_Status
+        Judge_Notes
+    )
+    filters
+    (
+        Presenter
+        Presentation_Status
+    )
+    sort by
+    (
+        Slot_Start ascending
+    )
+    options
+    (
+        display field = Presentation_Status
+        othercolumn = "Other"
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

@@ -1,0 +1,14 @@
+customize
+{
+    layout = slidingpane
+    font = "lato"
+    style = "3"
+    color options
+    {
+        name = "Beyond Limits Indigo"
+        brand color = "#5B4BDB"
+        type = "custom"
+        dark mode color = "#8B7CFF"
+    }
+    logo { preference = "app_icon" }
+}

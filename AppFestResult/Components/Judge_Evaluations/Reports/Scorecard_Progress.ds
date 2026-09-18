@@ -1,0 +1,26 @@
+spreadsheet Scorecard_Progress
+{
+    displayName = "Scorecard Progress"
+    show all rows from Judge_Evaluations
+    (
+        Judge
+        Judge_Email
+        Application
+        Evaluation_Status
+        Weighted_Total
+        Submitted_At
+    )
+    filters
+    (
+        Judge
+        Application
+        Evaluation_Status
+        Submitted_At
+    )
+    sort by
+    (
+        Evaluation_Status ascending
+        Application ascending
+        Judge ascending
+    )
+}

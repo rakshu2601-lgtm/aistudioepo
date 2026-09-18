@@ -1,0 +1,107 @@
+"Participant"
+{
+    name        = "Participant"
+    type        = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false }
+    description = "Least-privilege participant access: own phase-controlled submission and ballot, safe roster/challenge/schedule visibility, and published results only."
+
+    ModulePermissions
+    {
+        Members
+        {
+            enabled          = Viewall,View,Search
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                Active_Participants={"View"}
+            }
+            FieldPermissions
+            {
+                Main_Section{visibility:true,readonly:true}
+                Member_Name{visibility:true,readonly:true}
+                Member_Type{visibility:true,readonly:true}
+                Is_Active{visibility:true,readonly:true}
+                Display_Order{visibility:true,readonly:true}
+                Identity_Display_Settings{visibility:true,readonly:true}
+                Login_Email{visibility:false}
+                Profile_Color{visibility:true,readonly:true}
+                Avatar{visibility:true,readonly:true}
+            }
+        }
+
+        Challenge_Settings
+        {
+            enabled          = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Challenge_Timeline={"View"}
+            }
+        }
+
+        Applications
+        {
+            enabled          = Create,View,Edit,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Application_Gallery={"View"}
+            }
+        }
+
+        Participant_Ballots
+        {
+            enabled          = Create,View,Edit,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                My_Ballot={"View","Edit"}
+                Voting_Completion={"View"}
+            }
+        }
+
+        Presentation_Slots
+        {
+            enabled          = Viewall,View,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                Presentation_Schedule={"View"}
+                Showcase_Calendar={"View"}
+            }
+            FieldPermissions
+            {
+                Main_Section{visibility:true,readonly:true}
+                Application{visibility:true,readonly:true}
+                Presenter{visibility:true,readonly:true}
+                Slot_Start{visibility:true,readonly:true}
+                Slot_End{visibility:true,readonly:true}
+                Duration_Minutes{visibility:true,readonly:true}
+                Room_Or_Link{visibility:true,readonly:true}
+                Presentation_Status{visibility:true,readonly:true}
+                Judge_Notes{visibility:false}
+            }
+        }
+
+        Final_Rankings
+        {
+            enabled          = View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Published_Leaderboard={"View"}
+            }
+        }
+
+        Participant_Challenge_Hub
+        {
+            enabled = tab
+        }
+
+        Results_Stage
+        {
+            enabled = tab
+        }
+    }
+}
+

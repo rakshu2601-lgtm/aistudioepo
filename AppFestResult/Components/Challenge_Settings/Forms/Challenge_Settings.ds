@@ -1,0 +1,164 @@
+form Challenge_Settings
+{
+    title
+    {
+        displayname = "Challenge Settings"
+        on add = "Create Challenge Settings"
+        on edit = "Edit Challenge Settings"
+    }
+    success message = "Challenge settings saved successfully."
+    Main_Section
+    (
+        type = section
+        displayname = "Challenge Control"
+        row = 1
+        column = 0
+    )
+    must have Challenge_Title
+    (
+        type = text
+        displayname = "Challenge Title"
+        initial value = "Om.ai Beyond Limits Challenge"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Challenge_Status
+    (
+        type = picklist
+        displayname = "Challenge Status"
+        values = {"Setup", "Submission Open", "Voting Open", "Judging Open", "Finalization", "Results Published"}
+        initial value = "Setup"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Challenge_Start
+    (
+        type = datetime
+        displayname = "Challenge Start"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Challenge_End
+    (
+        type = datetime
+        displayname = "Challenge End"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Voting_Opens
+    (
+        type = datetime
+        displayname = "Voting Opens"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Voting_Closes
+    (
+        type = datetime
+        displayname = "Voting Closes"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Judging_Closes
+    (
+        type = datetime
+        displayname = "Judging Closes"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Showcase_Date_Time
+    (
+        type = datetime
+        displayname = "Showcase Date Time"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Presentation_Minutes
+    (
+        type = number
+        displayname = "Presentation Minutes"
+        initial value = 15
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Rules_And_Announcement
+    (
+        type = richtext
+        displayname = "Rules And Announcement"
+        height = 240px
+        toolbar = enable
+        [
+            style, font-color, alignment, bullets-and-numbering, indent, link, table, quote,
+            font-size : {2, 3, 4, 5},
+            font-family : {"Arimo", "Lato", "Poppins"}
+        ]
+        row = 1
+        column = 2
+        width = medium
+    )
+    Bootstrap_Roster
+    (
+        type = checkbox
+        displayname = "Bootstrap Roster"
+        initial value = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Results_Visible_To_Participants
+    (
+        type = checkbox
+        displayname = "Results Visible To Participants"
+        initial value = false
+        row = 1
+        column = 2
+        width = medium
+    )
+    Current_Record
+    (
+        type = checkbox
+        displayname = "Current Record"
+        initial value = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Settings"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Settings"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

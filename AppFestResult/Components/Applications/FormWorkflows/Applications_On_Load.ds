@@ -1,0 +1,45 @@
+Applications_On_Load as "Prepare Application Submission"
+{
+    type = form
+    form = Applications
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                hide Submitted_At, Readiness_Percent, Created_By_Email;
+                if(input.Catalyst_Connected == true)
+                {
+                    show Other_Integrations;
+                }
+                else
+                {
+                    hide Other_Integrations;
+                }
+                loginMember = Members[Login_Email == zoho.loginuserid && Is_Active == true];
+                if(loginMember.ID != null && loginMember.Member_Type == "Participant")
+                {
+                    if(input.ID == null)
+                    {
+                        input.Participant = loginMember.ID;
+                        input.Created_By_Email = zoho.loginuserid;
+                    }
+                    disable Participant;
+                }
+                currentSettings = Challenge_Settings[Current_Record == true] sort by Modified_Time desc range from 0 to 0;
+                phaseClosed = false;
+                if(currentSettings.ID != null && currentSettings.Challenge_Status != "Submission Open" && currentSettings.Challenge_Status != "Setup")
+                {
+                    phaseClosed = true;
+                }
+                if(input.Submission_Status == "Locked" || phaseClosed == true)
+                {
+                    disable Participant, App_Name, Tagline, Problem_Statement, Core_Functionality, Beyond_Creator_Capability, Why_Not_Feasible_In_Creator, Evidence_URL, Demo_URL, Evidence_File, Catalyst_Connected, Other_Integrations, Presentation_Summary, Submission_Status;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,26 @@
+Validate_AI_Analysis_Request as "Validate AI Analysis Request"
+{
+    type = form
+    form = AI_Analyses
+    record event = on add
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                judges = Members[Login_Email == zoho.loginuser && Member_Type == "Judge" && Is_Active == true];
+                if(judges.count() != 1)
+                {
+                    alert "Only an active, mapped judge can request AI analysis.";
+                    cancel submit;
+                }
+                input.Requested_By = zoho.loginuser;
+                input.Requested_At = zoho.currenttime;
+                input.Analysis_Status = "Queued";
+                input.Is_Latest = true;
+            )
+        }
+    }
+}

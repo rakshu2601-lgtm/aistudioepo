@@ -1,0 +1,19 @@
+<page linkname = "Judge_Command_Center" displayname = "Judge Command Center"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Command_Center' elementName='Command_Center'>
+          <![CDATA[htmlpage Command_Center()
+            content
+            <%{%>
+              <file name:Command_Center.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

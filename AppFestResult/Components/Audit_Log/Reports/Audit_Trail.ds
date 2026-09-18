@@ -1,0 +1,26 @@
+default list Audit_Trail
+{
+    displayName = "Audit Trail"
+    show all rows from Audit_Log
+    (
+        Event_Time
+        Actor_Email
+        Event_Type
+        Related_Form
+        Related_Record_ID
+        Event_Summary
+        Before_Value
+        After_Value
+        Severity
+    )
+    filters
+    (
+        Event_Type
+        Actor_Email
+        Severity
+    )
+    sort by
+    (
+        Event_Time descending
+    )
+}

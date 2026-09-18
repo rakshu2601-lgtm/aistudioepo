@@ -1,0 +1,55 @@
+Validate_Presentation_Slot as "Validate Presentation Slot"
+{
+    type = form
+    form = Presentation_Slots
+    record event = on add or edit
+    description = "Enforces configured duration, chronology, presenter ownership, and collision-free active showcase slots."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                currentSettings = Challenge_Settings[Current_Record == true] sort by Modified_Time desc range from 0 to 0;
+                if(currentSettings.ID == null || currentSettings.Presentation_Minutes == null || currentSettings.Presentation_Minutes <= 0)
+                {
+                    alert "Configure a positive presentation duration in the current Challenge Settings record before scheduling slots.";
+                    cancel submit;
+                }
+                configuredMinutes = currentSettings.Presentation_Minutes;
+                if(input.Duration_Minutes != configuredMinutes)
+                {
+                    alert "Duration Minutes must exactly match the configured presentation duration of " + configuredMinutes + " minutes.";
+                    cancel submit;
+                }
+                if(input.Slot_End <= input.Slot_Start)
+                {
+                    alert "Slot End must be after Slot Start.";
+                    cancel submit;
+                }
+                expectedEnd = input.Slot_Start.addMinutes(configuredMinutes);
+                if(input.Slot_End != expectedEnd)
+                {
+                    alert "Slot End must be exactly " + configuredMinutes + " minutes after Slot Start.";
+                    cancel submit;
+                }
+                applicationRecord = Applications[ID == input.Application];
+                if(applicationRecord.ID == null || applicationRecord.Participant != input.Presenter)
+                {
+                    alert "The presenter must be the participant who owns the selected application.";
+                    cancel submit;
+                }
+                if(input.Presentation_Status != "Completed" && input.Presentation_Status != "No Show")
+                {
+                    overlapCount = Presentation_Slots[ID != input.ID && Presentation_Status != "Completed" && Presentation_Status != "No Show" && Slot_Start < input.Slot_End && Slot_End > input.Slot_Start].count();
+                    if(overlapCount > 0)
+                    {
+                        alert "This session overlaps another active presentation slot.";
+                        cancel submit;
+                    }
+                }
+            )
+        }
+    }
+}

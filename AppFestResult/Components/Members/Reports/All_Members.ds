@@ -1,0 +1,24 @@
+default list All_Members
+{
+    displayName = "All Members"
+    show all rows from Members
+    (
+        Member_Name
+        Login_Email
+        Member_Type
+        Is_Active
+        Display_Order
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Member_Type ascending
+    )
+    sort by
+    (
+        Display_Order ascending
+    )
+}

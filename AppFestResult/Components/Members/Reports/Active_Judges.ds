@@ -1,0 +1,16 @@
+list Active_Judges
+{
+    displayName = "Active Judges"
+    show all rows from Members [Is_Active == true && Member_Type == "Judge"]
+    (
+        Member_Name
+        Login_Email
+        Member_Type
+        Is_Active
+        Display_Order
+    )
+    sort by
+    (
+        Display_Order ascending
+    )
+}

@@ -1,0 +1,26 @@
+default list Final_Ranking_Drafts
+{
+    displayName = "Final Ranking Drafts"
+    show all rows from Final_Rankings [Decision_Status == "Draft" || Decision_Status == "Pending Consensus"]
+    (
+        Ranking_Version
+        Drafted_By
+        Drafted_At
+        Rank_1
+        Rank_2
+        Rank_3
+        Decision_Status
+        Based_On_AI_Analysis
+        Is_Current
+    )
+    filters
+    (
+        Drafted_By
+        Decision_Status
+        Is_Current
+    )
+    sort by
+    (
+        Drafted_At descending
+    )
+}

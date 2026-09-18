@@ -1,0 +1,30 @@
+default list Consensus_Status
+{
+    displayName = "Consensus Status"
+    show all rows from Final_Approvals
+    (
+        Final_Ranking
+        Judge
+        Judge_Email
+        Decision
+        Approval_Comment
+        Decided_At
+    )
+    filters
+    (
+        Decision
+        Judge
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Final_Ranking ascending
+    )
+    sort by
+    (
+        Decided_At descending
+    )
+}

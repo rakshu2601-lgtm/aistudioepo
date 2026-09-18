@@ -1,0 +1,28 @@
+Compute_Slot_End as "Compute Presentation Slot End"
+{
+    type = form
+    form = Presentation_Slots
+    record event = on add or edit
+    description = "Computes the slot end from the current configured presentation duration."
+
+    on user input of Slot_Start
+    {
+        actions
+        {
+            custom deluge script
+            (
+                currentSettings = Challenge_Settings[Current_Record == true] sort by Modified_Time desc range from 0 to 0;
+                configuredMinutes = 15;
+                if(currentSettings.ID != null && currentSettings.Presentation_Minutes != null)
+                {
+                    configuredMinutes = currentSettings.Presentation_Minutes;
+                }
+                input.Duration_Minutes = configuredMinutes;
+                if(input.Slot_Start != null)
+                {
+                    input.Slot_End = input.Slot_Start.addMinutes(configuredMinutes);
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,27 @@
+list Ranking_Versions
+{
+    displayName = "Ranking Versions"
+    show all rows from Final_Rankings
+    (
+        Ranking_Version
+        Drafted_By
+        Drafted_At
+        Rank_1
+        Rank_2
+        Rank_3
+        Decision_Status
+        Based_On_AI_Analysis
+        Published_At
+        Is_Current
+    )
+    filters
+    (
+        Drafted_By
+        Decision_Status
+        Is_Current
+    )
+    sort by
+    (
+        Drafted_At descending
+    )
+}

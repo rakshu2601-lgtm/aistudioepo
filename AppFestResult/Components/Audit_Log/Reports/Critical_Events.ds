@@ -1,0 +1,26 @@
+list Critical_Events
+{
+    displayName = "Critical Events"
+    show all rows from Audit_Log [Severity == "Critical"]
+    (
+        Event_Time
+        Actor_Email
+        Event_Type
+        Related_Form
+        Related_Record_ID
+        Event_Summary
+        Before_Value
+        After_Value
+        Severity
+    )
+    filters
+    (
+        Event_Type
+        Actor_Email
+        Severity
+    )
+    sort by
+    (
+        Event_Time descending
+    )
+}

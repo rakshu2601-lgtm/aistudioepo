@@ -1,0 +1,217 @@
+form Judge_Evaluations
+{
+    title
+    {
+        displayname = "Judge Evaluations"
+        on add = "New Judge Evaluation"
+        on edit = "Edit Judge Evaluation"
+    }
+    success message = "Evaluation saved successfully."
+    Main_Section
+    (
+        type = section
+        displayname = "Evaluation Identity"
+        row = 1
+        column = 0
+    )
+    must have Judge
+    (
+        type = picklist
+        displayname = "Judge"
+        values = Members.ID
+        displayformat = [Member_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Judge_Email
+    (
+        type = email
+        displayname = "Judge Email"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Application
+    (
+        type = picklist
+        displayname = "Application"
+        values = Applications.ID
+        displayformat = [App_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Scores_Section
+    (
+        type = section
+        displayname = "Category Scores"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have UI_Score
+    (
+        type = decimal
+        displayname = "UI Score (1-10)"
+        decimalplace = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Navigation_Usability_Score
+    (
+        type = decimal
+        displayname = "Navigation / Usability Score (1-10)"
+        decimalplace = 2
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Core_Functionality_Score
+    (
+        type = decimal
+        displayname = "Core Functionality Score (1-10)"
+        decimalplace = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Innovation_Score
+    (
+        type = decimal
+        displayname = "Innovation Score (1-10)"
+        decimalplace = 2
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Beyond_Creator_Proof_Score
+    (
+        type = decimal
+        displayname = "Beyond-Creator Proof Score (1-10)"
+        decimalplace = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Catalyst_Integrations_Score
+    (
+        type = decimal
+        displayname = "Catalyst / Integrations Score (1-10)"
+        decimalplace = 2
+        row = 2
+        column = 2
+        width = medium
+    )
+    must have Presentation_Score
+    (
+        type = decimal
+        displayname = "Presentation Score (1-10)"
+        decimalplace = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+    Weighted_Total
+    (
+        type = decimal
+        displayname = "Weighted Total (out of 100)"
+        decimalplace = 2
+        row = 2
+        column = 2
+        width = medium
+    )
+    Narrative_Section
+    (
+        type = section
+        displayname = "Narrative Assessment"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    must have Strengths
+    (
+        type = textarea
+        displayname = "Strengths"
+        height = 120px
+        row = 3
+        column = 1
+        width = medium
+    )
+    must have Risks_Concerns
+    (
+        type = textarea
+        displayname = "Risks / Concerns"
+        height = 120px
+        row = 3
+        column = 2
+        width = medium
+    )
+    Judge_Comments
+    (
+        type = textarea
+        displayname = "Judge Comments"
+        height = 120px
+        row = 3
+        column = 1
+        width = medium
+    )
+    Status_Section
+    (
+        type = section
+        displayname = "Submission Status"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    must have Evaluation_Status
+    (
+        type = picklist
+        displayname = "Evaluation Status"
+        values = {"Draft", "Submitted", "Locked"}
+        initial value = "Draft"
+        row = 4
+        column = 1
+        width = medium
+    )
+    Submitted_At
+    (
+        type = datetime
+        displayname = "Submitted At"
+        row = 4
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Evaluation"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Clear"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Evaluation"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

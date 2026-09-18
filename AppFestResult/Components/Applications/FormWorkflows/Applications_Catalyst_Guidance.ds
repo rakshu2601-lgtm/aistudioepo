@@ -1,0 +1,25 @@
+Applications_Catalyst_Guidance as "Show Integration Guidance"
+{
+    type = form
+    form = Applications
+    record event = on add or edit
+
+    on user input of Catalyst_Connected
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Catalyst_Connected == true)
+                {
+                    show Other_Integrations;
+                }
+                else
+                {
+                    hide Other_Integrations;
+                    input.Other_Integrations = "";
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,229 @@
+Process_AI_Analysis as "Process AI Analysis"
+{
+    type = form
+    form = AI_Analyses
+    record event = on add
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                try
+                {
+                    update AI_Analyses[ID != input.ID && Is_Latest == true]
+                    [
+                        Is_Latest = false
+                    ];
+                    submitted_apps = Applications[Submission_Status == "Submitted" || Submission_Status == "Locked"];
+                    active_participants = Members[Member_Type == "Participant" && Is_Active == true];
+                    active_judges = Members[Member_Type == "Judge" && Is_Active == true];
+                    submitted_ballots = Participant_Ballots[Ballot_Status == "Submitted" || Ballot_Status == "Locked"];
+                    submitted_scores = Judge_Evaluations[Evaluation_Status == "Submitted" || Evaluation_Status == "Locked"];
+                    expected_scores = submitted_apps.count() * active_judges.count();
+                    if(submitted_apps.count() == 0 || active_participants.count() == 0 || active_judges.count() == 0 || submitted_ballots.count() != active_participants.count() || submitted_scores.count() != expected_scores)
+                    {
+                        update AI_Analyses[ID == input.ID]
+                        [
+                            Analysis_Status = "Failed"
+                            Failure_Message = "Analysis was not run because submitted ballots or judge scorecards are incomplete."
+                        ];
+                    }
+                    else
+                    {
+                        app_evidence = List();
+                        for each app in submitted_apps
+                        {
+                            app_id = app.ID.toString();
+                            borda = 0;
+                            ranks = Map();
+                            ranks.put("rank_1",0);
+                            ranks.put("rank_2",0);
+                            ranks.put("rank_3",0);
+                            ranks.put("rank_4",0);
+                            ranks.put("rank_5",0);
+                            ranks.put("rank_6",0);
+                            ranks.put("rank_7",0);
+                            ranks.put("rank_8",0);
+                            peer_rationales = List();
+                            for each ballot in submitted_ballots
+                            {
+                                if(ballot.Rank_1 == app.ID) { borda = borda + 8; ranks.put("rank_1",ranks.get("rank_1") + 1); peer_rationales.add(ballot.Best_App_Explanation); }
+                                if(ballot.Rank_2 == app.ID) { borda = borda + 7; ranks.put("rank_2",ranks.get("rank_2") + 1); }
+                                if(ballot.Rank_3 == app.ID) { borda = borda + 6; ranks.put("rank_3",ranks.get("rank_3") + 1); }
+                                if(ballot.Rank_4 == app.ID) { borda = borda + 5; ranks.put("rank_4",ranks.get("rank_4") + 1); }
+                                if(ballot.Rank_5 == app.ID) { borda = borda + 4; ranks.put("rank_5",ranks.get("rank_5") + 1); }
+                                if(ballot.Rank_6 == app.ID) { borda = borda + 3; ranks.put("rank_6",ranks.get("rank_6") + 1); }
+                                if(ballot.Rank_7 == app.ID) { borda = borda + 2; ranks.put("rank_7",ranks.get("rank_7") + 1); }
+                                if(ballot.Rank_8 == app.ID) { borda = borda + 1; ranks.put("rank_8",ranks.get("rank_8") + 1); }
+                            }
+                            app_scores = Judge_Evaluations[Application == app.ID && (Evaluation_Status == "Submitted" || Evaluation_Status == "Locked")];
+                            total_weighted = 0.0;
+                            ui_total = 0.0;
+                            nav_total = 0.0;
+                            core_total = 0.0;
+                            innovation_total = 0.0;
+                            proof_total = 0.0;
+                            integration_total = 0.0;
+                            presentation_total = 0.0;
+                            for each score in app_scores
+                            {
+                                total_weighted = total_weighted + score.Weighted_Total;
+                                ui_total = ui_total + score.UI_Score;
+                                nav_total = nav_total + score.Navigation_Usability_Score;
+                                core_total = core_total + score.Core_Functionality_Score;
+                                innovation_total = innovation_total + score.Innovation_Score;
+                                proof_total = proof_total + score.Beyond_Creator_Proof_Score;
+                                integration_total = integration_total + score.Catalyst_Integrations_Score;
+                                presentation_total = presentation_total + score.Presentation_Score;
+                            }
+                            score_count = app_scores.count();
+                            weighted_average = total_weighted / score_count;
+                            variance_total = 0.0;
+                            for each score_for_variance in app_scores
+                            {
+                                variance_total = variance_total + ((score_for_variance.Weighted_Total - weighted_average) * (score_for_variance.Weighted_Total - weighted_average));
+                            }
+                            category_averages = Map();
+                            category_averages.put("ui",ui_total / score_count);
+                            category_averages.put("navigation_usability",nav_total / score_count);
+                            category_averages.put("core_functionality",core_total / score_count);
+                            category_averages.put("innovation",innovation_total / score_count);
+                            category_averages.put("beyond_creator_proof",proof_total / score_count);
+                            category_averages.put("catalyst_integrations",integration_total / score_count);
+                            category_averages.put("presentation",presentation_total / score_count);
+                            evidence = Map();
+                            evidence.put("application_id",app_id);
+                            evidence.put("app_name",app.App_Name);
+                            evidence.put("tagline",app.Tagline);
+                            evidence.put("problem_statement",app.Problem_Statement);
+                            evidence.put("beyond_creator_capability",app.Beyond_Creator_Capability);
+                            evidence.put("presentation_summary",app.Presentation_Summary);
+                            evidence.put("borda_points",borda);
+                            evidence.put("rank_distribution",ranks);
+                            evidence.put("peer_best_app_rationales",peer_rationales);
+                            evidence.put("judge_weighted_average",weighted_average);
+                            evidence.put("judge_weighted_variance",variance_total / score_count);
+                            evidence.put("category_averages",category_averages);
+                            app_evidence.add(evidence);
+                        }
+                        settings = AI_Settings[Is_Current == true && Is_Enabled == true];
+                        if(settings.count() != 1 || settings.API_Key == null || settings.API_Key == "")
+                        {
+                            update AI_Analyses[ID == input.ID]
+                            [
+                                Analysis_Status = "Failed"
+                                Failure_Message = "No complete, current, enabled AI configuration is available."
+                            ];
+                        }
+                        else
+                        {
+                            payload_evidence = Map();
+                            payload_evidence.put("applications",app_evidence);
+                            payload_evidence.put("ballot_count",submitted_ballots.count());
+                            payload_evidence.put("judge_count",active_judges.count());
+                            payload_evidence.put("required_output",{"team_vote_winner_app_name","judge_score_winner_app_name","overall_recommended_winner_app_name","team_confidence","judge_confidence","team_analysis","judge_analysis","consensus_and_disagreement","tie_break_explanation"});
+                            user_message = "Analyze only the supplied evidence. Return one JSON object using every required_output key. Winner values must exactly match an app_name. Confidence values must be numeric from 0 to 100. Do not invent facts. Evidence: " + payload_evidence.toString();
+                            messages = List();
+                            messages.add({"role":"system","content":settings.System_Prompt});
+                            messages.add({"role":"user","content":user_message});
+                            request_body = Map();
+                            request_body.put("model",settings.Model_Name);
+                            request_body.put("temperature",settings.Temperature);
+                            request_body.put("max_tokens",settings.Max_Tokens);
+                            request_body.put("response_format",{"type":"json_object"});
+                            request_body.put("messages",messages);
+                            endpoint = settings.Base_URL.toString();
+                            if(!endpoint.endsWith("/")) { endpoint = endpoint + "/"; }
+                            endpoint = endpoint + "chat/completions";
+                            headers = Map();
+                            headers.put("Content-Type","application/json");
+                            headers.put("Authorization","Bearer " + settings.API_Key);
+                            api_response = invokeUrl
+                            [
+                                url: endpoint
+                                type: POST
+                                headers: headers
+                                body: request_body.toString()
+                                detailed: true
+                            ];
+                            if(api_response.get("responseCode") < 200 || api_response.get("responseCode") >= 300)
+                            {
+                                update AI_Analyses[ID == input.ID]
+                                [
+                                    Analysis_Status = "Failed"
+                                    Failure_Message = "The AI service returned a non-success HTTP status."
+                                ];
+                            }
+                            else
+                            {
+                                response_body = api_response.get("responseText");
+                                choices = response_body.getJSON("choices");
+                                content = choices.get(0).get("message").get("content");
+                                team_name = content.getJSON("team_vote_winner_app_name");
+                                judge_name = content.getJSON("judge_score_winner_app_name");
+                                overall_name = content.getJSON("overall_recommended_winner_app_name");
+                                team_app = Applications[App_Name == team_name && (Submission_Status == "Submitted" || Submission_Status == "Locked")];
+                                judge_app = Applications[App_Name == judge_name && (Submission_Status == "Submitted" || Submission_Status == "Locked")];
+                                overall_app = Applications[App_Name == overall_name && (Submission_Status == "Submitted" || Submission_Status == "Locked")];
+                                team_confidence = content.getJSON("team_confidence");
+                                judge_confidence = content.getJSON("judge_confidence");
+                                if(team_app.count() != 1 || judge_app.count() != 1 || overall_app.count() != 1 || team_confidence == null || judge_confidence == null || team_confidence < 0 || team_confidence > 100 || judge_confidence < 0 || judge_confidence > 100)
+                                {
+                                    update AI_Analyses[ID == input.ID]
+                                    [
+                                        Analysis_Status = "Failed"
+                                        Failure_Message = "The AI response failed winner or confidence validation."
+                                        Full_AI_Response = content
+                                    ];
+                                }
+                                else
+                                {
+                                    update AI_Analyses[ID != input.ID && Is_Latest == true]
+                                    [
+                                        Is_Latest = false
+                                    ];
+                                    update AI_Analyses[ID == input.ID]
+                                    [
+                                        Analysis_Status = "Completed"
+                                        Team_Vote_Predicted_Winner = team_app.ID
+                                        Judge_Score_Predicted_Winner = judge_app.ID
+                                        Overall_Recommended_Winner = overall_app.ID
+                                        Team_Confidence = team_confidence
+                                        Judge_Confidence = judge_confidence
+                                        Team_Analysis = content.getJSON("team_analysis")
+                                        Judge_Analysis = content.getJSON("judge_analysis")
+                                        Consensus_And_Disagreement = content.getJSON("consensus_and_disagreement")
+                                        Tie_Break_Explanation = content.getJSON("tie_break_explanation")
+                                        Full_AI_Response = content
+                                        Failure_Message = ""
+                                        Is_Latest = true
+                                    ];
+                                    insert into Audit_Log
+                                    [
+                                        Event_Time = zoho.currenttime
+                                        Actor_Email = input.Requested_By
+                                        Event_Type = "AI Run"
+                                        Related_Form = "AI_Analyses"
+                                        Related_Record_ID = input.ID.toString()
+                                        Event_Summary = "Completed explainable AI analysis from complete peer and judge evidence."
+                                        Severity = "Info"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+                catch(error)
+                {
+                    update AI_Analyses[ID == input.ID]
+                    [
+                        Analysis_Status = "Failed"
+                        Failure_Message = "The analysis could not be completed because the service response was unavailable or malformed."
+                    ];
+                }
+            )
+        }
+    }
+}

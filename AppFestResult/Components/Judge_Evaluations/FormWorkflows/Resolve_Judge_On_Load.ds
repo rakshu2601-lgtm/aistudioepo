@@ -1,0 +1,77 @@
+Resolve_Judge_On_Load as "Resolve and Lock Judge Identity"
+{
+    type = form
+    form = Judge_Evaluations
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                judge_records = Members[Login_Email == zoho.loginuser && Member_Type == "Judge" && Is_Active == true];
+                if(judge_records.count() == 1)
+                {
+                    if(input.Judge == null)
+                    {
+                        input.Judge = judge_records.ID;
+                        input.Judge_Email = zoho.loginuser;
+                    }
+                    if(input.Judge != judge_records.ID || input.Judge_Email != zoho.loginuser)
+                    {
+                        alert "You cannot view or edit another judge's evaluation through this form.";
+                        disable Application;
+                        disable UI_Score;
+                        disable Navigation_Usability_Score;
+                        disable Core_Functionality_Score;
+                        disable Innovation_Score;
+                        disable Beyond_Creator_Proof_Score;
+                        disable Catalyst_Integrations_Score;
+                        disable Presentation_Score;
+                        disable Strengths;
+                        disable Risks_Concerns;
+                        disable Judge_Comments;
+                        disable Evaluation_Status;
+                    }
+                }
+                else
+                {
+                    alert "No single active judge account is mapped to your login.";
+                    disable Application;
+                    disable UI_Score;
+                    disable Navigation_Usability_Score;
+                    disable Core_Functionality_Score;
+                    disable Innovation_Score;
+                    disable Beyond_Creator_Proof_Score;
+                    disable Catalyst_Integrations_Score;
+                    disable Presentation_Score;
+                    disable Strengths;
+                    disable Risks_Concerns;
+                    disable Judge_Comments;
+                    disable Evaluation_Status;
+                }
+                disable Judge;
+                disable Judge_Email;
+                hide Weighted_Total;
+                disable Weighted_Total;
+                disable Submitted_At;
+                if(input.Evaluation_Status == "Submitted" || input.Evaluation_Status == "Locked")
+                {
+                    disable Application;
+                    disable UI_Score;
+                    disable Navigation_Usability_Score;
+                    disable Core_Functionality_Score;
+                    disable Innovation_Score;
+                    disable Beyond_Creator_Proof_Score;
+                    disable Catalyst_Integrations_Score;
+                    disable Presentation_Score;
+                    disable Strengths;
+                    disable Risks_Concerns;
+                    disable Judge_Comments;
+                    disable Evaluation_Status;
+                }
+            )
+        }
+    }
+}

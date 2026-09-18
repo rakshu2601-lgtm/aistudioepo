@@ -1,0 +1,19 @@
+<page linkname = "Results_Stage" displayname = "Results Stage"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Results_Experience' elementName='Results_Experience'>
+          <![CDATA[htmlpage Results_Experience()
+            content
+            <%{%>
+              <file name:Results_Experience.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

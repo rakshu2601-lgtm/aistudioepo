@@ -1,0 +1,35 @@
+calendar Challenge_Timeline
+{
+    displayName = "Challenge Timeline"
+    show all rows from Challenge_Settings
+    (
+        Challenge_Title
+        Challenge_Status
+        Challenge_Start
+        Challenge_End
+        Voting_Opens
+        Voting_Closes
+        Judging_Closes
+        Showcase_Date_Time
+        Current_Record
+    )
+    filters
+    (
+        Challenge_Status
+        Current_Record
+    )
+    options
+    (
+        display type = month
+        week start day = monday
+        display field = Challenge_Title
+        start date = Challenge_Start
+        end date = Showcase_Date_Time
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+}

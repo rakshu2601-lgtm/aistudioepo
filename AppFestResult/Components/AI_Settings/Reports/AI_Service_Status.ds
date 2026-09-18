@@ -1,0 +1,36 @@
+list AI_Service_Status
+{
+    displayName = "AI Service Status"
+    show all rows from AI_Settings [Is_Current == true]
+    (
+        Setting_Name
+        Base_URL
+        Model_Name
+        Is_Enabled
+        (
+            displaytrue = "Enabled"
+            displayfalse = "Disabled"
+        )
+        Is_Current
+        (
+            displaytrue = "Current"
+            displayfalse = "Inactive"
+        )
+        Last_Tested_At
+        Last_Test_Status
+        custom action "Test AI Configuration"
+        (
+            workflow = Test_AI_Configuration
+            show action for each record = true
+            column header = "Test AI Configuration"
+            success message = "AI service test completed; review the stored status."
+            condition = (Is_Current == true)
+            confirmation before execution
+            (
+                message for individual record = "Send a minimal connectivity test to the configured AI service?"
+                confirm button text = "Run Test"
+                cancel button text = "Cancel"
+            )
+        )
+    )
+}

@@ -1,0 +1,73 @@
+Resolve_And_Secure_Ballot as "Resolve and Secure Ballot"
+{
+    type = form
+    form = Participant_Ballots
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                logged_in_member = Members[Login_Email == zoho.loginuser && Member_Type == "Participant" && Is_Active == true];
+                disable Voter;
+                disable Voter_Email;
+                disable Submitted_At;
+                disable Ballot_Status;
+                if(logged_in_member.count() == 1)
+                {
+                    input.Voter = logged_in_member.ID;
+                    input.Voter_Email = zoho.loginuser;
+                }
+                clear Rank_1;
+                clear Rank_2;
+                clear Rank_3;
+                clear Rank_4;
+                clear Rank_5;
+                clear Rank_6;
+                clear Rank_7;
+                clear Rank_8;
+                settings = Challenge_Settings[Current_Record == true];
+                voting_open = false;
+                if(settings.count() == 1 && settings.Challenge_Status == "Voting Open" && zoho.currenttime >= settings.Voting_Opens && zoho.currenttime <= settings.Voting_Closes)
+                {
+                    voting_open = true;
+                }
+                if(voting_open && input.Ballot_Status != "Submitted" && input.Ballot_Status != "Locked" && logged_in_member.count() == 1)
+                {
+                    eligible_apps = Applications[(Submission_Status == "Submitted" || Submission_Status == "Locked") && Participant != logged_in_member.ID];
+                    Rank_1:ui.add(eligible_apps.ID.getall());
+                    Rank_2:ui.add(eligible_apps.ID.getall());
+                    Rank_3:ui.add(eligible_apps.ID.getall());
+                    Rank_4:ui.add(eligible_apps.ID.getall());
+                    Rank_5:ui.add(eligible_apps.ID.getall());
+                    Rank_6:ui.add(eligible_apps.ID.getall());
+                    Rank_7:ui.add(eligible_apps.ID.getall());
+                    Rank_8:ui.add(eligible_apps.ID.getall());
+                    enable Rank_1;
+                    enable Rank_2;
+                    enable Rank_3;
+                    enable Rank_4;
+                    enable Rank_5;
+                    enable Rank_6;
+                    enable Rank_7;
+                    enable Rank_8;
+                    enable Best_App_Explanation;
+                }
+                else
+                {
+                    disable Rank_1;
+                    disable Rank_2;
+                    disable Rank_3;
+                    disable Rank_4;
+                    disable Rank_5;
+                    disable Rank_6;
+                    disable Rank_7;
+                    disable Rank_8;
+                    disable Best_App_Explanation;
+                }
+            )
+        }
+    }
+}

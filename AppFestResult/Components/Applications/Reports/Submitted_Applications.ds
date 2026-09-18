@@ -1,0 +1,26 @@
+list Submitted_Applications
+{
+    displayName = "Submitted Applications"
+    show all rows from Applications [Submission_Status == "Submitted" || Submission_Status == "Locked"]
+    (
+        App_Name
+        Participant
+        Tagline
+        Catalyst_Connected
+        Other_Integrations
+        Demo_URL
+        Evidence_URL
+        Submission_Status
+        Submitted_At
+        Readiness_Percent
+    )
+    filters
+    (
+        Submission_Status
+        Catalyst_Connected
+    )
+    sort by
+    (
+        Submitted_At descending
+    )
+}

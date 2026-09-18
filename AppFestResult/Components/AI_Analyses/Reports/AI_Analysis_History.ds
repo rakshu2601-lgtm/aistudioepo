@@ -1,0 +1,28 @@
+default list AI_Analysis_History
+{
+    displayName = "AI Analysis History"
+    show all rows from AI_Analyses
+    (
+        Analysis_Run_ID
+        Requested_By
+        Requested_At
+        Analysis_Status
+        Team_Vote_Predicted_Winner
+        Judge_Score_Predicted_Winner
+        Overall_Recommended_Winner
+        Team_Confidence
+        Judge_Confidence
+        Is_Latest
+        Failure_Message
+    )
+    filters
+    (
+        Analysis_Status
+        Requested_At
+        Is_Latest
+    )
+    sort by
+    (
+        Requested_At descending
+    )
+}

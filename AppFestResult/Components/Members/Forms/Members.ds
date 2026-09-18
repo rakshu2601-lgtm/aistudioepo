@@ -1,0 +1,118 @@
+form Members
+{
+    title
+    {
+        on add = "Add Member"
+        on edit = "Edit Member"
+    }
+    success message = "Member saved successfully."
+    Main_Section
+    (
+        type = section
+        displayname = "Roster Details"
+        row = 1
+        column = 0
+    )
+    must have Member_Name
+    (
+        type = text
+        displayname = "Member Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Member_Type
+    (
+        type = picklist
+        displayname = "Member Type"
+        values = {"Participant", "Judge"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    Is_Active
+    (
+        type = checkbox
+        displayname = "Is Active"
+        initial value = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Display_Order
+    (
+        type = number
+        displayname = "Display Order"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Identity_Display_Settings
+    (
+        type = section
+        displayname = "Identity And Display"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    unique Login_Email
+    (
+        type = email
+        displayname = "Login Email"
+        description
+        [
+            type = tooltip
+            message = "Used to match this member with zoho.loginuser in downstream workflows."
+        ]
+        row = 2
+        column = 1
+        width = medium
+    )
+    Profile_Color
+    (
+        type = text
+        displayname = "Profile Color"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Avatar
+    (
+        type = image
+        displayname = "Avatar"
+        source = file
+        aspect ratio = square
+        row = 2
+        column = 1
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Add Member"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Save Changes"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

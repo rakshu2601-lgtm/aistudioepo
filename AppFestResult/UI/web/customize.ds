@@ -1,0 +1,25 @@
+customize
+{
+    layout
+    {
+        theme = "theme_2"
+        variant = "variant_2"
+    }
+    font = "lato"
+    color options
+    {
+        name = "Beyond Limits Indigo"
+        brand color = "#5B4BDB"
+        type = "custom"
+        dark mode color = "#8B7CFF"
+    }
+    logo
+    {
+        preference = "app_icon"
+        placement = "left"
+    }
+    custom css
+    {
+        content = ".zc-app-header{box-shadow:0 8px 30px rgba(29,24,74,.12)} .zc-menu{letter-spacing:.01em}"
+    }
+}

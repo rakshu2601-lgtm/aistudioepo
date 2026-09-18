@@ -1,0 +1,27 @@
+default list My_Judge_Scores
+{
+    displayName = "My Judge Scores"
+    show all rows from Judge_Evaluations [Judge_Email == zoho.loginuser]
+    (
+        Application
+        UI_Score
+        Navigation_Usability_Score
+        Core_Functionality_Score
+        Innovation_Score
+        Beyond_Creator_Proof_Score
+        Catalyst_Integrations_Score
+        Presentation_Score
+        Weighted_Total
+        Evaluation_Status
+        Submitted_At
+    )
+    filters
+    (
+        Evaluation_Status
+        Application
+    )
+    sort by
+    (
+        Application ascending
+    )
+}

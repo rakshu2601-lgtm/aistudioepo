@@ -1,0 +1,33 @@
+Process_Final_Ranking as "Process Final Ranking Consensus"
+{
+    type = form
+    form = Final_Rankings
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_ranking = Final_Rankings[ID == input.ID];
+                current_ranking.Is_Current = true;
+                if(input.Decision_Status == "Pending Consensus")
+                {
+                    older_rankings = Final_Rankings[ID != input.ID && (Decision_Status == "Draft" || Decision_Status == "Pending Consensus")];
+                    for each older_ranking in older_rankings
+                    {
+                        older_ranking.Decision_Status = "Superseded";
+                        older_ranking.Is_Current = false;
+                        delete from Final_Approvals[Final_Ranking == older_ranking.ID];
+                    }
+                    delete from Final_Approvals[Final_Ranking == input.ID];
+                }
+                else if(input.Decision_Status == "Draft")
+                {
+                    delete from Final_Approvals[Final_Ranking == input.ID];
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,97 @@
+menu
+{
+    space Beyond_Limits
+    {
+        displayname = "Beyond Limits Challenge"
+        icon = "business-award-49"
+
+        section Experiences
+        {
+            displayname = "Experience"
+            icon = "business-chart"
+            page Participant_Challenge_Hub { icon = "business-goal-64" }
+            page Judge_Command_Center { icon = "business-chart-bar-33" }
+            page Results_Stage { icon = "business-award-48" }
+        }
+        section Challenge
+        {
+            displayname = "Challenge"
+            icon = "business-goal-64"
+            form Challenge_Settings { icon = "business-agenda" }
+            report Challenge_Control { icon = "business-board-30" }
+            report Challenge_Timeline { icon = "business-progress" }
+            form Presentation_Slots { icon = "business-chair" }
+            report Presentation_Schedule { icon = "business-agenda" }
+            report Showcase_Calendar { icon = "business-board-27" }
+            report Presentation_Board { icon = "business-board-28" }
+        }
+        section My_Participation
+        {
+            displayname = "My Participation"
+            icon = "users-single-body"
+            form Applications { icon = "business-bulb-61" }
+            report Application_Gallery { icon = "design-album" }
+            report Submission_Pipeline { icon = "business-progress" }
+            report Submitted_Applications { icon = "design-todo" }
+            form Participant_Ballots { icon = "business-sign" }
+            report My_Ballot { icon = "design-bullet-list-67" }
+            report Voting_Completion { icon = "business-chart-pie-36" }
+        }
+        section Judging
+        {
+            displayname = "Judging"
+            icon = "business-scale"
+            report Ballot_Audit { icon = "business-notes" }
+            form Judge_Evaluations { icon = "business-signature" }
+            report My_Judge_Scores { icon = "business-calculator" }
+            report Judge_Score_Matrix { icon = "business-chart-bar-32" }
+            report Application_Score_Summary { icon = "business-chart-bar-33" }
+            report Scorecard_Progress { icon = "business-progress" }
+            form AI_Analyses { icon = "business-bulb-63" }
+            report Latest_AI_Prediction { icon = "business-goal-65" }
+            report AI_Analysis_History { icon = "business-chart" }
+            report AI_Service_Status { icon = "business-plug" }
+        }
+        section Finalization
+        {
+            displayname = "Finalization"
+            icon = "business-award-74"
+            form Final_Rankings { icon = "design-bullet-list-68" }
+            report Final_Ranking_Drafts { icon = "design-paper-design" }
+            report Ranking_Versions { icon = "design-collection" }
+            report Published_Leaderboard { icon = "business-award-48" }
+            form Final_Approvals { icon = "design-stamp" }
+            report My_Approval_Action { icon = "business-signature" }
+            report Consensus_Status { icon = "business-handshake" }
+            report Approval_Audit { icon = "business-badge" }
+        }
+        section Administration
+        {
+            displayname = "Administration"
+            icon = "business-safe"
+            form Members { icon = "users-multiple-11" }
+            report All_Members { icon = "users-contacts" }
+            report Active_Participants { icon = "users-multiple-19" }
+            report Active_Judges { icon = "users-badge-13" }
+            form AI_Settings { icon = "design-code" }
+            report AI_Configuration { icon = "design-window-code" }
+            form Audit_Log { icon = "business-notes" }
+            report Audit_Trail { icon = "design-bullet-list-69" }
+            report Critical_Events { icon = "business-hammer" }
+        }
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space,section,component}
+        }
+    }
+}

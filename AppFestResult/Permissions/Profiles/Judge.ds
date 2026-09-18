@@ -1,0 +1,164 @@
+"Judge"
+{
+    name        = "Judge"
+    type        = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false }
+    description = "Judge access for inspection, independent scoring, AI analysis, controlled ranking and approval, presentation management, and read-only audit review."
+
+    ModulePermissions
+    {
+        Members
+        {
+            enabled          = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Members={"View"}
+                Active_Participants={"View"}
+                Active_Judges={"View"}
+            }
+        }
+
+        Challenge_Settings
+        {
+            enabled          = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Challenge_Control={"View","Edit"}
+                Challenge_Timeline={"View"}
+            }
+        }
+
+        Applications
+        {
+            enabled          = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Application_Gallery={"View"}
+                Submission_Pipeline={"View"}
+                Submitted_Applications={"View"}
+            }
+        }
+
+        Participant_Ballots
+        {
+            enabled          = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Ballot_Audit={"View"}
+                Voting_Completion={"View"}
+            }
+        }
+
+        Judge_Evaluations
+        {
+            enabled          = Create,View,Edit,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                My_Judge_Scores={"View","Edit"}
+                Judge_Score_Matrix={"View"}
+                Application_Score_Summary={"View"}
+                Scorecard_Progress={"View"}
+            }
+        }
+
+        AI_Settings
+        {
+            enabled          = Viewall,View,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                AI_Service_Status={"View","Edit"}
+            }
+            FieldPermissions
+            {
+                Main_Section{visibility:true,readonly:true}
+                Setting_Name{visibility:true,readonly:true}
+                Base_URL{visibility:true,readonly:true}
+                Model_Name{visibility:true,readonly:true}
+                API_Key{visibility:false}
+                Temperature{visibility:true,readonly:true}
+                Max_Tokens{visibility:true,readonly:true}
+                System_Prompt{visibility:true,readonly:true}
+                Status_Section{visibility:true,readonly:true}
+                Is_Enabled{visibility:true,readonly:true}
+                Is_Current{visibility:true,readonly:true}
+                Last_Tested_At{visibility:true,readonly:true}
+                Last_Test_Status{visibility:true,readonly:true}
+            }
+        }
+
+        AI_Analyses
+        {
+            enabled          = Create,Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                AI_Analysis_History={"View"}
+                Latest_AI_Prediction={"View"}
+            }
+        }
+
+        Final_Rankings
+        {
+            enabled          = Create,Viewall,View,Edit,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Final_Ranking_Drafts={"View","Edit"}
+                Ranking_Versions={"View"}
+                Published_Leaderboard={"View"}
+            }
+        }
+
+        Final_Approvals
+        {
+            enabled          = Create,View,Edit,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                My_Approval_Action={"View","Edit"}
+                Consensus_Status={"View"}
+                Approval_Audit={"View"}
+            }
+        }
+
+        Presentation_Slots
+        {
+            enabled          = Viewall,Modifyall,View,Edit,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Presentation_Schedule={"View","Edit"}
+                Showcase_Calendar={"View","Edit"}
+                Presentation_Board={"View","Edit"}
+            }
+        }
+
+        Audit_Log
+        {
+            enabled          = Viewall,View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Audit_Trail={"View"}
+                Critical_Events={"View"}
+            }
+        }
+
+        Judge_Command_Center
+        {
+            enabled = tab
+        }
+
+        Results_Stage
+        {
+            enabled = tab
+        }
+    }
+}
+

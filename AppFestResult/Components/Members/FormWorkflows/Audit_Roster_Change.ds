@@ -1,0 +1,29 @@
+Audit_Roster_Change as "Audit Roster Change"
+{
+    type = form
+    form = Members
+    record event = on add or edit
+    description = "Records administrator changes to the official challenge roster."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                eventSummary = "Roster member saved: " + input.Member_Name + " (" + input.Member_Type + ")";
+                auditId = insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuser
+                    Event_Type = "Roster Change"
+                    Related_Form = "Members"
+                    Related_Record_ID = input.ID.toString()
+                    Event_Summary = eventSummary
+                    After_Value = "Active=" + input.Is_Active + ", Email=" + ifnull(input.Login_Email, "Not mapped")
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

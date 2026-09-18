@@ -1,0 +1,29 @@
+Presentation_Slot_On_Load as "Prepare Presentation Slot"
+{
+    type = form
+    form = Presentation_Slots
+    record event = on add or edit
+    description = "Applies configured duration and participant-safe field visibility while leaving status and notes management to judges and administrators."
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                currentSettings = Challenge_Settings[Current_Record == true] sort by Modified_Time desc range from 0 to 0;
+                if(currentSettings.ID != null && currentSettings.Presentation_Minutes != null)
+                {
+                    input.Duration_Minutes = currentSettings.Presentation_Minutes;
+                }
+                disable Duration_Minutes, Slot_End;
+                loginMember = Members[Login_Email == zoho.loginuser && Is_Active == true];
+                if(loginMember.ID != null && loginMember.Member_Type == "Participant")
+                {
+                    hide Judge_Notes;
+                    disable Application, Presenter, Slot_Start, Room_Or_Link, Presentation_Status;
+                }
+            )
+        }
+    }
+}

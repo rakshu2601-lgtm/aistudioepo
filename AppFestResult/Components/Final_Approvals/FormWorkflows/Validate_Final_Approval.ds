@@ -1,0 +1,40 @@
+Validate_Final_Approval as "Validate Final Approval"
+{
+    type = form
+    form = Final_Approvals
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                judge_records = Members[Login_Email == zoho.loginuser && Member_Type == "Judge" && Is_Active == true && (Member_Name == "Siddarth" || Member_Name == "Monica" || Member_Name == "Brandon")];
+                if(judge_records.count() != 1 || input.Judge != judge_records.ID || input.Judge_Email != zoho.loginuser)
+                {
+                    alert "Approval identity must match one active mapped named judge and the logged-in user.";
+                    cancel submit;
+                }
+                ranking_records = Final_Rankings[ID == input.Final_Ranking && Decision_Status == "Pending Consensus"];
+                if(ranking_records.count() != 1)
+                {
+                    alert "The referenced ranking must be the unchanged version currently Pending Consensus.";
+                    cancel submit;
+                }
+                duplicate_count = Final_Approvals[Judge == input.Judge && Final_Ranking == input.Final_Ranking && ID != input.ID].count();
+                if(duplicate_count > 0)
+                {
+                    alert "This judge has already recorded a decision for this ranking version.";
+                    cancel submit;
+                }
+                if(input.Approval_Comment == null || input.Approval_Comment.trim() == "")
+                {
+                    alert "Provide an approval comment documenting your independent decision.";
+                    cancel submit;
+                }
+                input.Decided_At = zoho.currenttime;
+            )
+        }
+    }
+}

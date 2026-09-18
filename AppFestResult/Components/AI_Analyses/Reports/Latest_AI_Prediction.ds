@@ -1,0 +1,22 @@
+list Latest_AI_Prediction
+{
+    displayName = "Latest AI Prediction"
+    show all rows from AI_Analyses [Is_Latest == true && Analysis_Status == "Completed"]
+    (
+        Analysis_Run_ID
+        Requested_At
+        Team_Vote_Predicted_Winner
+        Team_Confidence
+        Team_Analysis
+        Judge_Score_Predicted_Winner
+        Judge_Confidence
+        Judge_Analysis
+        Overall_Recommended_Winner
+        Consensus_And_Disagreement
+        Tie_Break_Explanation
+    )
+    sort by
+    (
+        Requested_At descending
+    )
+}

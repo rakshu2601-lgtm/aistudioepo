@@ -1,0 +1,80 @@
+Validate_Final_Ranking as "Validate Final Ranking"
+{
+    type = form
+    form = Final_Rankings
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                judge = Members[Login_Email == zoho.loginuser && Member_Type == "Judge" && Is_Active == true];
+                if(judge.count() != 1 || input.Drafted_By != zoho.loginuser)
+                {
+                    alert "Only an active judge using their mapped login identity may draft a final ranking.";
+                    cancel submit;
+                }
+                if(input.ID == null && input.Decision_Status == "Published")
+                {
+                    alert "A ranking cannot be published directly. Unanimous approval is required.";
+                    cancel submit;
+                }
+                if(input.ID != null)
+                {
+                    prior_ranking = Final_Rankings[ID == input.ID];
+                    if(prior_ranking.count() == 1 && input.Decision_Status == "Published" && prior_ranking.Decision_Status != "Published")
+                    {
+                        alert "A ranking cannot be published directly. Publication is controlled by unanimous approvals.";
+                        cancel submit;
+                    }
+                    if(prior_ranking.count() == 1 && prior_ranking.Decision_Status == "Published")
+                    {
+                        alert "Published rankings are immutable.";
+                        cancel submit;
+                    }
+                    if(prior_ranking.count() == 1 && prior_ranking.Decision_Status == "Pending Consensus")
+                    {
+                        input.Decision_Status = "Draft";
+                    }
+                }
+                ranked_apps = List();
+                ranked_apps.add(input.Rank_1);
+                ranked_apps.add(input.Rank_2);
+                ranked_apps.add(input.Rank_3);
+                ranked_apps.add(input.Rank_4);
+                ranked_apps.add(input.Rank_5);
+                ranked_apps.add(input.Rank_6);
+                ranked_apps.add(input.Rank_7);
+                ranked_apps.add(input.Rank_8);
+                ranked_apps.add(input.Rank_9);
+                unique_apps = ranked_apps.distinct();
+                if(ranked_apps.size() != 9 || unique_apps.size() != 9)
+                {
+                    alert "Rank all nine applications exactly once; duplicate ranks are not allowed.";
+                    cancel submit;
+                }
+                submitted_apps = Applications[Submission_Status == "Submitted" || Submission_Status == "Locked"];
+                if(submitted_apps.count() != 9)
+                {
+                    alert "Finalization requires exactly nine submitted or locked applications.";
+                    cancel submit;
+                }
+                for each submitted_app in submitted_apps
+                {
+                    if(!ranked_apps.contains(submitted_app.ID))
+                    {
+                        alert "The ranking must cover the complete submitted application field exactly once.";
+                        cancel submit;
+                    }
+                }
+                input.Is_Current = true;
+                if(input.Drafted_At == null)
+                {
+                    input.Drafted_At = zoho.currenttime;
+                }
+            )
+        }
+    }
+}

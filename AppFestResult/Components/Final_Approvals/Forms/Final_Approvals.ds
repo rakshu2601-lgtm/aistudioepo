@@ -1,0 +1,103 @@
+form Final_Approvals
+{
+    title
+    {
+        displayname = "Final Approvals"
+        on add = "Record Approval Decision"
+        on edit = "Review Approval Decision"
+    }
+    success message = "Your independent approval decision has been recorded."
+    Main_Section
+    (
+        type = section
+        displayname = "Consensus Decision"
+        row = 1
+        column = 0
+    )
+    must have Final_Ranking
+    (
+        type = picklist
+        displayname = "Final Ranking"
+        values = Final_Rankings.ID
+        displayformat = [Ranking_Version]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Judge
+    (
+        type = picklist
+        displayname = "Judge"
+        values = Members[Member_Type == "Judge" && Is_Active == true].ID
+        displayformat = [Member_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Judge_Email
+    (
+        type = email
+        displayname = "Judge Email"
+        personal data = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Decision
+    (
+        type = picklist
+        displayname = "Decision"
+        values = {"Approve","Request Changes"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Approval_Comment
+    (
+        type = textarea
+        displayname = "Approval Comment"
+        height = 120px
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Decided_At
+    (
+        type = datetime
+        displayname = "Decided At"
+        row = 1
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Record Decision"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Clear"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Decision"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

@@ -1,0 +1,92 @@
+Test_AI_Configuration as "Test AI Configuration"
+{
+    type = functions
+    form = AI_Settings
+    execution type = for each record
+    description = "Tests the current OpenAI-compatible chat-completions service without exposing its credential or response content."
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(current_profile != "Administrator" && current_profile != "Judge")
+                {
+                    test_result_message = "Only administrators or judges may test the AI configuration.";
+                }
+                else if(input.Is_Current != true)
+                {
+                    test_result_message = "Only the current AI configuration can be tested.";
+                }
+                else if(input.Is_Enabled != true)
+                {
+                    input.Last_Tested_At = zoho.currenttime;
+                    input.Last_Test_Status = "NOT TESTED: Current configuration is disabled.";
+                }
+                else if(input.Base_URL == null || input.Model_Name == null || input.API_Key == null || input.API_Key == "")
+                {
+                    input.Last_Tested_At = zoho.currenttime;
+                    input.Last_Test_Status = "NOT TESTED: Endpoint, model, or credential is missing.";
+                }
+                else
+                {
+                    endpoint = input.Base_URL.toString();
+                    if(endpoint.endsWith("/"))
+                    {
+                        endpoint = endpoint.subString(0,endpoint.length() - 1);
+                    }
+                    if(!endpoint.endsWith("/chat/completions"))
+                    {
+                        endpoint = endpoint + "/chat/completions";
+                    }
+                    headers_map = Map();
+                    headers_map.put("Content-Type","application/json");
+                    headers_map.put("Authorization","Bearer " + input.API_Key);
+                    system_message = Map();
+                    system_message.put("role","system");
+                    system_message.put("content",input.System_Prompt);
+                    user_message = Map();
+                    user_message.put("role","user");
+                    user_message.put("content","Reply with exactly OK. This is a configuration connectivity test; do not analyze challenge data.");
+                    message_list = List();
+                    message_list.add(system_message);
+                    message_list.add(user_message);
+                    request_body = Map();
+                    request_body.put("model",input.Model_Name);
+                    request_body.put("temperature",input.Temperature);
+                    request_body.put("max_tokens",10);
+                    request_body.put("messages",message_list);
+                    test_time = zoho.currenttime;
+                    try
+                    {
+                        api_response = invokeUrl
+                        [
+                            url: endpoint
+                            type: POST
+                            headers: headers_map
+                            body: request_body.toString()
+                            detailed: true
+                        ];
+                        response_code = api_response.get("responseCode");
+                        input.Last_Tested_At = test_time;
+                        if(response_code >= 200 && response_code < 300)
+                        {
+                            input.Last_Test_Status = "SUCCESS: Service responded with HTTP " + response_code.toString() + ".";
+                        }
+                        else
+                        {
+                            input.Last_Test_Status = "FAILED: Service returned HTTP " + response_code.toString() + ". Verify endpoint, model, credential, and provider access.";
+                        }
+                    }
+                    catch (test_error)
+                    {
+                        input.Last_Tested_At = test_time;
+                        input.Last_Test_Status = "FAILED: Network, timeout, TLS, or service error. Verify endpoint reachability and provider availability.";
+                    }
+                }
+            )
+        }
+    }
+}

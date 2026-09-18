@@ -1,0 +1,24 @@
+default list Presentation_Schedule
+{
+    displayName = "Presentation Schedule"
+    show all rows from Presentation_Slots
+    (
+        Application
+        Presenter
+        Slot_Start
+        Slot_End
+        Duration_Minutes
+        Room_Or_Link
+        Presentation_Status
+        Judge_Notes
+    )
+    filters
+    (
+        Presentation_Status
+        Presenter
+    )
+    sort by
+    (
+        Slot_Start ascending
+    )
+}

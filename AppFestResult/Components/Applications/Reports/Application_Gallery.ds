@@ -1,0 +1,44 @@
+default list Application_Gallery
+{
+    displayName = "Application Gallery"
+    show all rows from Applications
+    (
+        App_Name
+        Tagline
+        Participant
+        Catalyst_Connected
+        Submission_Status
+        Readiness_Percent
+        Submitted_At
+    )
+    filters
+    (
+        Submission_Status
+        Catalyst_Connected
+    )
+    sort by
+    (
+        App_Name ascending
+    )
+    conditional formatting
+    (
+        "Draft Badge"
+        {
+            condition = (Submission_Status == "Draft")
+            fields = [Submission_Status]
+            format = "background-color:#FFF4CC;color:#7A5200;font-weight:bold"
+        }
+        "Submitted Badge"
+        {
+            condition = (Submission_Status == "Submitted")
+            fields = [Submission_Status]
+            format = "background-color:#DDF8EA;color:#086B43;font-weight:bold"
+        }
+        "Locked Badge"
+        {
+            condition = (Submission_Status == "Locked")
+            fields = [Submission_Status]
+            format = "background-color:#E8EAF0;color:#303746;font-weight:bold"
+        }
+    )
+}

@@ -1,0 +1,45 @@
+Bootstrap_Challenge_Roster as "Bootstrap Challenge Roster"
+{
+    type = form
+    form = Challenge_Settings
+    record event = on add
+    description = "Creates the approved initial participant and judge roster once when Members is empty."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Bootstrap_Roster == true && Members[ID != 0].count() == 0)
+                {
+                    participant_names = {"Surjil","Cedrick","Ilavarasi","Gokul","Vamsi","Silvanose","Lavanya","Derek","Richerd"};
+                    display_order = 1;
+                    for each participant_name in participant_names
+                    {
+                        insert into Members
+                        [
+                            Member_Name = participant_name
+                            Member_Type = "Participant"
+                            Is_Active = true
+                            Display_Order = display_order
+                        ];
+                        display_order = display_order + 1;
+                    }
+                    judge_names = {"Siddarth","Monica","Brandon"};
+                    for each judge_name in judge_names
+                    {
+                        insert into Members
+                        [
+                            Member_Name = judge_name
+                            Member_Type = "Judge"
+                            Is_Active = true
+                            Display_Order = display_order
+                        ];
+                        display_order = display_order + 1;
+                    }
+                }
+            )
+        }
+    }
+}

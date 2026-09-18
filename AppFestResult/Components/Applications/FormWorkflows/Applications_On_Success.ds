@@ -1,0 +1,35 @@
+Applications_On_Success as "Finalize Application Readiness"
+{
+    type = form
+    form = Applications
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                readiness = 0;
+                if(input.App_Name != null) { readiness = readiness + 8; }
+                if(input.Tagline != null) { readiness = readiness + 8; }
+                if(input.Problem_Statement != null) { readiness = readiness + 10; }
+                if(input.Core_Functionality != null) { readiness = readiness + 12; }
+                if(input.Beyond_Creator_Capability != null) { readiness = readiness + 14; }
+                if(input.Why_Not_Feasible_In_Creator != null) { readiness = readiness + 12; }
+                if(input.Presentation_Summary != null) { readiness = readiness + 12; }
+                if(input.Evidence_URL != null || input.Evidence_File != null) { readiness = readiness + 10; }
+                if(input.Demo_URL != null) { readiness = readiness + 8; }
+                if(input.Catalyst_Connected == true || input.Other_Integrations != null) { readiness = readiness + 6; }
+                submittedTime = input.Submitted_At;
+                if(input.Submission_Status == "Submitted" && submittedTime == null)
+                {
+                    submittedTime = zoho.currenttime;
+                }
+                currentApplication = Applications[ID == input.ID];
+                currentApplication.Submitted_At = submittedTime;
+                currentApplication.Readiness_Percent = readiness;
+            )
+        }
+    }
+}

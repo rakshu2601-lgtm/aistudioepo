@@ -1,0 +1,37 @@
+list Judge_Score_Matrix
+{
+    displayName = "Judge Score Matrix"
+    show all rows from Judge_Evaluations
+    (
+        Judge
+        Judge_Email
+        Application
+        UI_Score
+        Navigation_Usability_Score
+        Core_Functionality_Score
+        Innovation_Score
+        Beyond_Creator_Proof_Score
+        Catalyst_Integrations_Score
+        Presentation_Score
+        Weighted_Total
+        Evaluation_Status
+    )
+    filters
+    (
+        Judge
+        Application
+        Evaluation_Status
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Application ascending
+    )
+    sort by
+    (
+        Judge ascending
+    )
+}

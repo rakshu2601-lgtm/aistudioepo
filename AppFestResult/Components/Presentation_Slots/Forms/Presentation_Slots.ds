@@ -1,0 +1,121 @@
+form Presentation_Slots
+{
+    title
+    {
+        displayname = "Presentation Slots"
+        on add = "Schedule Presentation"
+        on edit = "Update Presentation Slot"
+    }
+    Main_Section
+    (
+        type = section
+        displayname = "Showcase Session"
+        row = 1
+        column = 0
+    )
+    must have Application
+    (
+        type = picklist
+        displayname = "Application"
+        values = Applications.ID
+        displayformat = [App_Name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Presenter
+    (
+        type = picklist
+        displayname = "Presenter"
+        values = Members[Member_Type == "Participant" && Is_Active == true].ID
+        displayformat = [Member_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Slot_Start
+    (
+        type = datetime
+        displayname = "Slot Start"
+        mins_displayinterval = 15
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Slot_End
+    (
+        type = datetime
+        displayname = "Slot End"
+        mins_displayinterval = 15
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Duration_Minutes
+    (
+        type = number
+        displayname = "Duration Minutes"
+        initial value = 15
+        row = 1
+        column = 1
+        width = medium
+    )
+    Room_Or_Link
+    (
+        type = text
+        displayname = "Room Or Link"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Presentation_Status
+    (
+        type = picklist
+        displayname = "Presentation Status"
+        values = {"Scheduled", "Ready", "Presenting", "Completed", "No Show"}
+        initial value = "Scheduled"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Judge_Notes
+    (
+        type = textarea
+        displayname = "Judge Notes"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Schedule"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Slot"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

@@ -1,0 +1,94 @@
+Process_Final_Approval as "Process Final Approval"
+{
+    type = form
+    form = Final_Approvals
+    record event = on add
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                ranking_records = Final_Rankings[ID == input.Final_Ranking && Decision_Status == "Pending Consensus"];
+                audit_severity = "Info";
+                if(input.Decision == "Request Changes")
+                {
+                    audit_severity = "Warning";
+                }
+                insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuser
+                    Event_Type = "Approval"
+                    Related_Form = "Final_Approvals"
+                    Related_Record_ID = input.ID.toString()
+                    Event_Summary = input.Judge.Member_Name + " recorded " + input.Decision + " for final ranking version " + input.Final_Ranking.Ranking_Version
+                    Before_Value = "Pending Consensus"
+                    After_Value = input.Decision + ": " + input.Approval_Comment
+                    Severity = audit_severity
+                ];
+                if(ranking_records.count() == 1 && input.Decision == "Request Changes")
+                {
+                    update Final_Rankings[ID == input.Final_Ranking]
+                    [
+                        Decision_Status = "Draft"
+                        Published_At = null
+                    ];
+                }
+                else if(ranking_records.count() == 1 && input.Decision == "Approve")
+                {
+                    siddarth = Members[Member_Name == "Siddarth" && Member_Type == "Judge" && Is_Active == true];
+                    monica = Members[Member_Name == "Monica" && Member_Type == "Judge" && Is_Active == true];
+                    brandon = Members[Member_Name == "Brandon" && Member_Type == "Judge" && Is_Active == true];
+                    active_named_count = Members[Member_Type == "Judge" && Is_Active == true && (Member_Name == "Siddarth" || Member_Name == "Monica" || Member_Name == "Brandon")].count();
+                    siddarth_approved = 0;
+                    monica_approved = 0;
+                    brandon_approved = 0;
+                    if(siddarth.count() == 1)
+                    {
+                        siddarth_approved = Final_Approvals[Final_Ranking == input.Final_Ranking && Judge == siddarth.ID && Decision == "Approve"].count();
+                    }
+                    if(monica.count() == 1)
+                    {
+                        monica_approved = Final_Approvals[Final_Ranking == input.Final_Ranking && Judge == monica.ID && Decision == "Approve"].count();
+                    }
+                    if(brandon.count() == 1)
+                    {
+                        brandon_approved = Final_Approvals[Final_Ranking == input.Final_Ranking && Judge == brandon.ID && Decision == "Approve"].count();
+                    }
+                    distinct_approvers = Final_Approvals[Final_Ranking == input.Final_Ranking && Decision == "Approve"].distinct(Judge);
+                    if(active_named_count == 3 && siddarth.count() == 1 && monica.count() == 1 && brandon.count() == 1 && siddarth_approved == 1 && monica_approved == 1 && brandon_approved == 1 && distinct_approvers.size() == 3)
+                    {
+                        publish_time = zoho.currenttime;
+                        update Final_Rankings[ID == input.Final_Ranking]
+                        [
+                            Decision_Status = "Published"
+                            Published_At = publish_time
+                        ];
+                        current_settings = Challenge_Settings[Current_Record == true];
+                        if(current_settings.count() == 1)
+                        {
+                            update Challenge_Settings[ID == current_settings.ID]
+                            [
+                                Results_Visible_To_Participants = true
+                            ];
+                        }
+                        insert into Audit_Log
+                        [
+                            Event_Time = publish_time
+                            Actor_Email = zoho.loginuser
+                            Event_Type = "Publication"
+                            Related_Form = "Final_Rankings"
+                            Related_Record_ID = input.Final_Ranking.toString()
+                            Event_Summary = "Final ranking version " + input.Final_Ranking.Ranking_Version + " published after unanimous approval by Siddarth, Monica, and Brandon."
+                            Before_Value = "Pending Consensus"
+                            After_Value = "Published"
+                            Severity = "Critical"
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

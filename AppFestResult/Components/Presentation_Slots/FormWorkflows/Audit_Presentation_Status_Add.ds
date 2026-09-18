@@ -1,0 +1,28 @@
+Audit_Presentation_Status_Add as "Audit Initial Presentation Status"
+{
+    type = form
+    form = Presentation_Slots
+    record event = on add
+    description = "Writes the initial presentation status to the central audit trail after scheduling succeeds."
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuser
+                    Event_Type = "Configuration"
+                    Related_Form = "Presentation_Slots"
+                    Related_Record_ID = input.ID.toString()
+                    Event_Summary = "Presentation slot scheduled with status " + input.Presentation_Status
+                    After_Value = input.Presentation_Status
+                    Severity = "Info"
+                ];
+            )
+        }
+    }
+}

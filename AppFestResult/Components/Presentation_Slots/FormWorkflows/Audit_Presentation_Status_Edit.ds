@@ -1,0 +1,32 @@
+Audit_Presentation_Status_Edit as "Audit Presentation Status Change"
+{
+    type = form
+    form = Presentation_Slots
+    record event = on edit
+    description = "Writes presentation status changes to the central audit trail during validated edits."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(old.Presentation_Status != input.Presentation_Status)
+                {
+                    insert into Audit_Log
+                    [
+                        Event_Time = zoho.currenttime
+                        Actor_Email = zoho.loginuser
+                        Event_Type = "Configuration"
+                        Related_Form = "Presentation_Slots"
+                        Related_Record_ID = input.ID.toString()
+                        Event_Summary = "Presentation status changed from " + old.Presentation_Status + " to " + input.Presentation_Status
+                        Before_Value = old.Presentation_Status
+                        After_Value = input.Presentation_Status
+                        Severity = "Info"
+                    ];
+                }
+            )
+        }
+    }
+}

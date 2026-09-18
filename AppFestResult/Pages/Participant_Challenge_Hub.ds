@@ -1,0 +1,19 @@
+<page linkname = "Participant_Challenge_Hub" displayname = "Participant Challenge Hub"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Challenge_Hub_Experience' elementName='Challenge_Hub_Experience'>
+          <![CDATA[htmlpage Challenge_Hub_Experience()
+            content
+            <%{%>
+              <file name:Challenge_Hub_Experience.dshtml/>
+            <%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

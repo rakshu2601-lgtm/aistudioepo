@@ -1,0 +1,28 @@
+Validate_AI_Settings as "Validate AI Settings"
+{
+    type = form
+    form = AI_Settings
+    record event = on add or edit
+    description = "Restricts credential changes to administrators and enforces one current configuration."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(current_profile != "Administrator" && input.API_Key != null && input.API_Key != "")
+                {
+                    alert "Only administrators may supply or change the API key.";
+                    cancel submit;
+                }
+                if(input.Is_Current == true && AI_Settings[Is_Current == true && ID != input.ID].count() > 0)
+                {
+                    alert "Only one AI configuration can be current. Clear the existing current configuration first.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

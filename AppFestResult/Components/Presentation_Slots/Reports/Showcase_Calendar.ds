@@ -1,0 +1,33 @@
+calendar Showcase_Calendar
+{
+    displayName = "Showcase Calendar"
+    show all rows from Presentation_Slots
+    (
+        Application
+        Presenter
+        Slot_Start
+        Slot_End
+        Room_Or_Link
+        Presentation_Status
+        Judge_Notes
+    )
+    filters
+    (
+        Presentation_Status
+        Presenter
+    )
+    options
+    (
+        display type = day
+        week start day = monday
+        display field = Application
+        start date = Slot_Start
+        end date = Slot_End
+        default date
+        (
+            day = Today
+            month = Currentmonth
+            year = Currentyear
+        )
+    )
+}

@@ -1,0 +1,14 @@
+forms
+{
+    form Members { label placement = top }
+    form Challenge_Settings { label placement = top }
+    form Applications { label placement = top }
+    form Participant_Ballots { label placement = top }
+    form Judge_Evaluations { label placement = top }
+    form AI_Settings { label placement = top }
+    form AI_Analyses { label placement = top }
+    form Final_Rankings { label placement = top }
+    form Final_Approvals { label placement = top }
+    form Presentation_Slots { label placement = top }
+    form Audit_Log { label placement = top }
+}

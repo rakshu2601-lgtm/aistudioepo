@@ -1,0 +1,157 @@
+<%
+settings = Challenge_Settings[Current_Record == true];
+viewer = Members[Login_Email == zoho.loginuser && Is_Active == true];
+isJudge = viewer.count() > 0 && viewer.Member_Type == "Judge";
+publishedRanks = Final_Rankings[Decision_Status == "Published" && Is_Current == true] sort by Published_At desc;
+isPublished = publishedRanks.count() > 0;
+%>
+<style>
+:root{--zcs-theme-brand-color:var(--zcs_brand_color);--zcs-primary-text-color:var(--zcs_primary_text_color);--zcs-secondary-text-color:var(--zcs_secondary_text_color);--zcs-teritiary-text-color:var(--zcs_tertiary_text_color);--zcs-white-color:#fff;--zcs-border-color:var(--zcs_tertiary_border_color)}
+.zcs-flex{display:flex}.zcs-inline-flex{display:inline-flex}.zcs-row{display:flex;flex-wrap:wrap}.zcs-direction-column{flex-direction:column}.zcs-align-items-center{align-items:center}.zcs-justify-center{justify-content:center}.zcs-justify-space-between{justify-content:space-between}.zcs-gap-8{gap:.5rem}.zcs-gap-12{gap:.75rem}.zcs-gap-16{gap:1rem}.zcs-gap-20{gap:1.25rem}.zcs-w-full{width:100%}.zcs-p-16{padding:1rem}.zcs-p-20{padding:1.25rem}.zcs-p-24{padding:1.5rem}.zcs-px-10{padding-left:.625rem;padding-right:.625rem}.zcs-px-16{padding-left:1rem;padding-right:1rem}.zcs-py-2{padding-top:.125rem;padding-bottom:.125rem}.zcs-py-8{padding-top:.5rem;padding-bottom:.5rem}.zcs-py-12{padding-top:.75rem;padding-bottom:.75rem}.zcs-m-0{margin:0}.zcs-font-12{font-size:.75rem}.zcs-font-14{font-size:.875rem}.zcs-font-16{font-size:1rem}.zcs-font-20{font-size:1.25rem}.zcs-font-medium{font-weight:500}.zcs-font-semibold{font-weight:600}.zcs-font-bold{font-weight:700}.zcs-lh-body{line-height:1.5}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-secondary{color:var(--zcs-secondary-text-color)}.zcs-rounded-sm{border-radius:.25rem}.zcs-rounded-xl{border-radius:.75rem}.zcs-box-border{box-sizing:border-box}.zcs-text-left{text-align:left}.zcs-text-right{text-align:right}.zcs-relative{position:relative}.zcs-sticky{position:sticky}.zcs-no-shrink{flex-shrink:0}.zcs-card{background:var(--zcs-white-color);border:1px solid #e7e7ee;border-radius:12px}.zcs-toast{border-radius:8px}.zcs-info-toast{background:#e4f6fd;color:#024361}.zcs-warning-toast{background:#fef4e5;color:#663c01}.zcs-success-toast{background:#edf7ed;color:#1d4620}.zcs-badge{width:auto}.zcs-badge-filled-outline{border:1px solid}.zcs-badge-filled-outline.zcs-badge-green{background:#e4fcf3;border-color:#179e6c;color:#126f50}.zcs-badge-filled-outline.zcs-badge-blue{background:#e8efff;border-color:#2a6ffc;color:#174eb8}.zcs-badge-filled-outline.zcs-badge-yellow{background:#fcf4e6;border-color:#c67e00;color:#805200}.zcs-progress-bar{height:8px;background:var(--zcs_component_hover_color,#e8e8ef)}.zcs-progress-bar-indicator{height:inherit;border-radius:inherit;background:var(--zcs_brand_color,#635bff)}
+.zcs-table-wrapper{border:1px solid var(--zcs_tertiary_border_color,#ddd);background:#fff;overflow:auto}.zcs-table-wrapper table{line-height:normal;border-collapse:collapse}.zcs-table-wrapper th{background:#f9fafe;box-shadow:0 -1px 0 var(--zcs_tertiary_border_color,#ddd) inset;white-space:nowrap}.zcs-table-wrapper td{border-top:1px solid var(--zcs_tertiary_border_color,#ddd)}
+.results-stage{font-family:Inter,Lato,Arial,sans-serif;background:radial-gradient(circle at 50% 0,#302b63 0,#14142d 38%,#f4f5fa 38.1%);min-height:100vh;padding:clamp(16px,3vw,42px);color:#15162d;box-sizing:border-box}.stage-shell{max-width:1440px;margin:auto}.stage-hero{position:relative;overflow:hidden;isolation:isolate;min-height:390px;border-radius:28px;padding:clamp(28px,6vw,76px);display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;background:linear-gradient(135deg,#17172f,#3d2d76 55%,#7857d8);box-shadow:0 30px 70px rgba(10,10,35,.32)}.stage-hero:before,.stage-hero:after{content:"";position:absolute;z-index:-1;inset:-30%;background:conic-gradient(from 90deg at 50% 100%,transparent 0 39%,rgba(255,224,138,.25) 40% 44%,transparent 45% 55%,rgba(255,255,255,.16) 56% 60%,transparent 61%);animation:spotlight 9s ease-in-out infinite alternate}.stage-hero:after{transform:rotate(35deg);animation-delay:-3s}.eyebrow{text-transform:uppercase;letter-spacing:.18em;font-size:12px;font-weight:800;color:#f9d982}.winner-icon{font-size:50px;color:#f6c85f;display:block;margin-bottom:12px}.winner-name{font-size:clamp(42px,8vw,96px);line-height:.94;letter-spacing:-.055em;margin:8px 0 16px}.winner-tagline{font-size:clamp(17px,2vw,25px);max-width:800px;margin:0 auto;color:#eeecfa}.hero-rationale{max-width:900px;margin:25px auto 0;padding:18px 22px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(10,10,35,.25);line-height:1.65}.confetti{position:absolute;inset:0;pointer-events:none}.confetti i{position:absolute;top:-12%;width:8px;height:18px;background:#f6c85f;animation:fall 6s linear infinite}.confetti i:nth-child(2n){background:#59d4c7;animation-duration:7.4s}.confetti i:nth-child(3n){background:#e976b5;transform:rotate(45deg);animation-duration:5.3s}.confetti i:nth-child(1){left:7%}.confetti i:nth-child(2){left:18%;animation-delay:-2s}.confetti i:nth-child(3){left:29%;animation-delay:-4s}.confetti i:nth-child(4){left:41%;animation-delay:-1s}.confetti i:nth-child(5){left:54%;animation-delay:-5s}.confetti i:nth-child(6){left:68%;animation-delay:-3s}.confetti i:nth-child(7){left:79%;animation-delay:-1.5s}.confetti i:nth-child(8){left:91%;animation-delay:-4.5s}@keyframes fall{to{top:112%;transform:translateX(80px) rotate(540deg)}}@keyframes spotlight{to{transform:rotate(18deg) scale(1.08)}}
+.section{margin-top:28px}.section-head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:14px}.section-head h2{font-size:clamp(23px,3vw,34px);margin:0;letter-spacing:-.03em}.section-head p{margin:0;color:#64657a}.podium{display:grid;grid-template-columns:repeat(3,1fr);align-items:end;gap:16px;min-height:380px}.podium-card{text-align:center;padding:24px 18px 0;border-radius:20px 20px 8px 8px;color:#fff;box-shadow:0 16px 34px rgba(23,23,47,.18)}.podium-card.first{min-height:340px;background:linear-gradient(160deg,#6d4bd2,#322568)}.podium-card.second{min-height:280px;background:linear-gradient(160deg,#68738f,#343b50)}.podium-card.third{min-height:235px;background:linear-gradient(160deg,#b06e46,#704129)}.podium-rank{font-size:54px;font-weight:900;line-height:1}.podium-card h3{font-size:clamp(20px,2.4vw,31px);margin:14px 0 8px}.podium-card p{color:rgba(255,255,255,.78);margin:0}.rank-grid,.analysis-grid,.evidence-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.rank-card{padding:20px;position:relative;overflow:hidden}.rank-number{font-size:12px;font-weight:800;letter-spacing:.13em;color:#6952b9;text-transform:uppercase}.rank-card h3{margin:8px 0 6px;font-size:21px}.rank-card p{margin:0;color:#66677b}.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.analysis-card{padding:22px}.analysis-card h3{margin:10px 0 8px}.analysis-card .prediction{font-size:24px;font-weight:800;color:#322568}.metric-list{display:grid;gap:13px}.metric-label{display:flex;justify-content:space-between;gap:12px;font-size:13px;margin-bottom:5px}.comparison-key{display:flex;gap:16px;font-size:12px}.key-dot:before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;background:#6952b9}.key-dot.judge:before{background:#19a389}.compare-bars{min-width:210px}.peerbar,.judgebar{height:7px;border-radius:9px;background:#6952b9;margin:3px 0}.judgebar{background:#19a389}.consensus{display:flex;flex-wrap:wrap;gap:12px}.consensus-card{flex:1 1 220px;padding:18px;display:flex;align-items:center;gap:12px}.consensus-card i{font-size:25px;color:#16845f}.lock-stage{min-height:75vh;display:grid;place-items:center;background:radial-gradient(circle at 50% 20%,#3d2d76,#111126);border-radius:28px;color:#fff;padding:32px;text-align:center;box-sizing:border-box}.lock-card{max-width:680px}.lock-card>i{font-size:56px;color:#f6c85f}.lock-card h1{font-size:clamp(38px,7vw,72px);letter-spacing:-.05em;margin:20px 0 12px}.lock-card p{font-size:18px;color:#cfcee2;line-height:1.65}.pulse{width:12px;height:12px;border-radius:50%;background:#f6c85f;box-shadow:0 0 0 0 rgba(246,200,95,.5);animation:pulse 2s infinite}@keyframes pulse{70%{box-shadow:0 0 0 16px rgba(246,200,95,0)}}.empty-note{padding:20px;border:1px dashed #b9bac7;border-radius:12px;color:#66677b;background:#fafaff}.tie-note{margin-top:12px}.presentation-list{display:grid;gap:10px}.presentation-item{padding:14px 16px;border-left:4px solid #6952b9;background:#f8f7ff;border-radius:8px}.print-only{display:none}
+@media(max-width:900px){.rank-grid,.analysis-grid,.evidence-grid{grid-template-columns:1fr 1fr}.podium{grid-template-columns:1fr;align-items:stretch;min-height:0}.podium-card,.podium-card.first,.podium-card.second,.podium-card.third{min-height:180px}.podium-card.first{order:-1}}@media(max-width:600px){.results-stage{padding:10px}.rank-grid,.analysis-grid,.evidence-grid{grid-template-columns:1fr}.stage-hero{border-radius:18px;min-height:430px}.section-head{display:block}.section-head p{margin-top:6px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}.confetti{display:none}}
+@media print{.results-stage{background:#fff;padding:0}.stage-hero{background:#fff;color:#111;box-shadow:none;border:2px solid #111;min-height:0}.winner-tagline,.podium-card p{color:#333}.confetti{display:none}.podium-card{background:#fff!important;color:#111!important;border:1px solid #333;box-shadow:none;min-height:140px!important}.zcs-card{break-inside:avoid}.print-only{display:block}.section{break-inside:avoid}}
+</style>
+<div class="results-stage">
+<div class="stage-shell">
+<%
+if(!isPublished)
+{
+    approvalCount = Final_Approvals[Decision == "Approve"].count();
+%>
+  <section class="lock-stage" aria-labelledby="locked-title">
+    <div class="lock-card">
+      <i class="zc-li-outline ui-1-lock" aria-hidden="true"></i>
+      <div class="zcs-inline-flex zcs-align-items-center zcs-gap-12 zcs-py-12"><span class="pulse"></span><span class="eyebrow"><%=if(isJudge,"Locked judge preview","Awaiting unanimous consensus")%></span></div>
+      <h1 id="locked-title">The result is under wraps.</h1>
+      <p><%=if(isJudge,"The final stage is ready. Rankings remain concealed until Siddarth, Monica, and Brandon approve the same unchanged version.","Peer votes, judge evidence, and the final recommendation are being reconciled. The stage opens automatically after unanimous publication.")%></p>
+      <div class="zcs-toast zcs-info-toast zcs-w-full zcs-flex zcs-gap-8 zcs-px-16 zcs-py-12 zcs-box-border zcs-font-14 zcs-lh-body">
+        <i class="zcs-toast-icon zc-li-outline travel-info"></i><p class="zcs-m-0">Publication safeguard active. <%=if(isJudge,approvalCount + " approval record(s) are currently recorded.","No draft ranking or individual judge score is visible in this view.")%></p>
+      </div>
+    </div>
+  </section>
+<%
+}
+else
+{
+    ranking = publishedRanks;
+    winner = ranking.Rank_1;
+    winnerEvals = Judge_Evaluations[Application == winner.ID && (Evaluation_Status == "Submitted" || Evaluation_Status == "Locked")];
+    winnerUI = ifnull(winnerEvals.avg(UI_Score),0);
+    winnerNav = ifnull(winnerEvals.avg(Navigation_Usability_Score),0);
+    winnerCore = ifnull(winnerEvals.avg(Core_Functionality_Score),0);
+    winnerInnovation = ifnull(winnerEvals.avg(Innovation_Score),0);
+    winnerProof = ifnull(winnerEvals.avg(Beyond_Creator_Proof_Score),0);
+    winnerIntegration = ifnull(winnerEvals.avg(Catalyst_Integrations_Score),0);
+    winnerPresentation = ifnull(winnerEvals.avg(Presentation_Score),0);
+    aiRows = AI_Analyses[Is_Latest == true && Analysis_Status == "Completed"] sort by Requested_At desc;
+%>
+  <header class="stage-hero" aria-labelledby="winner-title">
+    <div class="confetti" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div>
+      <span class="winner-icon zc-li-solid sport-trophy" aria-hidden="true"></span>
+      <div class="eyebrow">Om.ai Beyond Limits Challenge winner</div>
+      <h1 class="winner-name" id="winner-title"><%=winner.App_Name%></h1>
+      <p class="winner-tagline"><%=winner.Tagline%></p>
+      <div class="hero-rationale"><%=ranking.Winner_Rationale%></div>
+      <div class="badges zcs-justify-center">
+        <% if(winner.Catalyst_Connected == true) { %><span class="zcs-badge zcs-badge-filled-outline zcs-badge-green zcs-inline-flex zcs-align-items-center zcs-gap-8 zcs-rounded-sm zcs-px-10 zcs-py-2"><i class="zc-li-outline ui-1-check-circle-08"></i><span class="zcs-font-14">Catalyst connected</span></span><% } %>
+        <% if(ifnull(winner.Other_Integrations,"") != "") { %><span class="zcs-badge zcs-badge-filled-outline zcs-badge-blue zcs-inline-flex zcs-align-items-center zcs-gap-8 zcs-rounded-sm zcs-px-10 zcs-py-2"><i class="zc-li-outline arrows-1-share-66"></i><span class="zcs-font-14">Extended integrations</span></span><% } %>
+      </div>
+    </div>
+  </header>
+
+  <section class="section" aria-labelledby="podium-title"><div class="section-head"><div><h2 id="podium-title">The podium</h2><p>The top three applications selected from the complete evidence set.</p></div></div>
+    <div class="podium">
+      <article class="podium-card second"><div class="podium-rank">2</div><h3><%=ranking.Rank_2.App_Name%></h3><p><%=ranking.Rank_2.Tagline%></p></article>
+      <article class="podium-card first"><i class="zc-li-solid sport-trophy zcs-font-30"></i><div class="podium-rank">1</div><h3><%=ranking.Rank_1.App_Name%></h3><p><%=ranking.Rank_1.Tagline%></p></article>
+      <article class="podium-card third"><div class="podium-rank">3</div><h3><%=ranking.Rank_3.App_Name%></h3><p><%=ranking.Rank_3.Tagline%></p></article>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="ranking-title"><div class="section-head"><div><h2 id="ranking-title">Complete final ranking</h2><p>All nine finalists, in the unanimously published order.</p></div></div>
+    <div class="rank-grid">
+      <article class="zcs-card rank-card"><div class="rank-number">Place 1</div><h3><%=ranking.Rank_1.App_Name%></h3><p><%=ranking.Rank_1.Tagline%></p></article>
+      <article class="zcs-card rank-card"><div class="rank-number">Place 2</div><h3><%=ranking.Rank_2.App_Name%></h3><p><%=ranking.Rank_2.Tagline%></p></article>
+      <article class="zcs-card rank-card"><div class="rank-number">Place 3</div><h3><%=ranking.Rank_3.App_Name%></h3><p><%=ranking.Rank_3.Tagline%></p></article>
+      <article class="zcs-card rank-card"><div class="rank-number">Place 4</div><h3><%=ranking.Rank_4.App_Name%></h3><p><%=ranking.Rank_4.Tagline%></p></article>
+      <article class="zcs-card rank-card"><div class="rank-number">Place 5</div><h3><%=ranking.Rank_5.App_Name%></h3><p><%=ranking.Rank_5.Tagline%></p></article>
+      <article class="zcs-card rank-card"><div class="rank-number">Place 6</div><h3><%=ranking.Rank_6.App_Name%></h3><p><%=ranking.Rank_6.Tagline%></p></article>
+      <article class="zcs-card rank-card"><div class="rank-number">Place 7</div><h3><%=ranking.Rank_7.App_Name%></h3><p><%=ranking.Rank_7.Tagline%></p></article>
+      <article class="zcs-card rank-card"><div class="rank-number">Place 8</div><h3><%=ranking.Rank_8.App_Name%></h3><p><%=ranking.Rank_8.Tagline%></p></article>
+      <article class="zcs-card rank-card"><div class="rank-number">Place 9</div><h3><%=ranking.Rank_9.App_Name%></h3><p><%=ranking.Rank_9.Tagline%></p></article>
+    </div>
+    <div class="zcs-toast zcs-info-toast zcs-w-full zcs-flex zcs-gap-8 zcs-px-16 zcs-py-12 zcs-box-border zcs-font-14 zcs-lh-body tie-note"><i class="zc-li-outline travel-info"></i><p class="zcs-m-0">Final positions reflect the published judge decision. Any source-data tie is resolved by the documented rationale and, when available, the AI tie-break explanation below.</p></div>
+  </section>
+
+  <section class="section" aria-labelledby="evidence-title"><div class="section-head"><div><h2 id="evidence-title">Evidence comparison</h2><p>Peer Borda support versus submitted judge weighted scores.</p></div><div class="comparison-key"><span class="key-dot">Peer</span><span class="key-dot judge">Judges</span></div></div>
+    <div class="zcs-table-wrapper zcs-rounded-sm zcs-box-border zcs-relative"><table class="zcs-w-full"><thead class="zcs-sticky"><tr><th class="zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14">Application</th><th class="zcs-px-16 zcs-py-8 zcs-text-right zcs-font-14">Peer points</th><th class="zcs-px-16 zcs-py-8 zcs-text-right zcs-font-14">Judge score</th><th class="zcs-px-16 zcs-py-8 zcs-text-left zcs-font-14">Relative strength</th></tr></thead><tbody>
+<%
+ballotCount = Participant_Ballots[Ballot_Status == "Submitted" || Ballot_Status == "Locked"].count();
+peerMax = ballotCount * 8;
+for each appRow in Applications[Submission_Status == "Submitted" || Submission_Status == "Locked"]
+{
+    peerPoints = Participant_Ballots[(Ballot_Status == "Submitted" || Ballot_Status == "Locked") && Rank_1 == appRow.ID].count() * 8;
+    peerPoints = peerPoints + Participant_Ballots[(Ballot_Status == "Submitted" || Ballot_Status == "Locked") && Rank_2 == appRow.ID].count() * 7;
+    peerPoints = peerPoints + Participant_Ballots[(Ballot_Status == "Submitted" || Ballot_Status == "Locked") && Rank_3 == appRow.ID].count() * 6;
+    peerPoints = peerPoints + Participant_Ballots[(Ballot_Status == "Submitted" || Ballot_Status == "Locked") && Rank_4 == appRow.ID].count() * 5;
+    peerPoints = peerPoints + Participant_Ballots[(Ballot_Status == "Submitted" || Ballot_Status == "Locked") && Rank_5 == appRow.ID].count() * 4;
+    peerPoints = peerPoints + Participant_Ballots[(Ballot_Status == "Submitted" || Ballot_Status == "Locked") && Rank_6 == appRow.ID].count() * 3;
+    peerPoints = peerPoints + Participant_Ballots[(Ballot_Status == "Submitted" || Ballot_Status == "Locked") && Rank_7 == appRow.ID].count() * 2;
+    peerPoints = peerPoints + Participant_Ballots[(Ballot_Status == "Submitted" || Ballot_Status == "Locked") && Rank_8 == appRow.ID].count();
+    judgeRows = Judge_Evaluations[Application == appRow.ID && (Evaluation_Status == "Submitted" || Evaluation_Status == "Locked")];
+    judgeAverage = ifnull(judgeRows.avg(Weighted_Total),0);
+    peerPercent = if(peerMax > 0,(peerPoints * 100 / peerMax),0);
+%>
+      <tr><td class="zcs-px-16 zcs-py-8 zcs-font-14"><strong><%=appRow.App_Name%></strong></td><td class="zcs-px-16 zcs-py-8 zcs-text-right zcs-font-14"><%=peerPoints%></td><td class="zcs-px-16 zcs-py-8 zcs-text-right zcs-font-14"><%=judgeAverage.round(1)%></td><td class="zcs-px-16 zcs-py-8"><div class="compare-bars" aria-label="Peer <%=peerPercent%> percent; judges <%=judgeAverage%> percent"><div class="peerbar" style="width:<%=peerPercent%>%"></div><div class="judgebar" style="width:<%=judgeAverage%>%"></div></div></td></tr>
+<% } %>
+    </tbody></table></div>
+  </section>
+
+  <section class="section" aria-labelledby="strength-title"><div class="section-head"><div><h2 id="strength-title">Winner category strengths</h2><p>Average judge scores, rendered without client-side scripts.</p></div></div>
+<% if(winnerEvals.count() > 0) { %>
+    <div class="zcs-card zcs-p-24 metric-list">
+<%
+labels = {"Interface","Navigation and usability","Core functionality","Innovation","Beyond Creator proof","Catalyst and integrations","Presentation"};
+values = {winnerUI,winnerNav,winnerCore,winnerInnovation,winnerProof,winnerIntegration,winnerPresentation};
+for each index c in labels
+{
+    categoryValue = values.get(c);
+%><div class="zcs-progress-bar-wrapper"><div class="metric-label"><span><%=labels.get(c)%></span><strong><%=categoryValue.round(1)%> / 10</strong></div><div class="zcs-progress-bar zcs-rounded-sm"><div class="zcs-progress-bar-indicator" style="width:<%=categoryValue * 10%>%"></div></div></div><% } %>
+    </div>
+<% } else { %><div class="empty-note"><i class="zc-li-outline travel-info"></i> No submitted category analysis is available for the winner.</div><% } %>
+  </section>
+
+  <section class="section" aria-labelledby="ai-title"><div class="section-head"><div><h2 id="ai-title">AI prediction lens</h2><p>Predictions support the human decision; they do not publish it.</p></div></div>
+<% if(aiRows.count() > 0) { ai = aiRows; %>
+    <div class="analysis-grid">
+      <article class="zcs-card analysis-card"><i class="zc-li-outline users-wm" aria-hidden="true"></i><h3>Team-vote prediction</h3><div class="prediction"><%=ifnull(ai.Team_Vote_Predicted_Winner.App_Name,"Not returned")%></div><p><%=ifnull(ai.Team_Analysis,"No team analysis was returned.")%></p><div class="zcs-progress-bar zcs-rounded-sm"><div class="zcs-progress-bar-indicator" style="width:<%=ifnull(ai.Team_Confidence,0)%>%"></div></div><small><%=ifnull(ai.Team_Confidence,0)%>% confidence</small></article>
+      <article class="zcs-card analysis-card"><i class="zc-li-outline business-chart-bar-32" aria-hidden="true"></i><h3>Judge-score prediction</h3><div class="prediction"><%=ifnull(ai.Judge_Score_Predicted_Winner.App_Name,"Not returned")%></div><p><%=ifnull(ai.Judge_Analysis,"No judge analysis was returned.")%></p><div class="zcs-progress-bar zcs-rounded-sm"><div class="zcs-progress-bar-indicator" style="width:<%=ifnull(ai.Judge_Confidence,0)%>%"></div></div><small><%=ifnull(ai.Judge_Confidence,0)%>% confidence</small></article>
+      <article class="zcs-card analysis-card"><i class="zc-li-outline ui-1-check-circle-08" aria-hidden="true"></i><h3>Overall recommendation</h3><div class="prediction"><%=ifnull(ai.Overall_Recommended_Winner.App_Name,"Not returned")%></div><p><%=ifnull(ai.Consensus_And_Disagreement,"No consensus analysis was returned.")%></p><div class="zcs-toast zcs-info-toast zcs-flex zcs-gap-8 zcs-px-16 zcs-py-12"><i class="zc-li-outline travel-info"></i><span><%=ifnull(ai.Tie_Break_Explanation,"No tie-break analysis was required or supplied.")%></span></div></article>
+    </div>
+<% } else { %><div class="empty-note"><i class="zc-li-outline travel-info"></i> No completed latest AI analysis is available. The published human ranking remains authoritative.</div><% } %>
+  </section>
+
+  <section class="section" aria-labelledby="consensus-title"><div class="section-head"><div><h2 id="consensus-title">Unanimous consensus</h2><p>Independent approval of this published ranking version.</p></div></div><div class="consensus">
+<%
+judgeNames = {"Siddarth","Monica","Brandon"};
+for each judgeName in judgeNames
+{
+    namedJudge = Members[Member_Name == judgeName && Member_Type == "Judge" && Is_Active == true];
+    approved = Final_Approvals[Final_Ranking == ranking.ID && Judge == namedJudge.ID && Decision == "Approve"].count() > 0;
+%><article class="zcs-card consensus-card"><i class="zc-li-outline <%=if(approved,"ui-1-check-circle-08","ui-1-circle-remove")%>"></i><div><strong><%=judgeName%></strong><div class="zcs-color-secondary zcs-font-14"><%=if(approved,"Approved published version","Approval evidence missing")%></div></div></article><% } %>
+    </div>
+  </section>
+
+  <section class="section evidence-grid" aria-label="Presentation and integration highlights">
+    <article class="zcs-card zcs-p-24"><h2>Presentation highlight</h2><p><%=winner.Presentation_Summary%></p><div class="presentation-list"><% for each slot in Presentation_Slots[Application == winner.ID] { %><div class="presentation-item"><strong><%=slot.Presentation_Status%></strong><br><span><%=slot.Slot_Start%> to <%=slot.Slot_End%></span><% if(ifnull(slot.Room_Or_Link,"") != "") { %><br><span><%=slot.Room_Or_Link%></span><% } %></div><% } %></div></article>
+    <article class="zcs-card zcs-p-24"><h2>Beyond Creator evidence</h2><div><%=winner.Beyond_Creator_Capability%></div><p><strong>Why it goes beyond:</strong> <%=winner.Why_Not_Feasible_In_Creator%></p></article>
+    <article class="zcs-card zcs-p-24"><h2>Integration profile</h2><div class="badges"><span class="zcs-badge zcs-badge-filled-outline <%=if(winner.Catalyst_Connected,"zcs-badge-green","zcs-badge-yellow")%> zcs-inline-flex zcs-align-items-center zcs-gap-8 zcs-rounded-sm zcs-px-10 zcs-py-2"><i class="zc-li-outline <%=if(winner.Catalyst_Connected,"ui-1-check-circle-08","travel-info")%>"></i><span>Catalyst <%=if(winner.Catalyst_Connected,"connected","not declared")%></span></span></div><p><%=ifnull(winner.Other_Integrations,"No additional integrations were declared.")%></p><p><strong>Published:</strong> <%=ranking.Published_At%></p></article>
+  </section>
+  <p class="print-only">Official published results for <%=if(settings.count() > 0,settings.Challenge_Title,"Om.ai Beyond Limits Challenge")%>.</p>
+<% } %>
+</div>
+</div>

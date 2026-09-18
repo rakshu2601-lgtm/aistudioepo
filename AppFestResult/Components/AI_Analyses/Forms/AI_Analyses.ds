@@ -1,0 +1,225 @@
+form AI_Analyses
+{
+    title
+    {
+        displayname = "AI Analyses"
+        on add = "Run AI Analysis"
+        on edit = "Review AI Analysis"
+    }
+    success message = "The AI analysis request has been processed."
+    Main_Section
+    (
+        type = section
+        displayname = "Analysis Request"
+        row = 1
+        column = 0
+    )
+    Analysis_Run_ID
+    (
+        type = autonumber
+        displayname = "Analysis Run ID"
+        start index = 1
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Requested_By
+    (
+        type = email
+        displayname = "Requested By"
+        personal data = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Requested_At
+    (
+        type = datetime
+        displayname = "Requested At"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Analysis_Status
+    (
+        type = picklist
+        displayname = "Analysis Status"
+        values = {"Queued","Completed","Failed"}
+        initial value = "Queued"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Is_Latest
+    (
+        type = checkbox
+        displayname = "Latest Analysis"
+        initial value = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Winners_Section
+    (
+        type = section
+        displayname = "Predicted Winners"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Team_Vote_Predicted_Winner
+    (
+        type = picklist
+        displayname = "Team Vote Predicted Winner"
+        values = Applications.ID
+        displayformat = [App_Name]
+        searchable = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Judge_Score_Predicted_Winner
+    (
+        type = picklist
+        displayname = "Judge Score Predicted Winner"
+        values = Applications.ID
+        displayformat = [App_Name]
+        searchable = true
+        row = 2
+        column = 2
+        width = medium
+    )
+    Overall_Recommended_Winner
+    (
+        type = picklist
+        displayname = "Overall Recommended Winner"
+        values = Applications.ID
+        displayformat = [App_Name]
+        searchable = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    Team_Confidence
+    (
+        type = decimal
+        displayname = "Team Confidence"
+        decimalplace = 2
+        row = 2
+        column = 2
+        width = medium
+    )
+    Judge_Confidence
+    (
+        type = decimal
+        displayname = "Judge Confidence"
+        decimalplace = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+    Explanation_Section
+    (
+        type = section
+        displayname = "Explainable Recommendation"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Team_Analysis
+    (
+        type = richtext
+        displayname = "Team Analysis"
+        height = 160px
+        toolbar = disable
+        row = 3
+        column = 1
+        width = medium
+    )
+    Judge_Analysis
+    (
+        type = richtext
+        displayname = "Judge Analysis"
+        height = 160px
+        toolbar = disable
+        row = 3
+        column = 2
+        width = medium
+    )
+    Consensus_And_Disagreement
+    (
+        type = richtext
+        displayname = "Consensus and Disagreement"
+        height = 160px
+        toolbar = disable
+        row = 3
+        column = 1
+        width = medium
+    )
+    Tie_Break_Explanation
+    (
+        type = richtext
+        displayname = "Tie-Break Explanation"
+        height = 160px
+        toolbar = disable
+        row = 3
+        column = 2
+        width = medium
+    )
+    Diagnostics_Section
+    (
+        type = section
+        displayname = "Response and Diagnostics"
+        visibility = true
+        row = 4
+        column = 1
+    )
+    Full_AI_Response
+    (
+        type = textarea
+        displayname = "Full AI Response"
+        height = 220px
+        row = 4
+        column = 1
+        width = medium
+    )
+    Failure_Message
+    (
+        type = textarea
+        displayname = "Failure Message"
+        height = 120px
+        row = 4
+        column = 2
+        width = medium
+    )
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Run Analysis"
+                tooltip = "Validate complete voting and judging data, then request an explainable prediction"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

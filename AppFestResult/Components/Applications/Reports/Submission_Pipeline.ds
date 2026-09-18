@@ -1,0 +1,29 @@
+kanban Submission_Pipeline
+{
+    displayName = "Submission Pipeline"
+    show all rows from Applications
+    (
+        App_Name
+        Participant
+        Tagline
+        Submission_Status
+        Readiness_Percent
+        Catalyst_Connected
+    )
+    filters
+    (
+        Participant
+        Catalyst_Connected
+    )
+    sort by
+    (
+        Readiness_Percent descending
+    )
+    options
+    (
+        display field = Submission_Status
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

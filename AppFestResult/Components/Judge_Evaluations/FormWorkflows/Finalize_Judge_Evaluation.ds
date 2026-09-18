@@ -1,0 +1,21 @@
+Finalize_Judge_Evaluation as "Finalize Judge Evaluation Total"
+{
+    type = form
+    form = Judge_Evaluations
+    record event = on add or edit
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Weighted_Total = input.UI_Score * 1.5 + input.Navigation_Usability_Score * 1.5 + input.Core_Functionality_Score * 2 + input.Innovation_Score * 1.5 + input.Beyond_Creator_Proof_Score * 2 + input.Catalyst_Integrations_Score + input.Presentation_Score * 0.5;
+                if(input.Evaluation_Status == "Submitted" && input.Submitted_At == null)
+                {
+                    input.Submitted_At = zoho.currenttime;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,25 @@
+list Published_Leaderboard
+{
+    displayName = "Published Leaderboard"
+    show all rows from Final_Rankings [Decision_Status == "Published"]
+    (
+        Ranking_Version
+        Rank_1
+        Rank_2
+        Rank_3
+        Rank_4
+        Rank_5
+        Rank_6
+        Rank_7
+        Rank_8
+        Rank_9
+        Winner_Rationale
+        Ranking_Rationale
+        Published_At
+        Is_Current
+    )
+    sort by
+    (
+        Published_At descending
+    )
+}

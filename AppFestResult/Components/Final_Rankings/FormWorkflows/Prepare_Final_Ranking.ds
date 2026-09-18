@@ -1,0 +1,52 @@
+Prepare_Final_Ranking as "Prepare Final Ranking"
+{
+    type = form
+    form = Final_Rankings
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.ID == null)
+                {
+                    input.Drafted_By = zoho.loginuser;
+                    input.Drafted_At = zoho.currenttime;
+                    input.Decision_Status = "Draft";
+                    input.Is_Current = true;
+                    disable Drafted_By;
+                    disable Drafted_At;
+                    disable Published_At;
+                }
+                else if(input.Decision_Status == "Published")
+                {
+                    disable Drafted_By;
+                    disable Drafted_At;
+                    disable Rank_1;
+                    disable Rank_2;
+                    disable Rank_3;
+                    disable Rank_4;
+                    disable Rank_5;
+                    disable Rank_6;
+                    disable Rank_7;
+                    disable Rank_8;
+                    disable Rank_9;
+                    disable Winner_Rationale;
+                    disable Ranking_Rationale;
+                    disable Decision_Status;
+                    disable Based_On_AI_Analysis;
+                    disable Published_At;
+                    disable Is_Current;
+                }
+                else
+                {
+                    disable Drafted_By;
+                    disable Drafted_At;
+                    disable Published_At;
+                }
+            )
+        }
+    }
+}

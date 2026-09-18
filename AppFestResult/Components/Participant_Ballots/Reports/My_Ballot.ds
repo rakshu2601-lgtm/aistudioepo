@@ -1,0 +1,24 @@
+default list My_Ballot
+{
+    displayName = "My Ballot"
+    show all rows from Participant_Ballots [Voter_Email == zoho.loginuser]
+    (
+        Voter
+        Voter_Email
+        Rank_1
+        Rank_2
+        Rank_3
+        Rank_4
+        Rank_5
+        Rank_6
+        Rank_7
+        Rank_8
+        Best_App_Explanation
+        Submitted_At
+        Ballot_Status
+    )
+    sort by
+    (
+        Submitted_At descending
+    )
+}

@@ -1,0 +1,47 @@
+Validate_Challenge_Settings as "Validate Challenge Settings"
+{
+    type = form
+    form = Challenge_Settings
+    record event = on add or edit
+    description = "Enforces a single current settings record, chronological windows, roster readiness, and forward-only phase transitions."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.Current_Record == true && Challenge_Settings[Current_Record == true && ID != input.ID].count() > 0)
+                {
+                    alert "Only one Challenge Settings record can be marked current.";
+                    cancel submit;
+                }
+                if(input.Challenge_Start >= input.Challenge_End)
+                {
+                    alert "Challenge End must be after Challenge Start.";
+                    cancel submit;
+                }
+                if(input.Challenge_End > input.Voting_Opens)
+                {
+                    alert "Voting Opens must be on or after Challenge End.";
+                    cancel submit;
+                }
+                if(input.Voting_Opens >= input.Voting_Closes)
+                {
+                    alert "Voting Closes must be after Voting Opens.";
+                    cancel submit;
+                }
+                if(input.Voting_Closes > input.Judging_Closes)
+                {
+                    alert "Judging Closes must be on or after Voting Closes.";
+                    cancel submit;
+                }
+                if(input.Showcase_Date_Time != null && input.Showcase_Date_Time < input.Judging_Closes)
+                {
+                    alert "Showcase Date Time must be on or after Judging Closes.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

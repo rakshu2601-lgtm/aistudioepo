@@ -1,0 +1,22 @@
+Validate_Audit_Log_Add as "Validate Audit Log Add"
+{
+    type = form
+    form = Audit_Log
+    record event = on add
+    description = "Denies direct audit event creation by participant and judge profiles; trusted critical workflows and administrators may insert audit events."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(thisapp.permissions.isUserInProfile("Participant") || thisapp.permissions.isUserInProfile("Judge"))
+                {
+                    alert "Audit events can only be inserted by trusted application workflows.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

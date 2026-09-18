@@ -1,0 +1,19 @@
+list Voting_Completion
+{
+    displayName = "Voting Completion"
+    show all rows from Participant_Ballots
+    (
+        Voter
+        Submitted_At
+        Ballot_Status
+    )
+    filters
+    (
+        Voter
+        Ballot_Status
+    )
+    sort by
+    (
+        Voter ascending
+    )
+}

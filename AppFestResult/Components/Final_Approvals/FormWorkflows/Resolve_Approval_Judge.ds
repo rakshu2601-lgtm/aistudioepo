@@ -1,0 +1,42 @@
+Resolve_Approval_Judge as "Resolve and Lock Approval Judge"
+{
+    type = form
+    form = Final_Approvals
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                judge_records = Members[Login_Email == zoho.loginuser && Member_Type == "Judge" && Is_Active == true && (Member_Name == "Siddarth" || Member_Name == "Monica" || Member_Name == "Brandon")];
+                if(judge_records.count() == 1)
+                {
+                    if(input.Judge == null)
+                    {
+                        input.Judge = judge_records.ID;
+                        input.Judge_Email = zoho.loginuser;
+                    }
+                    if(input.Judge != judge_records.ID || input.Judge_Email != zoho.loginuser)
+                    {
+                        alert "You cannot view or edit another judge's approval through this form.";
+                        disable Final_Ranking;
+                        disable Decision;
+                        disable Approval_Comment;
+                    }
+                }
+                else
+                {
+                    alert "No single active named consensus judge is mapped to your login.";
+                    disable Final_Ranking;
+                    disable Decision;
+                    disable Approval_Comment;
+                }
+                disable Judge;
+                disable Judge_Email;
+                disable Decided_At;
+            )
+        }
+    }
+}

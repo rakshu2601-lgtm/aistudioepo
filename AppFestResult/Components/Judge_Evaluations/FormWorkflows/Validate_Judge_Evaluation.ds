@@ -1,0 +1,45 @@
+Validate_Judge_Evaluation as "Validate Judge Evaluation"
+{
+    type = form
+    form = Judge_Evaluations
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                invalid_score = input.UI_Score < 1 || input.UI_Score > 10 || input.Navigation_Usability_Score < 1 || input.Navigation_Usability_Score > 10 || input.Core_Functionality_Score < 1 || input.Core_Functionality_Score > 10 || input.Innovation_Score < 1 || input.Innovation_Score > 10 || input.Beyond_Creator_Proof_Score < 1 || input.Beyond_Creator_Proof_Score > 10 || input.Catalyst_Integrations_Score < 1 || input.Catalyst_Integrations_Score > 10 || input.Presentation_Score < 1 || input.Presentation_Score > 10;
+                if(invalid_score)
+                {
+                    alert "Every category score must be between 1 and 10.";
+                    cancel submit;
+                }
+                judge_records = Members[Login_Email == zoho.loginuser && Member_Type == "Judge" && Is_Active == true];
+                if(judge_records.count() != 1 || input.Judge != judge_records.ID || input.Judge_Email != zoho.loginuser)
+                {
+                    alert "Judge identity must match the single active judge mapped to the logged-in user.";
+                    cancel submit;
+                }
+                duplicate_count = Judge_Evaluations[Judge == input.Judge && Application == input.Application && ID != input.ID].count();
+                if(duplicate_count > 0)
+                {
+                    alert "Only one evaluation is allowed per judge and application.";
+                    cancel submit;
+                }
+                settings = Challenge_Settings[Current_Record == true];
+                if(settings.count() != 1 || settings.Challenge_Status != "Judging Open" || zoho.currenttime > settings.Judging_Closes)
+                {
+                    alert "Evaluations may be saved only while the judging phase and window are open.";
+                    cancel submit;
+                }
+                if(input.Evaluation_Status == "Submitted" && (input.Strengths == null || input.Strengths.trim() == "" || input.Risks_Concerns == null || input.Risks_Concerns.trim() == ""))
+                {
+                    alert "Strengths and risks/concerns are required before submission.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

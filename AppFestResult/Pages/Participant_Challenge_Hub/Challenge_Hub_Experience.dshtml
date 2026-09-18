@@ -1,0 +1,164 @@
+<%
+loginEmail = zoho.loginuserid;
+memberName = zoho.loginuser;
+memberRows = Members[Login_Email == loginEmail && Member_Type == "Participant" && Is_Active == true];
+if(memberRows.count() > 0)
+{
+  memberName = memberRows.Member_Name;
+}
+settingsRows = Challenge_Settings[Current_Record == true];
+hasSettings = settingsRows.count() > 0;
+phaseName = "Setup";
+phaseIndex = 1;
+challengeTitle = "Om.ai Beyond Limits Challenge";
+announcement = "The challenge control record is being prepared. Check back soon for the official announcement and dates.";
+countdownLabel = "Challenge setup underway";
+countdownValue = "Dates pending";
+resultsVisible = false;
+presentationMinutes = 15;
+showcaseText = "To be announced";
+if(hasSettings)
+{
+  phaseName = settingsRows.Challenge_Status;
+  challengeTitle = settingsRows.Challenge_Title;
+  announcement = settingsRows.Rules_And_Announcement;
+  resultsVisible = settingsRows.Results_Visible_To_Participants;
+  presentationMinutes = settingsRows.Presentation_Minutes;
+  if(settingsRows.Showcase_Date_Time != null)
+  {
+    showcaseText = settingsRows.Showcase_Date_Time.toString("dd MMM yyyy, hh:mm a");
+  }
+  targetDate = settingsRows.Challenge_End;
+  countdownLabel = "Until submissions close";
+  if(phaseName == "Voting Open")
+  {
+    phaseIndex = 3;
+    targetDate = settingsRows.Voting_Closes;
+    countdownLabel = "Until voting closes";
+  }
+  else if(phaseName == "Judging Open")
+  {
+    phaseIndex = 4;
+    targetDate = settingsRows.Judging_Closes;
+    countdownLabel = "Until judging closes";
+  }
+  else if(phaseName == "Finalization")
+  {
+    phaseIndex = 5;
+    targetDate = settingsRows.Judging_Closes;
+    countdownLabel = "Final consensus in progress";
+  }
+  else if(phaseName == "Results Published")
+  {
+    phaseIndex = 6;
+    countdownLabel = "Results are published";
+  }
+  else if(phaseName == "Submission Open")
+  {
+    phaseIndex = 2;
+  }
+  if(phaseName != "Results Published")
+  {
+    daysLeft = zoho.currentdate.daysBetween(targetDate.toDate());
+    if(daysLeft < 0)
+    {
+      daysLeft = 0;
+    }
+    countdownValue = daysLeft + " day(s) remaining";
+  }
+  else
+  {
+    countdownValue = "Reveal ready";
+  }
+}
+myApps = Applications[Created_By_Email == loginEmail];
+hasApp = myApps.count() > 0;
+appName = "Your app concept";
+appStatus = "Not started";
+readiness = 0;
+appActionUrl = "#Form:Applications";
+appActionText = "Create submission";
+appActionIcon = "ui-1-simple-add";
+if(hasApp)
+{
+  appName = myApps.App_Name;
+  appStatus = myApps.Submission_Status;
+  if(myApps.Readiness_Percent != null)
+  {
+    readiness = myApps.Readiness_Percent;
+  }
+  appActionUrl = "#Form:Applications?recLinkID=" + myApps.ID + "&viewLinkName=Application_Gallery";
+  appActionText = "Edit submission";
+  appActionIcon = "ui-1-edit-72";
+}
+myBallots = Participant_Ballots[Voter_Email == loginEmail];
+hasBallot = myBallots.count() > 0;
+ballotStatus = "Not started";
+ballotDone = false;
+ballotUrl = "#Form:Participant_Ballots";
+if(hasBallot)
+{
+  ballotStatus = myBallots.Ballot_Status;
+  ballotUrl = "#Form:Participant_Ballots?recLinkID=" + myBallots.ID + "&viewLinkName=My_Ballot";
+  if(ballotStatus == "Submitted" || ballotStatus == "Locked")
+  {
+    ballotDone = true;
+  }
+}
+slots = Presentation_Slots[ID != 0] sort by Slot_Start asc;
+%>
+<style>
+/* zcs-global utility subset used by this page */
+:root{--zcs-theme-brand-color:var(--zcs_brand_color);--zcs-white-color:#fff;--zcs-primary-text-color:var(--zcs_primary_text_color);--zcs-secondary-text-color:var(--zcs_secondary_text_color);--zcs-teritiary-text-color:var(--zcs_tertiary_text_color)}
+.zcs-flex{display:flex}.zcs-inline-flex{display:inline-flex}.zcs-align-items-center{align-items:center}.zcs-justify-center{justify-content:center}.zcs-justify-space-between{justify-content:space-between}.zcs-direction-column{flex-direction:column}.zcs-gap-4{gap:.25rem}.zcs-gap-6{gap:.375rem}.zcs-gap-8{gap:.5rem}.zcs-gap-16{gap:1rem}.zcs-p-0{padding:0}.zcs-p-16{padding:1rem}.zcs-px-10{padding-left:.625rem;padding-right:.625rem}.zcs-px-16{padding-left:1rem;padding-right:1rem}.zcs-py-2{padding-top:.125rem;padding-bottom:.125rem}.zcs-py-8{padding-top:.5rem;padding-bottom:.5rem}.zcs-py-12{padding-top:.75rem;padding-bottom:.75rem}.zcs-m-0{margin:0}.zcs-mt-8{margin-top:.5rem}.zcs-mt-12{margin-top:.75rem}.zcs-rounded-sm{border-radius:.25rem}.zcs-rounded-md{border-radius:.375rem}.zcs-rounded-half{border-radius:50%}.zcs-box-border{box-sizing:border-box}.zcs-font-12{font-size:.75rem}.zcs-font-14{font-size:.875rem}.zcs-font-18{font-size:1.125rem}.zcs-font-normal{font-weight:400}.zcs-font-medium{font-weight:500}.zcs-font-semibold{font-weight:600}.zcs-font-bold{font-weight:700}.zcs-lh-body{line-height:1.5}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-tertiary{color:var(--zcs-teritiary-text-color)}.zcs-text-center{text-align:center}.zcs-relative{position:relative}.zcs-w-full{width:100%}.zcs-col-common{flex:1 1 0}.zcs-no-shrink{flex-shrink:0}
+.zcs-button{width:auto;min-width:5rem;min-height:36px;text-decoration:none}.zcs-primary-button{background:var(--zcs_brand_color);color:var(--zcs_brand_foreground_color)}.zcs-primary-outline-button{border:1px solid var(--zcs_brand_color);background:#fff;color:var(--zcs_brand_color)}.zcs-primary-button:hover{background:var(--zcs_brand_dark_color)}.zcs-primary-outline-button:hover{background:var(--zcs_component_hover_color)}.zcs-button:focus{outline:3px solid #fff;outline-offset:2px}.zcs-button-icon{width:16px;max-height:16px}
+.zcs-badge{width:auto}.zcs-badge-filled-outline{border:1px solid}.zcs-badge-green{background:#E4FCF3;border-color:#08764e;color:#08764e}.zcs-badge-blue{background:#E8EFFF;border-color:#174fbd;color:#174fbd}.zcs-badge-yellow{background:#FCF4E6;border-color:#895700;color:#895700}.zcs-badge-grey{background:#eee;border-color:#242424;color:#242424}
+.zcs-progress-bar{height:8px;background:var(--zcs_component_hover_color);overflow:hidden}.zcs-progress-bar-indicator{height:inherit;border-radius:inherit;background:var(--zcs_brand_color)}
+.zcs-toast{border:1px solid var(--zcs_brand_color);background:var(--zcs_component_hover_color)}
+.hub{font-family:Inter,Arial,sans-serif;background:linear-gradient(180deg,#f5f7ff 0,#fff 28%,#f7f8fc 100%);color:#14152d;padding:clamp(12px,2.4vw,32px);box-sizing:border-box;overflow:hidden}.hub *{box-sizing:border-box}.hero{position:relative;min-height:340px;border-radius:28px;padding:clamp(26px,5vw,64px);display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,.7fr);gap:30px;align-items:center;color:#fff;overflow:hidden;background:radial-gradient(circle at 82% 15%,rgba(129,90,246,.72),transparent 26%),radial-gradient(circle at 10% 100%,rgba(0,202,211,.34),transparent 34%),linear-gradient(125deg,#11133c,#24206b 52%,#37196c)}.hero:before,.hero:after{content:"";position:absolute;border:1px solid rgba(255,255,255,.18);border-radius:50%;animation:orbit 14s linear infinite}.hero:before{width:420px;height:420px;right:-150px;top:-205px}.hero:after{width:250px;height:250px;right:20px;top:-125px;animation-direction:reverse}.eyebrow{letter-spacing:.15em;text-transform:uppercase;font-size:12px;font-weight:800;color:#c9f9ff}.hero h1{font-size:clamp(36px,6vw,72px);line-height:.98;margin:14px 0 18px;max-width:760px}.hero p{font-size:clamp(16px,2vw,20px);line-height:1.55;max-width:680px;color:#e9eaff;margin:0}.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}.hero .zcs-primary-button{background:#fff;color:#191548}.hero .zcs-primary-outline-button{border-color:#b9f8ff;background:transparent;color:#fff}.trophy-wrap{position:relative;display:flex;justify-content:center;align-items:center;min-height:230px}.trophy-halo{position:absolute;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,#ffe9a6 0,rgba(255,209,91,.24) 45%,transparent 70%);animation:breathe 3.8s ease-in-out infinite}.trophy{position:relative;font-size:118px;color:#ffd45d;filter:drop-shadow(0 20px 20px rgba(0,0,0,.3));animation:float 4s ease-in-out infinite}.personal{position:absolute;right:22px;top:20px}.countdown{position:absolute;right:clamp(18px,3vw,42px);bottom:clamp(18px,3vw,38px);background:rgba(8,10,38,.76);border:1px solid rgba(255,255,255,.24);backdrop-filter:blur(8px);border-radius:16px;padding:14px 18px;min-width:230px}.countdown strong{display:block;font-size:22px;margin-top:3px}.section{margin-top:28px}.section-head{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:14px}.section h2{font-size:clamp(24px,3vw,34px);margin:0}.section-kicker{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--zcs_brand_color)}.card{background:#fff;border:1px solid #e2e5ef;border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(25,27,61,.06)}.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.phase-shell{overflow-x:auto;padding:26px 18px 18px}.zcs-stepper-wrapper{min-width:760px}.zcs-stepper-wrapper ul{list-style:none;display:flex}.zcs-stepper{display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;position:relative}.zcs-stepper-status{width:36px;height:36px;background:#fff;border:2px solid #c8ccda;z-index:1}.zcs-stepper:not(:last-child):before{content:"";position:absolute;top:18px;left:50%;width:100%;border-top:2px solid #c8ccda}.zcs-stepper.done .zcs-stepper-status,.zcs-stepper.active .zcs-stepper-status{background:var(--zcs_brand_color);border-color:var(--zcs_brand_color);color:var(--zcs_brand_foreground_color)}.zcs-stepper.done:not(:last-child):before{border-color:var(--zcs_brand_color)}.zcs-stepper.active .zcs-stepper-status{box-shadow:0 0 0 6px var(--zcs_component_hover_color);animation:breathe 2s ease-in-out infinite}.zcs-stepper-text{font-size:13px;font-weight:650}.announcement{font-size:15px;line-height:1.65;color:#35364b}.stealth-list{display:grid;gap:12px;margin:16px 0 0;padding:0;list-style:none}.stealth-list li{display:flex;gap:11px;align-items:flex-start}.stealth-list i{color:#5e35b1;margin-top:3px}.readiness-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.readiness-value{font-size:40px;font-weight:800;color:var(--zcs_brand_color)}.action-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.vote-lock{display:flex;gap:14px;align-items:center}.status-orb{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;background:#eef0f7;color:#555a70}.status-orb.done{background:#e4fcf3;color:#08764e}.schedule{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.slot{position:relative;overflow:hidden}.slot:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--zcs_brand_color)}.slot-time{font-size:13px;color:#62657a;font-weight:700}.slot h3{margin:8px 0 5px;font-size:18px}.slot-meta{color:#55586c;font-size:14px;line-height:1.5}.weights{display:grid;gap:12px}.weight-row{display:grid;grid-template-columns:minmax(150px,1fr) 3fr 44px;gap:12px;align-items:center;font-size:14px}.weight-track{height:9px;border-radius:9px;background:#edf0f7;overflow:hidden}.weight-fill{height:100%;background:linear-gradient(90deg,var(--zcs_brand_color),#6f67e8);border-radius:inherit}.catalyst{background:linear-gradient(120deg,#fff8e5,#fff 60%);border-color:#f1c44f;display:flex;gap:18px;align-items:center}.catalyst-icon{font-size:42px;color:#a96a00}.result-lock{position:relative;text-align:center;padding:40px 24px;background:linear-gradient(135deg,#17183f,#29225d);color:#fff;border:0}.result-lock i{font-size:42px;color:#ffd45d}.result-lock h2{margin:12px 0 8px}.result-lock p{color:#e6e6f5;max-width:600px;margin:0 auto 20px}.empty{text-align:center;padding:34px 20px;color:#5e6175}.empty i{display:block;font-size:38px;color:#8a8da0;margin-bottom:10px}@keyframes float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-16px) rotate(2deg)}}@keyframes breathe{0%,100%{transform:scale(1);opacity:.78}50%{transform:scale(1.08);opacity:1}}@keyframes orbit{to{transform:rotate(360deg)}}@media(max-width:980px){.hero{grid-template-columns:1fr}.trophy-wrap{min-height:180px;justify-content:flex-end}.trophy{font-size:88px}.trophy-halo{width:170px;height:170px}.countdown{left:22px;right:auto}.grid-3,.schedule{grid-template-columns:repeat(2,1fr)}}@media(max-width:680px){.hub{padding:10px}.hero{border-radius:20px;padding:24px 20px 150px}.personal{position:static;margin-bottom:15px}.trophy-wrap{display:none}.countdown{left:20px;right:20px;bottom:22px}.grid-2,.grid-3,.schedule{grid-template-columns:1fr}.section-head{align-items:flex-start;flex-direction:column}.weight-row{grid-template-columns:1fr 44px}.weight-track{grid-column:1/3;grid-row:2}.catalyst{align-items:flex-start}.hero-actions .zcs-button{width:100%}}@media(prefers-reduced-motion:reduce){.hero:before,.hero:after,.trophy,.trophy-halo,.zcs-stepper.active .zcs-stepper-status{animation:none!important}.hub *{scroll-behavior:auto!important;transition:none!important}}
+</style>
+<main class="hub">
+  <section class="hero" aria-labelledby="challenge-title">
+    <div>
+      <div class="personal zcs-badge zcs-badge-filled-outline zcs-badge-blue zcs-inline-flex zcs-align-items-center zcs-gap-8 zcs-rounded-sm zcs-px-10 zcs-py-2"><i class="zc-li-outline users-single-05"></i><span><%=memberName%></span></div>
+      <div class="eyebrow">Om.ai Beyond Limits</div>
+      <h1 id="challenge-title"><%=challengeTitle%></h1>
+      <p>Build past the expected. Prove what is possible, protect the surprise, and prepare your fifteen-minute moment.</p>
+      <div class="hero-actions">
+        <a class="zcs-button zcs-primary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md" href="<%=appActionUrl%>"><i class="zcs-button-icon zc-li-outline <%=appActionIcon%>"></i><span><%=appActionText%></span></a>
+        <a class="zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md" href="<%=ballotUrl%>"><i class="zcs-button-icon zc-li-outline ui-1-check-square-11"></i><span>Complete ballot</span></a>
+      </div>
+    </div>
+    <div class="trophy-wrap" aria-hidden="true"><div class="trophy-halo"></div><i class="trophy zc-li-solid sport-trophy"></i></div>
+    <div class="countdown" role="status" aria-live="polite"><span><%=countdownLabel%></span><strong><%=countdownValue%></strong><small>Server snapshot: <%=zoho.currenttime.toString("dd MMM, hh:mm a")%></small></div>
+  </section>
+
+  <section class="section" aria-labelledby="journey-title"><div class="section-head"><div><div class="section-kicker">Your journey</div><h2 id="journey-title">Challenge phase</h2></div><div class="zcs-badge zcs-badge-filled-outline zcs-badge-blue zcs-inline-flex zcs-align-items-center zcs-gap-8 zcs-rounded-sm zcs-px-10 zcs-py-2"><i class="zc-li-outline loader-dots-06"></i><span><%=phaseName%></span></div></div>
+    <div class="card phase-shell"><div class="zcs-stepper-wrapper"><ul class="zcs-flex zcs-p-0 zcs-m-0">
+    <% phases = {"Setup","Submission","Voting","Judging","Finalization","Results"}; for each index i in phases { stepNo = i + 1; stepClass = ""; if(stepNo < phaseIndex){stepClass="done";}else if(stepNo == phaseIndex){stepClass="active";} %>
+      <li class="zcs-stepper zcs-col-common <%=stepClass%>"><div class="zcs-stepper-status zcs-flex zcs-align-items-center zcs-justify-center zcs-rounded-half"><%if(stepNo < phaseIndex){%><i class="zc-li-outline ui-1-check-small"></i><%}else{%><span><%=stepNo%></span><%}%></div><span class="zcs-stepper-text"><%=phases.get(i)%></span></li>
+    <% } %></ul></div></div>
+  </section>
+
+  <section class="section grid-2" aria-label="Announcement and stealth rules">
+    <article class="card"><div class="section-kicker">Challenge announcement</div><h2>Mission briefing</h2><div class="announcement"><%=announcement%></div></article>
+    <article class="card"><div class="section-kicker">Stealth mode</div><h2>Keep the reveal fair</h2><ul class="stealth-list"><li><i class="zc-li-outline ui-1-lock-circle"></i><span>Do not share your app concept, screenshots, demo, or judging evidence with other participants before showcase.</span></li><li><i class="zc-li-outline ui-1-eye-ban-18"></i><span>Your ballot is private. This page shows only your completion status and never another participant's choices.</span></li><li><i class="zc-li-outline users-multiple-19"></i><span>Ask administrators about logistics without soliciting ranking commitments or coordinated votes.</span></li></ul></article>
+  </section>
+
+  <section class="section grid-2" aria-label="Personal progress">
+    <article class="card"><div class="readiness-top"><div><div class="section-kicker">My application</div><h2><%=appName%></h2><div class="zcs-badge zcs-badge-filled-outline <%if(appStatus == "Submitted" || appStatus == "Locked") {%>zcs-badge-green<%}else{%>zcs-badge-yellow<%}%> zcs-inline-flex zcs-align-items-center zcs-gap-8 zcs-rounded-sm zcs-px-10 zcs-py-2"><i class="zc-li-outline <%if(appStatus == "Submitted" || appStatus == "Locked") {%>ui-1-check-circle-08<%}else{%>ui-2-time<%}%>"></i><span><%=appStatus%></span></div></div><div class="readiness-value"><%=readiness%>%</div></div>
+      <div class="zcs-progress-bar-wrapper zcs-flex zcs-direction-column zcs-gap-6 zcs-mt-12"><div class="zcs-progress-bar zcs-rounded-sm"><div class="zcs-progress-bar-indicator" style="width:<%=readiness%>%;"></div></div><p class="zcs-flex zcs-justify-space-between zcs-font-12 zcs-font-medium zcs-m-0"><span>Submission readiness</span><span>Target 100%</span></p></div>
+      <div class="action-row"><a class="zcs-button zcs-primary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md" href="<%=appActionUrl%>"><i class="zcs-button-icon zc-li-outline <%=appActionIcon%>"></i><span><%=appActionText%></span></a><a class="zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md" href="#Report:Application_Gallery"><i class="zcs-button-icon zc-li-outline ui-1-eye-17"></i><span>View gallery</span></a></div>
+    </article>
+    <article class="card"><div class="section-kicker">Private peer ballot</div><h2>Voting status</h2><div class="vote-lock"><div class="status-orb <%if(ballotDone){%>done<%}%>"><i class="zc-li-outline <%if(ballotDone){%>ui-1-check-circle-08<%}else{%>ui-1-lock-circle<%}%>"></i></div><div><strong><%=ballotStatus%></strong><p class="zcs-mt-8">Rank all eight competing apps. Only your own status is shown here.</p></div></div><div class="action-row"><a class="zcs-button zcs-primary-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md" href="<%=ballotUrl%>"><i class="zcs-button-icon zc-li-outline ui-1-check-square-11"></i><span><%if(ballotDone){%>Review my ballot<%}else{%>Complete ballot<%}%></span></a><a class="zcs-button zcs-primary-outline-button zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md" href="#Report:Voting_Completion"><i class="zcs-button-icon zc-li-outline business-chart-bar-32"></i><span>Completion overview</span></a></div></article>
+  </section>
+
+  <section class="section" aria-labelledby="schedule-title"><div class="section-head"><div><div class="section-kicker">Showcase</div><h2 id="schedule-title"><%=presentationMinutes%>-minute presentation schedule</h2></div><div class="zcs-badge zcs-badge-filled-outline zcs-badge-grey zcs-inline-flex zcs-align-items-center zcs-gap-8 zcs-rounded-sm zcs-px-10 zcs-py-2"><i class="zc-li-outline ui-1-calendar-60"></i><span><%=showcaseText%></span></div></div>
+    <%if(slots.count() == 0){%><div class="card empty"><i class="zc-li-outline ui-1-calendar-60"></i><strong>Schedule coming soon</strong><p>Presentation slots will appear here as soon as they are assigned.</p><a class="zcs-button zcs-primary-outline-button zcs-inline-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md" href="#Report:Presentation_Schedule">Open schedule report</a></div><%}else{%><div class="schedule"><%for each slot in slots{%><article class="card slot"><div class="slot-time"><%=slot.Slot_Start.toString("hh:mm a")%> - <%=slot.Slot_End.toString("hh:mm a")%></div><h3><%=slot.Application.App_Name%></h3><div class="slot-meta"><%=slot.Presenter.Member_Name%><%if(slot.Room_Or_Link != null && slot.Room_Or_Link != "") {%><br><%=slot.Room_Or_Link%><%}%></div><div class="zcs-badge zcs-badge-filled-outline zcs-badge-blue zcs-inline-flex zcs-align-items-center zcs-gap-8 zcs-rounded-sm zcs-px-10 zcs-py-2 zcs-mt-12"><i class="zc-li-outline media-1-button-circle-play"></i><span><%=slot.Presentation_Status%></span></div></article><%}%></div><%}%>
+  </section>
+
+  <section class="section grid-2" aria-label="Scoring guide"><article class="card"><div class="section-kicker">How judging works</div><h2>Categories and weights</h2><div class="weights"><% labels={"UI quality","Navigation and usability","Core functionality","Innovation","Beyond-Creator proof","Catalyst and integrations","Presentation"}; weights={15,15,20,15,20,10,5}; for each index w in labels { barWidth = weights.get(w) * 5; %><div class="weight-row"><span><%=labels.get(w)%></span><div class="weight-track"><div class="weight-fill" style="width:<%=barWidth%>%;"></div></div><strong><%=weights.get(w)%>%</strong></div><%}%></div></article>
+    <article class="card catalyst"><i class="catalyst-icon zc-li-solid nature-energy"></i><div><div class="section-kicker">Catalyst bonus signal</div><h2>Connect beyond the baseline</h2><p>Thoughtful Catalyst use and meaningful integrations strengthen the integrations category. Demonstrate why the connection matters rather than adding technology for its own sake.</p><div class="zcs-toast zcs-w-full zcs-flex zcs-gap-8 zcs-px-16 zcs-py-12 zcs-rounded-sm"><i class="zc-li-outline travel-info"></i><span>Evidence and reliability matter more than the number of services connected.</span></div></div></article></section>
+
+  <section class="section"><article class="card result-lock"><i class="zc-li-solid <%if(resultsVisible){%>sport-trophy<%}else{%>ui-1-lock-circle<%}%>"></i><h2><%if(resultsVisible){%>The results stage is open<%}else{%>The final reveal is under lock<%}%></h2><p><%if(resultsVisible){%>Consensus is complete. Enter the published results experience to celebrate every finalist.<%}else{%>The leaderboard stays hidden until the controlled publication workflow enables Results Visible To Participants. No draft ranking or judge-only data is exposed here.<%}%></p><%if(resultsVisible){%><a class="zcs-button zcs-primary-button zcs-inline-flex zcs-align-items-center zcs-justify-center zcs-gap-8 zcs-px-16 zcs-py-8 zcs-rounded-md" href="#Page:Results_Stage"><i class="zc-li-outline arrows-1-tail-right"></i><span>Enter results stage</span></a><%}else{%><div class="zcs-badge zcs-badge-filled-outline zcs-badge-yellow zcs-inline-flex zcs-align-items-center zcs-gap-8 zcs-rounded-sm zcs-px-10 zcs-py-2"><i class="zc-li-outline ui-2-time"></i><span>Awaiting unanimous publication</span></div><%}%></article></section>
+</main>

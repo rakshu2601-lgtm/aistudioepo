@@ -1,0 +1,59 @@
+Applications_Validate as "Validate Application Submission"
+{
+    type = form
+    form = Applications
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                participantRecord = Members[ID == input.Participant && Member_Type == "Participant" && Is_Active == true];
+                if(participantRecord.ID == null)
+                {
+                    alert "Select an active participant from the official roster.";
+                    cancel submit;
+                }
+                if(zoho.loginuserid != zoho.adminuserid && participantRecord.Login_Email != zoho.loginuserid)
+                {
+                    alert "The application must belong to the active participant mapped to your login email.";
+                    cancel submit;
+                }
+                duplicateCount = Applications[Participant == input.Participant && ID != input.ID].count();
+                if(duplicateCount > 0)
+                {
+                    alert "Only one application is allowed per participant.";
+                    cancel submit;
+                }
+                currentSettings = Challenge_Settings[Current_Record == true] sort by Modified_Time desc range from 0 to 0;
+                if(input.Submission_Status == "Submitted")
+                {
+                    if(currentSettings.ID == null || currentSettings.Challenge_Status != "Submission Open" || zoho.currenttime < currentSettings.Challenge_Start || zoho.currenttime > currentSettings.Challenge_End)
+                    {
+                        alert "Submissions are accepted only while the challenge submission phase and date window are open.";
+                        cancel submit;
+                    }
+                    proofText = input.Beyond_Creator_Capability.toString();
+                    feasibilityText = input.Why_Not_Feasible_In_Creator.toString();
+                    if(proofText.length() < 100 || feasibilityText.length() < 100)
+                    {
+                        alert "For submission, provide meaningful proof narratives of at least 100 characters for the beyond-Creator capability and feasibility explanation.";
+                        cancel submit;
+                    }
+                    if(input.Evidence_URL == null && input.Demo_URL == null && input.Evidence_File == null)
+                    {
+                        alert "Add at least one evidence link, demo link, or evidence file before submitting.";
+                        cancel submit;
+                    }
+                }
+                if(input.Submission_Status == "Locked" && zoho.loginuserid != zoho.adminuserid)
+                {
+                    alert "Only an administrator-controlled process may lock an application.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

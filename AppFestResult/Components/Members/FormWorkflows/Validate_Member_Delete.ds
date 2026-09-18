@@ -1,0 +1,21 @@
+Validate_Member_Delete as "Validate Member Delete"
+{
+    type = form
+    form = Members
+    record event = on delete
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(!thisapp.permissions.adminEmailIds().contains(zoho.loginuser))
+                {
+                    alert "Only an application administrator can change the official roster.";
+                    cancel delete;
+                }
+            )
+        }
+    }
+}

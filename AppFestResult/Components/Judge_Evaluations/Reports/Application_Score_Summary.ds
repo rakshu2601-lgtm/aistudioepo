@@ -1,0 +1,30 @@
+list Application_Score_Summary
+{
+    displayName = "Application Score Summary"
+    show all rows from Judge_Evaluations [Evaluation_Status == "Submitted" || Evaluation_Status == "Locked"]
+    (
+        Application
+        Weighted_Total
+        (
+            display = average
+        )
+        Evaluation_Status
+    )
+    filters
+    (
+        Application
+        Evaluation_Status
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Application ascending
+    )
+    sort by
+    (
+        Weighted_Total descending
+    )
+}

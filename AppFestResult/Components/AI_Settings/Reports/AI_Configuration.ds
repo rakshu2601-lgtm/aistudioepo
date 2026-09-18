@@ -1,0 +1,24 @@
+default list AI_Configuration
+{
+    displayName = "AI Configuration"
+    show all rows from AI_Settings
+    (
+        Setting_Name
+        Base_URL
+        Model_Name
+        Temperature
+        Max_Tokens
+        Is_Enabled
+        (
+            displaytrue = "Enabled"
+            displayfalse = "Disabled"
+        )
+        Is_Current
+        (
+            displaytrue = "Current"
+            displayfalse = "Inactive"
+        )
+        Last_Tested_At
+        Last_Test_Status
+    )
+}

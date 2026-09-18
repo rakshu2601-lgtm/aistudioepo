@@ -1,0 +1,88 @@
+Advance_Challenge_Phase as "Advance Challenge Phase"
+{
+    type = functions
+    form = Challenge_Settings
+    execution type = for each record
+    description = "Safely advances the current challenge by one phase for administrators and judges."
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                is_authorized = false;
+                current_profile = thisapp.permissions.loginUserProfile();
+                if(current_profile == "Administrator" || current_profile == "Judge")
+                {
+                    is_authorized = true;
+                }
+                if(is_authorized == false)
+                {
+                    phase_result_message = "Only authorized administrators or judges may advance the challenge phase.";
+                }
+                else if(input.Current_Record != true)
+                {
+                    phase_result_message = "Only the current Challenge Settings record may be advanced.";
+                }
+                else if(input.Challenge_Status == "Results Published")
+                {
+                    phase_result_message = "Results Published is the final challenge phase.";
+                }
+                else if(Members[Is_Active == true && (Login_Email == null || Login_Email == "")].count() > 0)
+                {
+                    phase_result_message = "Map a login email for every active participant and judge before advancing the phase.";
+                }
+                else
+                {
+                    previous_status = input.Challenge_Status;
+                    next_status = "";
+                    if(previous_status == "Setup")
+                    {
+                        next_status = "Submission Open";
+                    }
+                    else if(previous_status == "Submission Open")
+                    {
+                        next_status = "Voting Open";
+                    }
+                    else if(previous_status == "Voting Open")
+                    {
+                        next_status = "Judging Open";
+                    }
+                    else if(previous_status == "Judging Open")
+                    {
+                        next_status = "Finalization";
+                    }
+                    else if(previous_status == "Finalization")
+                    {
+                        next_status = "Results Published";
+                    }
+                    if(next_status == "")
+                    {
+                        phase_result_message = "The current phase cannot be advanced.";
+                    }
+                    else
+                    {
+                        input.Challenge_Status = next_status;
+                        if(next_status == "Results Published")
+                        {
+                            input.Results_Visible_To_Participants = true;
+                        }
+                        insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuser
+                            Event_Type = "Phase Change"
+                            Related_Form = "Challenge_Settings"
+                            Related_Record_ID = input.ID.toString()
+                            Event_Summary = "Challenge phase advanced from " + previous_status + " to " + next_status
+                            Before_Value = previous_status
+                            After_Value = next_status
+                            Severity = "Info"
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

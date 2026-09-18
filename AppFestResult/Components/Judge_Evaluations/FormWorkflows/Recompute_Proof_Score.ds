@@ -1,0 +1,19 @@
+Recompute_Proof_Score as "Recompute Total from Proof Score"
+{
+    type = form
+    form = Judge_Evaluations
+    record event = on add or edit
+    on user input of Beyond_Creator_Proof_Score
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(input.UI_Score != null && input.Navigation_Usability_Score != null && input.Core_Functionality_Score != null && input.Innovation_Score != null && input.Beyond_Creator_Proof_Score != null && input.Catalyst_Integrations_Score != null && input.Presentation_Score != null)
+                {
+                    input.Weighted_Total = input.UI_Score * 1.5 + input.Navigation_Usability_Score * 1.5 + input.Core_Functionality_Score * 2 + input.Innovation_Score * 1.5 + input.Beyond_Creator_Proof_Score * 2 + input.Catalyst_Integrations_Score + input.Presentation_Score * 0.5;
+                }
+            )
+        }
+    }
+}

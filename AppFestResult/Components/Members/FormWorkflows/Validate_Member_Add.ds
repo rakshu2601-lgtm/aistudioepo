@@ -1,0 +1,26 @@
+Validate_Member_Add as "Validate Member Add"
+{
+    type = form
+    form = Members
+    record event = on add
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if(!thisapp.permissions.adminEmailIds().contains(zoho.loginuser))
+                {
+                    alert "Only an application administrator can change the official roster.";
+                    cancel submit;
+                }
+                if(input.Is_Active == true && Members[Member_Name == input.Member_Name && Is_Active == true].count() > 0)
+                {
+                    alert(Member_Name, "An active member with this name already exists.");
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

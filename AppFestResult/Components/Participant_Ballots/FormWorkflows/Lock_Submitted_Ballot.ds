@@ -1,0 +1,21 @@
+Lock_Submitted_Ballot as "Lock Submitted Ballot"
+{
+    type = form
+    form = Participant_Ballots
+    record event = on add or edit
+
+    on success
+    {
+        actions ( Ballot_Status == "Submitted" )
+        {
+            custom deluge script
+            (
+                update Participant_Ballots[ID == input.ID]
+                [
+                    Submitted_At = zoho.currenttime
+                    Ballot_Status = "Locked"
+                ];
+            )
+        }
+    }
+}
